@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 45
-updated_at: unix:1791565597
+map_version: 46
+updated_at: unix:1791566615
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -104,14 +104,15 @@ topics:
   - declaration-persistence-guide
   - definition-plans-guide
   - durable-execution-admission
+  - durable-execution-dispatch
   - kubernetes-adapter-guide
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - sandbox-process-supervisor
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-6613ff452407cf77e82499f6348d46c28cbe36a7823d90033e79acf632b64564.yaml
-  digest: 6613ff452407cf77e82499f6348d46c28cbe36a7823d90033e79acf632b64564
+  ref: topics/topic-875b9380866e9d56-216a5521a508fe793beeaaec445b62fae7684af527c18d54550cd8d057ce75c5.yaml
+  digest: 216a5521a508fe793beeaaec445b62fae7684af527c18d54550cd8d057ce75c5
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -135,12 +136,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 29
+  omitted_through: 30
   recent:
-  - version: 30
-    action: source.add
-    actor: cli
-    summary: Added source 'definition-plans-guide' to topic 'development'.
   - version: 31
     action: source.update
     actor: cli
@@ -201,3 +198,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'durable-execution-admission' to topic 'development'.
+  - version: 46
+    action: source.add
+    actor: cli
+    summary: Added source 'durable-execution-dispatch' to topic 'development'.

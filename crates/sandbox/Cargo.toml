@@ -9,6 +9,7 @@ license.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
+getrandom.workspace = true
 rustix.workspace = true
 tokio = { workspace = true, features = ["signal"] }
 

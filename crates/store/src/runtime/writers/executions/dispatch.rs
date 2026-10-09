@@ -1,5 +1,7 @@
 //! Trusted worker journal API. No Kubernetes mutation or process launch here.
+mod startup;
 use super::*;
+pub use startup::{ExecutionStartupAttempt, ExecutionStartupGrant};
 use std::time::{Duration, Instant};
 
 /// Fixed dispatch inputs and current metadata for a trusted store client. Reading

@@ -6,10 +6,15 @@
 
 mod output;
 mod request;
+mod startup;
 mod supervisor;
 
 pub use output::Output;
 pub use request::{MAX_REQUEST_BYTES, Request};
+pub use startup::{
+    Bootstrap, STARTUP_PROTOCOL, STARTUP_WAIT_MS, StartupChallenge, StartupGrant, StartupReport,
+    startup,
+};
 pub use supervisor::{Outcome, Report, run};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -17,6 +22,8 @@ pub enum Error {
     InvalidRequest,
     IsolationRequired,
     Setup,
+    StartupExpired,
+    StartupCancelled,
 }
 
 impl std::fmt::Display for Error {

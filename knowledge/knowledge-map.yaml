@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 46
-updated_at: unix:1791566615
+map_version: 47
+updated_at: unix:1791567693
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -105,14 +105,15 @@ topics:
   - definition-plans-guide
   - durable-execution-admission
   - durable-execution-dispatch
+  - execution-startup-authorization
   - kubernetes-adapter-guide
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - sandbox-process-supervisor
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-216a5521a508fe793beeaaec445b62fae7684af527c18d54550cd8d057ce75c5.yaml
-  digest: 216a5521a508fe793beeaaec445b62fae7684af527c18d54550cd8d057ce75c5
+  ref: topics/topic-875b9380866e9d56-6cd970960635b60eedb1c3d057704d287bb06dbc26753911ad850cc0a2ae979f.yaml
+  digest: 6cd970960635b60eedb1c3d057704d287bb06dbc26753911ad850cc0a2ae979f
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -136,12 +137,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 30
+  omitted_through: 31
   recent:
-  - version: 31
-    action: source.update
-    actor: cli
-    summary: Updated source 'control-openapi-schema'.
   - version: 32
     action: source.add
     actor: cli
@@ -202,3 +199,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'durable-execution-dispatch' to topic 'development'.
+  - version: 47
+    action: source.add
+    actor: cli
+    summary: Added source 'execution-startup-authorization' to topic 'development'.

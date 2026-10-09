@@ -39,3 +39,5 @@
 默认工作区共 254 项测试：115 项 PostgreSQL、20 项服务，以及原有 119 项其他测试。Cargo test、fmt/Clippy、Bazel build/test、OpenAPI 与中英文文档检查通过。完整 Qualitygate 只执行既有换行策略。T01–T43 仍全部为 `not_run`。
 
 仍须实现实际 Candidate Pod/worker、可信监督器交付、存储挂载身份核验、进程启动授权、外部 watchdog 与物理 fencing、有界输出对象、可信完成接纳和独立后台存续期。[22 监督器暂停故障](22-sandbox-supervisor.md) 不能由本地监督报告或 Kubernetes 状态解决。在取得真实运行时证据前，本日志保留不确定写入权。
+
+后续 [25 启动授权](25-execution-startup.md)已加入运行时挑战后的新鲜授权，并将传输延迟计入固定预算。实际 Pod/attach 集成仍待实现。

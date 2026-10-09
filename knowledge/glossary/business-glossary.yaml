@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: execution-startup-grant
+    domain: agent-infrastructure
+    canonical_name: ExecutionStartupGrant
+    definition: 收到可信监督器一次性挑战后，在原连接当前授权和固定派发期限内持久签发的启动响应，绑定 Pod UID 与挑战摘要；从挑战发出前计时，不可重复签发或续期，不构成进程启动、终止或物理排空证据。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/sandbox/src/startup.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/executions/dispatch/startup.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/25-execution-startup.md
   - id: execution-dispatch-intent
     domain: agent-infrastructure
     canonical_name: ExecutionDispatchIntent

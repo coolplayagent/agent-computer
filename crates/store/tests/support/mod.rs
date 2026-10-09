@@ -10,8 +10,12 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_execution_startup(&self) {
+        sqlx::raw_sql("DROP TABLE execution_startup_grants; DROP FUNCTION guard_execution_startup(); DELETE FROM _sqlx_migrations WHERE version=14;").execute(&self.pool).await.unwrap();
+    }
     /// Restore migration 12 when constructing historical upgrade fixtures.
     pub async fn remove_execution_dispatch(&self) {
+        self.remove_execution_startup().await;
         sqlx::raw_sql("DROP TABLE execution_dispatch_intents; DROP FUNCTION guard_execution_dispatch(); DROP FUNCTION complete_execution_dispatch(); DROP TRIGGER check_execution_file_completion ON candidate_writer_completions; DELETE FROM _sqlx_migrations WHERE version=13;").execute(&self.pool).await.unwrap();
         sqlx::raw_sql("ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_state_check; ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_reason_check; ALTER TABLE execution_requests ADD CHECK (state IN ('Queued','Cancelled')); ALTER TABLE execution_requests ADD CHECK (reason IN ('awaiting_runtime_dispatch','user_requested','writer_unavailable'));").execute(&self.pool).await.unwrap();
         for function in include_str!("../../migrations/0012_execution_admission.sql")

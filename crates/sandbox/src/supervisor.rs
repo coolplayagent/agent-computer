@@ -45,10 +45,10 @@ pub struct Report {
 }
 
 // This type and its constructor are private. There is no host-execution/test bypass.
-struct NamespaceInit;
+pub(crate) struct NamespaceInit;
 static STARTED: AtomicBool = AtomicBool::new(false);
 impl NamespaceInit {
-    fn check() -> Result<Self> {
+    pub(crate) fn check() -> Result<Self> {
         if process::getpid() != Pid::INIT
             || process::getuid().as_raw() != 1000
             || process::geteuid().as_raw() != 1000
@@ -115,7 +115,15 @@ impl Drop for NamespaceInit {
 pub async fn run(request: Request) -> Result<Report> {
     request.validate()?;
     let namespace = NamespaceInit::check()?;
-    let start = Instant::now();
+    run_anchored(request, namespace, Instant::now()).await
+}
+
+pub(crate) async fn run_anchored(
+    request: Request,
+    namespace: NamespaceInit,
+    start: Instant,
+) -> Result<Report> {
+    let process_start = Instant::now();
     let mut report = Report {
         version: 1,
         execution_id: request.execution_id.clone(),
@@ -154,8 +162,8 @@ pub async fn run(request: Request) -> Result<Report> {
     };
     let timeout = Duration::from_secs(request.timeout_seconds.into());
     let lease = Duration::from_millis(request.lease_budget_ms.into());
-    let deadline = start + timeout.min(lease);
-    let deadline_outcome = if lease <= timeout {
+    let deadline = (process_start + timeout).min(start + lease);
+    let deadline_outcome = if start + lease <= process_start + timeout {
         Outcome::LeaseExpired
     } else {
         Outcome::TimedOut

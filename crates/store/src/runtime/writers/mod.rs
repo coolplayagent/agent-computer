@@ -8,7 +8,8 @@ use crate::plans::types::{digest, random_id};
 use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
 pub use executions::{
     CancelExecution, ExecutionCommand, ExecutionDispatchAttempt, ExecutionDispatchIntent,
-    ExecutionLifetime, ExecutionRequest, ExecutionState, SubmitExecution,
+    ExecutionLifetime, ExecutionRequest, ExecutionStartupAttempt, ExecutionStartupGrant,
+    ExecutionState, SubmitExecution,
 };
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;

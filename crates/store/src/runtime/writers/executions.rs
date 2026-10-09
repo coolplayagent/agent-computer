@@ -2,7 +2,10 @@
 mod dispatch;
 use super::*;
 use crate::plans::DefinitionKind;
-pub use dispatch::{ExecutionDispatchAttempt, ExecutionDispatchIntent};
+pub use dispatch::{
+    ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionStartupAttempt,
+    ExecutionStartupGrant,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

@@ -39,3 +39,5 @@ Eleven new real PostgreSQL cases cover concurrent begin/cancel, one-winner dispa
 The default workspace has 254 tests: 115 PostgreSQL, 20 server, and the existing 119 other cases. Cargo tests, fmt/Clippy, Bazel build/test, OpenAPI validation and bilingual documentation checks pass. Full Qualitygate checks the existing line-ending policy only. T01–T43 remain `not_run`.
 
 Still required: an actual Candidate Pod/worker, trusted supervisor delivery, storage mount identity checks, process-start authorization, an external watchdog and physical fencing, bounded output objects, accepted completion and independent background lifetimes. The [22 suspended-init fault](22-sandbox-supervisor.md) remains unresolved by a local supervisor report or Kubernetes status. This journal deliberately retains uncertain ownership until that runtime evidence exists.
+
+The next increment, [25 Startup authorization](25-execution-startup.md), adds fresh authority after a runtime challenge and charges transport delay against the fixed budget. Actual Pod/attach integration remains pending.

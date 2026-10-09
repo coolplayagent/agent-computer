@@ -110,6 +110,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0013_execution_dispatch.sql")),
                     false,
                 ),
+                Migration::new(
+                    14,
+                    Cow::Borrowed("execution startup"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0014_execution_startup.sql")),
+                    false,
+                ),
             ])
         })
     }

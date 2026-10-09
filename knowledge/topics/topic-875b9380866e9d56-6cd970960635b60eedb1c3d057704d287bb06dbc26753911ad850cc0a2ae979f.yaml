@@ -103,6 +103,36 @@ sources:
   status: active
   version: 1
   description: Authorized definition plans, immutable SpecVersions and atomic apply with queued reconciliation; paired English guide in docs/en/10-plans-and-apply.md.
+- id: durable-execution-admission
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/23-execution-admission.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Connection-scoped durable execution queue, fixed Sandbox/Candidate binding, writer reservation, retry and cancellation; paired English docs/en/23-execution-admission.md. Runtime dispatch and background lifetimes remain pending.
+- id: durable-execution-dispatch
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/24-execution-dispatch.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Atomic single execution dispatch intent, immutable recovery, cancellation requests and unresolved writer ownership; paired English docs/en/24-execution-dispatch.md. Actual Candidate Pod dispatch and fencing remain pending.
+- id: execution-startup-authorization
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/25-execution-startup.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: One-shot supervisor challenge, fresh original-credential startup grant, anchored budget and real gVisor component probes; paired English docs/en/25-execution-startup.md. Kubernetes attach, Candidate mounts and physical fencing remain pending.
 - id: kubernetes-adapter-guide
   topic: development
   kind: doc
@@ -182,4 +212,7 @@ route:
   - bounded-candidate-file-saves
   - candidate-file-http-gateway
   - sandbox-process-supervisor
+  - durable-execution-admission
+  - durable-execution-dispatch
+  - execution-startup-authorization
   fallback: bounded-search
