@@ -1,0 +1,27 @@
+Attempt 1: live test fixture used an unnormalized Volume name; strict identity verification rejected it.
+
+running 1 test
+
+thread 'actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement' (11101) panicked at crates/worker/tests/candidate_live.rs:191:10:
+called `Result::unwrap()` on an `Err` value: IdentityMismatch
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement ... FAILED
+
+failures:
+
+failures:
+    actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.49s
+
+
+Attempt 2: source f4bff8771e4c192137a108d7b7c5818866144d43; normalized binding matches the actual Volume worker.
+
+running 1 test
+CANDIDATE_WORKER_REAL_PREPARATION_AND_OBSERVATION_PASSED
+test actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.46s
+
+
+Fresh-client read: 27 bytes; sha256:59c71d190a322eab5b578e2f2ada008552b868ed5966c5b2ab12f794ee00c35a; real S3 GET recorded.

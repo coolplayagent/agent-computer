@@ -22,4 +22,4 @@
 
 运行证据字段沿用[验收记录格式](../../codespec/test/agent-computer.md)：`test_id/status/source_commit/component_digests/environment/input_refs/expected/observed/evidence_refs/limits`。当前不会生成虚假的 `passed` 运行报告。
 
-新增 7 项 PostgreSQL 与 2 项存储测试验证已提交输入绑定、准备认领/派发、收据一致性、撤权、仅观察恢复及迁移安全，见 [17 Candidate 准备 worker](17-candidate-preparation-worker.md)。
+新增 7 项 PostgreSQL 与 2 项存储测试验证已提交输入绑定、准备认领/派发、收据一致性、撤权、仅观察恢复及迁移安全，见 [17 Candidate 准备 worker](17-candidate-preparation-worker.md)。另在 `f4bff87` 上通过一项真实 worker 手动测试，覆盖实际 Volume 供应、准备命令、回执丢失后保留 inode/文件、缺失发布不重建及新挂载 S3 回读；[固定证据](../evidence/candidate-worker-2026-10-09.json)记录该组件范围，不计为完整 Computer 运行验收。

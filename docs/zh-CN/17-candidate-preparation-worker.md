@@ -74,4 +74,6 @@ agent-computer-server candidate-prepare-once \
 
 显式目标 `//crates/worker:candidate_worker_live_test` 要求一次性、root 管理的 Linux 环境，包括真实 Kubernetes/CSI、完整 JuiceFS 挂载、分离的控制/元数据 PostgreSQL 数据库及 S3。`AGENT_COMPUTER_CANDIDATE_TEST_CONFIG` 指向私有测试配置。测试供应真实 Volume，调用运维命令，核验发布后的 inode 与所有者，在实际发布后注入数据库回执丢失，并验证观察不会重新复制。另一个已派发但无发布目录的请求必须保持未知且不创建文件。详见[测试源码](../../crates/worker/tests/candidate_live.rs)；仅构建该手动目标不算执行证据。
 
+2026-10-09，该显式测试在提交 `f4bff87` 上通过，使用一次性 K3s/CSI VM、PostgreSQL 16.15、JuiceFS 1.4.1 与 SeaweedFS 4.48。两个已发布请求到达 Prepared，`ready=false`；恢复保留 inode 18 与已同步的文件。缺失目录的请求保持 Preparing、容量预留及 `storage_unknown`。独立的新只读挂载通过实际 S3 GET 读回 27 字节文件。[固定证据](../evidence/candidate-worker-2026-10-09.json)与[执行日志](../evidence/candidate-worker-2026-10-09.log)保留源码/二进制摘要、真实 PVC/PV 身份、已修正的测试夹具失败记录、脚本及限制。收集后已移除 VM、可写磁盘和私有凭据。这是默认 178 项之外的一项手动测试。
+
 产品 Pod 挂载、fencing、非空 Artifact 输入、stop/recover、清理及 T01–T43 验收仍待完成。
