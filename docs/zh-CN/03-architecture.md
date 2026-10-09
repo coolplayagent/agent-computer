@@ -6,15 +6,15 @@
 | --- | --- |
 | `crates/core` | 无基础设施依赖的领域契约与状态机 |
 | `crates/definitions` | 有界解析、声明语义、固定摘要和结构 Schema |
-| `crates/store` | PostgreSQL 声明版本、原子幂等/CAS 与事件/Outbox 事务 |
-| `crates/server` | Axum HTTP、请求限额、服务认证与本地凭据运维 |
+| `crates/store` | PostgreSQL 计划、声明权限、不可变 SpecVersion、原子幂等/CAS 与事件/Outbox 事务 |
+| `crates/server` | Axum HTTP、请求限额、服务认证、plan/apply 与本地凭据/授权/目录运维 |
 | `crates/test-support` | 仅用于集成测试的真实私有 PostgreSQL 集群 |
 | `crates/cli` | 原生 CLI；提供版本、能力状态、声明验证及 Schema 导出 |
 | `docs/zh-CN`、`docs/en` | 编号一致的用户与开发文档 |
 | `codespec` | 详细需求、设计、决策和验收权威 |
 | `knowledge` | 术语表和 CLI 管理的导航映射 |
 
-后续 Rust 控制服务采用 Tokio/Axum/SQLx/PostgreSQL，可信 worker 位于用户 Sandbox 外。浏览器 Driver 与 ComputerView 的适配实现沿用设计中 TypeScript/Playwright/React 边界；核心、控制面与 CLI 使用 Rust，构建统一由 Bazel 管理。
+Rust 控制服务采用 Tokio/Axum/SQLx/PostgreSQL，可信 worker 位于用户 Sandbox 外。浏览器 Driver 与 ComputerView 的适配实现沿用设计中 TypeScript/Playwright/React 边界；核心、控制面与 CLI 使用 Rust，构建统一由 Bazel 管理。
 
 ## 03.2 必须保留的不变量
 

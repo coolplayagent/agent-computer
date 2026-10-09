@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 29
-updated_at: unix:1791541273
+map_version: 31
+updated_at: unix:1791543212
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -63,8 +63,8 @@ topics:
   source_ids:
   - computer-set-declaration-schema
   - control-openapi-schema
-  ref: topics/topic-14c2529eb4498c5d-2db7228bccbc168738a0c0f1b912a16686dc927520d41907afaa303ff92da1b7.yaml
-  digest: 2db7228bccbc168738a0c0f1b912a16686dc927520d41907afaa303ff92da1b7
+  ref: topics/topic-14c2529eb4498c5d-b59a462d1d0fe853d212a85edbbf60ec092b73450563fce690196352d16d4b0b.yaml
+  digest: b59a462d1d0fe853d212a85edbbf60ec092b73450563fce690196352d16d4b0b
 - id: architecture
   title: architecture
   description: Added by CLI source registration.
@@ -95,9 +95,10 @@ topics:
   source_ids:
   - control-service-guide
   - declaration-persistence-guide
+  - definition-plans-guide
   - numbered-bilingual-docs
-  ref: topics/topic-875b9380866e9d56-f56d133dd2a287c1d93aaaec431dee60ae95bfe1e13ea9f7676509cb63a060a8.yaml
-  digest: f56d133dd2a287c1d93aaaec431dee60ae95bfe1e13ea9f7676509cb63a060a8
+  ref: topics/topic-875b9380866e9d56-8434fe08f6692948005f407b1775892437512ebaaf132958f2a5aa984f302de3.yaml
+  digest: 8434fe08f6692948005f407b1775892437512ebaaf132958f2a5aa984f302de3
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -121,16 +122,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 13
+  omitted_through: 15
   recent:
-  - version: 14
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-ecosystem'.
-  - version: 15
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-compute-storage-selection'.
   - version: 16
     action: source.add
     actor: cli
@@ -187,3 +180,11 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'control-openapi-schema' to topic 'api'.
+  - version: 30
+    action: source.add
+    actor: cli
+    summary: Added source 'definition-plans-guide' to topic 'development'.
+  - version: 31
+    action: source.update
+    actor: cli
+    summary: Updated source 'control-openapi-schema'.

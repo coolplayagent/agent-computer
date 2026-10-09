@@ -18,20 +18,20 @@ pub struct Failure {
     pub exit: u8,
     pub message: &'static str,
 }
-fn usage() -> Failure {
+pub(crate) fn usage() -> Failure {
     Failure {
         exit: 2,
         message: "Invalid arguments. Run agent-computer-server --help.",
     }
 }
-fn failed(message: &'static str) -> Failure {
+pub(crate) fn failed(message: &'static str) -> Failure {
     Failure { exit: 1, message }
 }
 
 pub async fn run(args: Vec<String>) -> Result<(), Failure> {
     if args.is_empty() || args == ["--help"] || args == ["help"] {
         println!(
-            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes definitions.validate[,definitions.manage] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
+            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes definitions.validate[,definitions.manage] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
         );
         return Ok(());
     }
@@ -50,6 +50,16 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
         ],
         "credential-revoke" => &["database-url-file", "organization", "credential"],
         "principal-disable" => &["database-url-file", "organization", "principal"],
+        "definition-grant" | "definition-revoke" => &[
+            "database-url-file",
+            "organization",
+            "principal",
+            "kind",
+            "name",
+            "permission",
+        ],
+        "catalog-register" => &["database-url-file", "organization", "kind", "name"],
+        "catalog-disable" => &["database-url-file", "organization", "resource-id"],
         _ => return Err(usage()),
     };
     if !(args.len() - 1).is_multiple_of(2) {
@@ -83,6 +93,9 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             .await
             .map_err(|_| failed("Database schema is not ready. Run migrate first."))?;
         match command {
+            "definition-grant" | "definition-revoke" | "catalog-register" | "catalog-disable" => {
+                crate::definition_admin::run(command, &store, &options).await?
+            }
             "serve" => {
                 let address: SocketAddr = options
                     .get("listen")

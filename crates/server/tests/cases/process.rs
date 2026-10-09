@@ -40,6 +40,17 @@ fn http(
     token: Option<&str>,
     body: &str,
 ) -> (u16, Value) {
+    http_with_key(address, method, path, token, None, body)
+}
+
+fn http_with_key(
+    address: SocketAddr,
+    method: &str,
+    path: &str,
+    token: Option<&str>,
+    key: Option<&str>,
+    body: &str,
+) -> (u16, Value) {
     let mut stream = TcpStream::connect_timeout(&address, Duration::from_secs(5)).unwrap();
     stream
         .set_read_timeout(Some(Duration::from_secs(5)))
@@ -50,7 +61,10 @@ fn http(
     let authentication = token
         .map(|token| format!("Authorization: Bearer {token}\r\n"))
         .unwrap_or_default();
-    write!(stream, "{method} {path} HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\nContent-Type: application/json\r\nContent-Length: {}\r\n{authentication}\r\n{body}", body.len()).unwrap();
+    let idempotency = key
+        .map(|key| format!("Idempotency-Key: {key}\r\n"))
+        .unwrap_or_default();
+    write!(stream, "{method} {path} HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\nContent-Type: application/json\r\nContent-Length: {}\r\n{authentication}{idempotency}\r\n{body}", body.len()).unwrap();
     let mut response = String::new();
     stream.read_to_string(&mut response).unwrap();
     let (head, body) = response.split_once("\r\n\r\n").unwrap();
@@ -76,7 +90,7 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         "--kind",
         "agent",
         "--scopes",
-        "definitions.validate",
+        "definitions.validate,definitions.manage",
         "--ttl-seconds",
         "3600",
         "--output",
@@ -151,6 +165,94 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         )
         .0,
         200
+    );
+    for kind in ["declaration", "agent"] {
+        let granted = command(
+            &[
+                "definition-grant",
+                "--organization",
+                "acme",
+                "--principal",
+                "worker",
+                "--kind",
+                kind,
+                "--name",
+                "*",
+                "--permission",
+                "create",
+            ],
+            &database_file,
+        );
+        assert!(
+            granted.status.success(),
+            "{}",
+            String::from_utf8_lossy(&granted.stderr)
+        );
+    }
+    let (status, plan) = http_with_key(
+        address,
+        "POST",
+        "/v1alpha1/plans",
+        Some(token),
+        Some("tcp-plan"),
+        &document().to_string(),
+    );
+    assert_eq!(status, 201, "{plan}");
+    let path = format!(
+        "/v1alpha1/plans/{}/apply",
+        plan["plan_id"].as_str().unwrap()
+    );
+    let apply = serde_json::json!({"plan_digest":plan["plan_digest"]}).to_string();
+    let (status, operation) = http_with_key(
+        address,
+        "POST",
+        &path,
+        Some(token),
+        Some("tcp-apply"),
+        &apply,
+    );
+    assert_eq!(status, 202, "{operation}");
+    assert_eq!(operation["state"], "Queued");
+    assert_eq!(
+        http_with_key(
+            address,
+            "POST",
+            &path,
+            Some(token),
+            Some("tcp-apply"),
+            &apply
+        )
+        .1,
+        operation
+    );
+    let catalog = command(
+        &[
+            "catalog-register",
+            "--organization",
+            "acme",
+            "--kind",
+            "storage_class",
+            "--name",
+            "test-storage",
+        ],
+        &database_file,
+    );
+    assert!(catalog.status.success());
+    let catalog: Value = serde_json::from_slice(&catalog.stdout).unwrap();
+    assert_eq!(catalog["scope"], "reference-metadata");
+    assert!(
+        command(
+            &[
+                "catalog-disable",
+                "--organization",
+                "acme",
+                "--resource-id",
+                catalog["resource_id"].as_str().unwrap()
+            ],
+            &database_file
+        )
+        .status
+        .success()
     );
     let revoke = command(
         &[

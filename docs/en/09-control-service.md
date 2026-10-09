@@ -2,7 +2,7 @@
 
 ## 09.1 Start the development service
 
-`agent-computer-server` is the Rust/Tokio/Axum HTTP entry point, built with Bazel. It currently serves health, schema readiness, version/capabilities, OpenAPI, and authenticated static ComputerSet validation. It does not start a Computer or expose the internal declaration registry as an apply endpoint.
+`agent-computer-server` is the Rust/Tokio/Axum HTTP entry point, built with Bazel. It currently serves health, schema readiness, version/capabilities, OpenAPI, authenticated static ComputerSet validation, and [authorized plan/apply](10-plans-and-apply.md). Resource publication queues reconciliation intents; starting a Computer requires the future runtime worker.
 
 Provision a PostgreSQL database and put its connection URL in a private regular file, mode `0600` or `0400`, under a trusted directory. Symlinks and group/other access are rejected; URL contents are limited to 8 KiB. The URL is supplied through a file, never a command-line value. Run migrations explicitly before serving:
 
@@ -40,7 +40,7 @@ The new credential file is created exclusively with mode `0600`; an existing pat
 
 Tokens use `acsk_<128-bit random ID>_<256-bit random secret>`. Random bytes come from the operating system; the database stores a domain-separated SHA-256 digest, not the token. The secret type redacts Debug output and does not implement Serialize. Digest comparison uses constant-time comparison. See [getrandom](https://docs.rs/getrandom/0.4.3/getrandom/fn.fill.html) and [subtle](https://docs.rs/subtle/2.6.1/subtle/trait.ConstantTimeEq.html).
 
-Lifetimes are whole seconds from 1 to 86400. Expiry uses database time. Every protected request checks token validity, expiry, revocation, principal status and exact scope; validation rechecks before constructing its response. `definitions.validate` permits only static validation. `definitions.manage` is reserved for the future planner and does not imply validate, resource manage, or any runtime permission. Disabling a principal invalidates all its credentials for subsequent checks; a cached identity value is not an authorization permit for a later transaction. Requests already past their final check may finish; ongoing SSE/WSS revocation is not implemented because those transports are not available yet.
+Lifetimes are whole seconds from 1 to 86400. Expiry uses database time. Every protected request checks token validity, expiry, revocation, principal status and exact scope; validation rechecks before constructing its response. `definitions.validate` permits only static validation. `definitions.manage` permits the plan/apply API subject to separate definition/reference grants; it does not imply validate, resource manage, or any runtime permission. Disabling a principal invalidates all its credentials for subsequent checks; a cached identity value is not an authorization permit for a later transaction. Requests already past their final check may finish; ongoing SSE/WSS revocation is not implemented because those transports are not available yet.
 
 ## 09.3 HTTP contract
 
@@ -52,6 +52,8 @@ Lifetimes are whole seconds from 1 to 86400. Expiry uses database time. Every pr
 | `GET /v1alpha1/capabilities` | Public | Actual available and unsupported capabilities |
 | `GET /v1alpha1/openapi.json` | Public | [OpenAPI 3.1 contract](../../schemas/openapi-v1alpha1.json) |
 | `POST /v1alpha1/definitions/validate` | Bearer + `definitions.validate` | Static ComputerSet JSON validation; no writes or resource apply |
+| `POST /v1alpha1/plans`, `GET /v1alpha1/plans/{id}` | Bearer + `definitions.manage` + definition/reference grants | Create/read immutable plans; [details](10-plans-and-apply.md) |
+| `POST /v1alpha1/plans/{id}/apply`, `GET /v1alpha1/operations/{id}` | Bearer + `definitions.manage` + definition/reference grants | Atomic resource publication and current operation metadata |
 
 Send the token in exactly one `Authorization: Bearer …` header. Cookies, query strings, caller headers and body principal fields never establish identity. The current endpoint rejects browser Origin headers; human OIDC/CSRF/embedded login is pending. Use an uncompressed `application/json` body, at most 1 MiB; the existing duplicate-key, depth/node and semantic bounds also apply. YAML remains a local CLI input format. A valid report returns 200; invalid declarations return 422 with `details.validation`. Static validation is a query and does not require an Idempotency-Key.
 
@@ -61,6 +63,6 @@ The request handler permits 64 concurrent requests, has a 10-second timeout, and
 
 ## 09.4 Verification and remaining scope
 
-The shared `crates/test-support` starts real private PostgreSQL clusters for store and server tests. Three credential cases cover random issuance, stored hashes, principal binding, scope separation, tampering, expiry, revocation, disable, lifetime bounds and readiness checks. Six service cases cover authorization before parsing, identity spoofing, no-side-effect validation, duplicate headers, protocol limits, readiness failures, private operator files, and an actual server process over TCP with issue/validate/revoke/SIGTERM. Run the [database-enabled Bazel/Cargo suite](08-persistence.md).
+The shared `crates/test-support` starts real private PostgreSQL clusters for store and server tests. Three credential cases cover random issuance, stored hashes, principal binding, scope separation, tampering, expiry, revocation, disable, lifetime bounds and readiness checks. Seven service cases cover authorization before parsing, identity spoofing, no-side-effect validation, duplicate headers, protocol limits, readiness failures, private operator files, and an actual server process over TCP with issue/validate/grant/catalog/plan/apply/revoke/SIGTERM. Run the [database-enabled Bazel/Cargo suite](08-persistence.md).
 
-OIDC, organization membership and Workspace/Computer/App grants, ConnectionSession/ViewerSession, protected streaming, transactional resource authorization, plan/apply, deployment and Computer runtime are still pending. This increment does not satisfy full T10/T18/T22 acceptance or establish production security certification.
+[Definition grants and transactional plan/apply](10-plans-and-apply.md) are implemented. OIDC, organization membership and runtime Workspace/Computer/App grants, ConnectionSession/ViewerSession, protected streaming, deployment and Computer runtime are still pending. This increment does not satisfy full T10/T18/T22 acceptance or establish production security certification.

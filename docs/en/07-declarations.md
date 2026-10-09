@@ -28,7 +28,7 @@ The [JSON Schema](../../schemas/computer-set-v1alpha1.json) is generated from Ru
 
 ## 07.3 Digests and budgets
 
-Successful reports contain `scope: static`, `definition_digest`, resource count, and references requiring verification. `valid: true` establishes local structure and semantics only. Services must still check reference type, organization, ACL, revision, image/driver compatibility, and deployment compatibility. `plan/apply` and runtime capabilities remain unsupported.
+Successful reports contain `scope: static`, `definition_digest`, resource count, and references requiring verification. `valid: true` establishes local structure and semantics only. Services must still check reference type, organization, ACL, revision, image/driver compatibility, and deployment compatibility. The local CLI still reports remote plan/apply as unsupported; use the [control API](10-plans-and-apply.md) for definition publication. Runtime capabilities remain unsupported.
 
 Canonicalization is versioned as `agent-computer/definition-v1`: fill DTO defaults; order resources by name, mounts by path, references and path sets lexically, and capabilities by the schema's enum order. Preserve argv order. Serialize sorted object keys as compact UTF-8 JSON, then compute `SHA256(version string + NUL + JSON)`. The digest includes names and expectedRevision and identifies the complete declaration intent, not an individual runtime spec. YAML comments, whitespace, object-key order, and unordered collection permutations do not change it.
 

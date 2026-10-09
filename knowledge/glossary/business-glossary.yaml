@@ -4,6 +4,36 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: definition-plan
+    domain: agent-infrastructure
+    canonical_name: DefinitionPlan
+    definition: 绑定认证主体、组织、准确 diff、依赖版本、排空要求、摘要和有效期的不可变声明计划；规划不发布资源，首次 apply 重新核验权限与版本。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/plans/build.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/10-plans-and-apply.md
+  - id: resource-spec-version
+    domain: agent-infrastructure
+    canonical_name: SpecVersion
+    definition: 稳定资源身份下只追加的声明规格版本，保存解析后的规格及固定依赖 revision/digest；与运行实例 generation 分离，未变规格保留原版本。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0003_definition_plans.sql
+  - id: reconcile-intent
+    domain: agent-infrastructure
+    canonical_name: ReconcileIntent
+    definition: 与定义版本、operation、幂等回执和事件同事务提交的协调意图，指定资源版本及排空要求；Pending 只表示已排队，不能作为运行成功证据。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/plans/apply.rs
   - id: service-credential
     domain: agent-infrastructure
     canonical_name: ServiceCredential
@@ -19,7 +49,7 @@ terms:
   - id: declaration-registry-version
     domain: agent-infrastructure
     canonical_name: DeclarationRegistryVersion
-    definition: 按组织和文档名保存的不可变 ComputerSet 提交版本；revision 与文档内资源前置条件独立，持久化不等于资源 apply 或运行调度。
+    definition: 按组织和文档名保存的不可变 ComputerSet 提交版本；授权 apply 以根 metadata.expectedRevision 约束声明版本，并分别检查资源版本；内部 record 另收前置条件，声明持久化本身不等于运行调度。
     language: zh-CN
     mappings:
       - relation: represented_by

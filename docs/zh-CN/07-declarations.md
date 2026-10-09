@@ -28,7 +28,7 @@ CLI 接受文件或 `-`（stdin），可指定 `--format yaml|json`。未指定�
 
 ## 07.3 摘要与预算
 
-成功报告返回 `scope: static`、`definition_digest`、资源数和待核验引用。`valid: true` 仅证明本地结构和静态语义；服务端还必须检查引用的类型、组织、ACL、revision、镜像/驱动及部署兼容性。`plan/apply` 和运行能力仍为 unsupported。
+成功报告返回 `scope: static`、`definition_digest`、资源数和待核验引用。`valid: true` 仅证明本地结构和静态语义；服务端还必须检查引用的类型、组织、ACL、revision、镜像/驱动及部署兼容性。本地 CLI 的远程 plan/apply 仍标记为 unsupported，声明发布使用[控制 API](10-plans-and-apply.md)。运行能力仍未支持。
 
 规范化版本为 `agent-computer/definition-v1`：补齐 DTO 缺省值；按名称排列资源、按 path 排列挂载、按字典序排列引用和路径集合；capabilities 使用 Schema 枚举顺序；保留 argv 顺序。将对象键排序后输出紧凑 UTF-8 JSON，再计算 `SHA256(版本字符串 + NUL + JSON)`。摘要包含名称和 expectedRevision，代表完整声明意图，不等于单个资源的运行 spec digest。YAML 注释、空白、对象 key 顺序和无序集合重排不改变摘要。
 

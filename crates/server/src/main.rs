@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+mod definition_admin;
 mod operator;
 
 #[tokio::main]

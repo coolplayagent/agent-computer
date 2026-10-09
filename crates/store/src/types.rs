@@ -58,6 +58,13 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    PreconditionRequired,
+    ReferenceUnavailable,
+    PlanNotFound,
+    PlanDigestMismatch,
+    PlanExpired,
+    PlanTooLarge,
+    UnsupportedChange,
     Unauthenticated,
     Forbidden,
     InvalidCredentialParameters,
@@ -82,6 +89,15 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::PreconditionRequired => "expected revision is required for existing definitions",
+            Self::ReferenceUnavailable => {
+                "reference is missing, inaccessible, disabled or incompatible"
+            }
+            Self::PlanNotFound => "plan or operation is unavailable",
+            Self::PlanDigestMismatch => "plan digest does not match",
+            Self::PlanExpired => "plan expired; create a new plan",
+            Self::PlanTooLarge => "plan exceeds its size limit",
+            Self::UnsupportedChange => "this definition update requires a separate data migration",
             Self::Unauthenticated => "invalid or inactive credential",
             Self::Forbidden => "credential does not grant the required scope",
             Self::InvalidCredentialParameters => "invalid credential parameters",

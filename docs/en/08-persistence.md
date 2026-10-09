@@ -2,7 +2,7 @@
 
 ## 08.1 Delivered scope
 
-`crates/store` records validated ComputerSet documents in an internal PostgreSQL registry. Each organization and document name has an append-only version history and a current revision. This preserves submitted intent for later planning; it does not resolve external references, create individual resource SpecVersions, authorize an apply, enqueue reconciliation, or start a Computer. The registry revision is separate from the `expectedRevision` fields inside the document.
+The internal `Store::record` method records validated ComputerSet documents in an internal PostgreSQL registry. Each organization and document name has an append-only version history and a current revision. This preserves submitted intent for later planning; it does not resolve external references, create individual resource SpecVersions, authorize an apply, enqueue reconciliation, or start a Computer. This trusted internal method takes a separate registry precondition. The [authorized plan/apply path](10-plans-and-apply.md) now publishes resource versions and intents in the same registry transaction, using root `metadata.expectedRevision` for the declaration head and each resource's own revision condition. It never calls the unguarded record method from HTTP.
 
 The service must authenticate and authorize every call, including reads, retirement and event acknowledgement. `Store` receives a trusted SQLx pool; deployment credentials, TLS, connection limits and timeouts remain the service's responsibility. The library is not an HTTP or CLI database endpoint. Database access is trusted; organization predicates are not PostgreSQL row-level security.
 

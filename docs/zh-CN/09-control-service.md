@@ -2,7 +2,7 @@
 
 ## 09.1 启动开发服务
 
-`agent-computer-server` 是由 Bazel 构建的 Rust/Tokio/Axum HTTP 入口。目前提供探活、Schema 就绪检查、版本/能力、OpenAPI，以及带认证的 ComputerSet 静态验证。它不启动 Computer，也不把内部声明库当作 apply 端点暴露。
+`agent-computer-server` 是由 Bazel 构建的 Rust/Tokio/Axum HTTP 入口。目前提供探活、Schema 就绪检查、版本/能力、OpenAPI，带认证的 ComputerSet 静态验证及[授权 plan/apply](10-plans-and-apply.md)。资源发布只排入协调意图，启动 Computer 仍需后续运行 worker。
 
 准备 PostgreSQL 数据库，将连接 URL 放入可信目录下、权限为 `0600` 或 `0400` 的普通文件。拒绝符号链接及组/其他用户可访问的文件，URL 最多 8 KiB。通过文件提供 URL，不将秘密放在命令行参数中。启动前显式迁移：
 
@@ -40,7 +40,7 @@ bazel run //:agent-computer-server -- principal-disable \
 
 令牌格式为 `acsk_<128 位随机 ID>_<256 位随机秘密>`。随机字节来自操作系统；数据库只保存有域分隔的 SHA-256 摘要，不保存令牌原文。秘密类型的 Debug 输出脱敏，且不实现 Serialize；摘要使用常数时间比较。依据见 [getrandom](https://docs.rs/getrandom/0.4.3/getrandom/fn.fill.html) 与 [subtle](https://docs.rs/subtle/2.6.1/subtle/trait.ConstantTimeEq.html)。
 
-有效期为 1–86400 的整秒数，以数据库时间判定到期。每次受保护请求检查令牌、到期、撤销、主体状态及准确 scope，静态验证在构造响应前再次检查。`definitions.validate` 仅允许静态验证；`definitions.manage` 为后续 planner 预留，不隐含 validate、资源管理或运行权限。禁用主体后，其全部凭据在后续检查中失效；缓存的身份值不能成为后续事务的授权许可。已通过最后检查的请求仍可能结束；SSE/WSS 尚未提供，因此当前没有持续流撤权实现。
+有效期为 1–86400 的整秒数，以数据库时间判定到期。每次受保护请求检查令牌、到期、撤销、主体状态及准确 scope，静态验证在构造响应前再次检查。`definitions.validate` 仅允许静态验证；`definitions.manage` 允许调用 plan/apply API，但还需独立的声明/引用 grant，不隐含 validate、资源管理或运行权限。禁用主体后，其全部凭据在后续检查中失效；缓存的身份值不能成为后续事务的授权许可。已通过最后检查的请求仍可能结束；SSE/WSS 尚未提供，因此当前没有持续流撤权实现。
 
 ## 09.3 HTTP 契约
 
@@ -52,6 +52,8 @@ bazel run //:agent-computer-server -- principal-disable \
 | `GET /v1alpha1/capabilities` | 公开 | 实际可用及未支持能力 |
 | `GET /v1alpha1/openapi.json` | 公开 | [OpenAPI 3.1 契约](../../schemas/openapi-v1alpha1.json) |
 | `POST /v1alpha1/definitions/validate` | Bearer + `definitions.validate` | ComputerSet JSON 静态验证，不写入或执行资源 apply |
+| `POST /v1alpha1/plans`、`GET /v1alpha1/plans/{id}` | Bearer + `definitions.manage` + 声明/引用 grant | 创建/读取不可变计划；[详细说明](10-plans-and-apply.md) |
+| `POST /v1alpha1/plans/{id}/apply`、`GET /v1alpha1/operations/{id}` | Bearer + `definitions.manage` + 声明/引用 grant | 原子发布资源版本，查询 operation 当前元数据 |
 
 令牌只放在单个 `Authorization: Bearer …` 请求头中。Cookie、查询字符串、调用方请求头和 body 主体字段均不构成身份。当前端点拒绝浏览器 Origin 头，人的 OIDC/CSRF/嵌入登录待实现。正文使用未压缩的 `application/json`，最多 1 MiB，并继续执行重复键、深度/节点和语义限制。YAML 仍用于本地 CLI。有效声明返回 200，无效声明返回 422，`details.validation` 包含诊断。静态验证属于查询，不要求 Idempotency-Key。
 
@@ -61,6 +63,6 @@ bazel run //:agent-computer-server -- principal-disable \
 
 ## 09.4 验证与剩余范围
 
-共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。3 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。6 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
+共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。3 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。7 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/授权/目录管理/plan/apply/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
 
-OIDC、组织成员和 Workspace/Computer/App grant、ConnectionSession/ViewerSession、受保护流、事务内资源鉴权、plan/apply、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。
+[声明 grant 和事务内 plan/apply](10-plans-and-apply.md)已实现。OIDC、组织成员和运行时 Workspace/Computer/App grant、ConnectionSession/ViewerSession、受保护流、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。

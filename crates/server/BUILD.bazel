@@ -3,7 +3,7 @@ load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "server",
-    srcs = ["src/lib.rs", "src/http.rs", "src/error.rs"],
+    srcs = ["src/lib.rs", "src/http.rs", "src/error.rs", "src/plans.rs", "src/requests.rs"],
     compile_data = ["//schemas:openapi-v1alpha1.json"],
     crate_name = "agent_computer_server",
     edition = "2024",
@@ -15,7 +15,7 @@ rust_library(
 
 rust_binary(
     name = "agent-computer-server",
-    srcs = ["src/main.rs", "src/operator.rs"],
+    srcs = ["src/main.rs", "src/operator.rs", "src/definition_admin.rs"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],

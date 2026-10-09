@@ -6,8 +6,8 @@
 | --- | --- |
 | `crates/core` | Domain contracts and state machines without infrastructure dependencies |
 | `crates/definitions` | Bounded parsing, declaration semantics, fixed digests, structural schema |
-| `crates/store` | PostgreSQL declaration versions, atomic retries/CAS and event/Outbox transactions |
-| `crates/server` | Axum HTTP routes, bounded requests, service authentication and local credential administration |
+| `crates/store` | PostgreSQL plans, definition grants, immutable SpecVersions, atomic retries/CAS and event/Outbox transactions |
+| `crates/server` | Axum HTTP routes, bounded requests, service authentication, plan/apply and local credential/grant/catalog administration |
 | `crates/test-support` | Private real PostgreSQL clusters for integration tests only |
 | `crates/cli` | Native CLI with version, capability status, declaration validation, and schema export |
 | `docs/zh-CN`, `docs/en` | User and developer documentation with matching numbering |

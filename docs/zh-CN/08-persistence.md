@@ -2,7 +2,7 @@
 
 ## 08.1 已交付范围
 
-`crates/store` 将已静态验证的 ComputerSet 文档保存到内部 PostgreSQL 声明库。每个组织、文档名有仅追加的版本历史与当前 revision，为后续计划保留提交意图；目前不解析外部引用、不创建独立资源 SpecVersion、不授权 apply、不写协调任务，也不启动 Computer。声明库 revision 与文档内的 `expectedRevision` 字段相互独立。
+内部 `Store::record` 方法将已静态验证的 ComputerSet 文档保存到内部 PostgreSQL 声明库。每个组织、文档名有仅追加的版本历史与当前 revision，为后续计划保留提交意图；此方法不解析外部引用、不创建独立资源 SpecVersion、不授权 apply、不写协调任务，也不启动 Computer。该可信内部方法使用独立的声明库前置条件。[授权 plan/apply 路径](10-plans-and-apply.md)现可在同一声明库事务内发布资源版本和协调意图：根 `metadata.expectedRevision` 约束声明当前版本，每个资源另用自身 revision 条件。HTTP 不调用未鉴权的 record 方法。
 
 服务必须为每次调用认证授权，包括读取、幂等记录退役和事件确认。`Store` 接收可信 SQLx 连接池；部署凭据、TLS、连接上限与超时仍由服务负责。此库不是 HTTP 或 CLI 数据库接口。数据库访问方必须可信；查询中的组织条件不等于 PostgreSQL 行级安全策略。
 

@@ -1,25 +1,23 @@
 use crate::error::RequestContext;
 use agent_computer_core::{API_VERSION, VERSION};
-use agent_computer_definitions::{Format, MAX_DOCUMENT_BYTES, validate_bytes};
 use agent_computer_store::{Store, auth::ServiceScope};
 use axum::{
     Extension, Json, Router,
-    body::to_bytes,
     extract::{Request, State},
-    http::{HeaderMap, StatusCode},
+    http::StatusCode,
     middleware::{self, Next},
     response::{IntoResponse, Response},
     routing::{get, post},
 };
 use serde_json::json;
-use std::{error::Error as _, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 use tokio::sync::Semaphore;
 
 #[derive(Clone)]
-struct ServiceState {
-    store: Store,
+pub(crate) struct ServiceState {
+    pub(crate) store: Store,
     requests: Arc<Semaphore>,
-    validators: Arc<Semaphore>,
+    pub(crate) validators: Arc<Semaphore>,
 }
 
 pub fn router(store: Store) -> Router {
@@ -38,6 +36,13 @@ pub fn router(store: Store) -> Router {
         .route("/v1alpha1/capabilities", get(capabilities))
         .route("/v1alpha1/openapi.json", get(openapi))
         .route("/v1alpha1/definitions/validate", post(validate))
+        .route("/v1alpha1/plans", post(crate::plans::create))
+        .route("/v1alpha1/plans/{id}", get(crate::plans::get_plan))
+        .route("/v1alpha1/plans/{id}/apply", post(crate::plans::apply))
+        .route(
+            "/v1alpha1/operations/{id}",
+            get(crate::plans::get_operation),
+        )
         .fallback(not_found)
         .method_not_allowed_fallback(method_not_allowed)
         .layer(middleware::from_fn_with_state(state.clone(), envelope))
@@ -101,7 +106,7 @@ async fn capabilities() -> Json<serde_json::Value> {
     Json(
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported",
-            "definitions.plan":"unsupported", "definitions.apply":"unsupported", "computer":"unsupported",
+            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation":"unsupported", "computer":"unsupported",
             "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
@@ -115,103 +120,23 @@ async fn openapi() -> impl IntoResponse {
     )
 }
 
-fn bearer(headers: &HeaderMap) -> Option<&str> {
-    if headers.get_all("authorization").iter().count() != 1 {
-        return None;
-    }
-    let (scheme, token) = headers
-        .get("authorization")?
-        .to_str()
-        .ok()?
-        .split_once(' ')?;
-    if !scheme.eq_ignore_ascii_case("Bearer") {
-        return None;
-    }
-    Some(token)
-}
-
 async fn validate(
     State(state): State<ServiceState>,
     Extension(context): Extension<RequestContext>,
     request: Request,
 ) -> Response {
-    let Some(token) = bearer(request.headers()).map(str::to_owned) else {
-        return context.store_error(agent_computer_store::Error::Unauthenticated);
-    };
-    if let Err(error) = state
-        .store
-        .authorize_service(&token, ServiceScope::DefinitionsValidate)
-        .await
+    let token = match crate::requests::authorize(
+        &state,
+        &context,
+        request.headers(),
+        ServiceScope::DefinitionsValidate,
+    )
+    .await
     {
-        return context.store_error(error);
-    }
-    // This service-credential endpoint has no cookie or browser login mode. The
-    // OIDC/CSRF/origin-bound human flow will be a separate authenticated adapter.
-    if request.headers().contains_key("origin") {
-        return context.error(
-            StatusCode::FORBIDDEN,
-            "browser_auth_unavailable",
-            "Browser authentication is not available on this endpoint.",
-            false,
-        );
-    }
-    let content_type = request
-        .headers()
-        .get("content-type")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("")
-        .split(';')
-        .next()
-        .unwrap_or("")
-        .trim();
-    if !content_type.eq_ignore_ascii_case("application/json")
-        || request.headers().get_all("content-type").iter().count() != 1
-        || request.headers().contains_key("content-encoding")
-    {
-        return context.error(
-            StatusCode::UNSUPPORTED_MEDIA_TYPE,
-            "unsupported_media_type",
-            "Use an uncompressed application/json body.",
-            false,
-        );
-    }
-    let body = match to_bytes(request.into_body(), MAX_DOCUMENT_BYTES).await {
-        Ok(body) => body,
-        Err(error) => {
-            let oversized = error
-                .source()
-                .is_some_and(|source| source.is::<http_body_util::LengthLimitError>());
-            return if oversized {
-                context.error(
-                    StatusCode::PAYLOAD_TOO_LARGE,
-                    "body_too_large",
-                    "The body exceeds 1 MiB.",
-                    false,
-                )
-            } else {
-                context.error(
-                    StatusCode::BAD_REQUEST,
-                    "invalid_body",
-                    "Unable to read the request body.",
-                    false,
-                )
-            };
-        }
+        Ok(v) => v,
+        Err(e) => return e,
     };
-    let Ok(permit) = state.validators.try_acquire_owned() else {
-        return context.error(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "busy",
-            "Too many validations are in progress.",
-            true,
-        );
-    };
-    let checked = tokio::task::spawn_blocking(move || {
-        let _permit = permit; // Held until parsing finishes, even if the request times out.
-        validate_bytes(&body, Format::Json)
-    })
-    .await;
-    // Recheck at response construction; do not cache revocation/expiry decisions.
+    let checked = crate::requests::definition(&state, &context, request).await;
     if let Err(error) = state
         .store
         .authorize_service(&token, ServiceScope::DefinitionsValidate)
@@ -220,20 +145,8 @@ async fn validate(
         return context.store_error(error);
     }
     match checked {
-        Ok(Ok(definition)) => Json(definition.report()).into_response(),
-        Ok(Err(report)) => context.details(
-            StatusCode::UNPROCESSABLE_ENTITY,
-            "invalid_definition",
-            "The declaration is invalid.",
-            false,
-            json!({"validation":report}),
-        ),
-        Err(_) => context.error(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "unavailable",
-            "The service is unavailable.",
-            true,
-        ),
+        Ok(definition) => Json(definition.report()).into_response(),
+        Err(response) => response,
     }
 }
 

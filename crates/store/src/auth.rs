@@ -27,7 +27,7 @@ impl PrincipalKind {
 pub enum ServiceScope {
     #[serde(rename = "definitions.validate")]
     DefinitionsValidate,
-    /// Reserved for the future planner; not a resource-level manage grant.
+    /// Plan/apply API scope; object grants are checked separately.
     #[serde(rename = "definitions.manage")]
     DefinitionsManage,
 }
@@ -163,30 +163,20 @@ impl Store {
         let id = token_id(token)?;
         let row = sqlx::query("SELECT c.organization,c.principal,p.kind,c.secret_hash,c.scopes,(NOT c.revoked AND p.enabled AND c.expires_at > clock_timestamp()) AS active FROM service_credentials c JOIN principals p USING (organization,principal) WHERE c.credential_id=$1")
             .bind(id).fetch_optional(&self.pool).await?;
-        let Some(row) = row else {
-            return Err(Error::Unauthenticated);
-        };
-        let expected: Vec<u8> = row.try_get("secret_hash")?;
-        let matches: bool = hash(token).ct_eq(&expected).into();
-        if !matches || !row.try_get::<bool, _>("active")? {
-            return Err(Error::Unauthenticated);
-        }
-        let scopes: Vec<String> = row.try_get("scopes")?;
-        if !scopes.iter().any(|s| s == required.as_str()) {
-            return Err(Error::Forbidden);
-        }
-        let kind = match row.try_get::<String, _>("kind")?.as_str() {
-            "human" => PrincipalKind::Human,
-            "agent" => PrincipalKind::Agent,
-            _ => return Err(Error::InvalidStoredData),
-        };
-        Ok(AuthenticatedPrincipal {
-            organization: OrganizationId::new(row.try_get::<String, _>("organization")?)
-                .map_err(|_| Error::InvalidStoredData)?,
-            principal: PrincipalId::new(row.try_get::<String, _>("principal")?)
-                .map_err(|_| Error::InvalidStoredData)?,
-            kind,
-        })
+        decode_principal(row, token, required)
+    }
+
+    /// Caller takes the organization stream lock first. Row share locks serialize
+    /// admission with credential revocation and principal disable until commit.
+    pub(crate) async fn authorize_service_in(
+        tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        token: &str,
+        required: ServiceScope,
+    ) -> Result<AuthenticatedPrincipal> {
+        let id = token_id(token)?;
+        let row = sqlx::query("SELECT c.organization,c.principal,p.kind,c.secret_hash,c.scopes,(NOT c.revoked AND p.enabled AND c.expires_at > clock_timestamp()) AS active FROM service_credentials c JOIN principals p USING (organization,principal) WHERE c.credential_id=$1 FOR SHARE OF c,p")
+            .bind(id).fetch_optional(&mut **tx).await?;
+        decode_principal(row, token, required)
     }
 
     pub async fn revoke_credential(&self, organization: &OrganizationId, id: &str) -> Result<bool> {
@@ -209,4 +199,35 @@ impl Store {
         .rows_affected()
             == 1)
     }
+}
+
+fn decode_principal(
+    row: Option<sqlx::postgres::PgRow>,
+    token: &str,
+    required: ServiceScope,
+) -> Result<AuthenticatedPrincipal> {
+    let Some(row) = row else {
+        return Err(Error::Unauthenticated);
+    };
+    let expected: Vec<u8> = row.try_get("secret_hash")?;
+    let matches: bool = hash(token).ct_eq(&expected).into();
+    if !matches || !row.try_get::<bool, _>("active")? {
+        return Err(Error::Unauthenticated);
+    }
+    let scopes: Vec<String> = row.try_get("scopes")?;
+    if !scopes.iter().any(|s| s == required.as_str()) {
+        return Err(Error::Forbidden);
+    }
+    let kind = match row.try_get::<String, _>("kind")?.as_str() {
+        "human" => PrincipalKind::Human,
+        "agent" => PrincipalKind::Agent,
+        _ => return Err(Error::InvalidStoredData),
+    };
+    Ok(AuthenticatedPrincipal {
+        organization: OrganizationId::new(row.try_get::<String, _>("organization")?)
+            .map_err(|_| Error::InvalidStoredData)?,
+        principal: PrincipalId::new(row.try_get::<String, _>("principal")?)
+            .map_err(|_| Error::InvalidStoredData)?,
+        kind,
+    })
 }

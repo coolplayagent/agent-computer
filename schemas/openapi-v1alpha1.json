@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development service credential and static declaration validation surface. OIDC, resource grants, plan/apply and Computer runtime remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, authorized definition plans and atomic apply. Apply publishes immutable resource versions and queued reconciliation intents. Runtime reconciliation, OIDC and runtime grants remain unsupported."
   },
   "servers": [
     {
@@ -248,6 +248,579 @@
             }
           }
         }
+      }
+    },
+    "/v1alpha1/plans": {
+      "post": {
+        "operationId": "createDefinitionPlan",
+        "description": "Create/retry an immutable diff and impact plan. Writes only the plan, receipt and event/Outbox; no resource definitions or runtime effects. Existing root metadata and each existing resource require expectedRevision. Requires definitions.manage and current definition/reference grants. Browser Origin is rejected.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Create/retry an immutable diff and impact plan. Writes only the plan, receipt and event/Outbox; no resource definitions or runtime effects. Existing root metadata and each existing resource require expectedRevision.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefinitionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID, missing/invalid Idempotency-Key, or malformed apply body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, expired, disabled or revoked credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing definitions.manage, object grant or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request timeout. The commit outcome may be unknown; retry with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency input conflict or plan digest mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Retired request key or expired unapplied plan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Declaration/resource revision or referenced head changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB or resolved plan exceeds 8 MiB / dependency traversal bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported content type or content encoding.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid declaration, unavailable reference (missing, wrong kind, disabled or unauthorized), or unsupported data migration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "An existing declaration or resource is missing expectedRevision.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable or capacity limit reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerSet"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
+      }
+    },
+    "/v1alpha1/plans/{id}": {
+      "get": {
+        "operationId": "getDefinitionPlan",
+        "description": "Read the caller-owned plan under current original plan permissions, including transitive reference grants. Requires definitions.manage and current definition/reference grants. Browser Origin is rejected.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Read the caller-owned plan under current original plan permissions, including transitive reference grants.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefinitionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID, missing/invalid Idempotency-Key, or malformed apply body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, expired, disabled or revoked credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing definitions.manage, object grant or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan/operation not found in the authenticated principal and organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request timeout. The commit outcome may be unknown; retry with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Declaration/resource revision or referenced head changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB or resolved plan exceeds 8 MiB / dependency traversal bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid declaration, unavailable reference (missing, wrong kind, disabled or unauthorized), or unsupported data migration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable or capacity limit reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^plan_[0-9a-f]{32}$"
+            }
+          }
+        ]
+      }
+    },
+    "/v1alpha1/plans/{id}/apply": {
+      "post": {
+        "operationId": "applyDefinitionPlan",
+        "description": "Atomically publish immutable versions, creator grants, Queued operation, Pending intents, receipt and event/Outbox. Rechecks authorization, first-apply expiry and all selected revisions. Repeating an applied plan returns the same operation with current progress, including under a new key. Requires definitions.manage and current definition/reference grants. Browser Origin is rejected.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Atomically publish immutable versions, creator grants, Queued operation, Pending intents, receipt and event/Outbox. Rechecks authorization, first-apply expiry and all selected revisions. Repeating an applied plan returns the same operation with current progress, including under a new key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefinitionOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID, missing/invalid Idempotency-Key, or malformed apply body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, expired, disabled or revoked credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing definitions.manage, object grant or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan/operation not found in the authenticated principal and organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request timeout. The commit outcome may be unknown; retry with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency input conflict or plan digest mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Retired request key or expired unapplied plan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Declaration/resource revision or referenced head changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB or resolved plan exceeds 8 MiB / dependency traversal bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported content type or content encoding.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid declaration, unavailable reference (missing, wrong kind, disabled or unauthorized), or unsupported data migration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable or capacity limit reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyDefinitionPlan"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^plan_[0-9a-f]{32}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
+      }
+    },
+    "/v1alpha1/operations/{id}": {
+      "get": {
+        "operationId": "getDefinitionOperation",
+        "description": "Read the caller-owned operation and its current state under current original plan permissions. Requires definitions.manage and current definition/reference grants. Browser Origin is rejected.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Read the caller-owned operation and its current state under current original plan permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefinitionOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID, missing/invalid Idempotency-Key, or malformed apply body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, expired, disabled or revoked credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing definitions.manage, object grant or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan/operation not found in the authenticated principal and organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request timeout. The commit outcome may be unknown; retry with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Declaration/resource revision or referenced head changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB or resolved plan exceeds 8 MiB / dependency traversal bound.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid declaration, unavailable reference (missing, wrong kind, disabled or unauthorized), or unsupported data migration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable or capacity limit reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^op_[0-9a-f]{32}$"
+            }
+          }
+        ]
       }
     }
   },
@@ -777,6 +1350,270 @@
             ]
           }
         }
+      },
+      "DefinitionDependency": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "resource_id",
+          "name",
+          "revision",
+          "digest"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "volume",
+              "workspace",
+              "sandbox",
+              "app",
+              "agent",
+              "computer",
+              "storage_class",
+              "network_policy",
+              "browser_profile",
+              "secret"
+            ]
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^(res|ref)_[0-9a-f]{32}$"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      },
+      "PlannedResource": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "name",
+          "resource_id",
+          "expected_revision",
+          "revision",
+          "digest",
+          "change",
+          "before",
+          "before_digest",
+          "before_dependencies",
+          "after",
+          "dependencies",
+          "requires_drain"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "volume",
+              "workspace",
+              "sandbox",
+              "app",
+              "agent",
+              "computer"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$"
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^res_[0-9a-f]{32}$"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "change": {
+            "enum": [
+              "create",
+              "update",
+              "unchanged"
+            ]
+          },
+          "before": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "before_digest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "before_dependencies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DefinitionDependency"
+            }
+          },
+          "after": {
+            "type": "object"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DefinitionDependency"
+            }
+          },
+          "requires_drain": {
+            "type": "boolean"
+          }
+        },
+        "description": "Resolved before/after resource spec, stable ID and immutable dependency versions. Name and expectedRevision are metadata outside the spec. requires_drain is a reconciliation requirement; no runtime transition has occurred."
+      },
+      "DefinitionPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "plan_id",
+          "plan_digest",
+          "organization",
+          "principal",
+          "declaration_name",
+          "declaration_expected_revision",
+          "definition_digest",
+          "expires_at_ms",
+          "resources",
+          "deletes_data",
+          "event_sequence"
+        ],
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "pattern": "^plan_[0-9a-f]{32}$"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "organization": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "declaration_name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$"
+          },
+          "declaration_expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "definition_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "expires_at_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "resources": {
+            "type": "array",
+            "maxItems": 1024,
+            "items": {
+              "$ref": "#/components/schemas/PlannedResource"
+            }
+          },
+          "deletes_data": {
+            "const": false
+          },
+          "event_sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          }
+        },
+        "description": "Immutable caller-owned plan; at most 8 MiB serialized, valid for first apply for 15 minutes by database clock. Missing declarations never delete existing data. Returned principal/organization come from authentication, not client input."
+      },
+      "DefinitionOperation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation_id",
+          "plan_id",
+          "state",
+          "resources",
+          "event_sequence"
+        ],
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "pattern": "^op_[0-9a-f]{32}$"
+          },
+          "plan_id": {
+            "type": "string",
+            "pattern": "^plan_[0-9a-f]{32}$"
+          },
+          "state": {
+            "enum": [
+              "Queued",
+              "Running",
+              "Succeeded",
+              "Failed",
+              "Blocked"
+            ]
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DefinitionDependency"
+            }
+          },
+          "event_sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          }
+        },
+        "description": "Current operation metadata. This release creates Queued operations and Pending intents; no runtime worker is available. event_sequence is the original publication event sequence."
+      },
+      "ApplyDefinitionPlan": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "plan_digest"
+        ],
+        "properties": {
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
       }
     },
     "responses": {
@@ -788,6 +1625,20 @@
               "$ref": "#/components/schemas/Error"
             }
           }
+        }
+      }
+    },
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "description": "Exactly one header. Scoped to authenticated organization, principal and operation. Reusing a key with changed input returns 409; retired receipts return 410. Retry unknown outcomes with the same key and input.",
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9_-]+$"
         }
       }
     }

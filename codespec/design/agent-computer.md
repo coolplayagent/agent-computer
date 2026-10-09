@@ -1,8 +1,8 @@
 # agent-computer 详细技术设计
 
-版本：设计基线 0.5；日期：2026-10-09；状态：渐进式实现；静态声明、领域规则、PostgreSQL 声明库及服务凭据认证入口已交付，Computer 运行接口仍待实现。
+版本：设计基线 0.5；日期：2026-10-09；状态：渐进式实现；静态声明、领域规则、PostgreSQL 声明库、服务凭据及授权 plan/apply 控制元数据发布已交付，Computer 运行接口仍待实现。
 
-本文落实[产品需求 R01–R35](../requirements/agent-computer.md)，R32 是后续可选评测扩展，R34–R35 是可选生态组合要求。协议、业务命令和运行配置仍为设计契约；已交付的本地静态声明验证见 [docs 07](../../docs/zh-CN/07-declarations.md)，持久化边界见 [docs 08](../../docs/zh-CN/08-persistence.md)，声明入库尚不执行资源 apply；当前已实现的 HTTP 子集与认证边界见 [docs 09](../../docs/zh-CN/09-control-service.md)，Computer 运行服务 API 仍待实现。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约，0.5 新增 D18 多 Agent 与环境分配及 E08–E10 组合方案。
+本文落实[产品需求 R01–R35](../requirements/agent-computer.md)，R32 是后续可选评测扩展，R34–R35 是可选生态组合要求。协议、业务命令和运行配置仍为设计契约；已交付的本地静态声明验证见 [docs 07](../../docs/zh-CN/07-declarations.md)，持久化边界见 [docs 08](../../docs/zh-CN/08-persistence.md)，内部 record 不执行资源 apply；当前 HTTP 与认证边界见 [docs 09](../../docs/zh-CN/09-control-service.md)，授权计划/原子资源发布见 [docs 10](../../docs/zh-CN/10-plans-and-apply.md)。发布只产生排队协调意图，Computer 运行服务 API 仍待实现。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约，0.5 新增 D18 多 Agent 与环境分配及 E08–E10 组合方案。
 
 ## D01. 架构与技术决策
 
@@ -294,7 +294,7 @@ Artifact ACL 在每次读取时检查；哈希相同不授予跨组织访问权�
 
 ### 公共约定
 
-- 首版 API 前缀 `/v1alpha1`，HTTPS/JSON + OpenAPI 3.1；当前静态验证和元数据端点子集见 [OpenAPI 文件](../../schemas/openapi-v1alpha1.json)，其余接口仍为待实现设计。
+- 首版 API 前缀 `/v1alpha1`，HTTPS/JSON + OpenAPI 3.1；当前静态验证、声明计划/发布和元数据端点子集见 [OpenAPI 文件](../../schemas/openapi-v1alpha1.json)，其余接口仍为待实现设计。
 - 身份由受认证服务端推导。用户界面支持组织 OIDC；CLI 和适配器使用绑定 scope 的可撤销服务凭据，禁止把 body 中的 principal 当成鉴权结论。
 - 同步查询返回 200，资源新建返回 201，长时操作返回 202 和持久 operation/execution ID。重复请求可返回已有记录及其当前状态。
 - 每个写请求必须有 `Idempotency-Key`；作用域为组织、主体和操作类型。相同键不同规范化输入返回 409。记录及墓碑在显式删除前保留，已回收键返回 410，不静默当新请求。

@@ -25,6 +25,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0002_service_credentials.sql")),
                     false,
                 ),
+                Migration::new(
+                    3,
+                    Cow::Borrowed("definition plans"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0003_definition_plans.sql")),
+                    false,
+                ),
             ])
         })
     }

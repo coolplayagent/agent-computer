@@ -4,6 +4,16 @@ topic:
   title: development
   description: Added by CLI source registration.
 sources:
+- id: control-service-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/09-control-service.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Service credential lifecycle, authenticated HTTP validation and real process verification; paired English guide in docs/en/09-control-service.md.
 - id: declaration-persistence-guide
   topic: development
   kind: doc
@@ -14,6 +24,16 @@ sources:
   status: active
   version: 1
   description: PostgreSQL declaration registry transactions and real database test setup; paired English guide in docs/en/08-persistence.md.
+- id: definition-plans-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/10-plans-and-apply.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authorized definition plans, immutable SpecVersions and atomic apply with queued reconciliation; paired English guide in docs/en/10-plans-and-apply.md.
 - id: numbered-bilingual-docs
   topic: development
   kind: doc
@@ -29,4 +49,6 @@ route:
   source_order:
   - numbered-bilingual-docs
   - declaration-persistence-guide
+  - control-service-guide
+  - definition-plans-guide
   fallback: bounded-search

@@ -4,6 +4,7 @@
 
 pub mod auth;
 mod migrations;
+pub mod plans;
 mod reads;
 mod retention;
 mod types;
