@@ -4,4 +4,4 @@ alias(
     visibility = ["//visibility:public"],
 )
 
-exports_files(["rust-toolchain.toml"])
+exports_files(["rust-toolchain.toml", "Cargo.toml", "Cargo.lock"])

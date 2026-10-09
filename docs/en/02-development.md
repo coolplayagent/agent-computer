@@ -4,7 +4,7 @@
 
 The baseline is Linux x86_64, Bazel 9.3.0, Rust 1.97.1 (edition 2024), and rules_rust 0.74.0. Versions are pinned in `.bazelversion`, `rust-toolchain.toml`, and `MODULE.bazel`; module resolution is recorded in `MODULE.bazel.lock`. The initial build downloads public rules and a Rust toolchain and needs a local C/C++ linker toolchain.
 
-Bazel is the project build and test entry point, using `rust_library`, `rust_binary`, and `rust_test` directly. It does not invoke Cargo through a shell. The Cargo workspace supports editors, formatting, and Clippy over the same Rust sources. Future external crate dependencies must keep Cargo and Bazel resolution aligned.
+Bazel is the project build and test entry point, using `rust_library`, `rust_binary`, and `rust_test` directly. It does not invoke Cargo through a shell. The Cargo workspace supports editors, formatting, and Clippy over the same Rust sources. External crates use crate_universe over the same Cargo.toml/Cargo.lock. After dependency updates, run Bazel and commit Cargo.lock and MODULE.bazel.lock.
 
 ## 02.2 Commands
 
@@ -15,6 +15,8 @@ bazel build //...
 bazel test //...
 bazel run //:agent-computer -- version --json
 bazel run //:agent-computer -- capabilities --json
+bazel run //:agent-computer -- validate examples/research.computer.yaml --json
+bazel run //:agent-computer -- schema computer-set --json
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```

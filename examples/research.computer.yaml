@@ -1,0 +1,42 @@
+# Static declaration example. Replace placeholder digests and resolve authorized references before deployment.
+apiVersion: agent-computer/v1alpha1
+kind: ComputerSet
+metadata:
+  name: research
+spec:
+  volumes:
+    - name: work
+      storageClass: juicefs-workspace
+      quotaBytes: 10737418240
+      reclaimPolicy: Retain
+  workspaces:
+    - name: research-work
+      volumeRef: work
+      conflictPolicy: explicit
+  sandboxes:
+    - name: browser-env
+      runtimeClass: gvisor
+      image: registry.example.invalid/browser@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      resources: {cpuMillis: 2000, memoryMiB: 4096}
+      networkPolicyRef: public-web-v1
+    - name: exec-env
+      runtimeClass: gvisor
+      image: registry.example.invalid/tools@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      resources: {cpuMillis: 2000, memoryMiB: 2048}
+      networkPolicyRef: tool-egress-v1
+  apps:
+    - name: browser
+      driver: chromium-playwright
+      sandboxRef: browser-env
+      profileRef: browser-profile-personal
+  agents:
+    - name: researcher
+      mode: external
+      adapter: tools-api
+      capabilities: [browser.observe, browser.act, files.read, execution.submit]
+  computers:
+    - name: research-computer
+      workspaceRef: research-work
+      sandboxRefs: [browser-env, exec-env]
+      appRefs: [browser]
+      desiredState: Stopped

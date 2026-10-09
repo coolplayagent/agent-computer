@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: api
+  title: api
+  description: Added by CLI source registration.
+sources:
+- id: computer-set-declaration-schema
+  topic: api
+  kind: config
+  uri: schemas/computer-set-v1alpha1.json
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Generated ComputerSet v1alpha1 structural schema; semantic validation lives in crates/definitions and docs section 07.
+route:
+  topic: api
+  source_order:
+  - computer-set-declaration-schema
+  fallback: bounded-search

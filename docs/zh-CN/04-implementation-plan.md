@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | 01 | Rust + Bazel、CLI 骨架、编号中英文文档 | R18 / T00 | 已实现；构建、CLI、格式/Clippy、文档检查通过 |
 | 02 | 类型化身份、Computer/Lease/Execution 状态约束 | R01、R08、R09、R21 / D02、D04、D06、D08 的领域测试 | 已实现；28 项契约测试通过，真实适配器待实现 |
-| 03 | ComputerSet schema/验证器、声明版本、计划与能力协商 | R01、R14、R31 / T01、T17、T36 | 待实现 |
+| 03 | ComputerSet schema/验证器、声明版本、计划与能力协商 | R01、R14、R31 / T01、T17、T36 | 部分实现：静态验证/摘要/Schema 已交付；计划、持久声明版本及运行能力协商待实现 |
 | 04 | PostgreSQL 迁移、原子幂等记录、事件/Outbox、CAS | R06、R08–R10 / T09、T12、T13 | 待实现 |
 | 05 | API/OpenAPI、服务凭据/OIDC、授权和多对多 ConnectionSession | R02、R15、R22、R24、R33 / T02、T10、T18、T22、T38 | 待实现 |
 | 06 | Kubernetes/gVisor 协调器、实际 fencing、启动/停止/恢复 | R02、R09、R13、R16 / T03、T08、T16、T19；B01–B07 | 待实现/待真实环境认证 |

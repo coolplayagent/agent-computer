@@ -1,10 +1,22 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@crates//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test")
 
 rust_binary(
     name = "agent-computer",
-    srcs = ["src/main.rs"],
+    srcs = glob(["src/**/*.rs"]),
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/core"],
+    deps = ["//crates/core", "//crates/definitions"] + all_crate_deps(normal = True),
+)
+
+rust_test(
+    name = "cli_contracts_test",
+    size = "small",
+    srcs = ["tests/cli_contracts.rs"],
+    compile_data = ["//examples:research.computer.yaml"],
+    data = [":agent-computer"],
+    rustc_env = {"AGENT_COMPUTER_BIN": "$(rootpath :agent-computer)"},
+    edition = "2024",
+    deps = all_crate_deps(normal = True),
 )

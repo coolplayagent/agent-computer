@@ -5,7 +5,8 @@
 | Path | Responsibility |
 | --- | --- |
 | `crates/core` | Domain contracts and state machines without infrastructure dependencies |
-| `crates/cli` | Native CLI; currently version and capability status only |
+| `crates/definitions` | Bounded parsing, declaration semantics, fixed digests, structural schema |
+| `crates/cli` | Native CLI with version, capability status, declaration validation, and schema export |
 | `docs/zh-CN`, `docs/en` | User and developer documentation with matching numbering |
 | `codespec` | Authoritative detailed requirements, designs, decisions, and acceptance |
 | `knowledge` | Glossary and CLI-managed navigation maps |

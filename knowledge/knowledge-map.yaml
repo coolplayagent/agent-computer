@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 25
-updated_at: unix:1791537083
+map_version: 26
+updated_at: unix:1791538985
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -57,6 +57,13 @@ topics:
   - agent-computer-acceptance
   ref: topics/topic-c1514c6cdad166c1-aa8b51e876c034f3be7c3b0d216be1372607c013f62419877d19f57fbb604413.yaml
   digest: aa8b51e876c034f3be7c3b0d216be1372607c013f62419877d19f57fbb604413
+- id: api
+  title: api
+  description: Added by CLI source registration.
+  source_ids:
+  - computer-set-declaration-schema
+  ref: topics/topic-14c2529eb4498c5d-c5e647dada8aadc61fc441f6a8c9d2e06ec8f8eb3d85a6d086e9b2abca7f4695.yaml
+  digest: c5e647dada8aadc61fc441f6a8c9d2e06ec8f8eb3d85a6d086e9b2abca7f4695
 - id: architecture
   title: architecture
   description: Added by CLI source registration.
@@ -111,12 +118,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 9
+  omitted_through: 10
   recent:
-  - version: 10
-    action: source.add
-    actor: cli
-    summary: Added source 'agent-computer-compute-storage-selection' to topic 'architecture'.
   - version: 11
     action: source.update
     actor: cli
@@ -177,3 +180,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'numbered-bilingual-docs' to topic 'development'.
+  - version: 26
+    action: source.add
+    actor: cli
+    summary: Added source 'computer-set-declaration-schema' to topic 'api'.

@@ -1,0 +1,490 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComputerSet",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "$ref": "#/$defs/ApiVersion"
+    },
+    "kind": {
+      "$ref": "#/$defs/DocumentKind"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "spec": {
+      "$ref": "#/$defs/SetSpec"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "$defs": {
+    "Agent": {
+      "type": "object",
+      "properties": {
+        "adapter": {
+          "$ref": "#/$defs/AgentAdapter"
+        },
+        "capabilities": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Capability"
+          }
+        },
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "mode": {
+          "$ref": "#/$defs/AgentMode"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sandboxRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "secretRefs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "mode",
+        "adapter"
+      ]
+    },
+    "AgentAdapter": {
+      "type": "string",
+      "enum": [
+        "tools-api"
+      ]
+    },
+    "AgentMode": {
+      "type": "string",
+      "enum": [
+        "external",
+        "hosted"
+      ]
+    },
+    "ApiVersion": {
+      "type": "string",
+      "enum": [
+        "agent-computer/v1alpha1"
+      ]
+    },
+    "App": {
+      "type": "object",
+      "properties": {
+        "argv": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "cwd": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "driver": {
+          "$ref": "#/$defs/AppDriver"
+        },
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "exportPaths": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "health": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Health"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "profileRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sandboxRef": {
+          "type": "string"
+        },
+        "statePaths": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "driver",
+        "sandboxRef"
+      ]
+    },
+    "AppDriver": {
+      "type": "string",
+      "enum": [
+        "chromium-playwright",
+        "web-application"
+      ]
+    },
+    "Capability": {
+      "type": "string",
+      "enum": [
+        "browser.observe",
+        "browser.act",
+        "files.read",
+        "files.write",
+        "execution.submit",
+        "artifacts.read",
+        "artifacts.commit"
+      ]
+    },
+    "Computer": {
+      "type": "object",
+      "properties": {
+        "appRefs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "desiredState": {
+          "$ref": "#/$defs/DesiredState"
+        },
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string"
+        },
+        "sandboxRefs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "workspaceRef": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "workspaceRef",
+        "desiredState"
+      ]
+    },
+    "ConflictPolicy": {
+      "type": "string",
+      "enum": [
+        "explicit"
+      ]
+    },
+    "DesiredState": {
+      "type": "string",
+      "enum": [
+        "Running",
+        "Stopped"
+      ]
+    },
+    "DocumentKind": {
+      "type": "string",
+      "enum": [
+        "ComputerSet"
+      ]
+    },
+    "Health": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        },
+        "startupTimeoutSeconds": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "port",
+        "path",
+        "startupTimeoutSeconds"
+      ]
+    },
+    "Metadata": {
+      "type": "object",
+      "properties": {
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ]
+    },
+    "Mount": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "readOnly": {
+          "type": "boolean"
+        },
+        "workspaceRef": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "workspaceRef",
+        "path",
+        "readOnly"
+      ]
+    },
+    "ReclaimPolicy": {
+      "type": "string",
+      "enum": [
+        "Retain"
+      ]
+    },
+    "Resources": {
+      "type": "object",
+      "properties": {
+        "cpuMillis": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "memoryMiB": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "cpuMillis",
+        "memoryMiB"
+      ]
+    },
+    "Sandbox": {
+      "type": "object",
+      "properties": {
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "image": {
+          "type": "string"
+        },
+        "mounts": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Mount"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "networkPolicyRef": {
+          "type": "string"
+        },
+        "resources": {
+          "$ref": "#/$defs/Resources"
+        },
+        "runtimeClass": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "runtimeClass",
+        "image",
+        "resources",
+        "networkPolicyRef"
+      ]
+    },
+    "SetSpec": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Agent"
+          }
+        },
+        "apps": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/App"
+          }
+        },
+        "computers": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Computer"
+          }
+        },
+        "sandboxes": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Sandbox"
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Volume"
+          }
+        },
+        "workspaces": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Workspace"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Volume": {
+      "type": "object",
+      "properties": {
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string"
+        },
+        "quotaBytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "reclaimPolicy": {
+          "$ref": "#/$defs/ReclaimPolicy"
+        },
+        "storageClass": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "storageClass",
+        "quotaBytes",
+        "reclaimPolicy"
+      ]
+    },
+    "Workspace": {
+      "type": "object",
+      "properties": {
+        "conflictPolicy": {
+          "$ref": "#/$defs/ConflictPolicy"
+        },
+        "expectedRevision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string"
+        },
+        "volumeRef": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "volumeRef",
+        "conflictPolicy"
+      ]
+    }
+  }
+}

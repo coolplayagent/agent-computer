@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 24
-updated_at: unix:1791533686
+map_version: 25
+updated_at: unix:1791537083
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -81,6 +81,13 @@ topics:
   - agent-computer-deployment
   ref: topics/topic-aee50b18a03c89e4-416afa3d7c96bff9e49be28684597e767f56c086d824e81f37e95378039e32e6.yaml
   digest: 416afa3d7c96bff9e49be28684597e767f56c086d824e81f37e95378039e32e6
+- id: development
+  title: development
+  description: Added by CLI source registration.
+  source_ids:
+  - numbered-bilingual-docs
+  ref: topics/topic-875b9380866e9d56-e56527cd0c1f7a830289b438d09df67745522e3e336ccec790992f104ea0daca.yaml
+  digest: e56527cd0c1f7a830289b438d09df67745522e3e336ccec790992f104ea0daca
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -104,12 +111,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 8
+  omitted_through: 9
   recent:
-  - version: 9
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-acceptance'.
   - version: 10
     action: source.add
     actor: cli
@@ -170,3 +173,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'agent-computer-collaboration-foundations' to topic 'architecture'.
+  - version: 25
+    action: source.add
+    actor: cli
+    summary: Added source 'numbered-bilingual-docs' to topic 'development'.

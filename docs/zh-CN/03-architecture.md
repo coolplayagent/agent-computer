@@ -5,7 +5,8 @@
 | 路径 | 职责 |
 | --- | --- |
 | `crates/core` | 无基础设施依赖的领域契约与状态机 |
-| `crates/cli` | 原生 CLI；当前仅提供版本和能力状态 |
+| `crates/definitions` | 有界解析、声明语义、固定摘要和结构 Schema |
+| `crates/cli` | 原生 CLI；提供版本、能力状态、声明验证及 Schema 导出 |
 | `docs/zh-CN`、`docs/en` | 编号一致的用户与开发文档 |
 | `codespec` | 详细需求、设计、决策和验收权威 |
 | `knowledge` | 术语表和 CLI 管理的导航映射 |

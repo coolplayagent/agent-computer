@@ -4,7 +4,7 @@
 
 基线为 Linux x86_64、Bazel 9.3.0、Rust 1.97.1（edition 2024）和 rules_rust 0.74.0。版本固定于 `.bazelversion`、`rust-toolchain.toml` 和 `MODULE.bazel`；Bazel 模块解析写入 `MODULE.bazel.lock`。首次构建需要下载公开规则及 Rust 工具链，并需要本地 C/C++ 链接工具链。
 
-Bazel 是项目构建与测试入口，直接使用 `rust_library`、`rust_binary` 和 `rust_test`，不通过 shell 转调 Cargo。Cargo 工作区用于编辑器、格式化和 Clippy，二者使用同一 Rust 源码。后续外部 crate 依赖必须保持 Cargo 与 Bazel 锁定一致。
+Bazel 是项目构建与测试入口，直接使用 `rust_library`、`rust_binary` 和 `rust_test`，不通过 shell 转调 Cargo。Cargo 工作区用于编辑器、格式化和 Clippy，二者使用同一 Rust 源码。外部 crate 通过 crate_universe 从同一 Cargo.toml/Cargo.lock 解析；更新依赖后运行 Bazel 并提交 Cargo.lock 与 MODULE.bazel.lock。
 
 ## 02.2 命令
 
@@ -15,6 +15,8 @@ bazel build //...
 bazel test //...
 bazel run //:agent-computer -- version --json
 bazel run //:agent-computer -- capabilities --json
+bazel run //:agent-computer -- validate examples/research.computer.yaml --json
+bazel run //:agent-computer -- schema computer-set --json
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```

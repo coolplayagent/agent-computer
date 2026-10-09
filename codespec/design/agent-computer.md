@@ -1,8 +1,8 @@
 # agent-computer 详细技术设计
 
-版本：设计基线 0.5；日期：2026-10-09；状态：待实现。
+版本：设计基线 0.5；日期：2026-10-09；状态：渐进式实现；静态声明验证与领域规则已交付，运行接口仍待实现。
 
-本文落实[产品需求 R01–R35](../requirements/agent-computer.md)，R32 是后续可选评测扩展，R34–R35 是可选生态组合要求。所有协议、命令和配置例子均为设计契约；当前仓库没有实现这些接口。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约，0.5 新增 D18 多 Agent 与环境分配及 E08–E10 组合方案。
+本文落实[产品需求 R01–R35](../requirements/agent-computer.md)，R32 是后续可选评测扩展，R34–R35 是可选生态组合要求。协议、业务命令和运行配置仍为设计契约；已交付的本地静态声明验证见 [docs 07](../../docs/zh-CN/07-declarations.md)，当前仓库尚无运行服务 API。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约，0.5 新增 D18 多 Agent 与环境分配及 E08–E10 组合方案。
 
 ## D01. 架构与技术决策
 
@@ -92,7 +92,7 @@ Agent 与 Computer 为多对多使用关系：一个主体可以有多台 Comput
 
 `agents` 可省略或为空；创建可供人操作的 Computer 只需其实际引用的资源。下面包含 external Agent 的例子展示可选接入，不是使用 Computer 的前置条件。
 
-以下是有效结构的设计示例。镜像哈希仅展示格式，部署时必须替换为经过验证、可拉取的真实摘要；运行代码尚未实现声明验证器。
+以下是有效结构的设计示例。镜像哈希仅展示格式，部署时必须替换为经过验证、可拉取的真实摘要；该例已由静态声明验证器覆盖；真实资源、权限与镜像兼容性仍须在后续计划和运行验收中核验。
 
 ```yaml
 apiVersion: agent-computer/v1alpha1
