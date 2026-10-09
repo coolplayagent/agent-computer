@@ -1,7 +1,7 @@
 use super::*;
 use agent_computer_store::{Error, runtime::*};
 
-async fn runtime_fixture() -> (Database, String, String, String, String) {
+pub(super) async fn runtime_fixture() -> (Database, String, String, String, String) {
     let (db, definition_token, document) = fixture().await;
     let plan = db
         .store
@@ -34,7 +34,7 @@ async fn runtime_fixture() -> (Database, String, String, String, String) {
     let token = runtime_token(&db, "acme", "alice", &ServiceScope::ALL).await;
     (db, definition_token, token, computer, workspace)
 }
-async fn runtime_token(
+pub(super) async fn runtime_token(
     db: &Database,
     organization: &str,
     actor: &str,
@@ -53,7 +53,7 @@ async fn runtime_token(
         .expose_token()
         .into()
 }
-async fn allow(
+pub(super) async fn allow(
     db: &Database,
     id: &str,
     kind: RuntimeKind,

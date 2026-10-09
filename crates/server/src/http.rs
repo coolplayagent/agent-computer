@@ -47,6 +47,18 @@ pub fn router(store: Store) -> Router {
             "/v1alpha1/runtime-access/{kind}/{id}",
             get(crate::runtime::access),
         )
+        .route(
+            "/v1alpha1/computers/{id}/runtime",
+            get(crate::computers::runtime),
+        )
+        .route(
+            "/v1alpha1/computers/{id}/start",
+            post(crate::computers::start),
+        )
+        .route(
+            "/v1alpha1/computers/{id}/start/cancel",
+            post(crate::computers::cancel),
+        )
         .fallback(not_found)
         .method_not_allowed_fallback(method_not_allowed)
         .layer(middleware::from_fn_with_state(state.clone(), envelope))
@@ -110,7 +122,7 @@ async fn capabilities() -> Json<serde_json::Value> {
     Json(
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
-            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported",
+            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane",
             "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),

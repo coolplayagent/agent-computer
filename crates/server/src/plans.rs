@@ -9,7 +9,10 @@ use axum::{
 };
 use serde::Deserialize;
 
-fn key(context: &RequestContext, headers: &HeaderMap) -> Result<IdempotencyKey, Box<Response>> {
+pub(crate) fn key(
+    context: &RequestContext,
+    headers: &HeaderMap,
+) -> Result<IdempotencyKey, Box<Response>> {
     let key = if headers.get_all("idempotency-key").iter().count() == 1 {
         headers
             .get("idempotency-key")

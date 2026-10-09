@@ -58,6 +58,8 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    RuntimeConflict,
+    RuntimeCapacityUnavailable,
     InvalidRuntimeRequest,
     RuntimeAccessUnavailable,
     RuntimeBudgetExceeded,
@@ -96,6 +98,8 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::RuntimeConflict => "runtime revision or queued request no longer matches",
+            Self::RuntimeCapacityUnavailable => "runtime admission capacity is unavailable",
             Self::InvalidRuntimeRequest => "invalid runtime authorization request",
             Self::RuntimeAccessUnavailable => "runtime resource is unavailable or inaccessible",
             Self::RuntimeBudgetExceeded => "activation exceeds the granted runtime budget",

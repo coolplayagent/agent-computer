@@ -54,6 +54,7 @@ bazel run //:agent-computer-server -- principal-disable \
 | `POST /v1alpha1/definitions/validate` | Bearer + `definitions.validate` | ComputerSet JSON 静态验证，不写入或执行资源 apply |
 | `POST /v1alpha1/plans`、`GET /v1alpha1/plans/{id}` | Bearer + `definitions.manage` + 声明/引用 grant | 创建/读取不可变计划；[详细说明](10-plans-and-apply.md) |
 | `POST /v1alpha1/plans/{id}/apply`、`GET /v1alpha1/operations/{id}` | Bearer + `definitions.manage` + 声明/引用 grant | 原子发布资源版本，查询 operation 当前元数据 |
+| `POST /v1alpha1/computers/{id}/start`、`GET /v1alpha1/computers/{id}/runtime`、`POST /v1alpha1/computers/{id}/start/cancel` | Bearer + 所需运行 scope/grant | [排队准入、状态与取消](16-start-admission.md) |
 
 令牌只放在单个 `Authorization: Bearer …` 请求头中。Cookie、查询字符串、调用方请求头和 body 主体字段均不构成身份。当前端点拒绝浏览器 Origin 头，人的 OIDC/CSRF/嵌入登录待实现。正文使用未压缩的 `application/json`，最多 1 MiB，并继续执行重复键、深度/节点和语义限制。YAML 仍用于本地 CLI。有效声明返回 200，无效声明返回 422，`details.validation` 包含诊断。静态验证属于查询，不要求 Idempotency-Key。
 
@@ -65,6 +66,6 @@ bazel run //:agent-computer-server -- principal-disable \
 
 operation 进度、数据库协调及本地 `reconciliation-inspect/resume/abandon` 命令见 [11 持久化协调](11-reconciliation-coordination.md)。
 
-共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。4 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。8 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/授权/目录管理/plan/apply/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
+共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。4 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。9 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/授权/目录管理/plan/apply/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
 
-[声明 grant 和事务内 plan/apply](10-plans-and-apply.md)已实现。[精确资源运行 grant 与有效权限查询](15-runtime-authorization.md)也已实现。OIDC、组织成员管理、生命周期准入、ConnectionSession/ViewerSession、受保护流、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。
+[声明 grant 和事务内 plan/apply](10-plans-and-apply.md)已实现。[精确资源运行 grant 与有效权限查询](15-runtime-authorization.md)也已实现。[持久化启动排队准入](16-start-admission.md)已实现。OIDC、组织成员管理、运行时派发、ConnectionSession/ViewerSession、受保护流、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。

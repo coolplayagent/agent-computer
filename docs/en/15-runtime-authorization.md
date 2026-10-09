@@ -4,7 +4,7 @@
 
 Migration 6 adds resource runtime grants independently of declaration creation, management and reference grants. An operator can grant or revoke access to an exact Computer, Workspace, App or browser profile. A credential must also carry the corresponding API scope. Neither creating a definition nor sharing its organization grants runtime access. Existing credentials retain their original scopes after migration.
 
-The store provides a transaction-scoped authorization function for subsequent lifecycle admission, a standalone current-permission check, and a current effective-access view. The server exposes that view and trusted local grant commands. These surfaces do not allocate a generation, prepare a Candidate, start a Pod, reserve a modification lease or certify that a process has stopped. Generation allocation, immutable Artifact input selection, Candidate receipt consumption and physical fencing remain separate unfinished work.
+The store provides a transaction-scoped authorization function for subsequent lifecycle admission, a standalone current-permission check, and a current effective-access view. The server exposes that view and trusted local grant commands. These surfaces do not allocate a generation, prepare a Candidate, start a Pod, reserve a modification lease or certify that a process has stopped. [16 Start admission](16-start-admission.md) subsequently adds generation allocation and capacity reservations. Immutable Artifact input selection, Candidate receipt consumption and physical fencing remain unfinished.
 
 ## 15.2 Permissions and credential limits
 

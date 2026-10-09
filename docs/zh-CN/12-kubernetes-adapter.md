@@ -2,7 +2,7 @@
 
 ## 12.1 已交付范围
 
-Rust `agent-computer-kubernetes` 库可通过真实 Kubernetes HTTPS API 创建、核对并有条件地删除经显式准入的**临时** Sandbox Pod。尚未连接协调队列：apply Sandbox 定义仍不会启动 Pod。Computer 运行准入、持久化实例分配、Workspace Candidate、JuiceFS 挂载、租约 watchdog 与物理 fencing 待实现，公开运行时能力仍为 unsupported。
+Rust `agent-computer-kubernetes` 库可通过真实 Kubernetes HTTPS API 创建、核对并有条件地删除经显式准入的**临时** Sandbox Pod。尚未连接协调队列：apply Sandbox 定义仍不会启动 Pod。[16 启动准入](16-start-admission.md) 已新增持久化排队请求。运行实例分配、Candidate 准备派发、JuiceFS 挂载、租约 watchdog 与物理 fencing 待实现，公开运行时能力仍为 unsupported。
 
 `EphemeralSandboxPlan::new` 接收已通过静态验证的 ComputerSet、Sandbox 名称、已持久化的组织/Computer/Sandbox/实例身份、generation、SpecVersion revision、命名空间及命令参数数组。这些值不代表权限。后续 worker 必须先授权启动、持久化实例分配，并获得已有派发许可，才能调用适配器。租户 HTTP API 不暴露这些参数。
 

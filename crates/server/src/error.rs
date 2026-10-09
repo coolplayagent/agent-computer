@@ -33,10 +33,22 @@ impl RequestContext {
     pub fn store_error(&self, error: agent_computer_store::Error) -> Response {
         use agent_computer_store::Error;
         match error {
+            Error::RuntimeConflict => self.error(
+                StatusCode::CONFLICT,
+                "runtime_conflict",
+                "The control revision or queued request no longer matches.",
+                false,
+            ),
+            Error::RuntimeCapacityUnavailable => self.error(
+                StatusCode::TOO_MANY_REQUESTS,
+                "runtime_capacity_unavailable",
+                "Runtime admission capacity is unavailable.",
+                true,
+            ),
             Error::InvalidRuntimeRequest => self.error(
                 StatusCode::BAD_REQUEST,
                 "invalid_request",
-                "Invalid runtime authorization request.",
+                "Invalid runtime request.",
                 false,
             ),
             Error::RuntimeAccessUnavailable => self.error(

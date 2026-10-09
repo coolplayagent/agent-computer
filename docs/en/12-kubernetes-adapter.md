@@ -2,7 +2,7 @@
 
 ## 12.1 Delivered scope
 
-The Rust `agent-computer-kubernetes` library can create, inspect and conditionally delete an explicitly admitted **ephemeral** Sandbox Pod through the real Kubernetes HTTPS API. It is not wired to the reconciliation queue: applying a Sandbox definition still does not start a Pod. Computer runtime admission, durable instance allocation, Workspace Candidates, JuiceFS mounts, lease watchdogs and physical fencing remain pending. Public runtime capabilities remain unsupported.
+The Rust `agent-computer-kubernetes` library can create, inspect and conditionally delete an explicitly admitted **ephemeral** Sandbox Pod through the real Kubernetes HTTPS API. It is not wired to the reconciliation queue: applying a Sandbox definition still does not start a Pod. [16 Start admission](16-start-admission.md) adds durable queued requests. Runtime instance allocation, Candidate preparation dispatch, JuiceFS mounts, lease watchdogs and physical fencing remain pending. Public runtime capabilities remain unsupported.
 
 `EphemeralSandboxPlan::new` accepts a statically validated ComputerSet, its Sandbox name, persisted organization/Computer/Sandbox/instance identities, generation, SpecVersion revision, namespace and command vector. These values convey no authority. A future worker must authorize runtime start, persist the allocation and obtain the existing dispatch permit before calling the adapter. No tenant HTTP endpoint exposes these arguments.
 

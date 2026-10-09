@@ -20,7 +20,7 @@ pub(super) async fn begin<'a>(
         Store::authorize_service_in(&mut tx, token, ServiceScope::DefinitionsManage).await?;
     Ok((tx, identity, seq))
 }
-pub(super) async fn retry<T: DeserializeOwned>(
+pub(crate) async fn retry<T: DeserializeOwned>(
     tx: &mut Transaction<'_, Postgres>,
     identity: &AuthenticatedPrincipal,
     operation: &str,
@@ -43,7 +43,7 @@ fn input_hash(input: &str) -> Vec<u8> {
     use sha2::{Digest, Sha256};
     Sha256::digest(input).to_vec()
 }
-pub(super) async fn save_receipt(
+pub(crate) async fn save_receipt(
     tx: &mut Transaction<'_, Postgres>,
     identity: &AuthenticatedPrincipal,
     operation: &str,

@@ -17,6 +17,7 @@
 13. [持久化 JuiceFS 卷供应](zh-CN/13-volume-provisioning.md)
 14. [Candidate 存储准备](zh-CN/14-candidate-storage.md)
 15. [资源运行授权](zh-CN/15-runtime-authorization.md)
+16. [Computer 持久化启动准入](zh-CN/16-start-admission.md)
 
 ## 02. English
 
@@ -35,6 +36,7 @@
 13. [Durable JuiceFS volume provisioning](en/13-volume-provisioning.md)
 14. [Candidate storage preparation](en/14-candidate-storage.md)
 15. [Resource runtime authorization](en/15-runtime-authorization.md)
+16. [Durable Computer start admission](en/16-start-admission.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

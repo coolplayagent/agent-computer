@@ -151,7 +151,7 @@ pub struct DefinitionOperation {
     pub watermark: i64,
 }
 
-pub(super) fn random_id(prefix: &str) -> Result<String> {
+pub(crate) fn random_id(prefix: &str) -> Result<String> {
     let mut bytes = [0u8; 16];
     getrandom::fill(&mut bytes).map_err(|_| Error::EntropyUnavailable)?;
     Ok(format!(

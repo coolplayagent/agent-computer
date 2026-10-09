@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 36
-updated_at: unix:1791553104
+map_version: 37
+updated_at: unix:1791554703
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -94,6 +94,7 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - candidate-storage-guide
+  - computer-start-admission
   - control-service-guide
   - declaration-persistence-guide
   - definition-plans-guide
@@ -102,8 +103,8 @@ topics:
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-976ccbe72df3660c3eb94ee2f89cd74488c176b6e6844bb2f4c6ba883799c74f.yaml
-  digest: 976ccbe72df3660c3eb94ee2f89cd74488c176b6e6844bb2f4c6ba883799c74f
+  ref: topics/topic-875b9380866e9d56-739ef5250d113ba61f89664fea54a9afef294328173970ea64b6933a86a18d5a.yaml
+  digest: 739ef5250d113ba61f89664fea54a9afef294328173970ea64b6933a86a18d5a
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -127,12 +128,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 20
+  omitted_through: 21
   recent:
-  - version: 21
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-agentic-runtime'.
   - version: 22
     action: source.update
     actor: cli
@@ -193,3 +190,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'runtime-authorization-guide' to topic 'development'.
+  - version: 37
+    action: source.add
+    actor: cli
+    summary: Added source 'computer-start-admission' to topic 'development'.

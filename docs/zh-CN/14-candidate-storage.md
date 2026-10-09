@@ -4,7 +4,7 @@
 
 `agent-computer-storage` 在受信任的 JuiceFS 挂载中准备独立 Candidate 文件：验证固定 manifest，设置目录配额，逐个复制并核验对象摘要，同步文件及目录，最后通过禁止覆盖的原子重命名发布私有准备收据。这是 Linux 运维库和命令，尚不是租户 API，也不授予运行写权限。
 
-控制数据库仍须提供并授权 organization、Volume、Workspace、Candidate、Computer 和 generation。运行 grant、修改租约、fencing、Pod 挂载准入及消费准备证据的事务尚待实现。既有 Workspace 声明 Schema 未变；内部请求的 quota 不是新增的公开声明字段。调用者须先完成 Artifact 授权及对象存储读取，将输入放入私有缓存；知道对象摘要不等于具有读取权限。
+控制数据库仍须提供并授权 organization、Volume、Workspace、Candidate、Computer 和 generation。[15 运行 grant](15-runtime-authorization.md) 与 [16 启动排队准入](16-start-admission.md) 已实现；修改租约、fencing、Pod 挂载准入及消费准备证据的事务尚待实现。既有 Workspace 声明 Schema 未变；内部请求的 quota 不是新增的公开声明字段。调用者须先完成 Artifact 授权及对象存储读取，将输入放入私有缓存；知道对象摘要不等于具有读取权限。
 
 ## 14.2 存储契约
 

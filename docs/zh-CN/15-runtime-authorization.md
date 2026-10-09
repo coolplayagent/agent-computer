@@ -4,7 +4,7 @@
 
 迁移 6 新增独立于声明创建、管理和引用权限的资源运行 grant。运维可对指定 Computer、Workspace、App 或浏览器 profile 授权与撤权，凭据还须具有对应 API scope。创建声明或处于同一组织不会自动获得运行权限；迁移不扩展既有凭据的 scope。
 
-Store 提供供后续生命周期准入复用的事务内授权函数、独立当前权限检查及有效权限视图；服务提供视图查询和受信任的本地授权命令。这些接口不分配 generation、不准备 Candidate、不启动 Pod、不预留修改租约，也不证明进程停止。generation 分配、不可变 Artifact 输入选择、Candidate 收据消费及物理 fencing 仍是独立的待实现工作。
+Store 提供供后续生命周期准入复用的事务内授权函数、独立当前权限检查及有效权限视图；服务提供视图查询和受信任的本地授权命令。这些接口不分配 generation、不准备 Candidate、不启动 Pod、不预留修改租约，也不证明进程停止。后续 [16 启动准入](16-start-admission.md) 已实现 generation 分配与容量预留。不可变 Artifact 输入选择、Candidate 收据消费及物理 fencing 仍待实现。
 
 ## 15.2 权限与凭据约束
 

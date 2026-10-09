@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 35
-updated_at: unix:1791551358
+map_version: 36
+updated_at: unix:1791553104
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -100,9 +100,10 @@ topics:
   - kubernetes-adapter-guide
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
+  - runtime-authorization-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-2ad177faf0488d4f14895c12af491666769d92a8436981c18dfe99bc2ef6be9b.yaml
-  digest: 2ad177faf0488d4f14895c12af491666769d92a8436981c18dfe99bc2ef6be9b
+  ref: topics/topic-875b9380866e9d56-976ccbe72df3660c3eb94ee2f89cd74488c176b6e6844bb2f4c6ba883799c74f.yaml
+  digest: 976ccbe72df3660c3eb94ee2f89cd74488c176b6e6844bb2f4c6ba883799c74f
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -126,12 +127,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 19
+  omitted_through: 20
   recent:
-  - version: 20
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-design'.
   - version: 21
     action: source.update
     actor: cli
@@ -192,3 +189,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'candidate-storage-guide' to topic 'development'.
+  - version: 36
+    action: source.add
+    actor: cli
+    summary: Added source 'runtime-authorization-guide' to topic 'development'.

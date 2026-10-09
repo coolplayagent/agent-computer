@@ -1,6 +1,7 @@
 //! Exact resource runtime grants, separate from declaration management.
 //! No permission implies another, and successful checks do not establish a lease,
 //! a generation, physical fencing, stopped processes, or actual runtime readiness.
+mod start;
 mod types;
 use crate::{
     Error, Result, Store,
@@ -8,6 +9,7 @@ use crate::{
     plans::transactions,
 };
 use sqlx::{Postgres, Row, Transaction};
+pub use start::{CancelQueuedStart, ComputerRuntime, StartReceipt, StartRequest, StartState};
 pub use types::*;
 
 async fn target(

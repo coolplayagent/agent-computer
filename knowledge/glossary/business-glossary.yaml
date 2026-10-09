@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: computer-start-admission
+    domain: agent-infrastructure
+    canonical_name: ComputerStartAdmission
+    definition: 在同一数据库事务内校验独立运行授权、固定规格图、分配 generation/Candidate 并预留容量的持久化排队请求；可取消未派发请求，不代表输入已选择、存储准备、修改租约或运行 Ready。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/start/mod.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/start/graph.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/16-start-admission.md
   - id: runtime-grant
     domain: agent-infrastructure
     canonical_name: RuntimeGrant
