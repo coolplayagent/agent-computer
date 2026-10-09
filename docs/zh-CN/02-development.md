@@ -25,6 +25,8 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 
 CLI JSON 输出位于 stdout，诊断位于 stderr；不支持的命令/参数返回退出码 2。运行能力尚未交付，不应将版本命令成功当作运行服务健康。
 
+PostgreSQL 集成测试要求本机安装服务端/客户端二进制并以非 root 用户运行；安装与 Bazel 环境参数见 [08 持久化](08-persistence.md)。缺少 PostgreSQL 时测试失败。
+
 ## 02.3 开发约定
 
 每个提交对应可审阅的能力增量，包含相关构建目标、契约测试及两种语言的进度说明。先保持领域状态与外部副作用分离，再加入数据库、适配器和 UI。验证必须覆盖拒绝路径及与现实副作用相关的不变量。

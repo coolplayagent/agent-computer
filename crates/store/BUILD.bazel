@@ -1,0 +1,26 @@
+load("@crates//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+rust_library(
+    name = "store",
+    srcs = glob(["src/**/*.rs"]),
+    compile_data = glob(["migrations/*.sql"]),
+    crate_name = "agent_computer_store",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    visibility = ["//visibility:public"],
+    deps = ["//crates/core", "//crates/definitions"] + all_crate_deps(normal = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+)
+
+rust_test(
+    name = "postgres_contracts_test",
+    size = "large",
+    srcs = glob(["tests/**/*.rs"]),
+    crate_root = "tests/postgres_contracts.rs",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    tags = ["requires-postgresql"],
+    deps = [":store", "//crates/core", "//crates/definitions"] + all_crate_deps(normal = True, normal_dev = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
+)

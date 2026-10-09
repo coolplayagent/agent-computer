@@ -6,6 +6,7 @@
 | --- | --- |
 | `crates/core` | 无基础设施依赖的领域契约与状态机 |
 | `crates/definitions` | 有界解析、声明语义、固定摘要和结构 Schema |
+| `crates/store` | PostgreSQL 声明版本、原子幂等/CAS 与事件/Outbox 事务 |
 | `crates/cli` | 原生 CLI；提供版本、能力状态、声明验证及 Schema 导出 |
 | `docs/zh-CN`、`docs/en` | 编号一致的用户与开发文档 |
 | `codespec` | 详细需求、设计、决策和验收权威 |

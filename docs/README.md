@@ -9,6 +9,7 @@
 5. [验证与交付证据](zh-CN/05-verification.md)
 6. [领域状态契约](zh-CN/06-domain-contracts.md)
 7. [ComputerSet 声明验证](zh-CN/07-declarations.md)
+8. [PostgreSQL 声明持久化](zh-CN/08-persistence.md)
 
 ## 02. English
 
@@ -19,6 +20,7 @@
 5. [Verification and delivery evidence](en/05-verification.md)
 6. [Domain state contracts](en/06-domain-contracts.md)
 7. [ComputerSet declaration validation](en/07-declarations.md)
+8. [PostgreSQL declaration persistence](en/08-persistence.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

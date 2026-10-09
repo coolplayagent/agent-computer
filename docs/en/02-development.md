@@ -21,6 +21,8 @@ cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
+The PostgreSQL integration suite requires locally installed server/client binaries and a non-root user; see [08 Persistence](08-persistence.md) for setup and Bazel environment flags. Tests fail if PostgreSQL is missing.
+
 Bazelisk reads `.bazelversion`; Rustup reads `rust-toolchain.toml`. Use an organization-provided HTTPS proxy or verified mirror if downloads are restricted. Do not change pinned versions to conceal a download failure.
 
 CLI JSON is written to stdout and diagnostics to stderr. Unsupported commands or arguments exit with code 2. Runtime features are not delivered yet; a successful version query is not a service health check.

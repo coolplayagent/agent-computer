@@ -6,6 +6,7 @@
 | --- | --- |
 | `crates/core` | Domain contracts and state machines without infrastructure dependencies |
 | `crates/definitions` | Bounded parsing, declaration semantics, fixed digests, structural schema |
+| `crates/store` | PostgreSQL declaration versions, atomic retries/CAS and event/Outbox transactions |
 | `crates/cli` | Native CLI with version, capability status, declaration validation, and schema export |
 | `docs/zh-CN`, `docs/en` | User and developer documentation with matching numbering |
 | `codespec` | Authoritative detailed requirements, designs, decisions, and acceptance |

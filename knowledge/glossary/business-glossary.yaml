@@ -4,6 +4,18 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: declaration-registry-version
+    domain: agent-infrastructure
+    canonical_name: DeclarationRegistryVersion
+    definition: 按组织和文档名保存的不可变 ComputerSet 提交版本；revision 与文档内资源前置条件独立，持久化不等于资源 apply 或运行调度。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/types.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0001_declaration_registry.sql
   - id: computer-set
     domain: agent-infrastructure
     canonical_name: ComputerSet

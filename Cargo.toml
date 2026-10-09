@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/core", "crates/definitions", "crates/cli"]
+members = ["crates/core", "crates/definitions", "crates/store", "crates/cli"]
 resolver = "3"
 
 [workspace.package]
@@ -15,6 +15,9 @@ serde_yaml_ng = "0.10"
 schemars = "1.0"
 sha2 = "0.10"
 oci-spec = { version = "0.10", default-features = false, features = ["distribution"] }
+sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "tls-rustls-ring", "postgres", "json", "migrate"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time", "sync"] }
+tempfile = "3"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

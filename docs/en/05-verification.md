@@ -5,6 +5,7 @@
 | Check | What it establishes | What it does not establish |
 | --- | --- | --- |
 | Bazel build/test | Current Rust targets compile and executed contract assertions hold | External services, real isolation, storage durability |
+| PostgreSQL integration tests | Local transactions, concurrency, replay, and WAL recovery | Replication failover, power/disk loss or production deployment certification |
 | Cargo fmt/Clippy | Current source formatting and static diagnostics | Product acceptance |
 | Documentation checks | Local links, paired language files and numbering | Implementation of the linked designs |
 | Qualitygate full | Selected policy checks on the delivery snapshot | Unselected tests; current policy only checks line endings |
@@ -13,7 +14,7 @@
 
 ## 05.2 Current record
 
-2026-10-09 (stages 01–02 and static declarations in 03): Bazel builds, CLI JSON output and error exit codes, Cargo fmt/Clippy, local documentation links, and bilingual numbering passed; Bazel passes 63 tests (28 domain, 28 declaration, 7 CLI process tests). Python independently verifies the Draft 2020-12 schema and example SHA-256. Cargo tests and Clippy also pass. Runtime acceptance T01–T43 is entirely `not_run`. Existing T00 design checks do not establish product delivery.
+2026-10-09 (stages 01–02 and partial 03–04): Bazel builds, CLI JSON output and error exit codes, Cargo fmt/Clippy, local documentation links, and bilingual numbering passed; Bazel passes 71 tests (28 domain, 28 declaration, 7 CLI process tests, 8 real PostgreSQL integration cases). Python independently verifies the Draft 2020-12 schema and example SHA-256. Cargo tests and Clippy also pass. The database suite uses PostgreSQL 18.6 on Linux x86_64 in private temporary clusters with durable settings enabled; it verifies concurrent idempotency/CAS, rollback, immutable versions, migration checksums, snapshot/replay consistency, Outbox retention and WAL crash recovery. See [08 Persistence](08-persistence.md) for reproducible commands and limits. Runtime acceptance T01–T43 is entirely `not_run`. Existing T00 design checks do not establish product delivery.
 
 Local Qualitygate reports are retained in ignored `.qualitygate/`. Before each commit, run `check --worktree --profile full` on the final worktree. Require a nonempty delivery, no pending checks, `gate.complete: true`, `gate.decision: pass`, and exit code 0, plus separate Bazel and static checks. Retain the report's snapshot/policy digests; the default line-ending check is not functional verification.
 
