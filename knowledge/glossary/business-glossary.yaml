@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: sandbox-process-supervisor
+    domain: agent-infrastructure
+    canonical_name: SandboxProcessSupervisor
+    definition: 无控制凭据的隔离容器中一次性 PID 1，执行结构化 argv、限制输出并清理后代；本地报告不授予执行权限或释放写租约，监督器暂停和运行时故障仍需可信外部 watchdog 与 fencing。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/sandbox/src/supervisor.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/sandbox/tests/component.py
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/22-sandbox-supervisor.md
   - id: candidate-file-gateway
     domain: agent-infrastructure
     canonical_name: CandidateFileGateway

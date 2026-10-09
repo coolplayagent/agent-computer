@@ -23,6 +23,7 @@
 19. [Candidate 持久化写入租约](zh-CN/19-candidate-writer-leases.md)
 20. [Candidate 有界文件保存](zh-CN/20-bounded-file-saves.md)
 21. [Candidate 文件 HTTP 网关](zh-CN/21-file-http-gateway.md)
+22. [Sandbox 进程监督器](zh-CN/22-sandbox-supervisor.md)
 
 ## 02. English
 
@@ -47,6 +48,7 @@
 19. [Durable Candidate writer leases](en/19-candidate-writer-leases.md)
 20. [Bounded Candidate file saves](en/20-bounded-file-saves.md)
 21. [Candidate file HTTP gateway](en/21-file-http-gateway.md)
+22. [Sandbox process supervisor](en/22-sandbox-supervisor.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
