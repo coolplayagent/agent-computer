@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported. Credential-bound logical ConnectionSession creation, current views, bounded heartbeats and close are implemented; OIDC/browser login, connection tokens, ViewerSession and lease consumers remain unsupported."
   },
   "servers": [
     {
@@ -1351,6 +1351,496 @@
           }
         }
       }
+    },
+    "/v1alpha1/computers/{id}/connection-sessions": {
+      "post": {
+        "operationId": "createConnectionSession",
+        "description": "Requires runtime.connect and an exact Computer connect grant. Creates no compute, lease, ViewerSession or transport. Requested Computer capabilities are intersected with live grants and credential scopes on every response. Identity fields and AgentSpec/caller_ref extensions are not accepted yet. Exact retries return the original session in its current state.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing runtime.connect scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Current connection metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionSession"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Connection revision or idempotency input conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Inactive connection for a new heartbeat, or retired idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Live-session ceiling reached: 256 per organization, 32 per principal or 64 per Computer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/connection-sessions/{id}": {
+      "get": {
+        "operationId": "getConnectionSession",
+        "description": "Requires the exact original active credential and runtime.connect scope. Only its own session is visible; a replacement credential, another principal or organization receives 404. Expired/Closed/Revoked sessions remain inspectable while the original credential is valid.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing runtime.connect scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current connection metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionSession"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "closeConnectionSession",
+        "description": "Idempotently close an own connection. No key or body is required. Revokes later connection use, without cancelling background work, stopping compute, or proving input/writers drained. A repeated close leaves revision and events unchanged.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing runtime.connect scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current connection metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionSession"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/connection-sessions/{id}/heartbeat": {
+      "post": {
+        "operationId": "heartbeatConnectionSession",
+        "description": "Requires original active credential and Active connection, current connection revision, and an idempotency key. Records only self-reported presence. Fixed lifetime is never extended; a replay has no further write and returns current state.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing runtime.connect scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current connection metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionSession"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Connection revision or idempotency input conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Inactive connection for a new heartbeat, or retired idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionHeartbeat"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2487,6 +2977,217 @@
             "const": false
           }
         }
+      },
+      "ConnectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requested_capabilities"
+        ],
+        "properties": {
+          "requested_capabilities": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 11,
+            "items": {
+              "type": "string",
+              "enum": [
+                "connect",
+                "read",
+                "observe",
+                "app.use",
+                "activate",
+                "execute",
+                "modify",
+                "control",
+                "publish",
+                "manage",
+                "delete"
+              ]
+            },
+            "minItems": 1,
+            "contains": {
+              "const": "connect"
+            }
+          },
+          "lifetime_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600,
+            "default": 900
+          }
+        },
+        "description": "Logical connection only. Identity derives from the current service credential; it is permanently bound to that credential. Capabilities are requested Computer permissions, not resource grants or available backend features. Lifetime is capped by credential expiry."
+      },
+      "ConnectionHeartbeat": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision",
+          "activity",
+          "visibility"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "activity": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "active"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "hidden",
+              "visible"
+            ]
+          }
+        },
+        "description": "Self-reported presence only; not verified user input, readiness, billing or an idle-stop signal. Does not extend the session or identity lifetime."
+      },
+      "ConnectionSession": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "session_id",
+          "computer_id",
+          "principal_id",
+          "principal_kind",
+          "revision",
+          "revocation_revision",
+          "state",
+          "requested_capabilities",
+          "capabilities",
+          "max_runtime_seconds",
+          "created_at_ms",
+          "expires_at_ms",
+          "checked_at_ms",
+          "last_seen_at_ms",
+          "activity",
+          "visibility"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "principal_id": {
+            "type": "string"
+          },
+          "principal_kind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revocation_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "Expired",
+              "Revoked",
+              "Closed"
+            ]
+          },
+          "requested_capabilities": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 11,
+            "items": {
+              "type": "string",
+              "enum": [
+                "connect",
+                "read",
+                "observe",
+                "app.use",
+                "activate",
+                "execute",
+                "modify",
+                "control",
+                "publish",
+                "manage",
+                "delete"
+              ]
+            }
+          },
+          "capabilities": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 11,
+            "items": {
+              "type": "string",
+              "enum": [
+                "connect",
+                "read",
+                "observe",
+                "app.use",
+                "activate",
+                "execute",
+                "modify",
+                "control",
+                "publish",
+                "manage",
+                "delete"
+              ]
+            }
+          },
+          "max_runtime_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 86400
+          },
+          "created_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expires_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "checked_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "last_seen_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "activity": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "active"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "hidden",
+              "visible"
+            ]
+          }
+        },
+        "description": "Current own-session view. Replays return this current view, not a cached authority snapshot. Non-Active sessions expose no capabilities. Closing or revoking never certifies that a writer or process stopped."
       }
     },
     "responses": {

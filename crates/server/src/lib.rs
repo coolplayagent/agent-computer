@@ -2,6 +2,7 @@
 #![forbid(unsafe_code)]
 
 mod computers;
+mod connections;
 mod error;
 mod http;
 mod plans;

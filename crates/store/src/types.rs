@@ -58,6 +58,8 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    ConnectionInactive,
+    ConnectionRevisionConflict,
     WorkspaceInputUnavailable,
     RuntimeConflict,
     RuntimeCapacityUnavailable,
@@ -99,6 +101,8 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::ConnectionInactive => "connection is no longer active",
+            Self::ConnectionRevisionConflict => "connection revision no longer matches",
             Self::WorkspaceInputUnavailable => "workspace has no committed input version",
             Self::RuntimeConflict => "runtime revision or queued request no longer matches",
             Self::RuntimeCapacityUnavailable => "runtime admission capacity is unavailable",

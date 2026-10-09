@@ -90,7 +90,7 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         "--kind",
         "agent",
         "--scopes",
-        "definitions.validate,definitions.manage,runtime.read,runtime.app.use",
+        "definitions.validate,definitions.manage,runtime.read,runtime.app.use,runtime.connect",
         "--ttl-seconds",
         "3600",
         "--output",
@@ -269,6 +269,39 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
     let status: Value = serde_json::from_slice(&inspect.stdout).unwrap();
     assert_eq!(status["progress"][0]["state"], "Pending");
     let store = agent_computer_store::Store::new(database.pool.clone());
+    let computer = super::connections::provision(&store, token, "worker").await;
+    let connect_path = format!("/v1alpha1/computers/{computer}/connection-sessions");
+    let (code, session) = http_with_key(
+        address,
+        "POST",
+        &connect_path,
+        Some(token),
+        Some("tcp-connect"),
+        r#"{"requested_capabilities":["connect","read","modify"]}"#,
+    );
+    assert_eq!(code, 201, "{session}");
+    assert_eq!(
+        session["capabilities"],
+        serde_json::json!(["connect", "read"])
+    );
+    let session_path = format!(
+        "/v1alpha1/connection-sessions/{}",
+        session["session_id"].as_str().unwrap()
+    );
+    let (code, heartbeat) = http_with_key(
+        address,
+        "POST",
+        &format!("{session_path}/heartbeat"),
+        Some(token),
+        Some("tcp-heartbeat"),
+        r#"{"expected_revision":1,"activity":"active","visibility":"visible"}"#,
+    );
+    assert_eq!(code, 200, "{heartbeat}");
+    assert_eq!(heartbeat["expires_at_ms"], session["expires_at_ms"]);
+    assert_eq!(
+        http(address, "DELETE", &session_path, Some(token), "").1["state"],
+        "Closed"
+    );
     use agent_computer_store::reconciliation::{
         ClaimOutcome, ReconcileOutcome, ReconcileReason, WorkerId,
     };

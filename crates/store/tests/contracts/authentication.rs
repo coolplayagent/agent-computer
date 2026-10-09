@@ -193,7 +193,7 @@ async fn runtime_scope_migration_preserves_existing_credentials_without_granting
     let db = Database::new().await;
     // Reconstruct the exact predecessor constraint/history in this disposable
     // database, with no runtime rows. No production downgrade API is provided.
-    sqlx::raw_sql("DROP TABLE candidate_preparations,runtime_start_inputs,workspace_input_heads,workspace_input_versions; DROP FUNCTION guard_candidate_preparation(); DROP TABLE runtime_controls,runtime_start_requests CASCADE; DROP FUNCTION guard_runtime_start_mutation(); DROP TABLE runtime_grants; ALTER TABLE service_credentials DROP CONSTRAINT service_credentials_scopes_check; ALTER TABLE service_credentials ADD CONSTRAINT service_credentials_scopes_check CHECK (cardinality(scopes) BETWEEN 1 AND 2 AND scopes <@ ARRAY['definitions.validate','definitions.manage']::TEXT[]); DELETE FROM _sqlx_migrations WHERE version>=6;")
+    sqlx::raw_sql("DROP TABLE connection_sessions; DROP FUNCTION guard_connection_session_mutation(); DROP TABLE candidate_preparations,runtime_start_inputs,workspace_input_heads,workspace_input_versions; DROP FUNCTION guard_candidate_preparation(); DROP TABLE runtime_controls,runtime_start_requests CASCADE; DROP FUNCTION guard_runtime_start_mutation(); DROP TABLE runtime_grants; ALTER TABLE service_credentials DROP CONSTRAINT service_credentials_scopes_check; ALTER TABLE service_credentials ADD CONSTRAINT service_credentials_scopes_check CHECK (cardinality(scopes) BETWEEN 1 AND 2 AND scopes <@ ARRAY['definitions.validate','definitions.manage']::TEXT[]); DELETE FROM _sqlx_migrations WHERE version>=6;")
         .execute(&db.pool).await.unwrap();
     let credential = db
         .store

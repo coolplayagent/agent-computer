@@ -33,6 +33,18 @@ impl RequestContext {
     pub fn store_error(&self, error: agent_computer_store::Error) -> Response {
         use agent_computer_store::Error;
         match error {
+            Error::ConnectionInactive => self.error(
+                StatusCode::GONE,
+                "connection_inactive",
+                "The connection is expired, closed or revoked.",
+                false,
+            ),
+            Error::ConnectionRevisionConflict => self.error(
+                StatusCode::CONFLICT,
+                "connection_revision_conflict",
+                "The connection revision no longer matches.",
+                false,
+            ),
             Error::WorkspaceInputUnavailable => self.error(
                 StatusCode::CONFLICT,
                 "workspace_input_unavailable",

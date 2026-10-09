@@ -70,7 +70,7 @@ agent-computer-server candidate-prepare-once \
 
 ## 17.4 验证
 
-新增 7 项真实 PostgreSQL 测试覆盖输入/Volume 绑定、不隐式重置的迁移、凭据/grant 重查、旧认领、仅观察接管、取消、错误收据、原子回滚与 WAL 重启。新增 2 项存储测试验证观察缺失目录不产生副作用、保留编辑与绑定校验。默认 Cargo/Bazel 测试合计 178 项；真实组件测试单独执行。
+新增 7 项真实 PostgreSQL 测试覆盖输入/Volume 绑定、不隐式重置的迁移、凭据/grant 重查、旧认领、仅观察接管、取消、错误收据、原子回滚与 WAL 重启。新增 2 项存储测试验证观察缺失目录不产生副作用、保留编辑与绑定校验。此增量交付时默认 Cargo/Bazel 测试合计 178 项，当前总数见 [05 验证](05-verification.md)；真实组件测试单独执行。
 
 显式目标 `//crates/worker:candidate_worker_live_test` 要求一次性、root 管理的 Linux 环境，包括真实 Kubernetes/CSI、完整 JuiceFS 挂载、分离的控制/元数据 PostgreSQL 数据库及 S3。`AGENT_COMPUTER_CANDIDATE_TEST_CONFIG` 指向私有测试配置。测试供应真实 Volume，调用运维命令，核验发布后的 inode 与所有者，在实际发布后注入数据库回执丢失，并验证观察不会重新复制。另一个已派发但无发布目录的请求必须保持未知且不创建文件。详见[测试源码](../../crates/worker/tests/candidate_live.rs)；仅构建该手动目标不算执行证据。
 

@@ -34,6 +34,18 @@ pub fn router(store: Store) -> Router {
             get(|| async { Json(json!({"version":VERSION,"api_version":API_VERSION})) }),
         )
         .route("/v1alpha1/capabilities", get(capabilities))
+        .route(
+            "/v1alpha1/computers/{id}/connection-sessions",
+            post(crate::connections::connect),
+        )
+        .route(
+            "/v1alpha1/connection-sessions/{id}",
+            get(crate::connections::get).delete(crate::connections::close),
+        )
+        .route(
+            "/v1alpha1/connection-sessions/{id}/heartbeat",
+            post(crate::connections::heartbeat),
+        )
         .route("/v1alpha1/openapi.json", get(openapi))
         .route("/v1alpha1/definitions/validate", post(validate))
         .route("/v1alpha1/plans", post(crate::plans::create))
@@ -123,7 +135,7 @@ async fn capabilities() -> Json<serde_json::Value> {
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane",
-            "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
+            "connection.sessions":"control-plane", "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
     )

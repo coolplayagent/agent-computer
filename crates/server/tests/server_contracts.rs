@@ -1,6 +1,7 @@
 mod support;
 mod cases {
     mod authentication;
+    mod connections;
     mod plans;
     mod process;
     mod protocol;

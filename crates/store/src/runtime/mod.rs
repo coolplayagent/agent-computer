@@ -1,6 +1,7 @@
 //! Exact resource runtime grants, separate from declaration management.
 //! No permission implies another, and successful checks do not establish a lease,
 //! a generation, physical fencing, stopped processes, or actual runtime readiness.
+pub mod connections;
 pub(crate) mod inputs;
 pub mod preparation;
 mod start;
@@ -147,8 +148,17 @@ impl Store {
             sqlx::query("DELETE FROM runtime_grants WHERE organization=$1 AND principal=$2 AND kind=$3 AND resource_id=$4 AND permission=$5")
                 .bind(grant.organization.as_str()).bind(grant.principal.as_str()).bind(grant.kind.as_str()).bind(grant.resource_id).bind(grant.permission.as_str()).execute(&mut *tx).await?.rows_affected()
         };
-        if changed > 0 {
-            transactions::emit(&mut tx, grant.organization.as_str(), seq, if enabled { "runtime.permission_changed" } else { "access.revoked" }, serde_json::json!({"principal":grant.principal.as_str(),"kind":grant.kind,"resource_id":grant.resource_id,"permission":grant.permission,"max_runtime_seconds":grant.max_runtime_seconds,"enabled":enabled,"process_termination_confirmed":false})).await?;
+        let revoked_connections = if !enabled
+            && grant.kind == RuntimeKind::Computer
+            && grant.permission == RuntimePermission::Connect
+        {
+            sqlx::query("UPDATE connection_sessions SET state='Revoked',revision=revision+1,revocation_revision=revocation_revision+1 WHERE organization=$1 AND principal=$2 AND computer_id=$3 AND state='Active'")
+                .bind(grant.organization.as_str()).bind(grant.principal.as_str()).bind(grant.resource_id).execute(&mut *tx).await?.rows_affected()
+        } else {
+            0
+        };
+        if changed > 0 || revoked_connections > 0 {
+            transactions::emit(&mut tx, grant.organization.as_str(), seq, if enabled { "runtime.permission_changed" } else { "access.revoked" }, serde_json::json!({"principal":grant.principal.as_str(),"kind":grant.kind,"resource_id":grant.resource_id,"permission":grant.permission,"max_runtime_seconds":grant.max_runtime_seconds,"enabled":enabled,"revoked_connection_count":revoked_connections,"process_termination_confirmed":false})).await?;
         }
         tx.commit().await?;
         Ok(())

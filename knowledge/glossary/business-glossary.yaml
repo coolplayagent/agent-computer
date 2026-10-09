@@ -241,6 +241,12 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/connections/mod.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/18-connection-sessions.md
   - id: generation
     domain: agent-infrastructure
     canonical_name: Generation

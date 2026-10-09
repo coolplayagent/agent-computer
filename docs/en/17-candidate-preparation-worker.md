@@ -70,7 +70,7 @@ Filesystem work runs on a blocking worker thread. A slow or stuck FUSE operation
 
 ## 17.4 Verification
 
-Seven additional real PostgreSQL cases cover input/Volume binding, migration without implicit reset, credential/grant rechecks, stale claims, observation-only takeover, cancellation, changed receipts, atomic rollback and WAL restart. Two storage cases verify side-effect-free absence observation, retained edits and binding validation. Default Cargo/Bazel tests total 178; the live test is separate.
+Seven additional real PostgreSQL cases cover input/Volume binding, migration without implicit reset, credential/grant rechecks, stale claims, observation-only takeover, cancellation, changed receipts, atomic rollback and WAL restart. Two storage cases verify side-effect-free absence observation, retained edits and binding validation. This increment had 178 default Cargo/Bazel tests; see [current totals](05-verification.md). The live test is separate.
 
 The explicit `//crates/worker:candidate_worker_live_test` target requires a disposable root-owned Linux environment with actual Kubernetes/CSI, a full JuiceFS mount, separate control/metadata PostgreSQL databases and S3. `AGENT_COMPUTER_CANDIDATE_TEST_CONFIG` names its private test configuration. The test provisions a real Volume, invokes the operator command, checks the published inode and owner, injects a lost database acknowledgement after actual publication, and verifies observation without recopy. Another dispatched-but-absent case must remain unknown without creating files. See [the test source](../../crates/worker/tests/candidate_live.rs); building this manual target alone is not execution evidence.
 

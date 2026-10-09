@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 38
-updated_at: unix:1791556377
+map_version: 39
+updated_at: unix:1791556987
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -104,8 +104,8 @@ topics:
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-2be964eaf824216a1d01b6d5f82f33df9b4e3c4c98b48014649d294f33a69ac7.yaml
-  digest: 2be964eaf824216a1d01b6d5f82f33df9b4e3c4c98b48014649d294f33a69ac7
+  ref: topics/topic-875b9380866e9d56-98fefff02340fefd447a98472fb0e75e11793bac2ca4ae5d860980a5f8c9d1f7.yaml
+  digest: 98fefff02340fefd447a98472fb0e75e11793bac2ca4ae5d860980a5f8c9d1f7
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -129,12 +129,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 22
+  omitted_through: 23
   recent:
-  - version: 23
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-acceptance'.
   - version: 24
     action: source.add
     actor: cli
@@ -195,3 +191,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'candidate-preparation-worker' to topic 'development'.
+  - version: 39
+    action: source.update
+    actor: cli
+    summary: Updated source 'candidate-preparation-worker'.
