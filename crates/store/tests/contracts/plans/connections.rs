@@ -705,7 +705,7 @@ async fn connection_upgrade_preserves_existing_metadata_and_checks_exact_migrati
         .fetch_one(&db.pool)
         .await
         .unwrap();
-    sqlx::raw_sql("DROP TABLE connection_sessions; DROP FUNCTION guard_connection_session_mutation(); DELETE FROM _sqlx_migrations WHERE version=9;").execute(&db.pool).await.unwrap();
+    sqlx::raw_sql("DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DROP TABLE connection_sessions; DROP FUNCTION guard_connection_session_mutation(); DELETE FROM _sqlx_migrations WHERE version>=9;").execute(&db.pool).await.unwrap();
     assert!(matches!(db.store.ready().await, Err(Error::SchemaNotReady)));
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();

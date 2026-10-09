@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported. Credential-bound logical ConnectionSession creation, current views, bounded heartbeats and close are implemented; OIDC/browser login, connection tokens, ViewerSession and lease consumers remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported. Credential-bound logical ConnectionSession creation, current views, bounded heartbeats and close are implemented; OIDC/browser login, connection tokens, ViewerSession and lease consumers remain unsupported. Candidate modify leases now provide durable connection-owned acquisition, renewal, guarded one-time internal dispatch journaling and zero-dispatch release. Writer executors, watchdogs, physical fencing and control leases remain unsupported."
   },
   "servers": [
     {
@@ -1604,7 +1604,7 @@
       },
       "delete": {
         "operationId": "closeConnectionSession",
-        "description": "Idempotently close an own connection. No key or body is required. Revokes later connection use, without cancelling background work, stopping compute, or proving input/writers drained. A repeated close leaves revision and events unchanged.",
+        "description": "Idempotently close an own connection. No key or body is required. Revokes later connection use, without cancelling background work, stopping compute, or proving input/writers drained. A repeated close leaves revision and events unchanged. Closing atomically marks Held writer leases Draining; a trusted reconcile can release only a zero-dispatch epoch.",
         "security": [
           {
             "serviceBearer": []
@@ -1836,6 +1836,571 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ConnectionHeartbeat"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/computers/{id}/leases": {
+      "post": {
+        "operationId": "acquireCandidateWriter",
+        "description": "Requires runtime.connect/read/modify scopes, exact own Active connection and independent Computer/Workspace grants. Acquires modify ownership on the current Prepared Candidate, default/max 30 seconds; recommend renewal every 10 seconds. Held or Draining owners block takeover, including after expiry. A Released head can advance its epoch. Retrying a key after a later epoch fails; it never reacquires ownership. Does not start an executor or advertise Ready.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Current own-epoch lease metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriterLease"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcquireWriterLease"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/leases/{id}": {
+      "get": {
+        "operationId": "getCandidateWriter",
+        "description": "Requires the exact original credential and runtime.connect scope. Returns current own-epoch metadata; expiry or invalid authority derives Draining. Lease IDs confer no authority; this endpoint is not a physical fencing check.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current own-epoch lease metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriterLease"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/leases/{id}/renew": {
+      "post": {
+        "operationId": "renewCandidateWriter",
+        "description": "Requires live Held ownership, runtime.connect/read/modify scopes and current independent grants, generation, epoch and revision. Renewal does not revive expired/Draining ownership. Retry returns current metadata without another extension.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current own-epoch lease metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriterLease"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenewWriterLease"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/leases/{id}/release": {
+      "post": {
+        "operationId": "releaseCandidateWriter",
+        "description": "Requires the exact original credential, runtime.connect scope and owner/generation/epoch/revision CAS. Removes future admission. Returns 200 Released only with immutable no_dispatch journal proof; returns 202 Draining after recorded dispatch. Neither expiry nor caller-supplied stopped flags prove physical drain. Release does not cancel compute, release resource reservations or publish an Artifact.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current own-epoch lease metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriterLease"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Draining; physical completion is unconfirmed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriterLease"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WriterLeaseCommand"
               }
             }
           }
@@ -3188,6 +3753,167 @@
           }
         },
         "description": "Current own-session view. Replays return this current view, not a cached authority snapshot. Non-Active sessions expose no capabilities. Closing or revoking never certifies that a writer or process stopped."
+      },
+      "AcquireWriterLease": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scope",
+          "connection_session_id",
+          "candidate_id",
+          "generation"
+        ],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "const": "modify"
+          },
+          "connection_session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 30
+          }
+        },
+        "description": "Current Prepared Candidate only. Session must belong to the exact credential and request connect/read/modify; current Computer connect/read/modify and Workspace read/modify grants are all required. Duration is capped by the session deadline."
+      },
+      "WriterLeaseCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "connection_session_id",
+          "generation",
+          "epoch",
+          "expected_revision"
+        ],
+        "properties": {
+          "connection_session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "epoch": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "description": "Exact current owner, Computer generation, ownership epoch and lease revision CAS."
+      },
+      "RenewWriterLease": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lease"
+        ],
+        "properties": {
+          "lease": {
+            "$ref": "#/components/schemas/WriterLeaseCommand"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 30
+          }
+        },
+        "description": "Renew a live Held lease. Never shortens the existing deadline or exceeds the session deadline. Exact retries do not extend it twice."
+      },
+      "WriterLease": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lease_id",
+          "computer_id",
+          "candidate_id",
+          "connection_session_id",
+          "generation",
+          "epoch",
+          "revision",
+          "state",
+          "expires_at_ms",
+          "checked_at_ms",
+          "dispatch_recorded",
+          "release_proof"
+        ],
+        "properties": {
+          "lease_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "connection_session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "epoch": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Held",
+              "Draining",
+              "Released"
+            ]
+          },
+          "expires_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "checked_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dispatch_recorded": {
+            "type": "boolean"
+          },
+          "release_proof": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "no_dispatch",
+              null
+            ]
+          }
+        },
+        "description": "Current own-epoch control metadata, not an IO capability or stopped-process proof. Held becomes effectively Draining on expiry or authority loss. Released requires a durable no_dispatch proof; a recorded dispatch remains Draining until a future physical drain/fence adapter is implemented. Ready remains false."
       }
     },
     "responses": {

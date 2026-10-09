@@ -20,6 +20,7 @@
 16. [Computer 持久化启动准入](zh-CN/16-start-admission.md)
 17. [Candidate 持久化准备 worker](zh-CN/17-candidate-preparation-worker.md)
 18. [持久化逻辑连接会话](zh-CN/18-connection-sessions.md)
+19. [Candidate 持久化写入租约](zh-CN/19-candidate-writer-leases.md)
 
 ## 02. English
 
@@ -41,6 +42,7 @@
 16. [Durable Computer start admission](en/16-start-admission.md)
 17. [Durable Candidate preparation worker](en/17-candidate-preparation-worker.md)
 18. [Durable logical connection sessions](en/18-connection-sessions.md)
+19. [Durable Candidate writer leases](en/19-candidate-writer-leases.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

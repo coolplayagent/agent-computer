@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: candidate-writer-lease
+    domain: agent-infrastructure
+    canonical_name: CandidateWriterLease
+    definition: 绑定原凭据连接、当前 generation/Candidate 及准备收据的持久化修改所有权；单调 epoch 与派发日志约束交接，仅零派发证明可释放，过期或撤权不等于实际写入停止。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/mod.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0010_candidate_writer_leases.sql
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/19-candidate-writer-leases.md
   - id: candidate-preparation
     domain: agent-infrastructure
     canonical_name: CandidatePreparation

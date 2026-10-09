@@ -84,7 +84,7 @@ async fn view(
     })
 }
 
-async fn final_view(
+pub(super) async fn final_view(
     tx: &mut Transaction<'_, Postgres>,
     token: &str,
     identity: &AuthenticatedPrincipal,
@@ -266,7 +266,10 @@ impl Store {
                 .ok_or(Error::CounterExhausted)?;
             sqlx::query("UPDATE connection_sessions SET revision=$3,revocation_revision=$4,state='Closed' WHERE organization=$1 AND session_id=$2")
                 .bind(identity.organization().as_str()).bind(id).bind(revision).bind(revoked).execute(&mut *tx).await?;
-            transactions::emit(&mut tx, identity.organization().as_str(), seq, "connection.closed", serde_json::json!({"session_id":id,"revision":revision,"revocation_revision":revoked,"process_termination_confirmed":false})).await?;
+            let draining_writers =
+                super::writers::invalidate_session(&mut tx, identity.organization().as_str(), id)
+                    .await?;
+            transactions::emit(&mut tx, identity.organization().as_str(), seq, "connection.closed", serde_json::json!({"session_id":id,"revision":revision,"revocation_revision":revoked,"draining_writer_count":draining_writers,"process_termination_confirmed":false})).await?;
         }
         let result = final_view(&mut tx, token, &identity, id).await?;
         tx.commit().await?;

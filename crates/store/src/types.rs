@@ -58,6 +58,9 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    WriterLeaseBusy,
+    WriterLeaseConflict,
+    WriterLeaseInactive,
     ConnectionInactive,
     ConnectionRevisionConflict,
     WorkspaceInputUnavailable,
@@ -101,6 +104,11 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::WriterLeaseBusy => "candidate writer ownership has not been released",
+            Self::WriterLeaseConflict => {
+                "writer generation, epoch, owner or revision no longer matches"
+            }
+            Self::WriterLeaseInactive => "writer admission expired or is draining",
             Self::ConnectionInactive => "connection is no longer active",
             Self::ConnectionRevisionConflict => "connection revision no longer matches",
             Self::WorkspaceInputUnavailable => "workspace has no committed input version",

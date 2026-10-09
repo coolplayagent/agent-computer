@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 39
-updated_at: unix:1791556987
+map_version: 40
+updated_at: unix:1791558079
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -96,6 +96,7 @@ topics:
   - candidate-preparation-worker
   - candidate-storage-guide
   - computer-start-admission
+  - connection-sessions-guide
   - control-service-guide
   - declaration-persistence-guide
   - definition-plans-guide
@@ -104,8 +105,8 @@ topics:
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-98fefff02340fefd447a98472fb0e75e11793bac2ca4ae5d860980a5f8c9d1f7.yaml
-  digest: 98fefff02340fefd447a98472fb0e75e11793bac2ca4ae5d860980a5f8c9d1f7
+  ref: topics/topic-875b9380866e9d56-0da5b466f4965b7ca943fe93b0e43e2e611615c4f9a29f5d428e39150e280d63.yaml
+  digest: 0da5b466f4965b7ca943fe93b0e43e2e611615c4f9a29f5d428e39150e280d63
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -129,12 +130,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 23
+  omitted_through: 24
   recent:
-  - version: 24
-    action: source.add
-    actor: cli
-    summary: Added source 'agent-computer-collaboration-foundations' to topic 'architecture'.
   - version: 25
     action: source.add
     actor: cli
@@ -195,3 +192,7 @@ history:
     action: source.update
     actor: cli
     summary: Updated source 'candidate-preparation-worker'.
+  - version: 40
+    action: source.add
+    actor: cli
+    summary: Added source 'connection-sessions-guide' to topic 'development'.

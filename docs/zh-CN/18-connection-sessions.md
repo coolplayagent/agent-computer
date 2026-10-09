@@ -54,4 +54,4 @@
 
 新增 10 项 PostgreSQL 场景覆盖持久化/重试、WAL 重启、人/Agent 归属、凭据/组织隔离、权限变化、终态撤销、心跳竞争、到期、不可变字段、回滚、准入上限与迁移校验和。新增 2 项 HTTP 场景验证生命周期和身份字段拒绝；已有独立 TCP 进程测试也执行连接、心跳和关闭。数据库测试使用开启耐久配置的真实 PostgreSQL。
 
-这是连接拥有者写租约/控制租约的前置权威元数据。租约、真实排空/fencing、受限连接 token、OIDC、浏览器传输、ViewerSession、基于活动的停止及完整 Computer 执行仍待实现。T01–T43 运行验收继续保持 `not_run`。关联文档：[15 运行授权](15-runtime-authorization.md)、[16 启动准入](16-start-admission.md)、[17 Candidate 准备](17-candidate-preparation-worker.md)。
+连接所有的 Candidate 写入租约权威已实现，见 [19 写入租约](19-candidate-writer-leases.md)。关闭连接会原子地把 Held 写入租约改为 Draining，但不证明物理操作已完成。GUI 控制租约、真实排空/fencing、受限连接 token、OIDC、浏览器传输、ViewerSession、基于活动的停止及完整 Computer 执行仍待实现。T01–T43 运行验收继续保持 `not_run`。关联文档：[15 运行授权](15-runtime-authorization.md)、[16 启动准入](16-start-admission.md)、[17 Candidate 准备](17-candidate-preparation-worker.md)。

@@ -244,6 +244,28 @@ pub(super) async fn reauthorize(
     Ok(())
 }
 
+/// Validate pinned catalog dependencies without adopting the original starter identity.
+pub(crate) async fn validate_catalogs(
+    tx: &mut Transaction<'_, Postgres>,
+    org: &str,
+    request: &str,
+) -> Result<()> {
+    let row=sqlx::query("SELECT snapshot,snapshot_digest FROM runtime_start_requests WHERE organization=$1 AND request_id=$2").bind(org).bind(request).fetch_one(&mut **tx).await?;
+    let snapshot: Snapshot =
+        serde_json::from_value(row.try_get("snapshot")?).map_err(|_| Error::InvalidStoredData)?;
+    if digest("agent-computer/start-snapshot-v1", &snapshot)?
+        != row.try_get::<String, _>("snapshot_digest")?
+    {
+        return Err(Error::InvalidStoredData);
+    }
+    for resource in &snapshot.resources {
+        if resource.reference.kind.catalog() {
+            load(tx, org, &resource.reference).await?;
+        }
+    }
+    Ok(())
+}
+
 /// Recheck the original admitted credential, all grants and catalog versions.
 pub(crate) async fn authorize_bound(
     tx: &mut Transaction<'_, Postgres>,

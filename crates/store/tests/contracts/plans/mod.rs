@@ -15,6 +15,7 @@ mod reconciliation;
 mod references;
 mod runtime;
 mod starts;
+mod writers;
 
 const EXAMPLE: &[u8] = include_bytes!("../../../../../examples/research.computer.yaml");
 fn example() -> Value {

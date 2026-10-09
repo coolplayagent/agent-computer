@@ -6,6 +6,7 @@ pub(crate) mod inputs;
 pub mod preparation;
 mod start;
 mod types;
+pub mod writers;
 use crate::{
     Error, Result, Store,
     auth::{AuthenticatedPrincipal, ServiceScope},
@@ -157,8 +158,13 @@ impl Store {
         } else {
             0
         };
-        if changed > 0 || revoked_connections > 0 {
-            transactions::emit(&mut tx, grant.organization.as_str(), seq, if enabled { "runtime.permission_changed" } else { "access.revoked" }, serde_json::json!({"principal":grant.principal.as_str(),"kind":grant.kind,"resource_id":grant.resource_id,"permission":grant.permission,"max_runtime_seconds":grant.max_runtime_seconds,"enabled":enabled,"revoked_connection_count":revoked_connections,"process_termination_confirmed":false})).await?;
+        let draining_writers = if !enabled {
+            writers::invalidate_grant(&mut tx, &grant).await?
+        } else {
+            0
+        };
+        if changed > 0 || revoked_connections > 0 || draining_writers > 0 {
+            transactions::emit(&mut tx, grant.organization.as_str(), seq, if enabled { "runtime.permission_changed" } else { "access.revoked" }, serde_json::json!({"principal":grant.principal.as_str(),"kind":grant.kind,"resource_id":grant.resource_id,"permission":grant.permission,"max_runtime_seconds":grant.max_runtime_seconds,"enabled":enabled,"revoked_connection_count":revoked_connections,"draining_writer_count":draining_writers,"process_termination_confirmed":false})).await?;
         }
         tx.commit().await?;
         Ok(())

@@ -7,4 +7,5 @@ mod cases {
     mod protocol;
     mod runtime;
     mod starts;
+    mod writers;
 }

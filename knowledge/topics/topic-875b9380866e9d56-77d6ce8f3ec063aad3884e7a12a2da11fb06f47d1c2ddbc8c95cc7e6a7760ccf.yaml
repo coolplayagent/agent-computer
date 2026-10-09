@@ -12,8 +12,8 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 1
-  description: 'Durable Candidate preparation and committed Workspace input; paired English guide: docs/en/17-candidate-preparation-worker.md'
+  version: 2
+  description: Durable Candidate preparation worker, committed Workspace input, dispatch recovery and real CSI/PostgreSQL/JuiceFS evidence; paired English docs/en/17-candidate-preparation-worker.md
 - id: candidate-storage-guide
   topic: development
   kind: doc
@@ -24,6 +24,16 @@ sources:
   status: active
   version: 1
   description: Candidate 存储准备、配额与重试；配套英文文档 docs/en/14-candidate-storage.md
+- id: candidate-writer-leases
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/19-candidate-writer-leases.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Connection-owned Candidate modify leases, durable dispatch journal and zero-dispatch handoff; paired English docs/en/19-candidate-writer-leases.md
 - id: computer-start-admission
   topic: development
   kind: doc
@@ -34,6 +44,15 @@ sources:
   status: active
   version: 1
   description: 'Durable Computer start admission and capacity reservations; paired English guide: docs/en/16-start-admission.md'
+- id: connection-sessions-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/18-connection-sessions.md
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Credential-bound logical connections, live capability intersections, heartbeat and close; paired English docs/en/18-connection-sessions.md
 - id: control-service-guide
   topic: development
   kind: doc
@@ -128,4 +147,6 @@ route:
   - runtime-authorization-guide
   - computer-start-admission
   - candidate-preparation-worker
+  - connection-sessions-guide
+  - candidate-writer-leases
   fallback: bounded-search

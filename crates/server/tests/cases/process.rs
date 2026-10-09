@@ -90,7 +90,7 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         "--kind",
         "agent",
         "--scopes",
-        "definitions.validate,definitions.manage,runtime.read,runtime.app.use,runtime.connect",
+        "definitions.validate,definitions.manage,runtime.read,runtime.app.use,runtime.connect,runtime.modify,runtime.activate",
         "--ttl-seconds",
         "3600",
         "--output",
@@ -383,6 +383,44 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         .1["state"],
         "Failed"
     );
+    let start = super::writers::prepared(&store, &database.pool, token, &computer, "worker").await;
+    let (code, writer_session) = http_with_key(
+        address,
+        "POST",
+        &connect_path,
+        Some(token),
+        Some("tcp-writer-connect"),
+        r#"{"requested_capabilities":["connect","read","modify"]}"#,
+    );
+    assert_eq!(code, 201, "{writer_session}");
+    let (code, writer) = http_with_key(address, "POST", &format!("/v1alpha1/computers/{computer}/leases"), Some(token), Some("tcp-writer"), &serde_json::json!({"scope":"modify","connection_session_id":writer_session["session_id"],"candidate_id":start.candidate_id,"generation":start.generation}).to_string());
+    assert_eq!(code, 201, "{writer}");
+    let writer_session_path = format!(
+        "/v1alpha1/connection-sessions/{}",
+        writer_session["session_id"].as_str().unwrap()
+    );
+    assert_eq!(
+        http(address, "DELETE", &writer_session_path, Some(token), "").0,
+        200
+    );
+    let reconciled = command(
+        &[
+            "writer-lease-reconcile",
+            "--organization",
+            "acme",
+            "--lease-id",
+            writer["lease_id"].as_str().unwrap(),
+        ],
+        &database_file,
+    );
+    assert!(
+        reconciled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&reconciled.stderr)
+    );
+    let released: Value = serde_json::from_slice(&reconciled.stdout).unwrap();
+    assert_eq!(released["state"], "Released");
+    assert_eq!(released["release_proof"], "no_dispatch");
     let profile = command(
         &[
             "catalog-register",

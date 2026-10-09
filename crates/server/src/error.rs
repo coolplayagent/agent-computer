@@ -33,6 +33,24 @@ impl RequestContext {
     pub fn store_error(&self, error: agent_computer_store::Error) -> Response {
         use agent_computer_store::Error;
         match error {
+            Error::WriterLeaseBusy => self.error(
+                StatusCode::CONFLICT,
+                "writer_busy",
+                "Candidate writer ownership has not been released.",
+                false,
+            ),
+            Error::WriterLeaseConflict => self.error(
+                StatusCode::CONFLICT,
+                "writer_lease_conflict",
+                "Writer generation, epoch, owner or revision no longer matches.",
+                false,
+            ),
+            Error::WriterLeaseInactive => self.error(
+                StatusCode::CONFLICT,
+                "writer_lease_inactive",
+                "Writer admission expired or is draining.",
+                false,
+            ),
             Error::ConnectionInactive => self.error(
                 StatusCode::GONE,
                 "connection_inactive",

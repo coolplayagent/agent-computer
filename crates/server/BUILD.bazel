@@ -3,7 +3,7 @@ load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "server",
-    srcs = ["src/lib.rs", "src/http.rs", "src/error.rs", "src/plans.rs", "src/requests.rs", "src/runtime.rs", "src/computers.rs", "src/connections.rs"],
+    srcs = ["src/lib.rs", "src/http.rs", "src/error.rs", "src/plans.rs", "src/requests.rs", "src/runtime.rs", "src/computers.rs", "src/connections.rs", "src/writers.rs"],
     compile_data = ["//schemas:openapi-v1alpha1.json"],
     crate_name = "agent_computer_server",
     edition = "2024",

@@ -24,7 +24,7 @@ agent-computer-server workspace-initialize-empty \
 
 派发之后租约过期或回执丢失，接管者**只能观察**。`observe_prepared` 读取原最终目录，核对收据与 inode，重新确认配额并同步元数据；不会创建暂存目录、重新复制输入或重置已修改数据。发布目录缺失或存储错误将请求保留为 Preparing，原因为 `storage_unknown`，资源预留继续保留。后续观察可以发现原派发最终完成的发布；没有自动清理、另分 generation 或物理隔离声明。
 
-有效存储收据绑定请求摘要、文件系统 UUID、PVC UID、准确数据路径、inode、manifest 摘要与配额。数据库原子提交收据、`Prepared` 状态、控制版本、事件与 Outbox。精确完成重试幂等，旧租约不能覆盖结果。公开运行状态查询新增 `Prepared`，但 `ready` 仍为 false。Prepared 仅表示受信任适配器已确认文件和配额；Pod 创建、写入租约、驱动健康及 Computer Ready 是后续工作。
+有效存储收据绑定请求摘要、文件系统 UUID、PVC UID、准确数据路径、inode、manifest 摘要与配额。数据库原子提交收据、`Prepared` 状态、控制版本、事件与 Outbox。精确完成重试幂等，旧租约不能覆盖结果。公开运行状态查询新增 `Prepared`，但 `ready` 仍为 false。Prepared 仅表示受信任适配器已确认文件和配额；写入所有权另见已实现的 [19 写入租约](19-candidate-writer-leases.md)；Pod 创建、物理排空、驱动健康及 Computer Ready 仍待实现。
 
 ## 17.3 本地 worker 部署
 

@@ -95,7 +95,13 @@ pub(super) async fn provision(store: &Store, token: &str, actor: &str) -> String
     }
     computer
 }
-fn req(token: &str, method: &str, path: &str, key: Option<&str>, body: Value) -> Request<Body> {
+pub(super) fn req(
+    token: &str,
+    method: &str,
+    path: &str,
+    key: Option<&str>,
+    body: Value,
+) -> Request<Body> {
     let mut r = Request::builder()
         .method(method)
         .uri(path)

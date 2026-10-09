@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 40
-updated_at: unix:1791558079
+map_version: 41
+updated_at: unix:1791559496
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -95,6 +95,7 @@ topics:
   source_ids:
   - candidate-preparation-worker
   - candidate-storage-guide
+  - candidate-writer-leases
   - computer-start-admission
   - connection-sessions-guide
   - control-service-guide
@@ -105,8 +106,8 @@ topics:
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-0da5b466f4965b7ca943fe93b0e43e2e611615c4f9a29f5d428e39150e280d63.yaml
-  digest: 0da5b466f4965b7ca943fe93b0e43e2e611615c4f9a29f5d428e39150e280d63
+  ref: topics/topic-875b9380866e9d56-77d6ce8f3ec063aad3884e7a12a2da11fb06f47d1c2ddbc8c95cc7e6a7760ccf.yaml
+  digest: 77d6ce8f3ec063aad3884e7a12a2da11fb06f47d1c2ddbc8c95cc7e6a7760ccf
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -130,12 +131,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 24
+  omitted_through: 25
   recent:
-  - version: 25
-    action: source.add
-    actor: cli
-    summary: Added source 'numbered-bilingual-docs' to topic 'development'.
   - version: 26
     action: source.add
     actor: cli
@@ -196,3 +193,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'connection-sessions-guide' to topic 'development'.
+  - version: 41
+    action: source.add
+    actor: cli
+    summary: Added source 'candidate-writer-leases' to topic 'development'.
