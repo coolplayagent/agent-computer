@@ -38,3 +38,5 @@ agent-computer-server execution-recover-once --database-url-file /private/contro
 公开运行能力仍报告执行不支持。生产监督器打包、独立于控制器的 watchdog、物理 fencing、持久有界输出对象、完成接纳、自动崩溃对账和后台存续期仍待实现。本地轮询不能解决控制器或 PID 1 暂停。T01–T43 保持 `not_run`。
 
 实测夹具为五个固定 10 GiB Candidate 配置 50 GiB Volume。最初的 4 GiB 配置在创建执行 Pod 前被容量准入正确拒绝。可选 `node_observation_file` 为独立[节点检查器](../../crates/worker/tests/execution_node.py)启用最多 8 秒的取消屏障：在一次性 VM 内以 `--observation PATH --output PATH` 并行运行。检查器验证实际 runsc 容器和 kubelet Candidate 挂载 inode 后才释放屏障，执行预算持续消耗。
+
+五个场景已在 `bacaef9` 上实测通过。数据库回读保留 5 条派发、4 份 Pod 计划/UID 和 3 份启动授权，均关联原身份；5 条执行保持 Unknown，写入租约保持 Draining，完成接纳与排空记录均为零。节点检查确认取消场景的 runsc 容器及 Candidate inode 25。新的只读 JuiceFS 客户端通过两次 S3 GET 回读两个持久文件，共 18 字节。[固定源码记录](../evidence/candidate-execution-worker-2026-10-10.json)与[原始输出](../evidence/candidate-execution-worker-2026-10-10.log)绑定 223 个源码/构建输入、精确二进制/镜像，并保留此前的容量拒绝。取证后已回收自建 VM 及其私有凭据和存储。

@@ -1,0 +1,52 @@
+ATTEMPT 1 — capacity admission rejected before execution Pod creation; source 14ae0230db7f8686f063cb4de29cb60dd16d33d5
+
+running 1 test
+
+thread 'real_candidate_execution_uses_durable_grants_and_observation_only_recovery' (6524) panicked at crates/worker/tests/execution_live.rs:282:14:
+called `Result::unwrap()` on an `Err` value: RuntimeCapacityUnavailable
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery ... FAILED
+
+failures:
+
+failures:
+    real_candidate_execution_uses_durable_grants_and_observation_only_recovery
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.92s
+
+
+ATTEMPT 2 — fixed fixture capacity and independent node inspection; source bacaef93da8a6028a18cccac94f2b07a90a405f5
+
+running 1 test
+EXECUTION_WORKER_DATABASE_CSI_GVISOR_PASSED
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 27.86s
+
+NODE_INSPECTOR_EXIT 0
+
+NODE INSPECTION
+EXECUTION_NODE_IDENTITY_AND_INODE_VERIFIED
+
+INDEPENDENT READBACK
+{
+  "fresh_client_reads": [
+    {
+      "case": "normal",
+      "bytes": 9,
+      "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664",
+      "inode": 3074
+    },
+    {
+      "case": "command",
+      "bytes": 9,
+      "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664",
+      "inode": 4098
+    }
+  ],
+  "object_get_metrics": [
+    "juicefs_object_request_data_bytes_GET 18",
+    "juicefs_object_request_durations_histogram_seconds_GET_total 2",
+    "juicefs_object_request_durations_histogram_seconds_GET_sum 0.004147714"
+  ]
+}

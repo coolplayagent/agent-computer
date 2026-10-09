@@ -51,3 +51,5 @@
 新增 7 项 PostgreSQL 场景验证不可变执行 Pod 计划、单次创建凭据、UID 绑定启动授权、崩溃恢复、回滚和迁移 15 兼容，见 [28 Pod 身份持久化](28-execution-pod-journal.md)。模拟适配器夹具不证明实际 Pod 创建或物理排空。
 
 新增 3 项 PostgreSQL 场景验证固定执行输入和不恢复权限的只读对账，见 [29 执行工作器](29-execution-worker.md)。工作器连接数据库派发/授权与 Candidate Pod 创建、attach，采用条件清理并保留 Unknown/Draining。真实组件运行需另行记录固定源码证据。
+
+数据库/CSI/gVisor 执行工作器在 `bacaef9` 上通过五个真实场景，包含启动授权、运营派发命令、取消和仅观察恢复。[固定证据](../evidence/candidate-execution-worker-2026-10-10.json)包含节点 inode 检查及两次独立 S3 回读。执行仍保留 Unknown/Draining，完成接纳/排空记录为零，运行验收仍未执行。
