@@ -1,0 +1,7 @@
+alias(
+    name = "agent-computer",
+    actual = "//crates/cli:agent-computer",
+    visibility = ["//visibility:public"],
+)
+
+exports_files(["rust-toolchain.toml"])

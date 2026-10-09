@@ -1,3 +1,5 @@
 .qualitygate/
 codespec/*.lock
 knowledge/*.lock
+/target/
+/bazel-*

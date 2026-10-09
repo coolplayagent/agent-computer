@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 23
-updated_at: unix:1791531759
+map_version: 24
+updated_at: unix:1791533686
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -62,10 +62,11 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - agent-computer-agentic-runtime
+  - agent-computer-collaboration-foundations
   - agent-computer-compute-storage-selection
   - agent-computer-design
-  ref: topics/topic-4ca303a3bf7ddf7b-0d2a6d6235e128c94f49d1f010c123c5132e866d1cb287a8f6fb476f4b00db8e.yaml
-  digest: 0d2a6d6235e128c94f49d1f010c123c5132e866d1cb287a8f6fb476f4b00db8e
+  ref: topics/topic-4ca303a3bf7ddf7b-3aeeb2c3b20bcc594276188fbb71f1494a177f9d7167ccfde1a9a79a26e99829.yaml
+  digest: 3aeeb2c3b20bcc594276188fbb71f1494a177f9d7167ccfde1a9a79a26e99829
 - id: business-knowledge
   title: Business knowledge
   description: Version-controlled business domains, terminology, aliases, semantics, and technical mappings.
@@ -103,12 +104,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 7
+  omitted_through: 8
   recent:
-  - version: 8
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-ecosystem'.
   - version: 9
     action: source.update
     actor: cli
@@ -169,3 +166,7 @@ history:
     action: source.update
     actor: cli
     summary: Updated source 'agent-computer-acceptance'.
+  - version: 24
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-collaboration-foundations' to topic 'architecture'.
