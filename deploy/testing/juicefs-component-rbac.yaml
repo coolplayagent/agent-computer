@@ -1,0 +1,69 @@
+# Extend kubernetes-component.yaml only in a disposable CSI test cluster.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ac-volume-provisioner
+  namespace: ac-kube-component
+rules:
+  - apiGroups: [""]
+    resources: [persistentvolumeclaims]
+    verbs: [get, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ac-volume-provisioner
+  namespace: ac-kube-component
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ac-volume-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ac-volume-observer
+rules:
+  - apiGroups: [""]
+    resources: [persistentvolumes]
+    verbs: [get]
+  - apiGroups: [storage.k8s.io]
+    resources: [storageclasses]
+    resourceNames: [ac-juicefs]
+    verbs: [get]
+  - apiGroups: [storage.k8s.io]
+    resources: [csidrivers]
+    resourceNames: [csi.juicefs.com]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ac-volume-observer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ac-volume-observer
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ac-juicefs
+provisioner: csi.juicefs.com
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+mountOptions: [writeback=false]
+parameters:
+  csi.storage.k8s.io/fstype: juicefs
+  csi.storage.k8s.io/provisioner-secret-name: ac-juicefs-secret
+  csi.storage.k8s.io/provisioner-secret-namespace: kube-system
+  csi.storage.k8s.io/node-publish-secret-name: ac-juicefs-secret
+  csi.storage.k8s.io/node-publish-secret-namespace: kube-system

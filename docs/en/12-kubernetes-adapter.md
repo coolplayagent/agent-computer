@@ -20,7 +20,7 @@ Creation makes one POST. A conflict requires readback; a lost response or invali
 
 ## 12.3 Verification
 
-The default suite includes 13 adapter tests covering response loss without repeated POST, conflicting identities, injected spec fields, preflight rejection, conditional deletion, bounded responses and redacted errors. They are protocol fixtures, not runtime acceptance.
+The default suite includes 13 Pod adapter tests covering response loss without repeated POST, conflicting identities, injected spec fields, preflight rejection, conditional deletion, bounded responses and redacted errors. Four additional [Volume cases](13-volume-provisioning.md) bring the adapter suite to 17 tests. These are protocol fixtures, not runtime acceptance.
 
 The explicit component target needs an isolated cluster with runsc and an enforcing CNI. The [test deployment](../../deploy/testing/kubernetes-component.yaml) provisions a dedicated namespace, RuntimeClass, deny policy and narrowly scoped service account. Apply it only to a disposable test cluster. Obtain an expiring token for `ac-adapter`, the cluster CA, and actual object UIDs as the operator; store credentials outside the repository with private permissions.
 

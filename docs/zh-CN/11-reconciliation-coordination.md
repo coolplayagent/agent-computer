@@ -80,3 +80,5 @@ resume 要求当前准入权限有效。abandon 属于可信运维操作，只�
 服务测试通过 HTTP 验证当前进度/水位，并使用独立 TCP 进程覆盖三条运维修复命令。Cargo/Bazel 完整测试集共 103 项：28 领域、28 声明、7 CLI、33 PostgreSQL、7 服务场景。运行方式见[数据库测试命令](08-persistence.md)。
 
 本次检查的开发主机没有 Docker CLI/运行环境，也没有已注册 repo-sandbox 目标，未执行 Kubernetes/gVisor 实验。worker 调度、真实后端适配器、外部动作边界的授权、不可变实例身份、旧进程 fencing，以及全部 T01–T43 完整运行验收仍待实现/验证。
+
+后续增量已加入[Kubernetes 适配器](12-kubernetes-adapter.md)与[保留型 Volume worker](13-volume-provisioning.md)，包括不可变后端 UID 记录；这些组件仍未完成 Computer 运行协调。

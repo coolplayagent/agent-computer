@@ -15,11 +15,11 @@ rust_library(
 
 rust_binary(
     name = "agent-computer-server",
-    srcs = ["src/main.rs", "src/operator.rs", "src/definition_admin.rs", "src/reconciliation_admin.rs"],
+    srcs = ["src/main.rs", "src/operator.rs", "src/definition_admin.rs", "src/reconciliation_admin.rs", "src/volume_worker.rs"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = [":server", "//crates/core", "//crates/store"] + all_crate_deps(normal = True),
+    deps = [":server", "//crates/core", "//crates/store", "//crates/kubernetes", "//crates/worker"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 

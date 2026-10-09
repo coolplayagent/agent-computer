@@ -39,3 +39,5 @@ PostgreSQL 集成测试要求本机安装服务端/客户端二进制并以非 r
 规则配置参考 [rules_rust 官方文档](https://bazelbuild.github.io/rules_rust/)。构建成功只证明当前目标可编译；真实隔离与持久性认证见 [05 验证](05-verification.md)。
 
 受限 Kubernetes 库与显式真实组件测试入口见 [12 Kubernetes 适配器](12-kubernetes-adapter.md)。
+
+单次认领的 JuiceFS worker 与显式 PostgreSQL/CSI 目标见 [13 卷供应](13-volume-provisioning.md)。

@@ -8,6 +8,8 @@
 | `crates/definitions` | Bounded parsing, declaration semantics, fixed digests, structural schema |
 | `crates/store` | PostgreSQL plans, definition grants, immutable SpecVersions, atomic retries/CAS, worker leases/receipts and event/Outbox transactions |
 | `crates/server` | Axum HTTP routes, bounded requests, service authentication, plan/apply and local credential/grant/catalog administration |
+| `crates/kubernetes` | Constrained HTTPS Pod and retained JuiceFS PVC/PV adapters |
+| `crates/worker` | Authorized Volume intent dispatch, CSI observations and durable backend identity records |
 | `crates/test-support` | Private real PostgreSQL clusters for integration tests only |
 | `crates/cli` | Native CLI with version, capability status, declaration validation, and schema export |
 | `docs/zh-CN`, `docs/en` | User and developer documentation with matching numbering |

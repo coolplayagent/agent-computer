@@ -178,6 +178,18 @@ pub struct EffectReceipt {
     pub evidence_id: String,
 }
 
+/// Immutable identity observed by a trusted backend, retained before the effect
+/// is ready. This envelope is not itself proof of a backend or runtime fact.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ReconcileObject {
+    pub backend: String,
+    pub name: String,
+    pub uid: String,
+    /// The actual namespace/deployment UID, not a mutable display name.
+    pub scope_uid: String,
+}
+
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "outcome", rename_all = "snake_case")]
 pub enum ReconcileOutcome {

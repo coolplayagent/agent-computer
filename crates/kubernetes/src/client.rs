@@ -8,6 +8,7 @@ use reqwest::{
     header::{AUTHORIZATION, HeaderMap, HeaderValue},
 };
 use rustls::pki_types::{CertificateDer, pem::PemObject};
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::time::Duration;
 
@@ -15,7 +16,8 @@ const RESPONSE_LIMIT: usize = 1024 * 1024;
 
 /// Trusted deployment bindings, provisioned by an operator outside the tenant API.
 /// Cluster RBAC must reserve the namespace/policy to the operator and this controller.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct Deployment {
     pub namespace: String,
     pub namespace_uid: String,
@@ -70,6 +72,12 @@ pub enum DeleteOutcome {
 }
 
 impl Client {
+    pub fn namespace(&self) -> &str {
+        &self.deployment.namespace
+    }
+    pub fn namespace_uid(&self) -> &str {
+        &self.deployment.namespace_uid
+    }
     /// No kubeconfig discovery, credential helper execution, ambient proxy, redirect,
     /// system trust roots, or automatic HTTP retry. Only the explicit CA is trusted.
     pub fn new(
@@ -240,7 +248,7 @@ impl Client {
         }
     }
 
-    async fn get(&self, path: &str) -> Result<Option<Value>> {
+    pub(crate) async fn get(&self, path: &str) -> Result<Option<Value>> {
         match self.request(Method::GET, path, None).await? {
             (200, value) => Ok(Some(value)),
             (404, _) => Ok(None),

@@ -39,6 +39,15 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0004_reconciliation_leases.sql")),
                     false,
                 ),
+                Migration::new(
+                    5,
+                    Cow::Borrowed("reconciliation object identities"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!(
+                        "../migrations/0005_reconciliation_objects.sql"
+                    )),
+                    false,
+                ),
             ])
         })
     }

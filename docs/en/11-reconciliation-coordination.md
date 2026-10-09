@@ -80,3 +80,5 @@ Ten real PostgreSQL cases cover simultaneous claim exclusivity, dependency order
 The server tests verify current progress/watermarks over HTTP, and an independent TCP process exercises all three repair commands. The full Cargo/Bazel suite has 103 tests: 28 domain, 28 definitions, 7 CLI, 33 PostgreSQL and 7 server. Run the [database test commands](08-persistence.md).
 
 The inspected development host has no Docker CLI/runtime and no registered repo-sandbox targets. No Kubernetes/gVisor experiment was run. Worker scheduling, real backend adapters, authority at the external action boundary, immutable instance identity, old-process fencing and all full T01–T43 runtime acceptance remain pending.
+
+Later increments added [the Kubernetes adapter](12-kubernetes-adapter.md) and [the retained Volume worker](13-volume-provisioning.md), including immutable backend UID records. These narrow components do not complete Computer runtime coordination.

@@ -2,6 +2,7 @@
 //! invoked here, and a coordinator lease never proves physical fencing.
 mod claims;
 mod completion;
+mod objects;
 mod state;
 mod types;
 pub(crate) use state::progress;

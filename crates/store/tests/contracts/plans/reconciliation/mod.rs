@@ -86,4 +86,5 @@ fn agent_document(name: &str, agent: &str) -> Value {
 mod admission;
 mod claims;
 mod leases;
+mod objects;
 mod results;

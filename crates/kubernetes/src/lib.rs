@@ -8,6 +8,7 @@
 mod client;
 mod plan;
 mod verify;
+pub mod volume;
 
 pub use client::{Client, DeleteOutcome, Deployment, PodObservation, PodPhase};
 pub use plan::{EphemeralSandboxPlan, InstanceIdentity};
@@ -16,6 +17,7 @@ pub use plan::{EphemeralSandboxPlan, InstanceIdentity};
 pub enum Error {
     InvalidConfiguration,
     UnsupportedSandbox,
+    UnsupportedVolume,
     InvalidIdentity,
     InvalidCommand,
     Transport,

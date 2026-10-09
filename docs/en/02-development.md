@@ -39,3 +39,5 @@ Each commit is a reviewable capability increment with its build targets, contrac
 Rule configuration follows the [official rules_rust documentation](https://bazelbuild.github.io/rules_rust/). A successful build only proves that current targets compile; real isolation and durability certification are tracked in [05 Verification](05-verification.md).
 
 The constrained Kubernetes library and explicit live component target are documented in [12 Kubernetes adapter](12-kubernetes-adapter.md).
+
+The one-claim JuiceFS worker and explicit PostgreSQL/CSI target are documented in [13 Volume provisioning](13-volume-provisioning.md).

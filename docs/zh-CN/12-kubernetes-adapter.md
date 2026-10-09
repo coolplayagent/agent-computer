@@ -20,7 +20,7 @@ create/observe 前核对命名空间实际 UID、Active/restricted 状态、`gvi
 
 ## 12.3 验证
 
-默认测试包含 13 项适配器测试，覆盖创建响应丢失且不重复 POST、身份冲突、spec 注入、前置核对拒绝、条件删除、响应限额与错误脱敏。这些是协议测试，不是运行时验收。
+默认测试包含 13 项 Pod 适配器测试，覆盖创建响应丢失且不重复 POST、身份冲突、spec 注入、前置核对拒绝、条件删除、响应限额与错误脱敏。这些是协议测试，不是运行时验收。
 
 显式组件测试需要安装 runsc 并启用有效 CNI 的隔离集群。[测试部署清单](../../deploy/testing/kubernetes-component.yaml) 创建专用命名空间、RuntimeClass、全拒绝策略和受限服务账号，仅用于可销毁测试集群。由运维方获取 `ac-adapter` 的限时 token、集群 CA 和对象实际 UID；凭据须以私有权限存放在仓库外。
 
@@ -56,3 +56,5 @@ AGENT_COMPUTER_KUBE_TEST_CONFIG=/private/component/config.json \
 ## 12.5 部署依据
 
 依据上游 [gVisor 安装指南](https://gvisor.dev/docs/user_guide/install/)、[containerd 接入](https://gvisor.dev/docs/user_guide/containerd/quick_start/) 与 [shim 配置](https://gvisor.dev/docs/user_guide/containerd/configuration/)，固定并校验发行产物，包括完整 gVisor 归档。containerd 2 使用 version 3 runtime 表；K3s 按[高级配置](https://docs.k3s.io/advanced)扩展 base 模板。显式配置 runsc `systrap` 平台；组件测试失败时不能替换为 runc 或放开 privileged。
+
+新增的四项[卷协议测试](13-volume-provisioning.md)使适配器默认测试共计 17 项。

@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: retained-volume-provisioning
+    domain: agent-infrastructure
+    canonical_name: VolumeProvisioning
+    definition: 经当前权限与派发准入，将首版 Retain Volume 意图供应为固定 JuiceFS CSI PVC/PV，并不可变记录实际 UID；绑定只证明供应，不代表配额生效、Workspace 就绪或物理 fencing。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/worker/src/lib.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/kubernetes/src/volume.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/13-volume-provisioning.md
   - id: reconciliation-lease
     domain: agent-infrastructure
     canonical_name: ReconcileLease

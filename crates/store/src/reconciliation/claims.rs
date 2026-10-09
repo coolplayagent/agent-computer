@@ -52,12 +52,36 @@ impl Store {
         worker: &WorkerId,
         lifetime: Duration,
     ) -> Result<ClaimOutcome> {
+        self.claim_reconciliation_filtered(org, worker, lifetime, None)
+            .await
+    }
+
+    /// Claim only a backend's supported kind, preserving all dependency and
+    /// cross-operation ordering. Unhandled kinds remain available to other workers.
+    pub async fn claim_reconciliation_kind(
+        &self,
+        org: &OrganizationId,
+        worker: &WorkerId,
+        lifetime: Duration,
+        kind: plans::DefinitionKind,
+    ) -> Result<ClaimOutcome> {
+        self.claim_reconciliation_filtered(org, worker, lifetime, Some(kind))
+            .await
+    }
+
+    async fn claim_reconciliation_filtered(
+        &self,
+        org: &OrganizationId,
+        worker: &WorkerId,
+        lifetime: Duration,
+        kind: Option<plans::DefinitionKind>,
+    ) -> Result<ClaimOutcome> {
         let ttl = duration_ms(lifetime, 300)?;
         let mut tx = self.pool.begin().await?;
         let seq = Self::lock_stream(&mut tx, org.as_str()).await?;
         let now = plans::transactions::now(&mut tx).await?;
-        let row=sqlx::query("SELECT i.*,d.kind,v.spec,v.digest,v.dependencies FROM reconcile_intents i JOIN operations o USING (organization,operation_id) JOIN resource_definitions d USING (organization,resource_id) JOIN resource_spec_versions v ON v.organization=i.organization AND v.resource_id=i.resource_id AND v.revision=i.revision WHERE i.organization=$1 AND o.state IN ('Queued','Running') AND i.available_at_ms <= $2 AND (i.state='Pending' OR (i.state='Running' AND i.lease_until_ms <= $2)) AND NOT EXISTS (SELECT 1 FROM reconcile_intents earlier WHERE earlier.organization=i.organization AND earlier.operation_id=i.operation_id AND earlier.ordinal<i.ordinal AND earlier.state<>'Succeeded') AND NOT EXISTS (SELECT 1 FROM reconcile_intents older JOIN operations old_op USING (organization,operation_id) WHERE older.organization=i.organization AND older.resource_id=i.resource_id AND old_op.event_sequence<o.event_sequence AND old_op.state IN ('Queued','Running','Blocked') AND older.state NOT IN ('Succeeded','Failed')) ORDER BY o.event_sequence,i.ordinal LIMIT 1")
-            .bind(org.as_str()).bind(now).fetch_optional(&mut *tx).await?;
+        let row=sqlx::query("SELECT i.*,d.kind,v.spec,v.digest,v.dependencies FROM reconcile_intents i JOIN operations o USING (organization,operation_id) JOIN resource_definitions d USING (organization,resource_id) JOIN resource_spec_versions v ON v.organization=i.organization AND v.resource_id=i.resource_id AND v.revision=i.revision WHERE i.organization=$1 AND ($3::text IS NULL OR d.kind=$3) AND o.state IN ('Queued','Running') AND i.available_at_ms <= $2 AND (i.state='Pending' OR (i.state='Running' AND i.lease_until_ms <= $2)) AND NOT EXISTS (SELECT 1 FROM reconcile_intents earlier WHERE earlier.organization=i.organization AND earlier.operation_id=i.operation_id AND earlier.ordinal<i.ordinal AND earlier.state<>'Succeeded') AND NOT EXISTS (SELECT 1 FROM reconcile_intents older JOIN operations old_op USING (organization,operation_id) WHERE older.organization=i.organization AND older.resource_id=i.resource_id AND old_op.event_sequence<o.event_sequence AND old_op.state IN ('Queued','Running','Blocked') AND older.state NOT IN ('Succeeded','Failed')) ORDER BY o.event_sequence,i.ordinal LIMIT 1")
+            .bind(org.as_str()).bind(now).bind(kind.map(|k|k.as_str())).fetch_optional(&mut *tx).await?;
         let Some(row) = row else {
             tx.commit().await?;
             return Ok(ClaimOutcome::Idle);

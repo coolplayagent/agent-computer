@@ -1,5 +1,5 @@
 [package]
-name = "agent-computer-server"
+name = "agent-computer-worker"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,21 +8,22 @@ license.workspace = true
 [dependencies]
 agent-computer-core = { path = "../core" }
 agent-computer-definitions = { path = "../definitions" }
-agent-computer-store = { path = "../store" }
 agent-computer-kubernetes = { path = "../kubernetes" }
-agent-computer-worker = { path = "../worker" }
-axum.workspace = true
+agent-computer-store = { path = "../store" }
 serde.workspace = true
 serde_json.workspace = true
-sqlx.workspace = true
-getrandom.workspace = true
-http-body-util.workspace = true
-tokio = { workspace = true, features = ["net", "signal", "io-util"] }
 
 [dev-dependencies]
 agent-computer-test-support = { path = "../test-support" }
-tempfile.workspace = true
-tower.workspace = true
+tokio.workspace = true
+sqlx.workspace = true
+
+[features]
+live-test = []
+
+[[test]]
+name = "live"
+required-features = ["live-test"]
 
 [lints]
 workspace = true

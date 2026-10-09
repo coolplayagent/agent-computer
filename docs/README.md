@@ -14,6 +14,7 @@
 10. [声明计划与原子 apply](zh-CN/10-plans-and-apply.md)
 11. [持久化协调与租约](zh-CN/11-reconciliation-coordination.md)
 12. [受限 Kubernetes 适配器](zh-CN/12-kubernetes-adapter.md)
+13. [持久化 JuiceFS 卷供应](zh-CN/13-volume-provisioning.md)
 
 ## 02. English
 
@@ -29,6 +30,7 @@
 10. [Definition plans and atomic apply](en/10-plans-and-apply.md)
 11. [Durable reconciliation coordination](en/11-reconciliation-coordination.md)
 12. [Constrained Kubernetes adapter](en/12-kubernetes-adapter.md)
+13. [Durable JuiceFS volume provisioning](en/13-volume-provisioning.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 32
-updated_at: unix:1791544518
+map_version: 33
+updated_at: unix:1791545752
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -96,10 +96,11 @@ topics:
   - control-service-guide
   - declaration-persistence-guide
   - definition-plans-guide
+  - kubernetes-adapter-guide
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
-  ref: topics/topic-875b9380866e9d56-3e94e11accab137cc6b2e4bf0b55ca140a92e31b402aad8de81350b2695d11ca.yaml
-  digest: 3e94e11accab137cc6b2e4bf0b55ca140a92e31b402aad8de81350b2695d11ca
+  ref: topics/topic-875b9380866e9d56-7c3330b51fb4f189ba29c52b1a3f8af913974d191773dce963952bd79e25422d.yaml
+  digest: 7c3330b51fb4f189ba29c52b1a3f8af913974d191773dce963952bd79e25422d
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -123,12 +124,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 16
+  omitted_through: 17
   recent:
-  - version: 17
-    action: source.add
-    actor: cli
-    summary: Added source 'agent-computer-agentic-runtime' to topic 'architecture'.
   - version: 18
     action: source.add
     actor: cli
@@ -189,3 +186,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'reconciliation-coordination-guide' to topic 'development'.
+  - version: 33
+    action: source.add
+    actor: cli
+    summary: Added source 'kubernetes-adapter-guide' to topic 'development'.

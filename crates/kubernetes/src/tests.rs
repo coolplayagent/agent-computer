@@ -573,3 +573,218 @@ fn production_configuration_rejects_insecure_endpoints_ambient_auth_and_empty_ca
         Err(Error::InvalidConfiguration)
     ));
 }
+
+fn storage_binding() -> crate::volume::StorageClassBinding {
+    crate::volume::StorageClassBinding {
+        reference: "juicefs".into(),
+        name: "ac-juicefs".into(),
+        uid: "sc-uid".into(),
+        driver_uid: "driver-uid".into(),
+        secret_name: "juicefs-secret".into(),
+        secret_namespace: "kube-system".into(),
+    }
+}
+fn volume_plan() -> crate::volume::VolumePlan {
+    let doc = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"volume"},"spec":{"volumes":[{"name":"data","storageClass":"juicefs","quotaBytes":1073741824u64,"reclaimPolicy":"Retain"}]}});
+    let validated = validate_bytes(&serde_json::to_vec(&doc).unwrap(), Format::Json).unwrap();
+    crate::volume::VolumePlan::new(
+        &validated,
+        "data",
+        crate::volume::VolumeIdentity {
+            organization: "org_a".into(),
+            resource_id: "res_a".into(),
+            revision: 1,
+            step_id: "step_a".into(),
+            spec_digest: format!("sha256:{}", "a".repeat(64)),
+        },
+        "ac-test",
+        storage_binding(),
+    )
+    .unwrap()
+}
+fn storage_prerequisites() -> Vec<Value> {
+    let mut values = prerequisites();
+    values.push(json!({"metadata":{"name":"ac-juicefs","uid":"sc-uid"},"provisioner":"csi.juicefs.com","reclaimPolicy":"Retain","volumeBindingMode":"Immediate","mountOptions":["writeback=false"],"parameters":{
+        "csi.storage.k8s.io/fstype":"juicefs","csi.storage.k8s.io/provisioner-secret-name":"juicefs-secret","csi.storage.k8s.io/provisioner-secret-namespace":"kube-system","csi.storage.k8s.io/node-publish-secret-name":"juicefs-secret","csi.storage.k8s.io/node-publish-secret-namespace":"kube-system"}}));
+    values.push(json!({"metadata":{"name":"csi.juicefs.com","uid":"driver-uid"},"spec":{"attachRequired":false,"volumeLifecycleModes":["Persistent"]}}));
+    values
+}
+fn pvc_fixture(plan: &crate::volume::VolumePlan, bound: bool) -> Value {
+    let mut pvc = plan.manifest();
+    pvc["metadata"]["uid"] = json!("pvc-uid");
+    if bound {
+        pvc["spec"]["volumeName"] = json!("pvc-volume");
+        pvc["status"] = json!({"phase":"Bound","capacity":{"storage":"1Gi"}});
+    } else {
+        pvc["status"] = json!({"phase":"Pending"});
+    }
+    pvc
+}
+fn pv_fixture(plan: &crate::volume::VolumePlan) -> Value {
+    json!({"apiVersion":"v1","kind":"PersistentVolume","metadata":{"name":"pvc-volume","uid":"pv-uid"},"status":{"phase":"Bound"},
+        "spec":{"capacity":{"storage":"1Gi"},"accessModes":["ReadWriteMany"],"volumeMode":"Filesystem","persistentVolumeReclaimPolicy":"Retain","storageClassName":"ac-juicefs","mountOptions":["writeback=false"],
+            "claimRef":{"name":plan.name(),"namespace":"ac-test","uid":"pvc-uid"},"csi":{"driver":"csi.juicefs.com","fsType":"juicefs","volumeHandle":"pvc-volume","volumeAttributes":{"subPath":"pvc-volume","capacity":"1073741824","juicefs/controller-quota-set":"true","storage.kubernetes.io/csiProvisionerIdentity":"1791548452146-883-csi.juicefs.com"},"nodePublishSecretRef":{"name":"juicefs-secret","namespace":"kube-system"}}}})
+}
+
+#[test]
+fn volume_preflight_rejects_replaced_driver_async_upload_and_destructive_reclaim() {
+    let s = storage_binding();
+    let original = storage_prerequisites();
+    assert!(crate::volume::verify_storage(&s, &original[3], &original[4]).is_ok());
+    for (path, value) in [
+        ("/metadata/uid", json!("replacement")),
+        ("/reclaimPolicy", json!("Delete")),
+        ("/volumeBindingMode", json!("WaitForFirstConsumer")),
+        ("/mountOptions", json!(["writeback"])),
+    ] {
+        let mut sc = original[3].clone();
+        *sc.pointer_mut(path).unwrap() = value;
+        assert_eq!(
+            crate::volume::verify_storage(&s, &sc, &original[4]),
+            Err(Error::PreconditionFailed)
+        );
+    }
+    let mut driver = original[4].clone();
+    driver["metadata"]["uid"] = json!("replacement");
+    assert_eq!(
+        crate::volume::verify_storage(&s, &original[3], &driver),
+        Err(Error::PreconditionFailed)
+    );
+}
+
+#[test]
+fn pending_claim_identity_is_recordable_but_bound_volume_requires_reciprocal_uid() {
+    let plan = volume_plan();
+    let pending =
+        crate::volume::verify_claim(&plan, "namespace-uid", &pvc_fixture(&plan, false), None)
+            .unwrap();
+    assert_eq!(pending.uid(), "pvc-uid");
+    assert!(pending.volume_name().is_none());
+    assert_eq!(
+        crate::volume::verify_claim(
+            &plan,
+            "namespace-uid",
+            &pvc_fixture(&plan, true),
+            Some("old-uid")
+        )
+        .unwrap_err(),
+        Error::IdentityMismatch
+    );
+    let claim = crate::volume::verify_claim(
+        &plan,
+        "namespace-uid",
+        &pvc_fixture(&plan, true),
+        Some("pvc-uid"),
+    )
+    .unwrap();
+    let pv = pv_fixture(&plan);
+    assert_eq!(
+        crate::volume::verify_volume(&plan, &claim, &pv, None)
+            .unwrap()
+            .uid(),
+        "pv-uid"
+    );
+    for (path, value) in [
+        ("/spec/claimRef/uid", json!("other-claim")),
+        ("/spec/csi/driver", json!("other.csi")),
+        ("/spec/csi/volumeAttributes/subPath", json!("/")),
+        ("/spec/persistentVolumeReclaimPolicy", json!("Delete")),
+        ("/spec/csi/nodePublishSecretRef/name", json!("other-secret")),
+    ] {
+        let mut changed = pv.clone();
+        *changed.pointer_mut(path).unwrap() = value;
+        assert_eq!(
+            crate::volume::verify_volume(&plan, &claim, &changed, None).unwrap_err(),
+            Error::IdentityMismatch,
+            "{path}"
+        );
+    }
+    assert_eq!(
+        crate::volume::verify_volume(&plan, &claim, &pv, Some("old-pv-uid")).unwrap_err(),
+        Error::IdentityMismatch
+    );
+    let mut changed_plan = plan.clone();
+    changed_plan.pvc["metadata"]["annotations"]["agent-computer.io/volume-binding"] =
+        json!("another-admitted-step");
+    assert_eq!(
+        crate::volume::verify_volume(&changed_plan, &claim, &pv, None).unwrap_err(),
+        Error::IdentityMismatch
+    );
+    for key in ["subdir", "mountOptions", "pathPattern", "secretFinalizer"] {
+        let mut changed = pv.clone();
+        changed["spec"]["csi"]["volumeAttributes"][key] = json!("unexpected");
+        assert_eq!(
+            crate::volume::verify_volume(&plan, &claim, &changed, None).unwrap_err(),
+            Error::IdentityMismatch
+        );
+    }
+}
+
+#[test]
+fn claim_data_sources_and_capacity_mismatch_cannot_be_adopted() {
+    let plan = volume_plan();
+    let mut pvc = pvc_fixture(&plan, true);
+    pvc["spec"]["dataSource"] = json!({"name":"private-snapshot"});
+    assert_eq!(
+        crate::volume::verify_claim(&plan, "namespace-uid", &pvc, None).unwrap_err(),
+        Error::IdentityMismatch
+    );
+    let mut pvc = pvc_fixture(&plan, true);
+    pvc["status"]["capacity"]["storage"] = json!("512Mi");
+    assert_eq!(
+        crate::volume::verify_claim(&plan, "namespace-uid", &pvc, None).unwrap_err(),
+        Error::IdentityMismatch
+    );
+    assert_eq!(
+        crate::volume::quantity(&json!("18446744073709551615Ei")),
+        None
+    );
+    assert_eq!(crate::volume::quantity(&json!("1.5Gi")), None);
+    assert_eq!(crate::volume::quantity(&json!("1024Mi")), Some(1 << 30));
+}
+
+#[tokio::test]
+async fn volume_creation_ack_loss_is_observed_without_second_post() {
+    let plan = volume_plan();
+    let mut replies: Vec<_> = storage_prerequisites()
+        .into_iter()
+        .map(|v| Reply::Json(200, v))
+        .collect();
+    replies.push(Reply::Drop);
+    replies.extend(
+        storage_prerequisites()
+            .into_iter()
+            .map(|v| Reply::Json(200, v)),
+    );
+    replies.push(Reply::Json(200, pvc_fixture(&plan, true)));
+    replies.push(Reply::Json(200, pv_fixture(&plan)));
+    let (client, requests, handle) = fixture(replies);
+    assert_eq!(
+        client.create_volume(&plan).await.unwrap_err(),
+        Error::MutationUnconfirmed
+    );
+    let claim = client
+        .observe_volume_claim(&plan, None)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        client
+            .observe_bound_volume(&plan, &claim, None)
+            .await
+            .unwrap()
+            .unwrap()
+            .uid(),
+        "pv-uid"
+    );
+    handle.join().unwrap();
+    assert_eq!(
+        requests
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|(r, _)| r.starts_with("POST "))
+            .count(),
+        1
+    );
+}
