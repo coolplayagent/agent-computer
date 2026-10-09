@@ -10,7 +10,7 @@ Only `gvisor` and a registered deployment mapping to a namespace-wide deny-all N
 
 ## 12.2 Identity and transport
 
-The deterministic Pod name depends on organization and the persisted instance ID. Changing generation, revision or command for that same instance produces a conflict, not another Pod. A label and a complete binding annotation tie readback to all plan inputs. Adoption also checks the actual Pod UID once known, resourceVersion, and controlled spec fields. Only a finite set of Kubernetes defaults is allowed; injected containers, mounts, environment variables and weaker security settings are rejected.
+The deterministic Pod name depends on organization and the persisted instance ID. Changing generation, revision or command for that same instance produces a conflict, not another Pod. A label and a complete binding annotation tie readback to all plan inputs. Adoption also checks the actual Pod UID once known, resourceVersion, and controlled spec fields. Only a finite set of Kubernetes defaults is allowed; injected containers, mounts, environment variables and weaker security settings are rejected. Security switches with enabled defaults must be explicitly disabled, and unexpected annotations that could affect the runtime are rejected.
 
 Before create/observe, the adapter verifies the configured namespace UID and Active/restricted state, `gvisor` RuntimeClass UID and `runsc` handler, and the sole NetworkPolicy's UID and deny-all rules. The deployment operator must restrict namespace/policy mutation and configure an enforcing CNI. These API reads do not prove node execution or network isolation, and do not remove races with a trusted cluster administrator.
 
@@ -20,7 +20,7 @@ Creation makes one POST. A conflict requires readback; a lost response or invali
 
 ## 12.3 Verification
 
-The default suite includes 12 adapter tests covering response loss without repeated POST, conflicting identities, injected spec fields, preflight rejection, conditional deletion, bounded responses and redacted errors. They are protocol fixtures, not runtime acceptance.
+The default suite includes 13 adapter tests covering response loss without repeated POST, conflicting identities, injected spec fields, preflight rejection, conditional deletion, bounded responses and redacted errors. They are protocol fixtures, not runtime acceptance.
 
 The explicit component target needs an isolated cluster with runsc and an enforcing CNI. The [test deployment](../../deploy/testing/kubernetes-component.yaml) provisions a dedicated namespace, RuntimeClass, deny policy and narrowly scoped service account. Apply it only to a disposable test cluster. Obtain an expiring token for `ac-adapter`, the cluster CA, and actual object UIDs as the operator; store credentials outside the repository with private permissions.
 

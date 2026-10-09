@@ -10,7 +10,7 @@ Rust `agent-computer-kubernetes` 库可通过真实 Kubernetes HTTPS API 创建�
 
 ## 12.2 身份与传输
 
-Pod 名称由组织和已持久化实例 ID 确定。同一实例修改 generation、revision 或命令会产生冲突，不会创建另一个 Pod。标签与完整绑定 annotation 将读回对象关联到全部计划输入；已知 UID 时必须核对实际 Pod UID，同时核对 resourceVersion 与受控 spec 字段。仅接受有限的 Kubernetes 默认字段；拒绝注入容器、挂载、环境变量或降低安全限制。
+Pod 名称由组织和已持久化实例 ID 确定。同一实例修改 generation、revision 或命令会产生冲突，不会创建另一个 Pod。标签与完整绑定 annotation 将读回对象关联到全部计划输入；已知 UID 时必须核对实际 Pod UID，同时核对 resourceVersion 与受控 spec 字段。仅接受有限的 Kubernetes 默认字段；拒绝注入容器、挂载、环境变量或降低安全限制。默认开启的安全相关开关必须显式关闭；可能影响运行时的额外 annotation 也会被拒绝。
 
 create/observe 前核对命名空间实际 UID、Active/restricted 状态、`gvisor` RuntimeClass UID 与 `runsc` handler，以及唯一 NetworkPolicy 的 UID 和全拒绝规则。部署运维方须限制命名空间/策略变更并配置真正执行规则的 CNI。API 读取不证明节点执行或网络隔离，也不能消除与受信集群管理员之间的变更竞态。
 
@@ -20,7 +20,7 @@ create/observe 前核对命名空间实际 UID、Active/restricted 状态、`gvi
 
 ## 12.3 验证
 
-默认测试包含 12 项适配器测试，覆盖创建响应丢失且不重复 POST、身份冲突、spec 注入、前置核对拒绝、条件删除、响应限额与错误脱敏。这些是协议测试，不是运行时验收。
+默认测试包含 13 项适配器测试，覆盖创建响应丢失且不重复 POST、身份冲突、spec 注入、前置核对拒绝、条件删除、响应限额与错误脱敏。这些是协议测试，不是运行时验收。
 
 显式组件测试需要安装 runsc 并启用有效 CNI 的隔离集群。[测试部署清单](../../deploy/testing/kubernetes-component.yaml) 创建专用命名空间、RuntimeClass、全拒绝策略和受限服务账号，仅用于可销毁测试集群。由运维方获取 `ac-adapter` 的限时 token、集群 CA 和对象实际 UID；凭据须以私有权限存放在仓库外。
 

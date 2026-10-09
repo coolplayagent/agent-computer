@@ -244,6 +244,34 @@ fn known_api_defaults_and_omitted_false_values_are_safe_but_unknown_fields_fail(
 }
 
 #[test]
+fn omitted_protections_and_unexpected_runtime_annotations_are_rejected() {
+    let plan = plan();
+    for key in ["automountServiceAccountToken", "enableServiceLinks"] {
+        let mut p = pod(&plan);
+        p["spec"].as_object_mut().unwrap().remove(key);
+        assert_eq!(
+            verify::pod(&plan, &p, None).unwrap_err(),
+            Error::IdentityMismatch
+        );
+    }
+    let mut p = pod(&plan);
+    p["spec"]["containers"][0]["securityContext"]
+        .as_object_mut()
+        .unwrap()
+        .remove("allowPrivilegeEscalation");
+    assert_eq!(
+        verify::pod(&plan, &p, None).unwrap_err(),
+        Error::IdentityMismatch
+    );
+    let mut p = pod(&plan);
+    p["metadata"]["annotations"]["dev.gvisor.spec.mount.tmp.options"] = json!("rw,shared");
+    assert_eq!(
+        verify::pod(&plan, &p, None).unwrap_err(),
+        Error::IdentityMismatch
+    );
+}
+
+#[test]
 fn namespace_runtime_and_deny_policy_are_bound_to_actual_uids() {
     let d = deployment();
     let original = prerequisites();

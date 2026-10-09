@@ -73,6 +73,7 @@ pub(crate) fn pod(
         || meta["name"] != plan.name
         || meta["namespace"] != plan.namespace
         || meta["annotations"][BINDING] != plan.binding
+        || meta["annotations"] != plan.pod["metadata"]["annotations"]
         || meta["labels"][IDENTITY] != plan.pod["metadata"]["labels"][IDENTITY]
         || expected_uid.is_some_and(|expected| expected != uid)
         || !matches_spec(&plan.pod["spec"], &pod["spec"], "")
@@ -119,7 +120,17 @@ fn matches_spec(expected: &Value, actual: &Value, path: &str) -> bool {
                     .zip(a)
                     .all(|(e, a)| matches_spec(e, a, &format!("{path}/*")))
         }
-        (Value::Bool(false), Value::Null) => true, // Kubernetes omitempty booleans.
+        // Only fields whose Kubernetes default is false may use omitempty. In
+        // particular, absent allowPrivilegeEscalation/automountServiceAccountToken/
+        // enableServiceLinks must never be interpreted as explicitly disabled.
+        (Value::Bool(false), Value::Null) => matches!(
+            path,
+            "/hostNetwork"
+                | "/hostPID"
+                | "/hostIPC"
+                | "/shareProcessNamespace"
+                | "/containers/*/securityContext/privileged"
+        ),
         _ => expected == actual,
     }
 }
