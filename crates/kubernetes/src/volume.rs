@@ -286,12 +286,29 @@ pub(crate) fn verify_claim(
         || pvc["metadata"]["namespace"] != plan.namespace
         || !pvc["metadata"]["deletionTimestamp"].is_null()
         || pvc["metadata"]["annotations"][BINDING] != plan.pvc["metadata"]["annotations"][BINDING]
-        || pvc["metadata"]["labels"][LABEL] != plan.pvc["metadata"]["labels"][LABEL]
+        || pvc["metadata"]["labels"] != plan.pvc["metadata"]["labels"]
+        || !pvc["metadata"]["annotations"]
+            .as_object()
+            .is_some_and(|annotations| {
+                annotations.iter().all(|(key, value)| match key.as_str() {
+                    BINDING => true,
+                    "pv.kubernetes.io/bind-completed" | "pv.kubernetes.io/bound-by-controller" => {
+                        value == "yes"
+                    }
+                    "volume.beta.kubernetes.io/storage-provisioner"
+                    | "volume.kubernetes.io/storage-provisioner" => value == "csi.juicefs.com",
+                    _ => false,
+                })
+            })
         || expected_uid.is_some_and(|u| u != uid)
         || spec["storageClassName"] != plan.storage.name
         || spec["accessModes"] != json!(["ReadWriteMany"])
         || spec["volumeMode"] != "Filesystem"
         || quantity(&spec["resources"]["requests"]["storage"]) != Some(plan.quota)
+        || !spec["resources"].as_object().is_some_and(|m| m.len() == 1)
+        || !spec["resources"]["requests"]
+            .as_object()
+            .is_some_and(|m| m.len() == 1)
         || !spec.as_object().is_some_and(|m| {
             m.keys().all(|k| {
                 [

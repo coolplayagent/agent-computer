@@ -788,3 +788,47 @@ async fn volume_creation_ack_loss_is_observed_without_second_post() {
         1
     );
 }
+
+#[test]
+fn volume_claim_metadata_cannot_override_csi_mount_configuration() {
+    let plan = volume_plan();
+    let mut pvc = pvc_fixture(&plan, true);
+    for (key, value) in [
+        ("pv.kubernetes.io/bind-completed", "yes"),
+        ("pv.kubernetes.io/bound-by-controller", "yes"),
+        (
+            "volume.beta.kubernetes.io/storage-provisioner",
+            "csi.juicefs.com",
+        ),
+        (
+            "volume.kubernetes.io/storage-provisioner",
+            "csi.juicefs.com",
+        ),
+    ] {
+        pvc["metadata"]["annotations"][key] = json!(value);
+    }
+    assert!(crate::volume::verify_claim(&plan, "namespace-uid", &pvc, Some("pvc-uid")).is_ok());
+    for (section, key, value) in [
+        ("annotations", "juicefs/mount-memory-limit", "0"),
+        ("annotations", "juicefs/mount-cpu-limit", "0"),
+        (
+            "annotations",
+            "volume.kubernetes.io/storage-provisioner",
+            "another.csi",
+        ),
+        ("labels", "custom-image", "true"),
+    ] {
+        let mut changed = pvc.clone();
+        changed["metadata"][section][key] = json!(value);
+        assert_eq!(
+            crate::volume::verify_claim(&plan, "namespace-uid", &changed, None).unwrap_err(),
+            Error::IdentityMismatch,
+            "{section}/{key}"
+        );
+    }
+    pvc["spec"]["resources"]["limits"] = json!({"storage":"2Gi"});
+    assert_eq!(
+        crate::volume::verify_claim(&plan, "namespace-uid", &pvc, None).unwrap_err(),
+        Error::IdentityMismatch
+    );
+}

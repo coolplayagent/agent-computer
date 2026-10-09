@@ -14,7 +14,7 @@
 
 迁移 5 增加不可变的协调对象记录。首次观察 PVC 时立即保存 UID，包括 Pending 状态；后续认领必须观察同一 UID。namespace、StorageClass、驱动、PVC 或已知 PV 被替换都会阻断进度。写入和精确重试遵守租约、权限、事件及 Outbox 的事务约束。重试延迟两秒；不确定副作用在租约过期后仍只能观察。
 
-Bound PVC 必须与 PV 的 claim UID/名称/namespace、容量、保留策略、驱动、文件系统、同步挂载选项、Secret 引用及每 PV 子目录相互吻合。额外 CSI 参数和其他卷源会被拒绝。两个对象 UID 均记录后才能完成。回执标识 PVC 与 PV，仅表示供应事实。
+Bound PVC 必须与 PV 的 claim UID/名称/namespace、容量、保留策略、驱动、文件系统、同步挂载选项、Secret 引用及每 PV 子目录相互吻合。额外 CSI 参数、其他卷源、额外 PVC 标签/资源项，以及有限 Kubernetes 绑定注解之外的字段都会被拒绝。PVC 元数据能改变 CSI 挂载配置，因此与 spec 一起核验。两个对象 UID 均记录后才能完成。回执标识 PVC 与 PV，仅表示供应事实。
 
 **PVC/PV Bound 不代表 Workspace 可用或目录配额已生效。** 固定的 JuiceFS CSI v0.33.0 控制器在返回 CreateVolume 前异步安排配额设置；即使 `juicefs/controller-quota-set` 属性存在，也不能证明设置完成。Candidate 准备仍需独立验证配额、访问、flush 行为及 generation 归属，之后才允许 writer。产品 Sandbox 尚不支持直接挂载整个 Volume。物理 fencing、多节点恢复、快照、Artifact 与垃圾回收仍待实现。
 
@@ -58,7 +58,7 @@ JSON 示例，部署占位符均需替换为实际值：
 
 ## 13.4 验证与部署依据
 
-数据库测试覆盖 UID 记录的不可变/幂等行为，记录/事件/Outbox 一起回滚，撤权、陈旧租约，以及保持依赖顺序的类型筛选认领。四项卷协议测试另外覆盖部署身份变化、破坏性回收、异步上传选项、其他数据源、PVC/PV 双向绑定、额外后端参数、容量溢出及创建确认丢失后不重复 POST。
+数据库测试覆盖 UID 记录的不可变/幂等行为，记录/事件/Outbox 一起回滚，撤权、陈旧租约，以及保持依赖顺序的类型筛选认领。五项卷协议测试另外覆盖部署身份变化、破坏性回收、异步上传选项、其他数据源、PVC/PV 双向绑定、额外后端参数、容量溢出及创建确认丢失后不重复 POST。
 
 显式实测需要一次性集群：[Kubernetes 测试 namespace](../../deploy/testing/kubernetes-component.yaml)、运维安装的固定版本 JuiceFS CSI、独立格式化且使用 PostgreSQL 元数据与 S3 数据的文件系统，最后配置[卷 RBAC/StorageClass 测试清单](../../deploy/testing/juicefs-component-rbac.yaml)。该清单只授予 PVC get/create 及 PV/StorageClass/CSIDriver 读取权，无删除卷或读取 Secret 权限。受信任 CSI 节点组件需要测试集群内的特权；应用 Pod 仍须使用受限 gVisor 配置。
 

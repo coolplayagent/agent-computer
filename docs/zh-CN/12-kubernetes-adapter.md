@@ -57,4 +57,4 @@ AGENT_COMPUTER_KUBE_TEST_CONFIG=/private/component/config.json \
 
 依据上游 [gVisor 安装指南](https://gvisor.dev/docs/user_guide/install/)、[containerd 接入](https://gvisor.dev/docs/user_guide/containerd/quick_start/) 与 [shim 配置](https://gvisor.dev/docs/user_guide/containerd/configuration/)，固定并校验发行产物，包括完整 gVisor 归档。containerd 2 使用 version 3 runtime 表；K3s 按[高级配置](https://docs.k3s.io/advanced)扩展 base 模板。显式配置 runsc `systrap` 平台；组件测试失败时不能替换为 runc 或放开 privileged。
 
-新增的四项[卷协议测试](13-volume-provisioning.md)使适配器默认测试共计 17 项。
+新增的五项[卷协议测试](13-volume-provisioning.md)使适配器默认测试共计 18 项。
