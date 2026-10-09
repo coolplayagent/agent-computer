@@ -74,3 +74,11 @@ AGENT_COMPUTER_VOLUME_TEST_CONFIG=/private/component/volume-config.json \
 显式目标缺少配置就失败，默认测试不执行它。它验证真实授权 plan/apply、worker 派发和 CSI 供应，检查持久化对象记录及后续 worker 空闲。PVC/PV 一直保留到隔离环境整体销毁。文件持久化及实际配额另需探针，此测试本身不认证 T16 或 T19。
 
 上游依据包括[动态供应指南](https://juicefs.com/docs/csi/guide/pv/)、[CSI 安装](https://juicefs.com/docs/csi/getting_started/)、[PostgreSQL 元数据指南](https://juicefs.com/docs/community/databases_for_metadata/)，以及固定的 [v0.33.0 控制器实现](https://github.com/juicedata/juicefs-csi-driver/blob/v0.33.0/pkg/driver/controller.go)。生产部署仍需通过 CodeSpec 的部署与恢复认证。
+
+## 13.5 组件实测记录
+
+2026-10-09，提交 `3cf8370` 在真实 PostgreSQL 与 JuiceFS CSI 上通过显式 Bazel worker 测试；加入 PVC 元数据保护后的 `30204c4` 也重新通过了禁用测试缓存的实测。一次性 KVM 环境使用 K3s v1.37.1+k3s1、containerd 2.3.4-k3s1、gVisor release-20261005.0/systrap、JuiceFS CSI v0.33.0、JuiceFS 1.4.1、文件系统元数据库 PostgreSQL 16.15 与 S3 数据服务 SeaweedFS 4.48；控制数据库测试使用 PostgreSQL 18.6。
+
+独立的受限 UID 1000 gVisor Pod 写入 1 MiB 随机文件并完成 `dd conv=fsync`；超配额写入返回 `Disk quota exceeded`。正常删除 writer Pod 后，新建只读 gVisor Pod 校验相同 SHA-256。使用空内存缓存的新只读 JuiceFS 客户端也读到相同摘要，指标记录了一次 1 MiB 对象 GET。这些是单独的运维探针，并非 Volume worker 提供的行为。
+
+[源码绑定记录](../evidence/juicefs-component-2026-10-09.json)保存部署/镜像摘要、真实对象 UID、探针清单/命令、失败的环境准备尝试及明确限制；[日志](../evidence/juicefs-component-2026-10-09.log)保存实际测试、文件与配额输出。记录保留原始源码摘要，并单独标明后续保护修复的验证。该单节点、非 HA 环境不认证断电耐久、生产 TLS、恢复、物理 fencing、Candidate 就绪或 T16/T19。

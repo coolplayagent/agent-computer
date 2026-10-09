@@ -1,0 +1,106 @@
+Bazel live target at 3cf837097484c8bc6dd80771c1479604ce678b31
+
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //crates/worker:volume_worker_live_test (0 packages loaded, 0 targets configured)
+Analyzing: target //crates/worker:volume_worker_live_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //crates/worker:volume_worker_live_test (0 packages loaded, 11 targets configured).
+[849 / 850] [Prepa] runfiles for //crates/worker:volume_worker_live_test
+[850 / 851] Testing //crates/worker:volume_worker_live_test; 1s processwrapper-sandbox
+[850 / 851] Testing //crates/worker:volume_worker_live_test; 2s processwrapper-sandbox
+INFO: Found 1 test target...
+Target //crates/worker:volume_worker_live_test up-to-date:
+  bazel-bin/crates/worker/volume_worker_live_test
+INFO: Elapsed time: 4.249s, Critical Path: 3.89s
+INFO: 7 processes: 1 action cache hit, 5 internal, 3 processwrapper-sandbox.
+INFO: Build completed successfully, 7 total actions
+//crates/worker:volume_worker_live_test                                  PASSED in 2.6s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+
+exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //crates/worker:volume_worker_live_test
+-----------------------------------------------------------------------------
+
+running 1 test
+test authorized_volume_intent_provisions_and_persists_actual_pvc_and_pv_uids ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.53s
+
+
+
+Writer file fsync
+
+1+0 records in
+1+0 records out
+1048576 bytes (1.0MB) copied, 0.016904 seconds, 59.2MB/s
+a28905262a5c842a111bb9a08e01ba8b2d5b50325a4dd952f765be2cb4d3200a  /workspace/probe.bin
+AC_VOLUME_FSYNC_OK
+
+
+Quota error
+
+dd: error writing '/workspace/quota-probe': Disk quota exceeded
+1093+0 records in
+1092+0 records out
+1145176064 bytes (1.1GB) copied, 2.605202 seconds, 419.2MB/s
+DD_EXIT=1
+QUOTA_BYTES=1006632960
+
+
+New gVisor Pod
+
+/workspace/probe.bin: OK
+AC_VOLUME_RECREATE_READ_OK
+
+
+Fresh JuiceFS client object GET
+
+{
+  "bytes": 1048576,
+  "sha256": "a28905262a5c842a111bb9a08e01ba8b2d5b50325a4dd952f765be2cb4d3200a",
+  "fresh_client": true,
+  "readonly": true,
+  "cache_dir": "memory",
+  "object_get_metrics": [
+    "juicefs_object_request_data_bytes_GET 1048576",
+    "juicefs_object_request_durations_histogram_seconds_GET_total 1",
+    "juicefs_object_request_durations_histogram_seconds_GET_sum 0.004690754"
+  ]
+}
+
+Fresh final-source live test at 30204c4d76580969b6c2180c1fecb11977c9421a
+
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //crates/worker:volume_worker_live_test (0 packages loaded, 0 targets configured)
+Analyzing: target //crates/worker:volume_worker_live_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //crates/worker:volume_worker_live_test (0 packages loaded, 10 targets configured).
+[849 / 850] [Prepa] runfiles for //crates/worker:volume_worker_live_test
+[850 / 851] Testing //crates/worker:volume_worker_live_test; 1s processwrapper-sandbox
+INFO: Found 1 test target...
+Target //crates/worker:volume_worker_live_test up-to-date:
+  bazel-bin/crates/worker/volume_worker_live_test
+INFO: Elapsed time: 4.103s, Critical Path: 3.79s
+INFO: 4 processes: 4 action cache hit, 2 internal, 3 processwrapper-sandbox.
+INFO: Build completed successfully, 4 total actions
+//crates/worker:volume_worker_live_test                                  PASSED in 2.6s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //crates/worker:volume_worker_live_test
+-----------------------------------------------------------------------------
+
+running 1 test
+test authorized_volume_intent_provisions_and_persists_actual_pvc_and_pv_uids ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.56s
+

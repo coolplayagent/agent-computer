@@ -1,0 +1,527 @@
+{
+  "test_id": "juicefs-volume-component-2026-10-09",
+  "status": "passed",
+  "scope": "Authorized retained Volume provisioning and single-node gVisor/JuiceFS file component probe; not T16/T19 or Workspace readiness",
+  "source_commit": "3cf837097484c8bc6dd80771c1479604ce678b31",
+  "source_files": {
+    "Cargo.lock": "sha256:f0da1766cc4bd2e82f02b08bb9c6e538cda39574461c385fb32faae58ac7fe84",
+    "Cargo.toml": "sha256:b23861e5e702a50138013387b30da159e8955c398536a09a93678aa479fe5f08",
+    "MODULE.bazel": "sha256:77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "sha256:301676306d39fa59173e5d108317d3f6d64709c435cd01a092a94230ada7cf65",
+    "crates/kubernetes/BUILD.bazel": "sha256:776718f6898ccfec54baea2310a895d99047afc284b3c5faceaf3ddc8130eaff",
+    "crates/kubernetes/Cargo.toml": "sha256:293ae865c955164a7b025c3e9d62d3d82be02352a30f4a5e0c253fe6547cab7b",
+    "crates/kubernetes/src/client.rs": "sha256:828d1b842fa252cf09c19ea7984b9659f71a8f4f7bc4d14c42373dabec9ae006",
+    "crates/kubernetes/src/lib.rs": "sha256:1d85803e81141f033e4e41a6ea3f7ac73a83efae2f0e507ff61670406e99bcf9",
+    "crates/kubernetes/src/plan.rs": "sha256:74141f9e9a13567c0b41d7cefd8bd495d361435d0bccf5e369ca0cc915c9b397",
+    "crates/kubernetes/src/tests.rs": "sha256:9a49dcaa01e2c85b2c5525141efd70bf9143348672c4d5cd6771475fa9c0b695",
+    "crates/kubernetes/src/verify.rs": "sha256:c805ccf12144890519ba2cf422ee8caf77d31866c262d3e0cfe6beabede01bde",
+    "crates/kubernetes/src/volume.rs": "sha256:e96df389cad0cbeec07313554b424b0a89b1d8e6d595780339133cda0ffc4ae9",
+    "crates/kubernetes/tests/live.rs": "sha256:48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/server/BUILD.bazel": "sha256:e0255199f470ea4aad3051b2fe92df6287db41186adfa88573814275766e1635",
+    "crates/server/Cargo.toml": "sha256:432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/definition_admin.rs": "sha256:2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "sha256:4a21344f3b7dcd714897e726753422ae0fbe26574ec3c604dedbb10a8148103d",
+    "crates/server/src/http.rs": "sha256:3fa3c7651295778c133dc8e81bedd19d90c5e2b9601024a9e13f6c1f7a1b221b",
+    "crates/server/src/lib.rs": "sha256:def16f221f8b87f94e385498fd7d3ac4949a224135e041b0ee9dd8a45c12b7df",
+    "crates/server/src/main.rs": "sha256:16b291ffd3d682791afcbe6364b5d198c87fa18f763c7456c668e4d48880bd30",
+    "crates/server/src/operator.rs": "sha256:c16ac4e8fc5b72397a5974de1d4790afb8de39dcb6c54a1bf1a72de0d2cdd359",
+    "crates/server/src/plans.rs": "sha256:50c6b95163870d6467cf76d73ee7f5568bd1e54f5fef0cb4dfc1362e1a65624e",
+    "crates/server/src/reconciliation_admin.rs": "sha256:e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "sha256:f3c0ab653eb4eba647a332368fcb30c8cec8c803e21d8431cae351b3cecdcaf0",
+    "crates/server/src/volume_worker.rs": "sha256:11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/tests/cases/authentication.rs": "sha256:3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/plans.rs": "sha256:836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "sha256:927584babc70d28ad217c5adca6ded6cdc6d9124b99ae4aef2bc4ca86b31b273",
+    "crates/server/tests/cases/protocol.rs": "sha256:aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/server_contracts.rs": "sha256:9d8ccdbff965e23546dd9be5c80bb1527cde4b2c38959943efa92bcd62b61f53",
+    "crates/server/tests/support/mod.rs": "sha256:872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "sha256:590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/src/migrations.rs": "sha256:654520f7f474c7da1a830fe4ca5f1aff38093f14d6c9f7001d510a95345b766a",
+    "crates/store/src/reconciliation/claims.rs": "sha256:129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "sha256:0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "sha256:d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "sha256:a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "sha256:b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "sha256:a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/worker/BUILD.bazel": "sha256:69fd77ab81be77b3f1a8b72d7cb1da2a7006074a61d99cc22c969f86d1680d5f",
+    "crates/worker/Cargo.toml": "sha256:143ffb59506f28e7a477c8737a094e9b9ce915728f0bca9ac0e49b1615c416b8",
+    "crates/worker/src/lib.rs": "sha256:45ade32a62d729b3d250a5ac3977e7534a9e20e6ad51c52c9977758589cdaf5e",
+    "crates/worker/tests/live.rs": "sha256:131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "deploy/testing/juicefs-component-rbac.yaml": "sha256:81bff185f8625557153e5c0364927af206a1bedafcfd97e9bc9bd7c97c3d26cb",
+    "deploy/testing/kubernetes-component.yaml": "sha256:83e98fb7408add353cd76c2259293c5b4952c21f54220fe1811b40a3ede02d4d"
+  },
+  "environment": {
+    "isolation": "Disposable KVM VM; loopback SSH/API forwards; no host cluster changes",
+    "vm": "Ubuntu 24.04.5, 4 vCPU, 6144 MiB, 24 GiB disposable disk",
+    "node": {
+      "architecture": "amd64",
+      "bootID": "8123a892-4acf-466d-a4eb-d57eb149fae1",
+      "containerRuntimeVersion": "containerd://2.3.4-k3s1",
+      "kernelVersion": "6.8.0-142-generic",
+      "kubeProxyVersion": "",
+      "kubeletVersion": "v1.37.1+k3s1",
+      "machineID": "1b3212a2c21c44d28721368367603fff",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.5 LTS",
+      "runningInUserNamespace": false,
+      "systemUUID": "1b3212a2c21c44d28721368367603fff"
+    },
+    "gvisor_release": "release-20261005.0",
+    "runsc_platform": "systrap",
+    "juicefs_host_and_mount": "juicefs version 1.4.1+2026-07-30.0b90c7db",
+    "juicefs_controller_bundled": "juicefs version 1.4.1+2026-07-30.0b90c7db",
+    "juicefs_csi": "v0.33.0",
+    "seaweedfs": "4.48",
+    "metadata_postgresql": [
+      "16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+      "on",
+      "on"
+    ],
+    "control_database_test_postgresql": "18.6 (private host-side temporary cluster)",
+    "metadata": "dedicated jfsmeta database/role; single-node PostgreSQL",
+    "object_store": "dedicated ac-juicefs S3 bucket; SeaweedFS master/volume/filer/S3 in the VM",
+    "transport_limit": "Metadata PostgreSQL sslmode=disable and S3 HTTP confined to disposable VM; not production TLS/HA certification"
+  },
+  "component_digests": {
+    "images": {
+      "csi-provisioner": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-provisioner@sha256:608640c92ee853e657ce663bc955f866910858d0f5c746da088ffb497d44a453",
+      "csi-resizer": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-resizer@sha256:fc764369dcb1dd3a031b6a842e265b7a19766e6817acd1b7bcdd5c413275638b",
+      "livenessprobe": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a",
+      "csi-node-driver-registrar": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9",
+      "csi_driver": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754",
+      "mount_client": "mirror.gcr.io/juicedata/mount@sha256:e7fff4153156a112ffdc69517c70c2be1665800add19d7cfdfa7c0362a9bd1d9",
+      "probe": "mirror.gcr.io/library/busybox@sha256:66a6306db78bf2dbf3487f293aa8d6990d8e506fdffab9cc43fe422becf886e4"
+    },
+    "release_files": {
+      "juicefs-binary.tar.gz": "sha256:01ee09a21a9351a465e09906f113845e1c6a19bea70f530e5e2b2125b2dd3b82",
+      "seaweedfs-binary.tar.gz": "sha256:4a7d108384d044d95212d1342cdda9533fa55842c1c9b41f606ca3c8a9561124",
+      "csi-k8s.yaml": "sha256:ab4860600dc51c586282855aea40aa091b20a468b2b000ff996211fe9a5d93b1",
+      "csi-rendered.yaml": "sha256:e24fe740a89d095296e785c16911cd65a24589c17de098fd467b6081e802aaff"
+    }
+  },
+  "input_refs": {
+    "test": "crates/worker/tests/live.rs",
+    "cluster_fixture": "deploy/testing/kubernetes-component.yaml",
+    "volume_fixture": "deploy/testing/juicefs-component-rbac.yaml",
+    "upstream_csi_manifest": "https://raw.githubusercontent.com/juicedata/juicefs-csi-driver/v0.33.0/deploy/k8s.yaml",
+    "upstream_csi_controller": "https://github.com/juicedata/juicefs-csi-driver/blob/v0.33.0/pkg/driver/controller.go"
+  },
+  "expected": [
+    "Current authority admits one stable PVC dispatch and completion only after reciprocal PVC/PV identity checks",
+    "Journal records the actual PVC and PV UIDs; later worker has no pending work",
+    "Non-root runsc Pod fsyncs a 1 MiB file on the CSI mount",
+    "Over-budget writes fail with EDQUOT",
+    "A replacement read-only gVisor Pod and a fresh JuiceFS memory-cache client read the same SHA-256"
+  ],
+  "observed": {
+    "bazel_live_test": {
+      "bindings": [
+        [
+          "pv",
+          {
+            "backend": "kubernetes_juicefs",
+            "name": "pvc-24d37b82-55ee-40d3-b47c-d7a13f493565",
+            "scope_uid": "b533b948-8c00-403e-8b36-75ab92986fbf",
+            "uid": "fabb7cea-b5c0-44d3-9deb-bfb59b74b5e4"
+          }
+        ],
+        [
+          "pvc",
+          {
+            "backend": "kubernetes_juicefs",
+            "name": "acv-6a7f90713da4c893780b0a766365db9d5c1ad7c399886cf3305e",
+            "scope_uid": "b533b948-8c00-403e-8b36-75ab92986fbf",
+            "uid": "24d37b82-55ee-40d3-b47c-d7a13f493565"
+          }
+        ]
+      ],
+      "limits": "PV provisioning only; no Workspace readiness or durability claim",
+      "operation": "op_3931a0bc6a67657885ce05838a5bc767",
+      "organization": "volume_probe_1791548986365795223",
+      "resource_id": "res_c8bba73469b41fdc71f363e730294e38"
+    },
+    "csi_components": [
+      {
+        "name": "juicefs-ac-component-node-pvc-44dd301a-5ae6-4274-a92a-34fee71a2bed-xduavr",
+        "uid": "f0381f22-609b-4931-ace1-b7ef4b63c443",
+        "phase": "Running",
+        "images": [
+          {
+            "name": "jfs-mount",
+            "image": "mirror.gcr.io/juicedata/mount@sha256:e7fff4153156a112ffdc69517c70c2be1665800add19d7cfdfa7c0362a9bd1d9",
+            "image_id": "mirror.gcr.io/juicedata/mount@sha256:e7fff4153156a112ffdc69517c70c2be1665800add19d7cfdfa7c0362a9bd1d9"
+          }
+        ]
+      },
+      {
+        "name": "juicefs-csi-controller-0",
+        "uid": "35e53729-5847-4c17-bc99-a43b0bc221ac",
+        "phase": "Running",
+        "images": [
+          {
+            "name": "juicefs-plugin",
+            "image": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754",
+            "image_id": "docker.io/juicedata/juicefs-csi-driver@sha256:f918e7331c055ec7efb5a13ff4f81def57620defb003f7379c28fa97822ff44d"
+          },
+          {
+            "name": "csi-provisioner",
+            "image": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-provisioner@sha256:608640c92ee853e657ce663bc955f866910858d0f5c746da088ffb497d44a453",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-provisioner@sha256:608640c92ee853e657ce663bc955f866910858d0f5c746da088ffb497d44a453"
+          },
+          {
+            "name": "csi-resizer",
+            "image": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-resizer@sha256:fc764369dcb1dd3a031b6a842e265b7a19766e6817acd1b7bcdd5c413275638b",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-resizer@sha256:fc764369dcb1dd3a031b6a842e265b7a19766e6817acd1b7bcdd5c413275638b"
+          },
+          {
+            "name": "liveness-probe",
+            "image": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a"
+          }
+        ]
+      },
+      {
+        "name": "juicefs-csi-node-j7pf8",
+        "uid": "3ce942cc-6e9c-4ec1-9b28-5d7a76d406fa",
+        "phase": "Running",
+        "images": [
+          {
+            "name": "juicefs-plugin",
+            "image": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754",
+            "image_id": "docker.io/juicedata/juicefs-csi-driver@sha256:f918e7331c055ec7efb5a13ff4f81def57620defb003f7379c28fa97822ff44d"
+          },
+          {
+            "name": "node-driver-registrar",
+            "image": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9"
+          },
+          {
+            "name": "liveness-probe",
+            "image": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a"
+          }
+        ]
+      }
+    ],
+    "file_and_quota_probes": {
+      "source_commit": "3cf837097484c8bc6dd80771c1479604ce678b31",
+      "pvc": {
+        "name": "acv-15676fe0130c5f2abd3457802aee5d0000490597266d19392761",
+        "uid": "44dd301a-5ae6-4274-a92a-34fee71a2bed"
+      },
+      "pv": {
+        "name": "pvc-44dd301a-5ae6-4274-a92a-34fee71a2bed",
+        "uid": "210693ea-b329-4769-baaf-a2806887ba8c"
+      },
+      "writer": {
+        "pod_uid": "2a45f845-f0de-4897-8944-6edc5239c482",
+        "container_id": "c1533297815f2365375e63a3ce037337f1c381dc688779dbd1a356c301b20ae4",
+        "runtime": {
+          "Name": "io.containerd.runsc.v1",
+          "Options": {
+            "type_url": "runtimeoptions.v1.Options",
+            "value": "Ch5pby5jb250YWluZXJkLnJ1bnNjLnYxLm9wdGlvbnMSGi9ldGMvY29udGFpbmVyZC9ydW5zYy50b21s"
+          }
+        },
+        "oci_root_readonly": true,
+        "startup_log": "sync: ignoring all arguments\nd1a3a8d1e26aee9a4bc84876aabc1b151dd37675c0ae4a8d262dccbff113b18b  /workspace/probe.bin\nAC_VOLUME_WRITE_SYNC_OK\n",
+        "fsync_log": "1+0 records in\n1+0 records out\n1048576 bytes (1.0MB) copied, 0.016904 seconds, 59.2MB/s\na28905262a5c842a111bb9a08e01ba8b2d5b50325a4dd952f765be2cb4d3200a  /workspace/probe.bin\nAC_VOLUME_FSYNC_OK\n"
+      },
+      "quota_log": "dd: error writing '/workspace/quota-probe': Disk quota exceeded\n1093+0 records in\n1092+0 records out\n1145176064 bytes (1.1GB) copied, 2.605202 seconds, 419.2MB/s\nDD_EXIT=1\nQUOTA_BYTES=1006632960\n",
+      "sha256": "a28905262a5c842a111bb9a08e01ba8b2d5b50325a4dd952f765be2cb4d3200a",
+      "reader": {
+        "pod_uid": "b3274cc2-2c1b-4daa-8b62-77fd9c62bf06",
+        "container_id": "4ea2137e60335be9aca67aa890e7018c7bead3213f20f65d24e7694681e89106",
+        "runtime": {
+          "Name": "io.containerd.runsc.v1",
+          "Options": {
+            "type_url": "runtimeoptions.v1.Options",
+            "value": "Ch5pby5jb250YWluZXJkLnJ1bnNjLnYxLm9wdGlvbnMSGi9ldGMvY29udGFpbmVyZC9ydW5zYy50b21s"
+          }
+        },
+        "log": "/workspace/probe.bin: OK\nAC_VOLUME_RECREATE_READ_OK\n",
+        "mount_readonly": true
+      },
+      "fresh_readonly_client": {
+        "bytes": 1048576,
+        "sha256": "a28905262a5c842a111bb9a08e01ba8b2d5b50325a4dd952f765be2cb4d3200a",
+        "fresh_client": true,
+        "readonly": true,
+        "cache_dir": "memory",
+        "object_get_metrics": [
+          "juicefs_object_request_data_bytes_GET 1048576",
+          "juicefs_object_request_durations_histogram_seconds_GET_total 1",
+          "juicefs_object_request_durations_histogram_seconds_GET_sum 0.004690754"
+        ]
+      },
+      "quota_configuration": "+-------------------------------------------+---------+---------+------+-----------+-------+-------+\n|                    Path                   |   Size  |   Used  | Use% |   Inodes  | IUsed | IUse% |\n+-------------------------------------------+---------+---------+------+-----------+-------+-------+\n| /pvc-44dd301a-5ae6-4274-a92a-34fee71a2bed | 1.0 GiB | 1.0 MiB |   0% | unchanged |     1 |       |\n+-------------------------------------------+---------+---------+------+-----------+-------+-------+\n\n"
+    }
+  },
+  "probe_inputs": {
+    "writer_pod": {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "ac-volume-write-probe",
+        "namespace": "ac-kube-component",
+        "labels": {
+          "agent-computer.io/component-probe": "volume"
+        }
+      },
+      "spec": {
+        "runtimeClassName": "gvisor",
+        "automountServiceAccountToken": false,
+        "enableServiceLinks": false,
+        "restartPolicy": "Never",
+        "activeDeadlineSeconds": 600,
+        "terminationGracePeriodSeconds": 30,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 1000,
+          "runAsGroup": 1000,
+          "fsGroup": 1000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "probe",
+            "image": "mirror.gcr.io/library/busybox@sha256:66a6306db78bf2dbf3487f293aa8d6990d8e506fdffab9cc43fe422becf886e4",
+            "imagePullPolicy": "IfNotPresent",
+            "command": [
+              "/bin/sh",
+              "-c",
+              "set -eu; test \"$(id -u)\" = 1000; test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token; head -c 1048576 /dev/urandom > /workspace/probe.bin; sync /workspace/probe.bin; sha256sum /workspace/probe.bin; echo AC_VOLUME_WRITE_SYNC_OK; sleep 300"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "250m",
+                "memory": "128Mi"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "256Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "workspace",
+                "mountPath": "/workspace"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "workspace",
+            "persistentVolumeClaim": {
+              "claimName": "acv-15676fe0130c5f2abd3457802aee5d0000490597266d19392761"
+            }
+          }
+        ]
+      }
+    },
+    "reader_pod": {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "ac-volume-read-probe",
+        "namespace": "ac-kube-component",
+        "labels": {
+          "agent-computer.io/component-probe": "volume"
+        }
+      },
+      "spec": {
+        "runtimeClassName": "gvisor",
+        "automountServiceAccountToken": false,
+        "enableServiceLinks": false,
+        "restartPolicy": "Never",
+        "activeDeadlineSeconds": 600,
+        "terminationGracePeriodSeconds": 30,
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 1000,
+          "runAsGroup": 1000,
+          "fsGroup": 1000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "probe",
+            "image": "mirror.gcr.io/library/busybox@sha256:66a6306db78bf2dbf3487f293aa8d6990d8e506fdffab9cc43fe422becf886e4",
+            "imagePullPolicy": "IfNotPresent",
+            "command": [
+              "/bin/sh",
+              "-c",
+              "set -eu; test \"$(id -u)\" = 1000; test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token; echo \"a28905262a5c842a111bb9a08e01ba8b2d5b50325a4dd952f765be2cb4d3200a  /workspace/probe.bin\" | sha256sum -c; echo AC_VOLUME_RECREATE_READ_OK; sleep 180"
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "250m",
+                "memory": "128Mi"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "256Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "workspace",
+                "mountPath": "/workspace",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "workspace",
+            "persistentVolumeClaim": {
+              "claimName": "acv-15676fe0130c5f2abd3457802aee5d0000490597266d19392761",
+              "readOnly": true
+            }
+          }
+        ]
+      }
+    },
+    "fsync_command": [
+      "dd",
+      "if=/dev/urandom",
+      "of=/workspace/probe.bin",
+      "bs=1048576",
+      "count=1",
+      "conv=fsync"
+    ],
+    "quota_command": [
+      "dd",
+      "if=/dev/zero",
+      "of=/workspace/quota-probe",
+      "bs=1048576",
+      "count=1152",
+      "conv=fsync"
+    ],
+    "cold_read_options": [
+      "--read-only",
+      "--no-bgjob",
+      "--no-usage-report",
+      "--cache-dir",
+      "memory",
+      "--buffer-size",
+      "64",
+      "--subdir",
+      "/pvc-44dd301a-5ae6-4274-a92a-34fee71a2bed"
+    ],
+    "csi_rendering": "Pinned v0.33.0 upstream manifest; dashboard Deployment/Service omitted; controller replicas=1; images replaced with the pinned image map; mountPodPatch ceMountImage pinned, request 100m/256Mi, limit 1CPU/1Gi, buffer-size=64; enableSetQuota and enableControllerSetQuota true",
+    "s3_server_options": [
+      "server",
+      "-dir=/var/lib/agent-computer-s3",
+      "-ip=10.0.2.15",
+      "-filer",
+      "-s3",
+      "-s3.config=/etc/agent-computer-test/s3.json",
+      "-volume.max=16",
+      "-master.volumeSizeLimitMB=512"
+    ],
+    "secret_handling": "Credentials randomly generated in private VM files, supplied by environment to format/mount, and referenced through CSI Secret. No Secret/token/database-password content is retained in this record."
+  },
+  "prior_attempts": [
+    {
+      "status": "failed",
+      "reason": "SeaweedFS volume.max=4 left no free volumes for the dedicated bucket; fixed disposable fixture to 16 and waited for readiness."
+    },
+    {
+      "status": "failed",
+      "reason": "Initial CSI startup exceeded 180 seconds; registry.k8s.io redirect TLS failed. Pinned Rancher sig-storage mirror images were used. No versions or runtime security controls were weakened."
+    },
+    {
+      "status": "failed",
+      "reason": "Real PV readback showed missing fsType by default and a dotted provisioner identity. Final source explicitly sets StorageClass fstype=juicefs and validates the bounded dotted CSI identifier; regression fixtures cover these actual fields."
+    },
+    {
+      "status": "failed",
+      "reason": "First fresh-reader collection referenced a nonexistent .jfs.stats path. Repeated with actual .stats and verified one 1048576-byte object GET."
+    }
+  ],
+  "evidence_refs": [
+    "docs/evidence/juicefs-component-2026-10-09.log"
+  ],
+  "limits": [
+    "Single-node component evidence only; runtime acceptance T01\u2013T43 remains not_run",
+    "No product Workspace Candidate, writer admission, generation fencing or Computer startup was exercised",
+    "No power loss, node partition, multi-node recovery, database failover, object-store failure, HA, backup/restore or production TLS certification",
+    "The worker checks provisioning; quota verification and file I/O were separate trusted operator probes",
+    "EDQUOT was observed for buffered over-quota dd with conv=fsync; stream byte count is not a durable-byte acknowledgement",
+    "The initial BusyBox sync ignored the filename; a separate successful dd conv=fsync supplied the file fsync evidence",
+    "RuntimeClass and deny policy were verified by API; this run did not measure packet-level isolation",
+    "The file probe PVC came from Cargo live execution of the same committed implementation; the explicit Bazel tests created their own separately recorded PVCs",
+    "Durable retained PVC/PV data are kept until destruction of this disposable VM; the product worker never deletes them"
+  ],
+  "followup_verification": {
+    "source_commit": "30204c4d76580969b6c2180c1fecb11977c9421a",
+    "status": "passed",
+    "reason": "PVC metadata guard added after the original component run",
+    "source_files": {
+      "crates/kubernetes/src/volume.rs": "sha256:c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+      "crates/kubernetes/src/tests.rs": "sha256:1b7bbd3435a0ccc65db2cbeb52212f3f38156ef97404ed9ab65fdf9cabc5d11f",
+      "crates/worker/tests/live.rs": "sha256:131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4"
+    },
+    "default_test_count": 124,
+    "live_test_cache": "disabled",
+    "observed": {
+      "bindings": [
+        [
+          "pv",
+          {
+            "backend": "kubernetes_juicefs",
+            "name": "pvc-e09a7dde-1ea6-4ff5-b6eb-a38e86765414",
+            "scope_uid": "b533b948-8c00-403e-8b36-75ab92986fbf",
+            "uid": "666523fa-acec-444a-9494-b3ec99cfc25e"
+          }
+        ],
+        [
+          "pvc",
+          {
+            "backend": "kubernetes_juicefs",
+            "name": "acv-bffbe04b6e253b58a8fcd1ae991b911875ee2f90d41ca4dcdcec",
+            "scope_uid": "b533b948-8c00-403e-8b36-75ab92986fbf",
+            "uid": "e09a7dde-1ea6-4ff5-b6eb-a38e86765414"
+          }
+        ]
+      ],
+      "limits": "PV provisioning only; no Workspace readiness or durability claim",
+      "operation": "op_8b8841202b06725eca78a8c53924e464",
+      "organization": "volume_probe_1791549506993766762",
+      "resource_id": "res_66ae1164d88655b466eef6142c95304d"
+    }
+  },
+  "cleanup": {
+    "state": "completed",
+    "observed_at": "2026-10-09T12:41:45.467406+00:00",
+    "vm_process_stopped": true,
+    "loopback_ports_closed": true,
+    "guest_disk_and_private_credentials_removed": true,
+    "release_downloads_and_nonsecret_evidence_retained": true
+  }
+}
