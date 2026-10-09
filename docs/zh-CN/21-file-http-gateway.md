@@ -33,4 +33,6 @@ Authorization: Bearer <original-connection-credential>
 
 新增两项存储场景覆盖有界读取与恶意对象；五项 PostgreSQL 场景覆盖独立读取 grant/scope、准确连接凭据、已准备代次/目录绑定、关闭/到期/撤权及请求能力；四项服务场景覆盖显式启用、请求限额、未知/重复查询字段、浏览器拒绝，以及等待方取消后保留 IO 名额且就绪接口仍可响应。默认测试现为 224 项。显式真实 Candidate 组件测试另运行独立 TCP 服务，覆盖只读会话读取、保存、准确/改换意图重试、跨凭据拒绝、符号链接拒绝、Workspace 撤权与连接关闭；另注入十一秒 Outbox 延迟，验证 HTTP 超时后查询已完成任务、准确重试不再写入。执行证据单独记录。
 
+2026-10-10（Asia/Singapore），显式组件测试在 `e7500e7` 上通过。[固定记录](../evidence/candidate-file-http-2026-10-10.json)与[运行输出](../evidence/candidate-file-http-2026-10-10.log)绑定实际部署的 Bazel 二进制和 174 个源码文件。上述 HTTP 场景均通过，包括先收到 408、随后查询 Applied/Released，准确重试保留 inode。组合测试共记录八条派发/完成/事件/Outbox 和七条有界排空证明。新的只读 JuiceFS 客户端读回最终 19 字节 HTTP 保存文件，SHA-256 与记录一致；连同准备恢复文件，两次 S3 GET 共读取 46 字节。一次性虚拟机和私有状态已删除。延迟数据库事务的测试不代表 FUSE 挂起或物理 fencing 已验证。
+
 目录操作、大文件流、OIDC/人的浏览器会话、文件 UI、产品 Pod 执行、通用进程 fencing、Artifact 发布与 Computer Ready 仍待实现，T01–T43 保持 `not_run`。

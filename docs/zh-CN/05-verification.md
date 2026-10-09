@@ -30,4 +30,4 @@
 
 新增 7 项本地存储与 2 项 PostgreSQL 场景验证有界文件保存、未知派发及升级安全。另在 `06f3d14` 上通过真实 worker 测试：六次派发覆盖保存/重试、替换、版本冲突、写后撤权接纳、Outbox 回滚及不安全目标阻止交接；新的 JuiceFS 客户端通过 S3 读回保存文件。[固定证据](../evidence/candidate-file-save-2026-10-09.json)保留实际观测及限制，见 [20 文件保存](20-bounded-file-saves.md)。
 
-新增两项存储、五项 PostgreSQL 与四项服务场景，覆盖有界文件读取、独立读取授权和可选 HTTP 文件网关，见 [21 文件 HTTP 网关](21-file-http-gateway.md)。完整路径另需真实 TCP/存储证据。
+新增两项存储、五项 PostgreSQL 与四项服务场景，覆盖有界文件读取、独立读取授权和可选 HTTP 文件网关。真实 TCP/PostgreSQL/JuiceFS/S3 组件测试在 `e7500e7` 上通过，包含 HTTP 超时后持久化完成及准确重试；[固定证据](../evidence/candidate-file-http-2026-10-10.json)记录该范围，见 [21 文件 HTTP 网关](21-file-http-gateway.md)。
