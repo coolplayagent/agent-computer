@@ -12,8 +12,8 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 3
-  description: E01–E07：CLI 权威分工、宿主接入、workflow 桥接、产品会话/授权/训练责任
+  version: 4
+  description: E01–E10：CLI 权威分工、workflow 桥接、协作通信归属、可选组合配置及开发和资料两条端到端流程
 route:
   topic: integrations
   source_order:

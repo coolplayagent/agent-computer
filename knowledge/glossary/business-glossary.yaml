@@ -211,3 +211,39 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agentic-runtime-contracts.md
+  - id: team
+    domain: agent-infrastructure
+    canonical_name: Team
+    definition: 外部产品或 Harness 拥有的长期成员、能力与策略组织；团队成员不自动成为 Workspace 成员，不授予 Computer、profile 或凭据权限。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: task-group
+    domain: agent-infrastructure
+    canonical_name: TaskGroup
+    definition: 外部 Harness 围绕本次目标组织的临时参与者、角色、依赖和验收约定，可使用零到多台 Computer；接入 workflow 时关联其 Task/attempt，不另建业务终态。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: collaboration-session
+    domain: agent-infrastructure
+    canonical_name: CollaborationSession
+    definition: relay-teams 或 Harness 拥有的有范围消息、参与者路由与协作接续记录；区别于 Computer 的 ConnectionSession，消息收到或处理完成不表示业务验收通过。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/ecosystem-integration.md
+  - id: ecosystem-composition
+    domain: agent-infrastructure
+    canonical_name: EcosystemComposition
+    definition: 本仓库定义、集成宿主解析的可选组件组合与版本化配置，关联服务、适配器、环境和固定成果；不是 ComputerSet 或业务流程引擎，不接管组件权威与部署生命周期。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/ecosystem-integration.md

@@ -1,0 +1,43 @@
+schema_version: 4
+topic:
+  id: architecture
+  title: architecture
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-agentic-runtime
+  topic: architecture
+  kind: doc
+  uri: codespec/design/agentic-runtime-contracts.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 2
+  description: AR01–AR07：绑定、许可、交接、证据、准入、协议与可选评测；复用绑定和事实交接支撑多 Computer 协作
+- id: agent-computer-compute-storage-selection
+  topic: architecture
+  kind: doc
+  uri: codespec/decisions/compute-storage-selection.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 2
+  description: CS01–CS10：计算存储候选、成熟度、采用/改选条件、成本与未执行 B01–B07 实验
+- id: agent-computer-design
+  topic: architecture
+  kind: doc
+  uri: codespec/design/agent-computer.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 4
+  description: D01–D18：计算存储、连接控制、ComputerView、Presentation、部署与 Agentic 契约，以及多 Agent 分组和环境分配
+route:
+  topic: architecture
+  source_order:
+  - agent-computer-design
+  - agent-computer-compute-storage-selection
+  - agent-computer-agentic-runtime
+  fallback: bounded-search

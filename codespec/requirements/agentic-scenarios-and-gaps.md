@@ -1,8 +1,10 @@
 # Agentic 演进、产品场景与能力缺口
 
-版本：设计基线 0.4；审视日期：2026-10-09；状态：研究与设计补充，未实现或运行验收。
+版本：设计基线 0.5；审视日期：2026-10-09；状态：研究与设计补充，未实现或运行验收。
 
 本文以 agent-computer 修改前提交 `a24a54525632703f3650496c9f8ba18660d1acbe` 为覆盖基线，使用 superpod 固定提交 `54f75c3f487dbcfe1f47779d0903383d5bce0ada` 的知识资料，并复核相关公开工程来源。它补充[产品需求](agent-computer.md)、[Agentic 运行契约](../design/agentic-runtime-contracts.md)和[部署契约](../design/deployment-automation.md)。
+
+0.5 的用户决策在[主设计 D18](../design/agent-computer.md)与[生态集成 E08–E10](../design/ecosystem-integration.md)补充多对多环境分配和组合方案；本文件固定研究来源与原覆盖基线不变，不把新设计写成实测或外部项目既有能力。
 
 ## SC01. 证据范围与状态口径
 

@@ -1,10 +1,12 @@
 # Agentic 产品场景的运行支撑契约
 
-版本：设计基线 0.4；日期：2026-10-09；状态：新增设计，全部待实现。
+版本：设计基线 0.5；日期：2026-10-09；状态：新增设计，全部待实现。
 
-本文落实 R26–R32，补充[主设计 D17](agent-computer.md)。需求来源与原有覆盖度见[场景审视](../requirements/agentic-scenarios-and-gaps.md)，验收见[测试 T31–T37](../test/agent-computer.md)。AR01–AR06 是首版核心补充；AR07 是后续可选评测扩展，未实现时 capability 必须明确为不支持。
+本文落实 R26–R32，并为 R33 的多对多环境使用提供绑定与交接契约，补充[主设计 D17–D18](agent-computer.md)。需求来源与原有覆盖度见[场景审视](../requirements/agentic-scenarios-and-gaps.md)，验收见[测试 T31–T39](../test/agent-computer.md)。AR01–AR06 是首版核心补充；AR07 是后续可选评测扩展，未实现时 capability 必须明确为不支持。
 
 Computer 提供环境事实、动作与执行证据。任务、消息、长期记忆、模型循环、奖励和训练分别属于集成产品、workflow、memory、Harness 与训练平台。本文件不创建第二套 Task/Run/Space 权威库。
+
+0.5 的团队分组与环境分配见主设计 D18；通信归属、组合配置与端到端流程见生态集成 E08–E10。沿用本文件既有绑定、交接和证据接口，不新增 Computer Team/TaskGroup/Message 端点。
 
 ## AR01. 产品会话到环境的显式绑定
 
@@ -19,6 +21,8 @@ Personal Agent 的持久电脑、团队频道的共享电脑和个人私聊的�
 | ephemeral | 从批准模板/固定成果创建隔离会话环境，绑定有效期；结束后按保留策略清理，成果单独保留 |
 
 注册/修改绑定需 manage 和所引用资源的授权；可信适配器根据真实身份和成员关系解析外部会话，不信任模型提交的 owner/频道成员表。请求有效权限取主体、成员策略、绑定、资源 ACL、委托、动作许可的交集。人的独立 Computer 链接不要求 ContextBinding；绑定是产品集成入口，不能成为新增强制 Agent 依赖。
+
+Team/TaskGroup/CollaborationSession 的外部关联不是资源授权。一个任务组可关联多个 ContextBinding；同一 Agent 使用多台 Computer 时分别创建 ConnectionSession、领取所需租约。一个 binding 仍引用一台 Computer 与其主 Workspace，不通过把 computer_ref 改为列表隐式共享权限。纯协调角色可只有外部协作会话；团队成员和授权 Workspace 成员分开维护。
 
 成员变更按 revision/撤销事件收敛；依赖外部成员服务的绑定必须有短时有效断言及到期拒绝规则，不能无限使用离线缓存。新请求、流投递、排队执行 dispatch 均检查当前权限；撤销停止相关输入/执行并收回受限凭据，不影响仍有权用户。已经观察或下载的内容无法远程收回。
 
@@ -48,7 +52,9 @@ Harness 跨上下文或不同 Agent 接续时，可请求 `HandoffManifest`。�
 
 交接不是自动 checkpoint。候选目录仍在修改、进程仍运行或跨 App 状态未形成一致恢复点时，清单必须标注 `consistency=observed`、观测时间及差异；只有 D07 已提交检查点可标记 `checkpointed`。权限裁剪导致缺失时记录 `complete=false` 和可披露原因，不把裁剪后的清单冒充完整快照。
 
-接收者先重新鉴权、检查 generation、补读 cursor 后的事件并查询 Unknown，再获取新页面观察与控制权；发生变化则重新取事实清单。清单是恢复线索，不是 bearer token、自动权限转交或可重放指令集。多人并行仍用独立 Candidate，合并由上层依据固定成果完成。
+接收者先重新鉴权、检查 generation、补读 cursor 后的事件并查询 Unknown，再获取新页面观察与控制权；发生变化则重新取事实清单。清单是恢复线索，不是 bearer token、自动权限转交或可重放指令集。 `checkpointed` 仅指 D07 所声明的 Computer 恢复范围，不涵盖 workflow、协作消息在途状态和第三方 API 的全局一致快照；接续仍逐一查询权威状态，外部效果只按业务契约对账/补偿。理论依据见[设计参考 C07](../decisions/multi-agent-collaboration-foundations.md)。多人并行仍用独立 Candidate，合并由上层依据固定成果完成。
+
+跨 Computer 交接传递获准 Artifact、环境版本和各自事实清单的引用；接收方显式准备输入并重建适用状态，不复制另一台 Computer 的活跃 profile、控制租约或未保存页面。协作消息仅携带有范围的任务摘要和引用，不默认广播完整模型历史；消息游标与 Computer 事件游标分别补读。
 
 ## AR04. 执行证据与受控轨迹导出
 

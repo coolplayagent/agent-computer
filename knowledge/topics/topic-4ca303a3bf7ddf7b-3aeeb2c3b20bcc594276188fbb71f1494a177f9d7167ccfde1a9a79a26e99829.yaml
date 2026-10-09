@@ -12,8 +12,18 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
+  version: 2
+  description: AR01–AR07：绑定、许可、交接、证据、准入、协议与可选评测；复用绑定和事实交接支撑多 Computer 协作
+- id: agent-computer-collaboration-foundations
+  topic: architecture
+  kind: doc
+  uri: codespec/decisions/multi-agent-collaboration-foundations.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
   version: 1
-  description: AR01–AR07：绑定、许可、交接、证据、准入、协议与可选评测环境的待实现契约
+  description: C01–C09：superpod 固定论文/实践证据，分组与环境分离、协作组件边界、因果/幂等/恢复与验证映射
 - id: agent-computer-compute-storage-selection
   topic: architecture
   kind: doc
@@ -32,12 +42,13 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 3
-  description: D01–D17：计算存储、连接控制、ComputerView、Presentation、部署与 Agentic 契约入口
+  version: 4
+  description: D01–D18：计算存储、连接控制、ComputerView、Presentation、部署与 Agentic 契约，以及多 Agent 分组和环境分配
 route:
   topic: architecture
   source_order:
   - agent-computer-design
   - agent-computer-compute-storage-selection
   - agent-computer-agentic-runtime
+  - agent-computer-collaboration-foundations
   fallback: bounded-search

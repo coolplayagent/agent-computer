@@ -1,8 +1,8 @@
 # agent-computer 详细技术设计
 
-版本：设计基线 0.4；日期：2026-10-09；状态：待实现。
+版本：设计基线 0.5；日期：2026-10-09；状态：待实现。
 
-本文落实[产品需求 R01–R32](../requirements/agent-computer.md)，R32 是后续可选评测扩展。所有协议、命令和配置例子均为设计契约；当前仓库没有实现这些接口。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约。
+本文落实[产品需求 R01–R35](../requirements/agent-computer.md)，R32 是后续可选评测扩展，R34–R35 是可选生态组合要求。所有协议、命令和配置例子均为设计契约；当前仓库没有实现这些接口。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约，0.5 新增 D18 多 Agent 与环境分配及 E08–E10 组合方案。
 
 ## D01. 架构与技术决策
 
@@ -81,6 +81,8 @@ K3s 的单节点与 HA 拓扑、gVisor 的 Kubernetes/containerd 接入和 Juice
 人可先连接再按需启动计算。AgentSpec、Harness、workflow caller_ref 缺席不影响人的授权或使用。ConnectionSession 跨计算重建保留逻辑关联，但旧 generation 的 token、ViewerSession、Lease 全部失效，重新鉴权后才可操作。
 
 托管 Agent 在单独受控进程/Sandbox 中运行，通过相同 API 操作 Computer。Agent 退出保留 Computer；实例重启是否恢复对话由对应 Harness 决定。
+
+Agent 与 Computer 为多对多使用关系：一个主体可以有多台 Computer 的独立 ConnectionSession，一台 Computer 可以有多个主体连接。模型运行位置不从 computer_id 推导；Team、TaskGroup、CollaborationSession 属于外部协作层，分组、分配与权限的完整边界见 D18。
 
 ## D03. 声明、版本与收敛
 
@@ -498,8 +500,10 @@ PostgreSQL 使用持续 WAL 归档与定期备份；JuiceFS 元数据备份和�
 | D7 | workflow adapter 和其他 CLI 示例 | T14、T15、T17；业务结束不关闭人的活动会话 |
 | D8 | 多节点故障、观测、运维与发布矩阵 | 原有 T01–T27 证据完整，继续完成新增部署与场景门 |
 | 交付 9 | 标准部署发行件、状态归属、认证路径、升级/恢复 | DP01–DP08；T28–T30 |
-| 交付 10 | 会话绑定/委托、动作约束、环境交接、证据、准入和能力协商 | AR01–AR06；首版核心 T01–T36 完整，可选适配按实际声明验收 |
-| 扩展 11 | 后续隔离评测环境扩展 | AR07；启用时要求 T37，不引入模型训练权威 |
+| 交付 10 | 会话绑定/委托、动作约束、环境交接、证据、准入和能力协商 | AR01–AR06；完成 T01–T36，继续完成交付 11 的核心门；可选适配按实际声明验收 |
+| 交付 11 | 多 Agent 多对多连接与环境分配 | D18；核心 T38–T39，不强依赖协作组件 |
+| 可选组合 12 | relay-teams 协作模块、集成宿主配置与开发/资料闭环 | E08–E10；发布对应组合要求 T40–T43，核心可独立交付 |
+| 扩展 13 | 后续隔离评测环境扩展 | AR07；启用时要求 T37，不引入模型训练权威 |
 
 所有 API 形状由这里的设计导出 OpenAPI/JSON Schema 后才能成为可执行协议。后续实现必须用真实测试反馈修订文档和兼容矩阵；不能通过未经同等认证即撤去隔离层、禁用冲突检查或改成单机本地存储来宣称本设计验收完成。
 
@@ -636,3 +640,58 @@ gVisor 的隔离价值、JuiceFS 的跨节点文件需求、上游生产证据�
 [运行契约 AR01–AR07](agentic-runtime-contracts.md)补充 ContextBinding 与委托、ActionIntent/许可及凭据代理、EnvironmentVersion/HandoffManifest、ExecutionEvidenceBundle、外部触发/公平准入、版本能力协商与后续评测 Episode。它们沿用 D02–D11 的身份、租约、幂等、事件、Artifact 和故障权威，不增加另一套业务 Task/消息/记忆库。
 
 R26–R31 为首版核心补充，R32 的评测扩展为后续可选能力；Desktop、音视频、GPU、内存快照、通用训练与模型发布不因新增接口而成为已支持特性。具体责任见 E07，新增验收见 T31–T37。
+
+## D18. 多 Agent 分组、连接与环境分配
+
+本节的论文、工程实践和决策映射见[多 Agent 协作技术依据](../decisions/multi-agent-collaboration-foundations.md)；部署和仓库拆分属于产品取舍，不宣称由论文直接证明。
+
+本节落实 R33–R35。Computer 是共享或隔离的工作环境，Agent 是通过 Harness 作出决策的参与者；Agent 的运行承载与其操作目标分别配置。外部 Agent 和托管 Agent 使用同一公共 API，托管不授予控制面身份。一个 Computer 可含多个 Sandbox，并不等于物理主机；分配独立 Computer 也不自动证明底层隔离已认证。
+
+### 分组与连接模型
+
+| 概念 | 权威与用途 | 对 Computer 的关系 |
+| --- | --- | --- |
+| Team | 外部产品/Harness 的长期成员、能力与策略组织 | 可获准使用 Workspace，但团队成员身份不等于 Workspace ACL |
+| TaskGroup | 围绕本次目标的参与者、角色、依赖和验收约定 | 可使用零到多台 Computer；接入 workflow 时引用其 Task/attempt |
+| CollaborationSession | 有范围的消息、路由和协作接续记录 | 通过外部引用关联 ContextBinding；不是 Computer 连接或控制租约 |
+| ConnectionSession | Computer 核验的人/Agent 主体到单台 Computer 的授权连接 | 多主体可连接同一台；同一主体使用多台时各自建连接、授权和取消范围 |
+
+默认角色为协调者、执行者、评审者；角色名称由 Harness 定义，Computer 不内置角色枚举或审批算法。协调者可不使用 Computer，评审者通过受授权接口读取固定成果时也无需启动计算。角色变化不自动改变 ACL、凭据和预算；人的直接使用继续不依赖团队、TaskGroup 或 AgentSpec。
+
+```mermaid
+flowchart LR
+    G[外部 Team / TaskGroup] --> H[Harness 协调与分派]
+    H --> A[Agent A]
+    H --> B[Agent B]
+    H --> R[无 Computer 的协调或评审者]
+    A --> S1[独立 ConnectionSession]
+    B --> S2[独立 ConnectionSession]
+    A --> S3[另一 ConnectionSession]
+    S1 --> C1[共享 Computer]
+    S2 --> C1
+    S3 --> C2[隔离 Computer]
+    C1 --> W[授权 Workspace / 固定成果]
+    C2 --> W
+```
+
+图中的 Workspace 访问仍逐项授权，不要求不同私有主体共享可写目录。每台 Computer 仍有一个主 Workspace；其他成果作为只读固定输入。相同 AgentSpec 可以实例化不同身份的 Agent，不能用同名角色或 agent_spec_ref 合并不同主体权限。
+
+### 默认分配与协作方式
+
+| 工作特征 | 分配规则 | 并发与恢复 |
+| --- | --- | --- |
+| 人/Agent 接续同一浏览器、共同观察 | 共享 Computer 与 Browser App，参与者均须有权观察全部共享画面 | Browser App 所有页面共用一份控制租约，交接排空后重新观察 |
+| 并行代码修改 | 可共享 Computer 逻辑身份，各执行者使用独立 Sandbox 与 Candidate；需要独立环境/预算时分配多台 Computer | 从固定输入开始，无共享可写 inode，固定成果显式合并并 CAS 更新指针 |
+| 并行独立浏览器任务 | 使用独立 Browser App/Sandbox，按权限与资源策略决定是否另建 Computer | 同一 Browser App 的不同标签页不构成并行控制隔离 |
+| 不同私人登录主体、互不信任参与者或不同网络策略 | 默认独立 Computer/Sandbox、profile、凭据和可写挂载 | 只经显式发布分享获准成果，不用成果 ACL 补救共享画面已经泄露的信息 |
+| 纯协调、讨论、读取获准成果评审 | 仅分配 Harness 会话与必要成果读取能力 | 不强制创建 Computer 或启动 Sandbox |
+
+环境分配策略归可信集成层：先解析身份/委托与模板，再复用授权环境或按预算申请独立环境。Computer 按 AR05 执行准入和配额，不从聊天文本自动选择私人电脑。共享工作空间是同一授权协作范围内的默认组合，不是全组织共享磁盘。
+
+协作过程为明确输入和验收→按需绑定环境→独立执行并固定成果→评审→显式集成→业务验收→按需 Presentation。合并在新的 Candidate 中完成，合并后重新检查最终版本；两个分支分别通过检查不证明合并版通过。交接沿用 AR03，跨 Computer 传递成果和事实引用，不迁移活跃进程或自动复制 profile。
+
+接入 workflow 后，领取、重试、取消和业务终态由其权威状态决定；Harness 分派记录只关联该任务，不另设可独立推进的业务完成状态。不使用 workflow 的组合由外部 Harness 自行管理任务结果，Computer 仍只返回执行事实。退出 Agent、解散任务组或完成任务，只释放所属连接/执行；共享环境停止仍检查人的活动和其他参与者，持久成果按保留策略保留。
+
+### 集成与验证边界
+
+协作通信的组件/仓库/部署选择见 E08；可选组合、配置入口和两条完整流程见 E09–E10。Computer 不新增 Team/TaskGroup/Message 状态库、通用消息总线或业务门户；复用 D02/AR06 的公开接口与外部关联即可串起执行和成果。核心拓扑验证为 T38–T39；团队通信和其它生态组合仅在发布对应能力时执行 T40–T43。

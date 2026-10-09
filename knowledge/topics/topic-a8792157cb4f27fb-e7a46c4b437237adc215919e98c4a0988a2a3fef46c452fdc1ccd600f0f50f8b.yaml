@@ -22,8 +22,8 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 3
-  description: 人和 Agent 的可连接电脑：首版 R01–R31、可选 R32、产品场景与外部责任
+  version: 4
+  description: 人和 Agent 团队的电脑基础设施：核心 R01–R31/R33、可选生态组合 R34–R35、后续评测 R32，多对多环境与组件边界
 route:
   topic: product
   source_order:

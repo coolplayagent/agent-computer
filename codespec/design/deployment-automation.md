@@ -1,6 +1,6 @@
 # 云服务自动化部署与运维契约
 
-版本：设计基线 0.4；日期：2026-10-09；状态：待实现，尚无安装器、Chart、IaC 模块或部署认证。
+版本：设计基线 0.5；日期：2026-10-09；状态：待实现，尚无安装器、Chart、IaC 模块或部署认证。
 
 本文落实 R25，补充[主设计 D12、D16](agent-computer.md)。选型依据见[CS01–CS10](../decisions/compute-storage-selection.md)，验收见[测试 T28–T30](../test/agent-computer.md)。本文命令和文件名是拟交付接口，不是现有安装说明。
 
@@ -83,7 +83,7 @@ agent-computer deploy verify --installation <installation-id> --json
 
 只有 RuntimeClass YAML 不代表节点已安装运行时。[Kubernetes RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) JuiceFS 默认 CSI 路径依赖节点组件；不能为适配受限 Serverless 平台而给用户应用添加 privileged/FUSE 权限。[JuiceFS CSI](https://juicefs.com/docs/csi/introduction/)
 
-组件认证环境须执行 CS09 的故障实验；生产每次安装只跑隔离、受控的现场检查，报告引用适用的认证证据。安装 smoke 不能代替发布时的 T01–T36。
+组件认证环境须执行 CS09 的故障实验；生产每次安装只跑隔离、受控的现场检查，报告引用适用的认证证据。安装 smoke 不能代替发布时的核心 T01–T36、T38–T39；发布生态组合另需对应 T40–T43。
 
 ## DP06. 升级、扩缩容与回退
 
