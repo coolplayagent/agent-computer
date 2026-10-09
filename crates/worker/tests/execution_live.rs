@@ -128,7 +128,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
     let image = field(&config, "image");
     let names = ["normal", "command", "cancel", "lost", "rejected"];
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":4294967296u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":53687091200u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
     for name in names {
         document["spec"]["workspaces"]
             .as_array_mut()
@@ -433,6 +433,25 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                             "child did not reach cancellation barrier"
                         );
                         tokio::time::sleep(Duration::from_millis(50)).await;
+                    }
+                    // Optional independent node inspection before cancellation;
+                    // the original execution budget continues to run throughout.
+                    if let Some(path) = config["node_observation_file"].as_str() {
+                        let journal = store
+                            .candidate_execution_pod(&org, &queued.execution_id)
+                            .await
+                            .unwrap()
+                            .unwrap();
+                        fs::write(path,serde_json::to_vec(&json!({"namespace":journal.namespace,"name":journal.pod_name,"uid":journal.pod_uid,"prepared":prepared})).unwrap()).unwrap();
+                        let marker = PathBuf::from(path).with_extension("inspected");
+                        let until = tokio::time::Instant::now() + Duration::from_secs(8);
+                        while !marker.exists() {
+                            assert!(
+                                tokio::time::Instant::now() < until,
+                                "node inspection deadline"
+                            );
+                            tokio::time::sleep(Duration::from_millis(50)).await;
+                        }
                     }
                     store
                         .cancel_candidate_execution(

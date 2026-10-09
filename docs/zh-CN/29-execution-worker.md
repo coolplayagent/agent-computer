@@ -36,3 +36,5 @@ agent-computer-server execution-recover-once --database-url-file /private/contro
 手动目标 `//crates/worker:execution_worker_live_test` 使用真实控制 PostgreSQL、Kubernetes/CSI、JuiceFS 和 gVisor。五个场景覆盖库调用、运营命令、子进程写入标记后的取消、创建回执丢失后的仅观察清理，以及监督器镜像拒绝；检查持久启动授权、持续写入互斥、禁止替代派发和零虚构排空。仅在一次性 root 所有的环境设置 `AGENT_COMPUTER_EXECUTION_TEST_CONFIG` 运行；配置在 [17 的夹具](17-candidate-preparation-worker.md)上增加 `image`、`server_binary` 和 `result_file`。测试目标存在不等于实测通过，实际运行必须另有固定源码证据。
 
 公开运行能力仍报告执行不支持。生产监督器打包、独立于控制器的 watchdog、物理 fencing、持久有界输出对象、完成接纳、自动崩溃对账和后台存续期仍待实现。本地轮询不能解决控制器或 PID 1 暂停。T01–T43 保持 `not_run`。
+
+实测夹具为五个固定 10 GiB Candidate 配置 50 GiB Volume。最初的 4 GiB 配置在创建执行 Pod 前被容量准入正确拒绝。可选 `node_observation_file` 为独立[节点检查器](../../crates/worker/tests/execution_node.py)启用最多 8 秒的取消屏障：在一次性 VM 内以 `--observation PATH --output PATH` 并行运行。检查器验证实际 runsc 容器和 kubelet Candidate 挂载 inode 后才释放屏障，执行预算持续消耗。
