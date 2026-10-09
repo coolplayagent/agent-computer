@@ -263,8 +263,9 @@ pub async fn verify(c: Context<'_>) -> Value {
         completed.file_edit.as_ref().unwrap().state,
         FileEditState::Applied
     );
-    let saved_inode = path.metadata().unwrap().ino();
     assert_eq!(fs::read(&path).unwrap(), b"retained-after-rollback");
+    let (http_evidence, completed) = super::file_http::verify(&c, &completed).await;
+    let saved_inode = path.metadata().unwrap().ino();
     let lease = acquire(&c, &input, "file-unknown").await;
     std::os::unix::fs::symlink("/etc/passwd", c.data.join("escape")).unwrap();
     let unknown = save_once(
@@ -303,5 +304,5 @@ pub async fn verify(c: Context<'_>) -> Value {
             .state,
         WriterLeaseState::Draining
     );
-    json!({"cli_create_and_exact_retry":true,"saved_inode":saved_inode,"final_file":completed.file_edit,"final_path":"saved.bin","stale_version":conflict.file_edit,"revoked_completion":revoked.file_edit,"outbox_rollback_and_same_evidence_retry":true,"uncertain_io_blocks_handoff":unknown,"candidate_ready":false})
+    json!({"cli_create_and_exact_retry":true,"saved_inode":saved_inode,"final_file":completed.file_edit,"final_path":"saved.bin","stale_version":conflict.file_edit,"revoked_completion":revoked.file_edit,"outbox_rollback_and_same_evidence_retry":true,"uncertain_io_blocks_handoff":unknown,"candidate_ready":false,"http_gateway":http_evidence})
 }

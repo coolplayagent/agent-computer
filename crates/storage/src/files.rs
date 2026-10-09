@@ -28,14 +28,28 @@ pub struct FileEdit {
     pub content: Vec<u8>,
     pub executable: bool,
 }
+pub fn validate_file_path(path: &str) -> Result<()> {
+    if !model::relative(path)
+        || path
+            .split('/')
+            .any(|p| p.starts_with(".agent-computer-write-"))
+    {
+        return Err(Error::InvalidRequest);
+    }
+    Ok(())
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FileRead {
+    pub version: FileVersion,
+    pub content: Vec<u8>,
+}
+
 impl FileEdit {
     pub fn validate(&self) -> Result<()> {
-        if !model::relative(&self.path)
-            || self.content.len() > MAX_FILE_BYTES
-            || self
-                .path
-                .split('/')
-                .any(|p| p.starts_with(".agent-computer-write-"))
+        validate_file_path(&self.path)?;
+        if self.content.len() > MAX_FILE_BYTES
             || self
                 .expected
                 .as_ref()
@@ -79,7 +93,7 @@ impl ClosedFileEdit {
     }
 }
 
-fn snapshot(dir: &Dir, path: &str) -> Result<Option<FileVersion>> {
+fn read(dir: &Dir, path: &str) -> Result<Option<FileRead>> {
     let Some(file) = dir.try_file(path)? else {
         return Ok(None);
     };
@@ -91,14 +105,27 @@ fn snapshot(dir: &Dir, path: &str) -> Result<Option<FileVersion>> {
     if bytes.len() as u64 != stat.len() {
         return Err(Error::InputMismatch);
     }
-    Ok(Some(FileVersion {
-        sha256: format!("sha256:{:x}", Sha256::digest(&bytes)),
-        size: bytes.len() as u64,
-        executable: stat.mode() & 0o111 != 0,
+    Ok(Some(FileRead {
+        version: FileVersion {
+            sha256: format!("sha256:{:x}", Sha256::digest(&bytes)),
+            size: bytes.len() as u64,
+            executable: stat.mode() & 0o111 != 0,
+        },
+        content: bytes,
     }))
+}
+fn snapshot(dir: &Dir, path: &str) -> Result<Option<FileVersion>> {
+    Ok(read(dir, path)?.map(|v| v.version))
 }
 
 impl MountedVolume {
+    /// A bounded read from a pinned regular inode. Atomic gateway replacements
+    /// yield either version; arbitrary unmanaged in-place writers are excluded.
+    pub fn read_file(&self, prepared: &Prepared, path: &str) -> Result<Option<FileRead>> {
+        validate_file_path(path)?;
+        read(&self.prepared_data(prepared)?, path)
+    }
+
     fn prepared_data(&self, prepared: &Prepared) -> Result<Dir> {
         if prepared.version != 1
             || prepared.filesystem_uuid != self.filesystem_uuid

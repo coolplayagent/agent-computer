@@ -4,6 +4,26 @@ topic:
   title: development
   description: Added by CLI source registration.
 sources:
+- id: bounded-candidate-file-saves
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/20-bounded-file-saves.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Bounded atomic Candidate file saves, consumed dispatch permits and sealed drain evidence; paired English docs/en/20-bounded-file-saves.md
+- id: candidate-file-http-gateway
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/21-file-http-gateway.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authenticated bounded Candidate HTTP read/save, independent read grants and IO capacity across cancellation; paired English docs/en/21-file-http-gateway.md
 - id: candidate-preparation-worker
   topic: development
   kind: doc
@@ -24,6 +44,16 @@ sources:
   status: active
   version: 1
   description: Candidate 存储准备、配额与重试；配套英文文档 docs/en/14-candidate-storage.md
+- id: candidate-writer-leases
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/19-candidate-writer-leases.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Connection-owned Candidate modify leases, durable dispatch journal and zero-dispatch handoff; paired English docs/en/19-candidate-writer-leases.md
 - id: computer-start-admission
   topic: development
   kind: doc
@@ -138,4 +168,7 @@ route:
   - computer-start-admission
   - candidate-preparation-worker
   - connection-sessions-guide
+  - candidate-writer-leases
+  - bounded-candidate-file-saves
+  - candidate-file-http-gateway
   fallback: bounded-search

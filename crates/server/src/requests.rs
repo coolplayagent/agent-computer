@@ -44,6 +44,14 @@ pub(crate) async fn authorize(
 }
 
 pub(crate) async fn body(context: &RequestContext, request: Request) -> Result<Vec<u8>, Response> {
+    bounded_body(context, request, MAX_DOCUMENT_BYTES).await
+}
+
+pub(crate) async fn bounded_body(
+    context: &RequestContext,
+    request: Request,
+    limit: usize,
+) -> Result<Vec<u8>, Response> {
     let media = request
         .headers()
         .get("content-type")
@@ -64,7 +72,7 @@ pub(crate) async fn body(context: &RequestContext, request: Request) -> Result<V
             false,
         ));
     }
-    to_bytes(request.into_body(), MAX_DOCUMENT_BYTES)
+    to_bytes(request.into_body(), limit)
         .await
         .map(|v| v.to_vec())
         .map_err(|error| {
@@ -75,7 +83,7 @@ pub(crate) async fn body(context: &RequestContext, request: Request) -> Result<V
                 context.error(
                     StatusCode::PAYLOAD_TOO_LARGE,
                     "body_too_large",
-                    "The body exceeds 1 MiB.",
+                    "The body exceeds the endpoint size limit.",
                     false,
                 )
             } else {

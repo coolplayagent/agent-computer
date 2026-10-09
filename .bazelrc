@@ -1,3 +1,5 @@
 build --enable_bzlmod
+# Reuse the operator-controlled Cargo registry cache when resolving locked crates.
+build --repo_env=CARGO_BAZEL_ISOLATED=false
 build --incompatible_strict_action_env
 test --test_output=errors

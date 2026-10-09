@@ -16,13 +16,24 @@ use tokio::sync::Semaphore;
 #[derive(Clone)]
 pub(crate) struct ServiceState {
     pub(crate) store: Store,
+    pub(crate) files: Option<agent_computer_worker::files::FileGateway>,
     requests: Arc<Semaphore>,
     pub(crate) validators: Arc<Semaphore>,
 }
 
 pub fn router(store: Store) -> Router {
+    configured_router(store, None)
+}
+pub fn router_with_files(store: Store, files: agent_computer_worker::files::FileGateway) -> Router {
+    configured_router(store, Some(files))
+}
+fn configured_router(
+    store: Store,
+    files: Option<agent_computer_worker::files::FileGateway>,
+) -> Router {
     let state = ServiceState {
         store,
+        files,
         requests: Arc::new(Semaphore::new(64)),
         validators: Arc::new(Semaphore::new(8)),
     };
@@ -47,6 +58,8 @@ pub fn router(store: Store) -> Router {
             post(crate::connections::heartbeat),
         )
         .route("/v1alpha1/openapi.json", get(openapi))
+        .route("/v1alpha1/workspaces/{id}/files", get(crate::files::read))
+        .route("/v1alpha1/leases/{id}/file", post(crate::files::save))
         .route(
             "/v1alpha1/computers/{id}/leases",
             post(crate::writers::acquire),
@@ -140,12 +153,12 @@ async fn ready(
     }
 }
 
-async fn capabilities() -> Json<serde_json::Value> {
+async fn capabilities(State(state): State<ServiceState>) -> Json<serde_json::Value> {
     Json(
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane",
-            "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
+            "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
     )

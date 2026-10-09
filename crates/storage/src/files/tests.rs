@@ -230,3 +230,48 @@ fn prepared_receipt_and_operation_digest_bind_every_file_intent_field() {
         FileEditState::Unknown
     );
 }
+
+#[test]
+fn bounded_reads_return_exact_binary_version_and_absence() {
+    let (_root, mount, prepared) = setup();
+    assert_eq!(mount.read_file(&prepared, "absent").unwrap(), None);
+    for (path, bytes) in [
+        ("资料", vec![0, 255, 128]),
+        ("empty", vec![]),
+        ("limit", vec![7; MAX_FILE_BYTES]),
+    ] {
+        let saved = run(&mount, &prepared, &edit(path, &bytes));
+        let read = mount.read_file(&prepared, path).unwrap().unwrap();
+        assert_eq!(read.content, bytes);
+        assert_eq!(Some(read.version), saved.report().version);
+    }
+}
+#[test]
+fn reads_reject_unsafe_objects_staging_and_candidate_replacement() {
+    let (root, mount, prepared) = setup();
+    let data = root.path().join(&prepared.path_ref);
+    let outside = tempfile::tempdir().unwrap();
+    fs::write(outside.path().join("secret"), b"private").unwrap();
+    symlink(outside.path(), data.join("escape")).unwrap();
+    symlink(outside.path().join("secret"), data.join("link")).unwrap();
+    fs::hard_link(outside.path().join("secret"), data.join("hard")).unwrap();
+    rustix::fs::mkfifoat(rustix::fs::CWD, data.join("fifo"), rustix::fs::Mode::RUSR).unwrap();
+    fs::write(data.join(".agent-computer-write-secret"), b"stage").unwrap();
+    fs::write(data.join("large"), vec![1; MAX_FILE_BYTES + 1]).unwrap();
+    for path in [
+        "escape/secret",
+        "link",
+        "hard",
+        "fifo",
+        "large",
+        ".agent-computer-write-secret",
+        "../receipt.json",
+    ] {
+        assert!(mount.read_file(&prepared, path).is_err(), "{path}");
+    }
+    fs::rename(&data, data.with_file_name("old")).unwrap();
+    fs::create_dir(&data).unwrap();
+    fs::set_permissions(&data, fs::Permissions::from_mode(0o700)).unwrap();
+    fs::write(data.join("forged"), b"different inode").unwrap();
+    assert!(mount.read_file(&prepared, "forged").is_err());
+}

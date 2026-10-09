@@ -25,7 +25,7 @@ rust_test(
 rust_test(
     name = "candidate_worker_live_test",
     size = "large",
-    srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs"],
+    srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs", "tests/support/file_http.rs"],
     crate_root = "tests/candidate_live.rs",
     tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
     edition = "2024",

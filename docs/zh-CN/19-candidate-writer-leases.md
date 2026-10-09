@@ -69,4 +69,4 @@ agent-computer-server writer-lease-reconcile \
 
 新增 12 项 PostgreSQL 场景覆盖 WAL 恢复、连接竞争、旧命令、期限、重放、单调 epoch、独立 grant、协作者凭据、撤权、派发/证明不可变、固定目录依赖变化、Outbox 回滚、凭据迟到过期及迁移校验和。新增 2 项 HTTP 场景覆盖生命周期、200/202 释放差异、严格请求结构与凭据隔离。已有独立 TCP 进程测试新增获取租约、关闭连接及运维对账命令。
 
-测试使用真实 PostgreSQL 和模拟准备收据，证明控制面授权，不证明物理 IO 停止。Cargo/Bazel 默认测试现为 213 项，后续有界文件路径见 [20 文件保存](20-bounded-file-saves.md)。通用受监督进程写入、watchdog、物理排空/fencing、Workspace Pod 挂载、GUI 控制租约、Artifact 发布及完整 Computer 执行仍待实现；T01–T43 运行验收继续为 `not_run`。参见 [17 Candidate 准备](17-candidate-preparation-worker.md)、[18 连接](18-connection-sessions.md)与 [04 完整计划](04-implementation-plan.md)。
+测试使用真实 PostgreSQL 和模拟准备收据，证明控制面授权，不证明物理 IO 停止。Cargo/Bazel 默认测试现为 224 项，后续有界文件路径见 [20 文件保存](20-bounded-file-saves.md)。通用受监督进程写入、watchdog、物理排空/fencing、Workspace Pod 挂载、GUI 控制租约、Artifact 发布及完整 Computer 执行仍待实现；T01–T43 运行验收继续为 `not_run`。参见 [17 Candidate 准备](17-candidate-preparation-worker.md)、[18 连接](18-connection-sessions.md)与 [04 完整计划](04-implementation-plan.md)。

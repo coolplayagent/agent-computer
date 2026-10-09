@@ -2,7 +2,7 @@
 
 ## 20.1 已实现路径
 
-可信 `candidate-file-save-once` worker 可消费连接所有的修改租约，保存一个文件，将 [19 写入租约](19-candidate-writer-leases.md)接入实际存储 IO。能力查询返回 `candidate.file_save: trusted-worker`；HTTP 上传/下载、目录列表及人的文件界面仍待实现。
+可信 `candidate-file-save-once` worker 可消费连接所有的修改租约，保存一个文件，将 [19 写入租约](19-candidate-writer-leases.md)接入实际存储 IO。能力查询返回 `candidate.file_save: trusted-worker`；可选 [21 HTTP 网关](21-file-http-gateway.md)支持有界读取/保存，目录列表及人的文件界面仍待实现。
 
 派发前重新检查当前 owner/generation/epoch/revision，并将配置中的完整 Volume target 与不可变准备绑定比较。挂载的 JuiceFS 必须符合已记录 UUID/PVC 和同步上传配置。文件操作边界再次核对私有准备收据、Candidate inode、data 的 UID/GID 和 mode。调用者不能选择宿主绝对路径；授权沿用租约获取所需的独立 Computer 与 Workspace grant。
 
@@ -64,8 +64,8 @@ agent-computer-server candidate-file-save-once \
 
 迁移 11 增加不可变完成记录，绑定派发、epoch、输入摘要与准备摘要。事务原子记录实际观察/接纳结果、事件/Outbox、排空及释放证明，并在末尾重查授权和期限；失败事务不改变这些记录。存活 worker 可使用同一封闭执行结果重试持久化，不重复 IO；若在提交证据前死亡，派发仍未解决并阻止接管，恢复需后续权威排空/fence 证据。不确定修改留下的暂存文件保留诊断，不自动清理。
 
-新增 7 项本地文件系统测试覆盖原子替换、旧读者 inode、二进制/Unicode/空/上限文件、旧版本、恶意对象、Candidate 身份和修改前到期；新增 2 项 PostgreSQL 场景验证未知派发重试及升级安全。默认 Cargo/Bazel 检查共 213 项，不能仅凭这些测试认证 JuiceFS。显式 `candidate_worker_live_test` 另覆盖真实 CSI/准备、CLI 保存/重试、替换、冲突、IO 后撤权、Outbox 提交失败及不确定 IO 后禁止交接；仅在一次性环境按第 17 节配置运行。
+新增 7 项本地文件系统测试覆盖原子替换、旧读者 inode、二进制/Unicode/空/上限文件、旧版本、恶意对象、Candidate 身份和修改前到期；新增 2 项 PostgreSQL 场景验证未知派发重试及升级安全。默认 Cargo/Bazel 检查共 224 项，不能仅凭这些测试认证 JuiceFS。显式 `candidate_worker_live_test` 另覆盖真实 CSI/准备、CLI 保存/重试、替换、冲突、IO 后撤权、Outbox 提交失败及不确定 IO 后禁止交接；仅在一次性环境按第 17 节配置运行。
 
 2026-10-09，该显式测试在提交 `06f3d14` 上通过，使用一次性 KVM 虚拟机及真实 PostgreSQL、JuiceFS CSI 和 S3。[固定源码组件记录](../evidence/candidate-file-save-2026-10-09.json)包含二进制/源码摘要、探针脚本和[运行输出](../evidence/candidate-file-save-2026-10-09.log)。六次文件派发形成六条不可变完成/事件/Outbox 记录及五条有界排空证明；第六次拒绝符号链接目标，保留 Unknown/Draining 并阻止接管。新的只读 JuiceFS 客户端不使用磁盘缓存，读回最终 23 字节文件且 SHA-256 与记录一致；连同准备恢复文件，共发生两次 S3 GET、读取 50 字节。随后删除虚拟机、可写磁盘和私有凭据。该实测未覆盖 FUSE 挂起、节点/进程故障、断电或通用物理 fencing。
 
-HTTP 文件接口、大文件流、目录操作、受监督进程/watchdog、物理 fencing、Artifact 发布及 Computer Ready 仍待实现。T01–T43 完整运行验收继续为 `not_run`。
+目录列表、大文件流、目录操作、受监督进程/watchdog、物理 fencing、Artifact 发布及 Computer Ready 仍待实现。T01–T43 完整运行验收继续为 `not_run`。

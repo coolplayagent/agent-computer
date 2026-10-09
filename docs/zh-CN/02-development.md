@@ -8,6 +8,8 @@ Bazel 是项目构建与测试入口，直接使用 `rust_library`、`rust_binar
 
 `REPO.bazel` 将 Cargo 的 `target/` 产物排除于 Bazel 包发现之外，避免与 Cargo 增量目录清理竞争。依据见 [Bazel ignore_directories](https://bazel.build/rules/lib/globals/repo#ignore_directories)。
 
+crate_universe 解析器通过 `.bazelrc` 显式设置 `CARGO_BAZEL_ISOLATED=false`，复用开发者的 Cargo 注册表缓存。Cargo.lock 继续固定 crate 版本和校验和，Rust 编译/测试 action 仍在 Bazel 沙箱中执行。CI 应提供受控的 Cargo home/configuration；缓存完整时可用 `--repo_env=CARGO_NET_OFFLINE=true` 离线重新生成依赖图，缺失依赖会明确失败。重新生成后以 `bazel build //... --lockfile_mode=error` 验证已提交模块锁文件。
+
 ## 02.2 命令
 
 在仓库根目录运行：

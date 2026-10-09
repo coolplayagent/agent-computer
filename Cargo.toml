@@ -18,7 +18,7 @@ oci-spec = { version = "0.10", default-features = false, features = ["distributi
 sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "tls-rustls-ring", "postgres", "json", "migrate"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "time", "sync"] }
 tempfile = "3"
-axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio"] }
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "query", "tokio"] }
 getrandom = "0.4"
 subtle = "2.6"
 url = "2.5"

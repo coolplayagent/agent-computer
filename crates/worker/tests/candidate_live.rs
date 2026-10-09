@@ -26,6 +26,8 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+#[path = "support/file_http.rs"]
+mod file_http;
 #[path = "support/file_writer.rs"]
 mod file_writer;
 

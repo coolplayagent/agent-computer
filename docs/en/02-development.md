@@ -8,6 +8,8 @@ Bazel is the project build and test entry point, using `rust_library`, `rust_bin
 
 `REPO.bazel` excludes Cargo’s `target/` output from Bazel package discovery, preventing races with Cargo incremental directory cleanup. See [Bazel ignore_directories](https://bazel.build/rules/lib/globals/repo#ignore_directories).
 
+The crate_universe resolver reuses the developer’s Cargo registry cache through the explicit `CARGO_BAZEL_ISOLATED=false` setting in `.bazelrc`. Cargo.lock still pins crate versions/checksums, and Bazel still runs the Rust compilation/test actions in its sandbox. CI should provide a controlled Cargo home/configuration. For a populated cache, `--repo_env=CARGO_NET_OFFLINE=true` permits dependency graph regeneration without remote index refresh; missing dependencies fail explicitly. After regeneration, verify `bazel build //... --lockfile_mode=error` against the committed module lock.
+
 ## 02.2 Commands
 
 Run from the repository root:

@@ -4,6 +4,24 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: candidate-file-gateway
+    domain: agent-infrastructure
+    canonical_name: CandidateFileGateway
+    definition: 显式配置的有界文件 HTTP 入口；原凭据连接及独立 Computer/Workspace grant 控制读写，读取前后重查授权，保存消费持久派发，超时不释放仍在运行任务的 IO 名额。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/files.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/worker/src/files/gateway.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/server/src/files.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/21-file-http-gateway.md
   - id: candidate-file-save
     domain: agent-infrastructure
     canonical_name: CandidateFileSave

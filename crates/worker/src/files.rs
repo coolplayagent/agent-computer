@@ -5,6 +5,8 @@ use agent_computer_store::{
     runtime::{preparation::PreparationTarget, writers::*},
 };
 use serde::Deserialize;
+mod gateway;
+pub use gateway::*;
 use std::path::PathBuf;
 
 pub fn read_request(path: &std::path::Path) -> agent_computer_store::Result<SaveRequest> {
@@ -13,7 +15,7 @@ pub fn read_request(path: &std::path::Path) -> agent_computer_store::Result<Save
     serde_json::from_slice(&bytes).map_err(|_| Error::InvalidRuntimeRequest)
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Configuration {
     pub target: PreparationTarget,
@@ -50,15 +52,9 @@ pub async fn save_once(
     if target != config.target {
         return Err(Error::ReferenceUnavailable);
     }
-    let mount = MountedVolume::open(
-        &config.mount_root,
-        &target.volume_path,
-        &target.filesystem_uuid,
-        &target.pvc_uid,
-        target.writer_uid,
-        target.writer_gid,
-    )
-    .map_err(|_| Error::ReferenceUnavailable)?;
+    let mount = tokio::task::spawn_blocking(move || open_mount(&config))
+        .await
+        .map_err(|_| Error::InvalidReconcileResult)??;
     let digest = input
         .edit
         .digest(&prepared)
@@ -80,4 +76,17 @@ pub async fn save_once(
         .await
         .map_err(|_| Error::InvalidReconcileResult)??;
     store.finish_candidate_file_edit(&closed).await
+}
+
+fn open_mount(config: &Configuration) -> agent_computer_store::Result<MountedVolume> {
+    let target = &config.target;
+    MountedVolume::open(
+        &config.mount_root,
+        &target.volume_path,
+        &target.filesystem_uuid,
+        &target.pvc_uid,
+        target.writer_uid,
+        target.writer_gid,
+    )
+    .map_err(|_| Error::ReferenceUnavailable)
 }

@@ -33,6 +33,8 @@ impl RequestContext {
     pub fn store_error(&self, error: agent_computer_store::Error) -> Response {
         use agent_computer_store::Error;
         match error {
+            Error::FileUnavailable => self.error(StatusCode::NOT_FOUND,"file_unavailable","The file is unavailable or not a supported bounded regular file.",false),
+            Error::DispatchAlreadyStarted => self.error(StatusCode::CONFLICT,"dispatch_unresolved","Dispatch is already recorded; query the lease and reuse the same intent. IO will not be replayed.",false),
             Error::WriterLeaseBusy => self.error(
                 StatusCode::CONFLICT,
                 "writer_busy",

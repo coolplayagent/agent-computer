@@ -2,6 +2,7 @@
 //! No permission implies another, and successful checks do not establish a lease,
 //! a generation, physical fencing, stopped processes, or actual runtime readiness.
 pub mod connections;
+pub mod files;
 pub(crate) mod inputs;
 pub mod preparation;
 mod start;

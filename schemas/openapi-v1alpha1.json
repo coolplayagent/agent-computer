@@ -2406,6 +2406,322 @@
           }
         }
       }
+    },
+    "/v1alpha1/workspaces/{id}/files": {
+      "get": {
+        "operationId": "readCandidateFile",
+        "description": "Optional configured file gateway. Exact original credential, active read-requesting connection, current Computer connect/read and independent Workspace read grants; current Prepared generation/Candidate and catalog bindings checked before/after IO. At most 1 MiB; unknown or duplicate query parameters are rejected.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "name": "connection_session_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "name": "generation",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "candidate_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "description": "Normalized relative UTF-8 path, at most 1024 bytes, 32 components, 255 bytes/component. No dot, empty, symlink, backslash, NUL, mount crossing or reserved staging components."
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid fields, query parameters, relative path or file size.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credential invalid, expired or revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource, exact connection owner or supported bounded file unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "HTTP deadline exceeded. File jobs retain capacity until actually finished; query the same lease/dispatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale generation/epoch/revision, changed intent or unresolved dispatch; never blindly replay IO.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection expired, closed or revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Configured Volume, preparation binding, catalog or mount is unavailable or incompatible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "File gateway unconfigured, IO capacity exhausted or service unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "One bounded regular file, authorized again after IO. No directory listing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRead"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/leases/{id}/file": {
+      "post": {
+        "operationId": "saveCandidateFile",
+        "description": "Optional configured file gateway. Requires original connection-owned modify lease, current read/modify scopes and independent Computer/Workspace grants. One dispatch per epoch. dispatch_id binds stable effect identity; no additional Idempotency-Key header. At most 1 MiB of bytes in a 5 MiB JSON body. Same unknown dispatch never reissues IO; HTTP timeout does not drain the writer.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileSaveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid fields, query parameters, relative path or file size.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credential invalid, expired or revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource, exact connection owner or supported bounded file unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "HTTP deadline exceeded. File jobs retain capacity until actually finished; query the same lease/dispatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale generation/epoch/revision, changed intent or unresolved dispatch; never blindly replay IO.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection expired, closed or revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Configured Volume, preparation binding, catalog or mount is unavailable or incompatible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "File gateway unconfigured, IO capacity exhausted or service unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Lease metadata; inspect file_edit.state. 200 alone does not establish Applied. Exact dispatch retry performs no IO.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriterLease"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 5 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3983,6 +4299,89 @@
           }
         },
         "description": "Result of the bounded trusted file adapter. Unknown may have a version and confirmed drain when physical IO completed but authorization was lost before database acceptance. Unknown IO without confirmed drain blocks handoff. This is not a general process fencing receipt."
+      },
+      "FileRead": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "content"
+        ],
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/FileVersion"
+          },
+          "content": {
+            "type": "array",
+            "maxItems": 1048576,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          }
+        }
+      },
+      "FileEdit": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "content",
+          "executable"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Normalized relative UTF-8 path, at most 1024 bytes, 32 components, 255 bytes/component. No dot, empty, symlink, backslash, NUL, mount crossing or reserved staging components."
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FileVersion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null or omitted requires absence; otherwise exact previous content/mode version."
+          },
+          "content": {
+            "type": "array",
+            "maxItems": 1048576,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          },
+          "executable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FileSaveRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lease",
+          "dispatch_id",
+          "edit"
+        ],
+        "properties": {
+          "lease": {
+            "$ref": "#/components/schemas/WriterLeaseCommand"
+          },
+          "dispatch_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "edit": {
+            "$ref": "#/components/schemas/FileEdit"
+          }
+        }
       }
     },
     "responses": {
