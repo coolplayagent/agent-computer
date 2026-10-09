@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 31
-updated_at: unix:1791543212
+map_version: 32
+updated_at: unix:1791544518
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -97,8 +97,9 @@ topics:
   - declaration-persistence-guide
   - definition-plans-guide
   - numbered-bilingual-docs
-  ref: topics/topic-875b9380866e9d56-8434fe08f6692948005f407b1775892437512ebaaf132958f2a5aa984f302de3.yaml
-  digest: 8434fe08f6692948005f407b1775892437512ebaaf132958f2a5aa984f302de3
+  - reconciliation-coordination-guide
+  ref: topics/topic-875b9380866e9d56-3e94e11accab137cc6b2e4bf0b55ca140a92e31b402aad8de81350b2695d11ca.yaml
+  digest: 3e94e11accab137cc6b2e4bf0b55ca140a92e31b402aad8de81350b2695d11ca
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -122,12 +123,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 15
+  omitted_through: 16
   recent:
-  - version: 16
-    action: source.add
-    actor: cli
-    summary: Added source 'agent-computer-deployment' to topic 'deployment'.
   - version: 17
     action: source.add
     actor: cli
@@ -188,3 +185,7 @@ history:
     action: source.update
     actor: cli
     summary: Updated source 'control-openapi-schema'.
+  - version: 32
+    action: source.add
+    actor: cli
+    summary: Added source 'reconciliation-coordination-guide' to topic 'development'.

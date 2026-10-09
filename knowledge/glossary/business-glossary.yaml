@@ -112,6 +112,9 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+      - relation: represented_by
+        target_kind: file
+        target: crates/kubernetes/src/plan.rs
   - id: workspace
     domain: agent-infrastructure
     canonical_name: Workspace

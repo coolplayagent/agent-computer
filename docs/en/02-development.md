@@ -37,3 +37,5 @@ CLI JSON is written to stdout and diagnostics to stderr. Unsupported commands or
 Each commit is a reviewable capability increment with its build targets, contract tests, and progress updates in both languages. Keep domain state separate from external side effects, then add persistence, adapters, and UI. Verification must exercise rejection paths and invariants involving real side effects.
 
 Rule configuration follows the [official rules_rust documentation](https://bazelbuild.github.io/rules_rust/). A successful build only proves that current targets compile; real isolation and durability certification are tracked in [05 Verification](05-verification.md).
+
+The constrained Kubernetes library and explicit live component target are documented in [12 Kubernetes adapter](12-kubernetes-adapter.md).

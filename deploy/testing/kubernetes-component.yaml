@@ -1,0 +1,85 @@
+# Only for a dedicated, disposable Kubernetes component-test cluster with runsc installed.
+# This is not a production deployment, tenant admission, or a fencing implementation.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ac-kube-component
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: gvisor
+handler: runsc
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ac-deny-all
+  namespace: ac-kube-component
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ac-adapter
+  namespace: ac-kube-component
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ac-adapter
+  namespace: ac-kube-component
+rules:
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [get, create, delete]
+  - apiGroups: [networking.k8s.io]
+    resources: [networkpolicies]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ac-adapter
+  namespace: ac-kube-component
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ac-adapter
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ac-component-observer
+rules:
+  - apiGroups: [""]
+    resources: [namespaces]
+    resourceNames: [ac-kube-component]
+    verbs: [get]
+  - apiGroups: [node.k8s.io]
+    resources: [runtimeclasses]
+    resourceNames: [gvisor]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ac-component-observer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ac-component-observer
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component

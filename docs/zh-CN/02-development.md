@@ -37,3 +37,5 @@ PostgreSQL 集成测试要求本机安装服务端/客户端二进制并以非 r
 每个提交对应可审阅的能力增量，包含相关构建目标、契约测试及两种语言的进度说明。先保持领域状态与外部副作用分离，再加入数据库、适配器和 UI。验证必须覆盖拒绝路径及与现实副作用相关的不变量。
 
 规则配置参考 [rules_rust 官方文档](https://bazelbuild.github.io/rules_rust/)。构建成功只证明当前目标可编译；真实隔离与持久性认证见 [05 验证](05-verification.md)。
+
+受限 Kubernetes 库与显式真实组件测试入口见 [12 Kubernetes 适配器](12-kubernetes-adapter.md)。
