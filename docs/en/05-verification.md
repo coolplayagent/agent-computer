@@ -39,3 +39,5 @@ Eleven PostgreSQL and two HTTP cases add durable connection-scoped execution res
 Eleven PostgreSQL and one HTTP case add a single execution dispatch intent, immutable recovery, post-dispatch cancellation/Unknown, blocked handoff and migration 13; see [24 Execution dispatch](24-execution-dispatch.md). They validate control transactions and do not start a Candidate Pod or prove physical drainage.
 
 Three supervisor and six PostgreSQL cases add one-shot startup challenges, fresh authorization and immutable grants; see [25 Startup authorization](25-execution-startup.md). Twelve explicit real-runsc startup cases and the 13 existing supervisor scenarios pass; fixture grants do not establish Kubernetes/CSI end-to-end execution.
+
+The startup component suites are pinned to `fca66d3` with exact source/binary hashes, OCI inputs, 25 runtime observations and private-VM cleanup in the [startup evidence record](../evidence/sandbox-startup-2026-10-10.json).

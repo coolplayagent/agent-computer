@@ -1,0 +1,110 @@
+startup/anchored-deadline stdout
+{"version":1,"execution_id":"anchored-deadline","generation":7,"bootstrap_digest":"sha256:089407f84515fea3b36003ef00f70507c2e22c49347161d774031f97a974a211","nonce":"8df2eb34721a420640c2bdd2aabc5d3081b6b836d1649f0aa34236b7fed9a1ff"}
+{"version":1,"challenge_digest":"sha256:e0e827a5fc1d79c0bcd58a632fd006565947d4c9530c836ba5504f84e9065375","grant_digest":"sha256:8754bf154a0060d54ac982b75fcf366831ce9b18f7d5065db52c36b8b0a6fb4d","report":{"version":1,"execution_id":"anchored-deadline","generation":7,"request_digest":"sha256:209fcfa46230650b6b039111162780b798ff10c9548073c586ab1e3c59d799e4","outcome":"lease_expired","main_exit_code":null,"main_signal":9,"reaped_processes":2,"children_reaped":true,"kill_sent":true,"elapsed_ms":623,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}}
+startup/anchored-deadline stderr
+
+startup/budget-increase stdout
+{"version":1,"execution_id":"budget-increase","generation":7,"bootstrap_digest":"sha256:d9934cc4718012516f90551af6dcb29000c3ecb7f0e5b07acc3e6698c2ed0218","nonce":"591d7ee7b6d2b2f8077373fe9ec54e032e03121f5bf403b85ca7e33a7ef7e20f"}
+startup/budget-increase stderr
+sandbox supervisor: InvalidRequest
+
+startup/cancel-before-grant stdout
+{"version":1,"execution_id":"cancel-before-grant","generation":7,"bootstrap_digest":"sha256:354a114828786951fb1b5fc01752f9d52a6152782c070414c7033aa6d2b6ab46","nonce":"bd2ac95f66369c8fa5507b58aaac70a2116daaf8fe698c770a7495779e013697"}
+startup/cancel-before-grant stderr
+sandbox supervisor: StartupCancelled
+
+startup/closed-channel stdout
+{"version":1,"execution_id":"closed-channel","generation":7,"bootstrap_digest":"sha256:f2c598263481f5e0bff102cb95446f824f16a4896ad1f07423c1b4d9d3294a8a","nonce":"7ddb3990ba8f0b329efa83bf39fbf2a55551ee83237f98c1633689cbc04f06fa"}
+startup/closed-channel stderr
+sandbox supervisor: InvalidRequest
+
+startup/delayed-valid stdout
+{"version":1,"execution_id":"delayed-valid","generation":7,"bootstrap_digest":"sha256:ed01093e588f4c7d349da7f3d2e5b5ceb89ec8a4d567cc5bfea40514a4073249","nonce":"44ab45d0400abd22b8732623b445ba8e824faa4699146fc0bf2e9791eaa59d70"}
+{"version":1,"challenge_digest":"sha256:d266e6cbd3082d100a2e433c241e624db3e2addc625f7f5b7d11c2afafcd9296","grant_digest":"sha256:e2b84b7c246d69a530edf69f350f667f4243c566527f5113f94c9363b8206e8e","report":{"version":1,"execution_id":"delayed-valid","generation":7,"request_digest":"sha256:c43aa1e6a1dd716d11b15a7e7d1b01580bda8e972373e95e255e68ae4076170b","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":288,"stdout":{"bytes":[108,105,116,101,114,97,108],"observed_bytes":7,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}}
+startup/delayed-valid stderr
+
+startup/duplicate-frame stdout
+{"version":1,"execution_id":"duplicate-frame","generation":7,"bootstrap_digest":"sha256:417fd008839010c95b96d93965fbe6f19d0d10514d06f42fe3c5a7b5c9622def","nonce":"0e16c9ee800b61c36cbbc681b24d7160be44715523e980ccdcae55ab596c7618"}
+startup/duplicate-frame stderr
+sandbox supervisor: InvalidRequest
+
+startup/late-grant stdout
+{"version":1,"execution_id":"late-grant","generation":7,"bootstrap_digest":"sha256:9ce88a12c2ef4d6032ef7d98151bdd94af370dc438eac73ef0593244ee819403","nonce":"c41de1fdcb69bf1a5c9e5e8687465e1c345e1a6e91029cd3b09875f9bbf70a3c"}
+startup/late-grant stderr
+sandbox supervisor: StartupExpired
+
+startup/oversized-frame stdout
+{"version":1,"execution_id":"oversized-frame","generation":7,"bootstrap_digest":"sha256:3e485ea0f11454235620f1919f0f59533987a34f2554d39da0dc5101c7215e2e","nonce":"b2433381a105c68650a67639aacfd55b44f80847b1265ce415a82c7bf9623ac0"}
+startup/oversized-frame stderr
+sandbox supervisor: InvalidRequest
+
+startup/stdin-and-environment stdout
+{"version":1,"execution_id":"stdin-and-environment","generation":7,"bootstrap_digest":"sha256:39c88c9b12a1433dbc5c778560c95486601bf45cfc67d8b59e65d62cf3d63c01","nonce":"866aa9a8918c3436c683714e8299f305bb690dd972b22b5fb9a28024000f93f8"}
+{"version":1,"challenge_digest":"sha256:03a7e0bda4d1965b95fa8597e5737bf86929e263a30b171438f0e0726c96cdfc","grant_digest":"sha256:d5e04703bce8ea93d9873f20fce86a8221ecef15b7fc8122a9c11b18d5fcb330","report":{"version":1,"execution_id":"stdin-and-environment","generation":7,"request_digest":"sha256:b8efd56965043e7e1253cf9fa417d07fd90fb950d36f522565b211da8615b9f5","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":31,"stdout":{"bytes":[72,79,77,69,61,47,116,109,112,10,80,65,84,72,61,47,117,115,114,47,98,105,110,58,47,98,105,110,10,76,65,78,71,61,67,10,80,87,68,61,47,119,111,114,107,115,112,97,99,101,10],"observed_bytes":51,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}}
+startup/stdin-and-environment stderr
+
+startup/valid stdout
+{"version":1,"execution_id":"valid","generation":7,"bootstrap_digest":"sha256:004f513a265bb8b8a74eacd430a1b1b3e896d2657d5ff2461ca95e74179e6d5f","nonce":"dfde427709c7aca40d01466f86bc523dacfcb50022edf069e3a6f254f5e30f80"}
+{"version":1,"challenge_digest":"sha256:cbd229e8279d86ad0a3bb1561fe111e4cebc87629bd63848f66138e5907e8e9c","grant_digest":"sha256:4b9d0d9bf0b07dc615e4bedbcc2474ab5e06a8eb8bccd83e340076cf3c3cb1ef","report":{"version":1,"execution_id":"valid","generation":7,"request_digest":"sha256:536c5125d1a0370677b730076c5e3feaf11ad953a20d7b0d803ad139959db40a","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":22,"stdout":{"bytes":[108,105,116,101,114,97,108],"observed_bytes":7,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}}
+startup/valid stderr
+
+startup/withheld-grant stdout
+{"version":1,"execution_id":"withheld-grant","generation":7,"bootstrap_digest":"sha256:6f1567c490713b32b233dfccb96968fbe7028f8f78cf4fa931746dba6dd03844","nonce":"c1a70319c358d95597daa9483b565bbef4cf0fefd044817cd6f018f54adea4d2"}
+startup/withheld-grant stderr
+sandbox supervisor: StartupExpired
+
+startup/wrong-challenge stdout
+{"version":1,"execution_id":"wrong-challenge","generation":7,"bootstrap_digest":"sha256:d4563f0a268c5e4737cf81486601e38a04b9a1327a4dccfb509642c3194db3bd","nonce":"71bb0a50a015539591325b4442a9906716d9e5f665e41c55d17cc89f587b1cd1"}
+startup/wrong-challenge stderr
+sandbox supervisor: InvalidRequest
+
+regression/cancel stdout
+{"version":1,"execution_id":"cancel","generation":7,"request_digest":"sha256:cbdcc93cbaa16cde0c7ad66de4281fdcfc792bc523fea2e625c58282b596bbe0","outcome":"cancelled","main_exit_code":null,"main_signal":9,"reaped_processes":2,"children_reaped":true,"kill_sent":true,"elapsed_ms":130,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/cancel stderr
+
+regression/cwd stdout
+{"version":1,"execution_id":"cwd","generation":7,"request_digest":"sha256:d962f5773af5d238bcb153cdf0b72dbd00175ccba69b94db3fe2b4260e85ab81","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":13,"stdout":{"bytes":[47,119,111,114,107,115,112,97,99,101,47,110,101,115,116,101,100,10],"observed_bytes":18,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/cwd stderr
+
+regression/environment stdout
+{"version":1,"execution_id":"environment","generation":7,"request_digest":"sha256:32e225ff57cb3d7931966bf24e42f87b09bf67d4394d89aeab044d4c866b1172","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":24,"stdout":{"bytes":[72,79,77,69,61,47,116,109,112,10,76,65,78,71,61,67,10,80,65,84,72,61,47,117,115,114,47,98,105,110,58,47,98,105,110,10],"observed_bytes":36,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/environment stderr
+
+regression/escaped-descendant stdout
+{"version":1,"execution_id":"escaped-descendant","generation":7,"request_digest":"sha256:5b602b30a1cbf876e850e58cd9fc6ad2b58689c847b902736aaa5fc8618904b3","outcome":"descendants_terminated","main_exit_code":0,"main_signal":null,"reaped_processes":3,"children_reaped":true,"kill_sent":true,"elapsed_ms":145,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/escaped-descendant stderr
+
+regression/init-protected stdout
+{"version":1,"execution_id":"init-protected","generation":7,"request_digest":"sha256:0125e2fe26bcb518bb1efb66e50915c3858e91c1d61d270dc5c5c291026e7635","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":13,"stdout":{"bytes":[112,114,111,116,101,99,116,101,100],"observed_bytes":9,"truncated":false,"eof":true},"stderr":{"bytes":[47,98,105,110,47,115,104,58,32,49,58,32,99,97,110,110,111,116,32,99,114,101,97,116,101,32,47,112,114,111,99,47,49,47,102,100,47,49,58,32,80,101,114,109,105,115,115,105,111,110,32,100,101,110,105,101,100,10],"observed_bytes":58,"truncated":false,"eof":true}}
+regression/init-protected stderr
+
+regression/lease-expiry stdout
+{"version":1,"execution_id":"lease-expiry","generation":7,"request_digest":"sha256:f39225515b630ef1b455d7ff4c7eb042e11830b4160b61b5af357ee9e08c791c","outcome":"lease_expired","main_exit_code":null,"main_signal":9,"reaped_processes":2,"children_reaped":true,"kill_sent":true,"elapsed_ms":332,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/lease-expiry stderr
+
+regression/literal stdout
+{"version":1,"execution_id":"literal","generation":7,"request_digest":"sha256:35adb9a1a8e97e422caaaa982c88376ca90a6c5cebb7fae93ea328b9e111dac7","outcome":"succeeded","main_exit_code":0,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":12,"stdout":{"bytes":[97,59,36,40,105,100,41],"observed_bytes":7,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/literal stderr
+
+regression/missing-executable stdout
+{"version":1,"execution_id":"missing-executable","generation":7,"request_digest":"sha256:42a43da5c29a41a40f2b31860de9680173ad099ff371a46df52bba8eb9116c6f","outcome":"spawn_failed","main_exit_code":null,"main_signal":null,"reaped_processes":0,"children_reaped":true,"kill_sent":false,"elapsed_ms":1,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":false},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":false}}
+regression/missing-executable stderr
+
+regression/nonzero stdout
+{"version":1,"execution_id":"nonzero","generation":7,"request_digest":"sha256:e2904fe5be664c7e66a4a4165622841e94c133e05c336a8a28c9bec1d55ad1a9","outcome":"failed","main_exit_code":23,"main_signal":null,"reaped_processes":1,"children_reaped":true,"kill_sent":false,"elapsed_ms":13,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/nonzero stderr
+
+regression/output-flood stdout
+{"version":1,"execution_id":"output-flood","generation":7,"request_digest":"sha256:257ec99b600f473f01e7dba859cbb7e07e1d4419741b22dbee50238cea4e1d30","outcome":"timed_out","main_exit_code":null,"main_signal":15,"reaped_processes":3,"children_reaped":true,"kill_sent":true,"elapsed_ms":1211,"stdout":{"bytes":[120,10,120,10,120,10,120,10,120,10,120,10,120,10,120,10,120],"observed_bytes":6225920,"truncated":true,"eof":true},"stderr":{"bytes":[121,10,121,10,121,10,121,10,121,10,121,10,121,10,121,10,121],"observed_bytes":6225920,"truncated":true,"eof":true}}
+regression/output-flood stderr
+
+regression/suspended-supervisor stdout
+regression/suspended-supervisor stderr
+
+regression/symlink-cwd stdout
+regression/symlink-cwd stderr
+sandbox supervisor: Setup
+
+regression/timeout stdout
+{"version":1,"execution_id":"timeout","generation":7,"request_digest":"sha256:fa0552666e7c6dd351e0c06306482fb76455206d0bdfac7d848ed2e20076ca68","outcome":"timed_out","main_exit_code":null,"main_signal":9,"reaped_processes":2,"children_reaped":true,"kill_sent":true,"elapsed_ms":1124,"stdout":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true},"stderr":{"bytes":[],"observed_bytes":0,"truncated":false,"eof":true}}
+regression/timeout stderr

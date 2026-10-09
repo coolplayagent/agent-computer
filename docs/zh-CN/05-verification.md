@@ -41,3 +41,5 @@
 新增 11 项 PostgreSQL 与 1 项 HTTP 测试，覆盖执行单次派发意图、不可变恢复、派发后的取消请求/Unknown、禁止交接与迁移 13，见 [24 执行派发日志](24-execution-dispatch.md)。这些测试验证控制事务，不启动 Candidate Pod，也不证明物理排空。
 
 新增 3 项监督器及 6 项 PostgreSQL 测试，覆盖一次性启动挑战、新鲜授权和不可变回执，见 [25 启动授权](25-execution-startup.md)。12 项显式真实 runsc 启动场景及原有 13 项监督器场景通过；测试授权帧不构成 Kubernetes/CSI 端到端执行。
+
+启动组件测试已在[固定证据](../evidence/sandbox-startup-2026-10-10.json)中绑定 `fca66d3`，保留精确源码/二进制摘要、OCI 输入、25 项运行观测及私有 VM 回收记录。

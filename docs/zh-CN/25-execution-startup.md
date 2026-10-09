@@ -42,3 +42,5 @@ sudo python3 crates/sandbox/tests/component.py --runsc /usr/local/bin/runsc --ro
 每个工作目录必须是新的。rootfs 脚本只对明确可信的本地二进制运行 `ldd`，生成的是验证 fixture，不是产品镜像。组件 JSON 记录精确 OCI 输入、运行时/二进制/库摘要及本地观测。
 
 仍须实现严格的 Kubernetes Candidate Pod/attach 适配器与 worker、可信监督器打包、CSI 挂载身份核验、外部 watchdog 与物理 fencing、有界输出对象和权威完成接纳。监督器暂停故障仍意味着本地报告、启动授权或 Pod API 状态都不能释放写入租约。后台执行仍需独立生命周期。
+
+[源码固定组件记录](../evidence/sandbox-startup-2026-10-10.json)与[原始输出](../evidence/sandbox-startup-2026-10-10.log)固定提交 `fca66d3`、196 个已核验构建/源码输入，以及实际监督器二进制 `sha256:7fd896307105722606b10081ef01e1a891fd4de2cc2ae253106ed14e8e40eba0`。两组测试运行同一二进制；取证后已删除测试 VM 及其私有磁盘/SSH 材料。
