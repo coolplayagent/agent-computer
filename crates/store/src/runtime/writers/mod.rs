@@ -9,7 +9,8 @@ use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
 pub use executions::{
     CancelExecution, ExecutionCommand, ExecutionDispatchAttempt, ExecutionDispatchIntent,
     ExecutionLifetime, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRequest,
-    ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionState, SubmitExecution,
+    ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionState,
+    SubmitExecution,
 };
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;

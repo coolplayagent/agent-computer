@@ -15,7 +15,7 @@ rust_library(
 
 rust_binary(
     name = "agent-computer-server",
-    srcs = ["src/main.rs", "src/operator.rs", "src/definition_admin.rs", "src/reconciliation_admin.rs", "src/volume_worker.rs", "src/runtime_admin.rs", "src/candidate_worker.rs"],
+    srcs = ["src/main.rs", "src/operator.rs", "src/definition_admin.rs", "src/reconciliation_admin.rs", "src/volume_worker.rs", "src/runtime_admin.rs", "src/candidate_worker.rs", "src/execution_worker.rs"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],

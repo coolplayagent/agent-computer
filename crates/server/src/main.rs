@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 mod candidate_worker;
 mod definition_admin;
+mod execution_worker;
 mod operator;
 mod reconciliation_admin;
 mod runtime_admin;

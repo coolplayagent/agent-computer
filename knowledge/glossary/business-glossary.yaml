@@ -43,6 +43,21 @@ terms:
       - relation: represented_by
         target_kind: file
         target: docs/zh-CN/25-execution-startup.md
+  - id: candidate-execution-worker
+    domain: agent-infrastructure
+    canonical_name: CandidateExecutionWorker
+    definition: 消费单次数据库执行准入的可信工作器，从固定准备和卷记录编译 Candidate Pod，复核真实存储并通过原 UID attach 申请新鲜启动授权；原期限内轮询权限，结果保持 Unknown/Draining，仅观察恢复，不证明物理排空或完成接纳。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/worker/src/execution.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/executions/dispatch/inputs.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/29-execution-worker.md
   - id: execution-pod-plan
     domain: agent-infrastructure
     canonical_name: ExecutionPodPlan

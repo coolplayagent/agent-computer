@@ -2,6 +2,7 @@
 //! mounting are separate admissions; a definition is never an implicit Pod start.
 #![forbid(unsafe_code)]
 pub mod candidate;
+pub mod execution;
 pub mod files;
 
 use agent_computer_core::identity::OrganizationId;
@@ -49,12 +50,11 @@ pub async fn reconcile_volume_once(
     Ok(WorkResult::Progress { progress })
 }
 
-fn compile(
-    lease: &ReconcileLease,
+pub(crate) fn compile_volume(
+    task: &ReconcileTask,
     client: &Client,
     storage: &StorageClassBinding,
 ) -> Result<VolumePlan, BackendError> {
-    let task = lease.task();
     // Verify the mapping is a pinned dependency of the admitted spec, not a name
     // supplied by an untrusted caller or a mutable catalog lookup.
     let reference = task.spec["storageClass"]
@@ -100,7 +100,7 @@ async fn perform(
     storage: &StorageClassBinding,
     lease: &ReconcileLease,
 ) -> agent_computer_store::Result<ReconcileOutcome> {
-    let plan = match compile(lease, client, storage) {
+    let plan = match compile_volume(lease.task(), client, storage) {
         Ok(plan) => plan,
         Err(e) => return Ok(backend_failure(e)),
     };

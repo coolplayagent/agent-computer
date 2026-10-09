@@ -1,7 +1,9 @@
 //! Trusted worker journal API. No Kubernetes mutation or process launch here.
+mod inputs;
 mod pods;
 mod startup;
 use super::*;
+pub use inputs::ExecutionRuntimeInputs;
 pub use pods::{ExecutionPodAttempt, ExecutionPodPlan};
 pub use startup::{ExecutionStartupAttempt, ExecutionStartupGrant};
 use std::time::{Duration, Instant};

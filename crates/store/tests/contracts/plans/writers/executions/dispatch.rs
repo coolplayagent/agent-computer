@@ -1,3 +1,4 @@
+mod inputs;
 mod pods;
 mod startup;
 use super::*;

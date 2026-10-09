@@ -31,5 +31,9 @@ required-features = ["live-test"]
 name = "candidate_live"
 required-features = ["live-test"]
 
+[[test]]
+name = "execution_live"
+required-features = ["live-test"]
+
 [lints]
 workspace = true

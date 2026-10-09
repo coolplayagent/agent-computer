@@ -23,6 +23,16 @@ rust_test(
 )
 
 rust_test(
+    name = "execution_worker_live_test",
+    size = "large",
+    srcs = ["tests/execution_live.rs"],
+    tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/store"] + all_crate_deps(normal = True, normal_dev = True),
+)
+
+rust_test(
     name = "candidate_worker_live_test",
     size = "large",
     srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs", "tests/support/file_http.rs"],

@@ -487,7 +487,7 @@
           "FILE:@@//crates/test-support/Cargo.toml c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
           "FILE:@@//crates/server/Cargo.toml 432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
           "FILE:@@//crates/kubernetes/Cargo.toml 2ee0b950d6b367cf344e58bf70ff2dd230d7318ea80cda2f0173c64364db55db",
-          "FILE:@@//crates/worker/Cargo.toml d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
+          "FILE:@@//crates/worker/Cargo.toml 98a8cfcc4b9e22ed3c9e16ac816f29ba3d9c40123f595cb780e279940282a5b3",
           "FILE:@@//crates/cli/Cargo.toml f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6"
         ],
         "generatedRepoSpecs": {

@@ -14,6 +14,16 @@ sources:
   status: active
   version: 1
   description: Bounded atomic Candidate file saves, consumed dispatch permits and sealed drain evidence; paired English docs/en/20-bounded-file-saves.md
+- id: candidate-execution-worker
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/29-execution-worker.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 数据库授权、Candidate Pod 派发和仅观察恢复工作器
 - id: candidate-file-http-gateway
   topic: development
   kind: doc
@@ -24,6 +34,16 @@ sources:
   status: active
   version: 1
   description: Authenticated bounded Candidate HTTP read/save, independent read grants and IO capacity across cancellation; paired English docs/en/21-file-http-gateway.md
+- id: candidate-pod-mounts
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/27-candidate-pod-mounts.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 固定 Candidate 数据叶目录挂载、CSI 身份复核与权限边界
 - id: candidate-preparation-worker
   topic: development
   kind: doc
@@ -123,6 +143,16 @@ sources:
   status: active
   version: 1
   description: Atomic single execution dispatch intent, immutable recovery, cancellation requests and unresolved writer ownership; paired English docs/en/24-execution-dispatch.md. Actual Candidate Pod dispatch and fencing remain pending.
+- id: execution-pod-journal
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/28-execution-pod-journal.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 执行 Pod 计划、单次创建凭据、不可变 UID 与恢复边界
 - id: execution-startup-authorization
   topic: development
   kind: doc
@@ -226,4 +256,7 @@ route:
   - durable-execution-dispatch
   - execution-startup-authorization
   - kubernetes-startup-attach
+  - candidate-pod-mounts
+  - execution-pod-journal
+  - candidate-execution-worker
   fallback: bounded-search
