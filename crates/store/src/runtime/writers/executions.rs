@@ -3,8 +3,8 @@ mod dispatch;
 use super::*;
 use crate::plans::DefinitionKind;
 pub use dispatch::{
-    ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionStartupAttempt,
-    ExecutionStartupGrant,
+    ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionPodAttempt, ExecutionPodPlan,
+    ExecutionStartupAttempt, ExecutionStartupGrant,
 };
 use serde::{Deserialize, Serialize};
 

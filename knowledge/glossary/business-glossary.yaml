@@ -43,6 +43,21 @@ terms:
       - relation: represented_by
         target_kind: file
         target: docs/zh-CN/25-execution-startup.md
+  - id: execution-pod-plan
+    domain: agent-infrastructure
+    canonical_name: ExecutionPodPlan
+    definition: 可信适配器创建前原子登记的不可变 Pod 清单与命名空间身份，绑定原执行意图和期限；仅首次提交签发创建凭据，恢复只读，已登记计划的启动授权必须匹配原观察 UID，不证明进程完成或写入排空。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/executions/dispatch/pods.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0015_execution_pods.sql
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/28-execution-pod-journal.md
   - id: execution-dispatch-intent
     domain: agent-infrastructure
     canonical_name: ExecutionDispatchIntent

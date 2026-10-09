@@ -24,6 +24,16 @@ sources:
   status: active
   version: 1
   description: Authenticated bounded Candidate HTTP read/save, independent read grants and IO capacity across cancellation; paired English docs/en/21-file-http-gateway.md
+- id: candidate-pod-mounts
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/27-candidate-pod-mounts.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 固定 Candidate 数据叶目录挂载、CSI 身份复核与权限边界
 - id: candidate-preparation-worker
   topic: development
   kind: doc
@@ -123,6 +133,16 @@ sources:
   status: active
   version: 1
   description: Atomic single execution dispatch intent, immutable recovery, cancellation requests and unresolved writer ownership; paired English docs/en/24-execution-dispatch.md. Actual Candidate Pod dispatch and fencing remain pending.
+- id: execution-pod-journal
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/28-execution-pod-journal.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 执行 Pod 计划、单次创建凭据、不可变 UID 与恢复边界
 - id: execution-startup-authorization
   topic: development
   kind: doc
@@ -143,6 +163,16 @@ sources:
   status: active
   version: 1
   description: 受限 Kubernetes HTTPS 适配器：临时实例、安全读回、派发不确定性与 UID 条件删除；Workspace 挂载和物理 fencing 待实现
+- id: kubernetes-startup-attach
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/26-kubernetes-startup-attach.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 有界 Kubernetes v5 启动通道、固定运行身份与组件验证边界
 - id: numbered-bilingual-docs
   topic: development
   kind: doc
@@ -215,4 +245,7 @@ route:
   - durable-execution-admission
   - durable-execution-dispatch
   - execution-startup-authorization
+  - kubernetes-startup-attach
+  - candidate-pod-mounts
+  - execution-pod-journal
   fallback: bounded-search

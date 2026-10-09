@@ -61,7 +61,7 @@ impl ExecutionDispatchIntent {
         Ok(result)
     }
 }
-async fn receipt(
+pub(super) async fn receipt(
     tx: &mut Transaction<'_, Postgres>,
     org: &str,
     id: &str,
@@ -133,6 +133,7 @@ impl Store {
         {
             return Err(Error::InvalidRuntimeRequest);
         }
+        pods::require_observed(&mut tx, org.as_str(), id, pod_uid).await?;
         match bound_authority(&mut tx, org.as_str(), &record).await {
             Ok(()) => {}
             Err(Error::Unauthenticated | Error::Forbidden) => {
@@ -196,6 +197,14 @@ impl Store {
         Self::lock_stream(&mut tx, org.as_str()).await?;
         let record = row(&mut tx, org.as_str(), id).await?;
         let result = receipt(&mut tx, org.as_str(), id).await?;
+        if let Some(value) = &result {
+            pods::require_observed(&mut tx, org.as_str(), id, &value.pod_uid)
+                .await
+                .map_err(|error| match error {
+                    Error::RuntimeConflict => Error::InvalidStoredData,
+                    other => other,
+                })?;
+        }
         if let Some(value) = &result
             && !value
                 .challenge

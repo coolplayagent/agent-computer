@@ -10,7 +10,11 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_execution_pods(&self) {
+        sqlx::raw_sql("DROP TRIGGER check_execution_startup_pod ON execution_startup_grants; DROP FUNCTION guard_execution_startup_pod(); DROP TABLE execution_pod_observations; DROP TABLE execution_pod_plans; DROP FUNCTION guard_execution_pod_plan(); DELETE FROM _sqlx_migrations WHERE version=15;").execute(&self.pool).await.unwrap();
+    }
     pub async fn remove_execution_startup(&self) {
+        self.remove_execution_pods().await;
         sqlx::raw_sql("DROP TABLE execution_startup_grants; DROP FUNCTION guard_execution_startup(); DELETE FROM _sqlx_migrations WHERE version=14;").execute(&self.pool).await.unwrap();
     }
     /// Restore migration 12 when constructing historical upgrade fixtures.

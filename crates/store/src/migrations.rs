@@ -117,6 +117,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0014_execution_startup.sql")),
                     false,
                 ),
+                Migration::new(
+                    15,
+                    Cow::Borrowed("execution Pod identities"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0015_execution_pods.sql")),
+                    false,
+                ),
             ])
         })
     }
