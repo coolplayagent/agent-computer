@@ -39,3 +39,5 @@ sudo env AGENT_COMPUTER_CANDIDATE_MOUNT_CONFIG=/private/candidate-mount-config.j
 测试按身份条件删除执行 Pod，并保留 Volume 供独立读取；收集证据后再回收私有 VM。产品监督器打包、数据库派发 worker 接入、独立 watchdog、物理 fencing、有界输出对象及权威完成仍待实现；运行验收 T01–T43 保持 `not_run`。
 
 显式实测通过两个 Candidate 场景。节点检查将实际 kubelet subPath 绑定 inode、UID/GID 1000 与准备回执匹配；新的只读 JuiceFS 客户端无磁盘缓存读到两个 fsync 文件，并记录两次 S3 GET。卷根目录、generation 父目录、回执及数据所有权/模式保持不变。首次测试因 CSI 辅助镜像下载超时，第二次停在节点检查脚本的错误路径假设；修正检查脚本后，同一测试二进制在第三次通过，前两次失败记录随证据保留。
+
+[固定源码记录](../evidence/candidate-pod-mounts-2026-10-10.json)和[测试原始输出](../evidence/candidate-pod-mounts-2026-10-10.log)绑定 `51600f9`、203 项已核验源码/构建输入、精确二进制/镜像、节点 inode 检查及独立 S3 读取，并明确保留两次失败尝试。收集后已回收本次 VM、私有存储和凭据。

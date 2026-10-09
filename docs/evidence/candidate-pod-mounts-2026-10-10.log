@@ -1,0 +1,45 @@
+Source inputs verified against 51600f9b617aeb8b2715a187de11c1872d22a31b
+
+Attempt 1: image download timeout
+
+
+running 1 test
+test candidate_data_leaf_mount_preserves_private_metadata_and_independent_files has been running for over 60 seconds
+
+thread 'candidate_data_leaf_mount_preserves_private_metadata_and_independent_files' (6250) panicked at crates/kubernetes/tests/candidate_live.rs:221:50:
+one: startup Pending
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test candidate_data_leaf_mount_preserves_private_metadata_and_independent_files ... FAILED
+
+failures:
+
+failures:
+    candidate_data_leaf_mount_preserves_private_metadata_and_independent_files
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 94.13s
+
+Attempt 2: external inspector path assumption failed
+
+
+running 1 test
+
+thread 'candidate_data_leaf_mount_preserves_private_metadata_and_independent_files' (19816) panicked at crates/kubernetes/tests/candidate_live.rs:221:50:
+one: node inspection timeout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test candidate_data_leaf_mount_preserves_private_metadata_and_independent_files ... FAILED
+
+failures:
+
+failures:
+    candidate_data_leaf_mount_preserves_private_metadata_and_independent_files
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.37s
+
+Attempt 3: corrected inspector, same test binary
+
+
+running 1 test
+2 real CSI Candidate mounts passed: independent files, fsync and unchanged private metadata; retained Volume remains for inspection
+test candidate_data_leaf_mount_preserves_private_metadata_and_independent_files ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.31s

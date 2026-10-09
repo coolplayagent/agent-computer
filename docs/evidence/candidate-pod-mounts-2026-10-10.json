@@ -1,0 +1,968 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "Prepared Candidate data-leaf mounts through real Kubernetes/gVisor/JuiceFS CSI; not product acceptance",
+  "source_commit": "51600f9b617aeb8b2715a187de11c1872d22a31b",
+  "execution_head_before_commit": "ac754e908428dc82c443062599a5824679b444b6",
+  "source_worktree_dirty_at_execution": true,
+  "source_inputs_verified_against_commit": true,
+  "source_inputs_sha256": {
+    ".bazelrc": "9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
+    ".bazelversion": "14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "Cargo.lock": "6c27f7e9b483eb807651ee1e9af5059e93d0f433bedf747374ec10ca753dce85",
+    "Cargo.toml": "9e182797cc6a0c6f708e8e0978edc7e574fc31886a902ef0d91a0cc2c4e96751",
+    "MODULE.bazel": "77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "4bb214fce17a1c57e42e753fff2729bdc28fba19158b36b1107aa9460ee09642",
+    "crates/cli/BUILD.bazel": "be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/definitions/BUILD.bazel": "68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/kubernetes/BUILD.bazel": "7fdf09618a04e0a7d2e5a70e9552e66bba470d622fa616ac8ae398da82c204c1",
+    "crates/kubernetes/Cargo.toml": "2ee0b950d6b367cf344e58bf70ff2dd230d7318ea80cda2f0173c64364db55db",
+    "crates/kubernetes/src/attach.rs": "b565d5a7328a98b67c3a22e969a3937e7ee7b86192432bb6b4d10adbe38962f0",
+    "crates/kubernetes/src/candidate.rs": "86166ec030f27ed0e6c065c4819b2a0daa3694d97fc270a8cbd6ec3e5226fecb",
+    "crates/kubernetes/src/client.rs": "e82218558dccd0a8f5954323203ae4112557a7dd9e5b545106625106b6c6d006",
+    "crates/kubernetes/src/lib.rs": "531a70b11382e230ce59a2c964415ec96e002f0391a5fec7b07db3457e27700d",
+    "crates/kubernetes/src/plan.rs": "33ad87e18a933e582be1c1cdf720cda6a1c4af96e2a01dea43ec2d4aac164898",
+    "crates/kubernetes/src/startup_plan.rs": "eec5fc4f4378132b142aaaa2b9dada28e66854e77ac4698ffdc527eb9b572c29",
+    "crates/kubernetes/src/tests.rs": "87e626ab20146d805dcabdb7e755462ada244b1a1b4751f5c57c165f915003e5",
+    "crates/kubernetes/src/tests/attach.rs": "ddf356c7a3138ed3ef64d21c9f88fcd25a37f2d09d6698ccb7fae2f9783a9d80",
+    "crates/kubernetes/src/tests/attach/candidate.rs": "e8c4aac7b5578b473230d98d9e209396f4c48dcad5c11e1f6bfc4dacebc49ff4",
+    "crates/kubernetes/src/verify.rs": "fdebabd72c4f598d7fceaea5e6c853fe983636955089951d5c28655f6f3ca48c",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/candidate_live.rs": "f60ddcbe6b2ef5528afa464d92cef53a1fbc09b7b3d0511e0633649cc86b10b9",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_image.py": "e71f5f1f42063121e9debd3a45338a901fb9ba8358c55bebd41165254a27a3ca",
+    "crates/kubernetes/tests/startup_live.rs": "0e570020fcd89f18b158ae92076743f389e2b1feb32fdf330133a6e087bfc476",
+    "crates/sandbox/BUILD.bazel": "79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "f9af73e96f4335bc488c77f42ebb5eafe0b10a2a6f21bd399bca7470450ccc31",
+    "crates/sandbox/src/lib.rs": "78a8c1b617eeb5a0b1fac02c35662d06e3396ac56ec18cde82cf4f14635ed8eb",
+    "crates/sandbox/src/main.rs": "71b39de404e0d4d10102ddad34ec82ef78e41c3c1dd580908293a4d6c60ffd90",
+    "crates/sandbox/src/output.rs": "0805b0b15d1dd67c8f926a8e93c8b5066978759ea55d7a7d5c177a29c345d4be",
+    "crates/sandbox/src/request.rs": "17372c71cfd625cb7475e7d5e5a132d1e92da295ec4a5fb473b2251210e34139",
+    "crates/sandbox/src/startup.rs": "c08e576aeb1408c37f9260766a9b4261acba0c48b88975f8addc18761b92d2d0",
+    "crates/sandbox/src/supervisor.rs": "a31cca7230f8e15b47effd6bf01f7f91b3710c215ebb818d716e87b949eba2df",
+    "crates/sandbox/tests/component.py": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "crates/sandbox/tests/rootfs.py": "b148a45feb59c88cfa828b633eec1f0d57e980076ab835012c666744bb228f8f",
+    "crates/sandbox/tests/startup_component.py": "d1671c99de3dce9bbd2e96f2d14a863d7b68c590e71a71339a62abac6f99924e",
+    "crates/server/BUILD.bazel": "202c67eaffa2167aae23968c6ddc4ad7e2f023c56e8cf58092c05a8eacc26d2c",
+    "crates/server/Cargo.toml": "432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/candidate_worker.rs": "2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "df3c1e9eb873ff063310dfcd48259050eb9e8d683de0d84370d331096efc449f",
+    "crates/server/src/connections.rs": "f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "ce07608eb1944309e1719af5ea4576a31f82e1a263461eb23a9d0fd46ac7a698",
+    "crates/server/src/executions.rs": "36c762c78c7ef28832df164b8ab578d2ec66a4a117a11f42426daaf3213239af",
+    "crates/server/src/files.rs": "8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "9a5730616504a767678bd0ca06d51affaca2db5e1027758cb4b0103166fcf64f",
+    "crates/server/src/lib.rs": "f9251475cd79205c7ac3b5913918e2ece5d44033ca9a08413c12df74beaf0101",
+    "crates/server/src/main.rs": "abdc3333b484b74091aef03af97ceb8d6d713da32d3d67a2ae5f2dc12e897e45",
+    "crates/server/src/operator.rs": "63cf49a2aa98e9cadd850b9d864e8a68c693b73312518779ff6d8727911972bc",
+    "crates/server/src/plans.rs": "5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/authentication.rs": "3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "06081eb9037a213d52cd47fda2c1219f07903c8e2024c06f793456fc2cbf7a2d",
+    "crates/server/tests/cases/executions.rs": "29cc4850e0ae92bf020482c7ea8f415f4c55b424c097284da772a1522d23e3ba",
+    "crates/server/tests/cases/files.rs": "5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/plans.rs": "836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "d9332b8cbfc244f60ac9132523a6d9e602b0a8b2a06916d1f25fecfa6ec6d8b6",
+    "crates/server/tests/cases/writers.rs": "1a145ebeb122260e606fa6c4ec83e7b7644e346c959f6a138d0c3bbd8ed1840e",
+    "crates/server/tests/server_contracts.rs": "afe01e567f3619a39758a5929aa8b2d8792805c02687cd6ee179376a8bd0d306",
+    "crates/server/tests/support/mod.rs": "872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/directory.rs": "d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "27069a9b5339b74966cd272a7072c4941abf8b3d9ebba8a5c572615ec2735273",
+    "crates/storage/src/files/tests.rs": "3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "1d7cd717cd002481a504b0aa8fbaef733ca282be966bc43e5a0f66243417cf14",
+    "crates/storage/src/main.rs": "1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "aeb8cb0f27e00590958188f10b3ab743a0b51cfb2c2d04e61a59535b4142156a",
+    "crates/storage/src/model.rs": "d688269a013be354bf9ca7c385e4e0c2d3cc63f7060eae20f7b28ba7d46ca293",
+    "crates/storage/src/quota.rs": "143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "d4dbf90c48affe28deee800b55634935771b7cff7282d364110dcdb5f0fcd58b",
+    "crates/store/BUILD.bazel": "400a3835ee1e9038b12524d7fbcfceb5cd52a67393d51e67ab8ed77657a9a61f",
+    "crates/store/Cargo.toml": "f63c2bea26d70602e04aefc8a66712d3465b87fc1eac34edac3a6a6cd186dadb",
+    "crates/store/migrations/0001_declaration_registry.sql": "222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/migrations/0012_execution_admission.sql": "381d01c13cba7e165b08e06abbdd623a1464b4f1cc7da065b1cb913dd42c7b5d",
+    "crates/store/migrations/0013_execution_dispatch.sql": "48e374c04d996a56173f8f53ae2f275af862e4ca8aea4ae4884373135273ebbb",
+    "crates/store/migrations/0014_execution_startup.sql": "86cd2ca00cdb925053c9c33a6afc8b4490a82783ba7d48f421bb53b1b7b4eacc",
+    "crates/store/src/auth.rs": "91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "72e4d6e7ffe328b46c65df08337b4e095c907a1b6e8d022321013a8d3713784c",
+    "crates/store/src/plans/access.rs": "3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/connections/mod.rs": "b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "c8d34e89733792ae58155e65a29c63d9089fb2832326f16144368b9b8b5d8a37",
+    "crates/store/src/runtime/mod.rs": "53c86cbd08cb5c26385d08576dafd1c3fbf0499ff173678c0385f0301a6dd226",
+    "crates/store/src/runtime/preparation.rs": "ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "2c7f78f85c4dad955490bb496a51ea8e3b02fb36a36b76cfba0c0e39d7df961f",
+    "crates/store/src/runtime/start/types.rs": "8de756f8fdd65557fa95766a351d5d6755b9e4d9b0f670dcfbe309e762281b61",
+    "crates/store/src/runtime/types.rs": "7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/executions.rs": "c1925c5c1e6f40bcdada9dfeea129eaa33c0cc7305bc358d10f588be9027d319",
+    "crates/store/src/runtime/writers/executions/dispatch.rs": "6f812cde0bf169227fa3f328d8a4da360bf1411c7e81597eb5cf1e7f1f7ebe40",
+    "crates/store/src/runtime/writers/executions/dispatch/startup.rs": "5c980faca3c50904af2cc33d562da751ab93c4ec66888e91d2a9772b734a6255",
+    "crates/store/src/runtime/writers/files.rs": "59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "4ca729b660c7484d1f642d8b4094946ea9f05309f2b4578bbaee04eb3395fc64",
+    "crates/store/src/runtime/writers/types.rs": "bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "3cc4d6a624a43cbc7403f288579141cf947cc3b22f113a40f436870b5df65b2a",
+    "crates/store/src/writes.rs": "6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "cd7101a8a982c22573d161e6fc288ecd2f8b5952c4e71b8d5684675fec0ecdd9",
+    "crates/store/tests/contracts/concurrency.rs": "4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/connections.rs": "b45628b23cc546e97903ff0cf4fa436920261cfd9cb13de9b657b29be6c22882",
+    "crates/store/tests/contracts/plans/mod.rs": "429d9d5e6064e738cfd6048db10b35dd7544498e19d9439b1864648ef2df0862",
+    "crates/store/tests/contracts/plans/preparation.rs": "b8d754fd07d2fa6f420ddd938392fec2056a35a8e60d71b0a838c7226b5429a2",
+    "crates/store/tests/contracts/plans/publication.rs": "fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "8534d0db05f080c6a6f23d8aa123f094bc8ee36b4adfa008669248aa6dac2f23",
+    "crates/store/tests/contracts/plans/starts.rs": "d2dc26b89e06c96c0e122026a23fb73d002a82173a8ec77b30267a614f152a6e",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/executions.rs": "7eb8892ce253731c41d3507a59263b0e8a11944ddcb57e46cd35c4c63bcc83f4",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch.rs": "4a14732887c34f41f3efa65a9e7b81fb741814bacc076bfbb868af96567ed110",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/startup.rs": "0e569c246d2148b69830abf69436ee5e068b82e33d3333203946671d58d982b6",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "c28cfc94650be073c01ba9b31553af68edaa2c18542f52ec86a3809a1211df7d",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "004f0c88be7fc6a871e468796d63e2d00249c25aa20cb0183c4eb839c452aaef",
+    "crates/store/tests/contracts/registry.rs": "99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "d3a095925421fb39535330675242eb9b643a0689d1a42fda7e5dd689b199f50a",
+    "crates/test-support/BUILD.bazel": "92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/worker/BUILD.bazel": "a141adcdaea4eb4aa4f0ee50200368e4bab642566606f20c4da4044e31dd2c0f",
+    "crates/worker/Cargo.toml": "d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
+    "crates/worker/src/candidate.rs": "b7bf6055c255a6196bc919ffe15b9a79704db022a0840851502f85e528fe854f",
+    "crates/worker/src/files.rs": "1c6008373f4afead3afc5ac76c122a44f1f2b4227837f8c058ae4a268f10df64",
+    "crates/worker/src/files/gateway.rs": "7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "dc52ef3ae9cdfeaddadbd29288fc21cf2eeb5f7852d6add2e02a0781ae92b4f1",
+    "crates/worker/tests/candidate_live.rs": "e703fb14e88a33a0637820891b3f751ed53dba6626b1c18f4b2844071eca176c",
+    "crates/worker/tests/live.rs": "131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/file_http.rs": "c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6",
+    "rust-toolchain.toml": "559f488c181e0e9e77cf17c29de663977f036ec7ff2e2060585714bf53c52d62"
+  },
+  "image": {
+    "image": "registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3",
+    "supervisor_sha256": "fd11ef0c8cd401240e607138b32fb2d834afc6c237b3e422731b75358382d278",
+    "archive_sha256": "7f37433995ecf0f4a57d706f5ec9a7d3b5715d917fd438c275e36224a911064f"
+  },
+  "test_binary_sha256": "aee2a572ebe6cf794b6dd74d4e8118f726d555ac06ed90d984b531e2294bcd6a",
+  "rootfs_files": {
+    "/bin/agent-computer-sandbox": "fd11ef0c8cd401240e607138b32fb2d834afc6c237b3e422731b75358382d278",
+    "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "9d339ecb409578d6a5d587e6c537a8f9589b8a13fefba30d167433a4b5758bee",
+    "/usr/lib/x86_64-linux-gnu/libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+    "/usr/lib/x86_64-linux-gnu/libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+    "/lib64/ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+    "/bin/sh": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+    "/bin/sleep": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+    "/usr/lib/x86_64-linux-gnu/libsystemd.so.0": "9405c27411b652140806ab7576f7d76610f67bde662ba730efc7aa7171785011",
+    "/usr/lib/x86_64-linux-gnu/libselinux.so.1": "7538ee77765a27966563c0d22437a3080dcdb346ff76cc16d71a3ce3379a716a",
+    "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0": "4a6b6b2078685b074869d75cb068664d7da6b3036df7bca0442b1bbbd4ac7e65",
+    "/bin/setsid": "e0247c69b5966f336155291c00153ee75e980fe526a1371ddf7445788671dc66",
+    "/bin/env": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+    "/bin/head": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+    "/bin/yes": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+    "/bin/cat": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+    "/bin/sync": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02"
+  },
+  "runtime": {
+    "cases": [
+      {
+        "metadata_before_and_after": {
+          "data": {
+            "gid": 1000,
+            "inode": 45,
+            "mode": 16832,
+            "uid": 1000
+          },
+          "parent": {
+            "gid": 0,
+            "inode": 44,
+            "mode": 16832,
+            "uid": 0
+          },
+          "receipt": {
+            "gid": 0,
+            "inode": 47,
+            "mode": 33024,
+            "uid": 0
+          },
+          "root": {
+            "gid": 0,
+            "inode": 3074,
+            "mode": 16832,
+            "uid": 0
+          }
+        },
+        "pod": {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "annotations": {
+              "agent-computer.io/binding": "{\"approved_supervisor_image\":\"registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3\",\"bootstrap\":{\"intent_digest\":\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"request\":{\"argv\":[\"/bin/sh\",\"-c\",\"test \\\"$(cat input.txt)\\\" = input-one && test ! -e ../receipt.json && test ! -e /.config && test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token && printf persisted-one > saved.txt && sync saved.txt && sync . && printf candidate-one-ok\"],\"cwd\":\"\",\"execution_id\":\"exec_one\",\"generation\":1,\"lease_budget_ms\":30000,\"output_limit_bytes\":128,\"term_grace_ms\":100,\"timeout_seconds\":10},\"version\":1},\"identity\":{\"computer\":\"computer_one\",\"generation\":1,\"instance\":\"exec_one\",\"organization\":\"mount_probe_1791570397556327209\",\"sandbox\":\"sandbox_probe\",\"spec_revision\":1},\"namespace\":\"ac-kube-component\",\"sandbox\":{\"image\":\"registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3\",\"mounts\":[{\"path\":\"/workspace\",\"readOnly\":false,\"workspaceRef\":\"id:workspace_probe\"}],\"name\":\"sandbox\",\"networkPolicyRef\":\"deny-all\",\"resources\":{\"cpuMillis\":500,\"memoryMiB\":256},\"runtimeClass\":\"gvisor\"},\"version\":2,\"workspace\":{\"candidate\":\"candidate_one\",\"computer\":\"computer_one\",\"generation\":1,\"kind\":\"prepared_candidate\",\"namespace_uid\":\"c4e490bc-8479-4bc3-85be-c1a781d9ced2\",\"organization\":\"mount_probe_1791570397556327209\",\"prepared\":{\"data_inode\":45,\"filesystem_uuid\":\"a1068d43-6ef2-4228-ace0-39af1c1736a8\",\"manifest_digest\":\"sha256:b44e350ef14a0e49322513c25cfb843ab7090a4acb2764f5203a999c35fe371d\",\"path_ref\":\"organization/mount_probe_1791570397556327209/workspace/workspace_probe/candidates/candidate_one/generation/1/data\",\"quota_bytes\":1073741824,\"request_digest\":\"sha256:39a6b059994c10e60751148147cf73329dac0d4b9de201f908fb3a4017b103ce\",\"version\":1,\"volume_uid\":\"f94e93e1-aae2-4bf8-9d5b-e67bf615f81a\"},\"pv_uid\":\"96b185d0-d9b4-4a7b-be2e-53a92ec19fcb\",\"pvc_name\":\"acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5\",\"version\":1,\"volume_binding\":\"{\\\"identity\\\":{\\\"organization\\\":\\\"mount_probe_1791570397556327209\\\",\\\"resource_id\\\":\\\"volume_probe\\\",\\\"revision\\\":1,\\\"spec_digest\\\":\\\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\\",\\\"step_id\\\":\\\"step_probe\\\"},\\\"namespace\\\":\\\"ac-kube-component\\\",\\\"storage\\\":{\\\"driver_uid\\\":\\\"f7e2803a-5079-4bcd-8975-fb69e5b1e550\\\",\\\"name\\\":\\\"ac-juicefs\\\",\\\"reference\\\":\\\"id:pending\\\",\\\"secret_name\\\":\\\"ac-juicefs-secret\\\",\\\"secret_namespace\\\":\\\"kube-system\\\",\\\"uid\\\":\\\"5037567f-7c4a-45c1-a6b8-7b15eb2315ce\\\"},\\\"version\\\":1,\\\"volume\\\":{\\\"name\\\":\\\"data\\\",\\\"quotaBytes\\\":4294967296,\\\"reclaimPolicy\\\":\\\"Retain\\\",\\\"storageClass\\\":\\\"id:pending\\\"}}\",\"volume_path\":\"pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a\",\"workspace\":\"workspace_probe\"}}"
+            },
+            "labels": {
+              "agent-computer.io/instance": "dc2ac34a2af8b386afc5c08ac09161c1b05db10364b94d02f3a0"
+            },
+            "name": "ac-dc2ac34a2af8b386afc5c08ac09161c1b05db10364b94d02f3a0",
+            "namespace": "ac-kube-component"
+          },
+          "spec": {
+            "activeDeadlineSeconds": 3600,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "command": [
+                  "/bin/agent-computer-sandbox",
+                  "--attach-startup-json",
+                  "{\"version\":1,\"intent_digest\":\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"request\":{\"execution_id\":\"exec_one\",\"generation\":1,\"argv\":[\"/bin/sh\",\"-c\",\"test \\\"$(cat input.txt)\\\" = input-one && test ! -e ../receipt.json && test ! -e /.config && test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token && printf persisted-one > saved.txt && sync saved.txt && sync . && printf candidate-one-ok\"],\"cwd\":\"\",\"timeout_seconds\":10,\"lease_budget_ms\":30000,\"term_grace_ms\":100,\"output_limit_bytes\":128}}"
+                ],
+                "image": "registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "sandbox",
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "privileged": false,
+                  "readOnlyRootFilesystem": true
+                },
+                "stdin": true,
+                "stdinOnce": true,
+                "tty": false,
+                "volumeMounts": [
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp"
+                  },
+                  {
+                    "mountPath": "/dev/shm",
+                    "name": "shm"
+                  },
+                  {
+                    "mountPath": "/workspace",
+                    "name": "workspace",
+                    "readOnly": false,
+                    "subPath": "organization/mount_probe_1791570397556327209/workspace/workspace_probe/candidates/candidate_one/generation/1/data"
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "hostIPC": false,
+            "hostNetwork": false,
+            "hostPID": false,
+            "restartPolicy": "Never",
+            "runtimeClassName": "gvisor",
+            "securityContext": {
+              "runAsGroup": 1000,
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "shareProcessNamespace": false,
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "64Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "64Mi"
+                },
+                "name": "shm"
+              },
+              {
+                "name": "workspace",
+                "persistentVolumeClaim": {
+                  "claimName": "acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5",
+                  "readOnly": false
+                }
+              }
+            ]
+          }
+        },
+        "pod_uid": "b896d7fb-d271-4918-8134-8d1cffc87c39",
+        "receipt": {
+          "data_inode": 45,
+          "filesystem_uuid": "a1068d43-6ef2-4228-ace0-39af1c1736a8",
+          "manifest_digest": "sha256:b44e350ef14a0e49322513c25cfb843ab7090a4acb2764f5203a999c35fe371d",
+          "path_ref": "organization/mount_probe_1791570397556327209/workspace/workspace_probe/candidates/candidate_one/generation/1/data",
+          "quota_bytes": 1073741824,
+          "request_digest": "sha256:39a6b059994c10e60751148147cf73329dac0d4b9de201f908fb3a4017b103ce",
+          "version": 1,
+          "volume_uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+        },
+        "report": {
+          "challenge_digest": "sha256:48b50c26069f19bd8b8eee4a6e5fd3162ad740382e35e41b6964f0db0173b3a5",
+          "grant_digest": "sha256:7c171304e80af79d5f6be1b9be8b4737324e100e72ff54c80bef97d2dc686ed0",
+          "report": {
+            "children_reaped": true,
+            "elapsed_ms": 98,
+            "execution_id": "exec_one",
+            "generation": 1,
+            "kill_sent": false,
+            "main_exit_code": 0,
+            "main_signal": null,
+            "outcome": "succeeded",
+            "reaped_processes": 1,
+            "request_digest": "sha256:b723ee9c361234dc73f961f88d91988e9bf96aa5a23a201e9ea1852ecaec895a",
+            "stderr": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "stdout": {
+              "bytes": [
+                99,
+                97,
+                110,
+                100,
+                105,
+                100,
+                97,
+                116,
+                101,
+                45,
+                111,
+                110,
+                101,
+                45,
+                111,
+                107
+              ],
+              "eof": true,
+              "observed_bytes": 16,
+              "truncated": false
+            },
+            "version": 1
+          },
+          "version": 1
+        },
+        "request": {
+          "candidate": "candidate_one",
+          "computer": "computer_one",
+          "generation": 1,
+          "manifest": {
+            "entries": {
+              "input.txt": {
+                "executable": false,
+                "kind": "file",
+                "sha256": "sha256:2af6a2a791503419c61c0c43003e02f0bf401fa476ad5ed66616d92df5367dcc",
+                "size": 9
+              }
+            }
+          },
+          "manifest_digest": "sha256:b44e350ef14a0e49322513c25cfb843ab7090a4acb2764f5203a999c35fe371d",
+          "organization": "mount_probe_1791570397556327209",
+          "quota_bytes": 1073741824,
+          "volume_uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a",
+          "workspace": "workspace_probe"
+        }
+      },
+      {
+        "metadata_before_and_after": {
+          "data": {
+            "gid": 1000,
+            "inode": 51,
+            "mode": 16832,
+            "uid": 1000
+          },
+          "parent": {
+            "gid": 0,
+            "inode": 50,
+            "mode": 16832,
+            "uid": 0
+          },
+          "receipt": {
+            "gid": 0,
+            "inode": 53,
+            "mode": 33024,
+            "uid": 0
+          },
+          "root": {
+            "gid": 0,
+            "inode": 3074,
+            "mode": 16832,
+            "uid": 0
+          }
+        },
+        "pod": {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "annotations": {
+              "agent-computer.io/binding": "{\"approved_supervisor_image\":\"registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3\",\"bootstrap\":{\"intent_digest\":\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"request\":{\"argv\":[\"/bin/sh\",\"-c\",\"test \\\"$(cat input.txt)\\\" = input-two && test ! -e ../receipt.json && test ! -e /.config && test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token && printf persisted-two > saved.txt && sync saved.txt && sync . && printf candidate-two-ok\"],\"cwd\":\"\",\"execution_id\":\"exec_two\",\"generation\":1,\"lease_budget_ms\":30000,\"output_limit_bytes\":128,\"term_grace_ms\":100,\"timeout_seconds\":10},\"version\":1},\"identity\":{\"computer\":\"computer_two\",\"generation\":1,\"instance\":\"exec_two\",\"organization\":\"mount_probe_1791570397556327209\",\"sandbox\":\"sandbox_probe\",\"spec_revision\":1},\"namespace\":\"ac-kube-component\",\"sandbox\":{\"image\":\"registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3\",\"mounts\":[{\"path\":\"/workspace\",\"readOnly\":false,\"workspaceRef\":\"id:workspace_probe\"}],\"name\":\"sandbox\",\"networkPolicyRef\":\"deny-all\",\"resources\":{\"cpuMillis\":500,\"memoryMiB\":256},\"runtimeClass\":\"gvisor\"},\"version\":2,\"workspace\":{\"candidate\":\"candidate_two\",\"computer\":\"computer_two\",\"generation\":1,\"kind\":\"prepared_candidate\",\"namespace_uid\":\"c4e490bc-8479-4bc3-85be-c1a781d9ced2\",\"organization\":\"mount_probe_1791570397556327209\",\"prepared\":{\"data_inode\":51,\"filesystem_uuid\":\"a1068d43-6ef2-4228-ace0-39af1c1736a8\",\"manifest_digest\":\"sha256:1be9c15a35757c7bc6fbc6e239f6d8b3171d17a896aa03f1c0f67ba71b10e1fa\",\"path_ref\":\"organization/mount_probe_1791570397556327209/workspace/workspace_probe/candidates/candidate_two/generation/1/data\",\"quota_bytes\":1073741824,\"request_digest\":\"sha256:7e0a99e4760cf56ad8b8397bf7841ab182aded6cbede15b510ccf939af434c12\",\"version\":1,\"volume_uid\":\"f94e93e1-aae2-4bf8-9d5b-e67bf615f81a\"},\"pv_uid\":\"96b185d0-d9b4-4a7b-be2e-53a92ec19fcb\",\"pvc_name\":\"acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5\",\"version\":1,\"volume_binding\":\"{\\\"identity\\\":{\\\"organization\\\":\\\"mount_probe_1791570397556327209\\\",\\\"resource_id\\\":\\\"volume_probe\\\",\\\"revision\\\":1,\\\"spec_digest\\\":\\\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\\",\\\"step_id\\\":\\\"step_probe\\\"},\\\"namespace\\\":\\\"ac-kube-component\\\",\\\"storage\\\":{\\\"driver_uid\\\":\\\"f7e2803a-5079-4bcd-8975-fb69e5b1e550\\\",\\\"name\\\":\\\"ac-juicefs\\\",\\\"reference\\\":\\\"id:pending\\\",\\\"secret_name\\\":\\\"ac-juicefs-secret\\\",\\\"secret_namespace\\\":\\\"kube-system\\\",\\\"uid\\\":\\\"5037567f-7c4a-45c1-a6b8-7b15eb2315ce\\\"},\\\"version\\\":1,\\\"volume\\\":{\\\"name\\\":\\\"data\\\",\\\"quotaBytes\\\":4294967296,\\\"reclaimPolicy\\\":\\\"Retain\\\",\\\"storageClass\\\":\\\"id:pending\\\"}}\",\"volume_path\":\"pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a\",\"workspace\":\"workspace_probe\"}}"
+            },
+            "labels": {
+              "agent-computer.io/instance": "2a1b0288ccfb1b4b8d382e2840194808f8069aa75d04d759a71c"
+            },
+            "name": "ac-2a1b0288ccfb1b4b8d382e2840194808f8069aa75d04d759a71c",
+            "namespace": "ac-kube-component"
+          },
+          "spec": {
+            "activeDeadlineSeconds": 3600,
+            "automountServiceAccountToken": false,
+            "containers": [
+              {
+                "command": [
+                  "/bin/agent-computer-sandbox",
+                  "--attach-startup-json",
+                  "{\"version\":1,\"intent_digest\":\"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"request\":{\"execution_id\":\"exec_two\",\"generation\":1,\"argv\":[\"/bin/sh\",\"-c\",\"test \\\"$(cat input.txt)\\\" = input-two && test ! -e ../receipt.json && test ! -e /.config && test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token && printf persisted-two > saved.txt && sync saved.txt && sync . && printf candidate-two-ok\"],\"cwd\":\"\",\"timeout_seconds\":10,\"lease_budget_ms\":30000,\"term_grace_ms\":100,\"output_limit_bytes\":128}}"
+                ],
+                "image": "registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "sandbox",
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "500m",
+                    "memory": "256Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "privileged": false,
+                  "readOnlyRootFilesystem": true
+                },
+                "stdin": true,
+                "stdinOnce": true,
+                "tty": false,
+                "volumeMounts": [
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp"
+                  },
+                  {
+                    "mountPath": "/dev/shm",
+                    "name": "shm"
+                  },
+                  {
+                    "mountPath": "/workspace",
+                    "name": "workspace",
+                    "readOnly": false,
+                    "subPath": "organization/mount_probe_1791570397556327209/workspace/workspace_probe/candidates/candidate_two/generation/1/data"
+                  }
+                ]
+              }
+            ],
+            "enableServiceLinks": false,
+            "hostIPC": false,
+            "hostNetwork": false,
+            "hostPID": false,
+            "restartPolicy": "Never",
+            "runtimeClassName": "gvisor",
+            "securityContext": {
+              "runAsGroup": 1000,
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "shareProcessNamespace": false,
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "64Mi"
+                },
+                "name": "tmp"
+              },
+              {
+                "emptyDir": {
+                  "medium": "Memory",
+                  "sizeLimit": "64Mi"
+                },
+                "name": "shm"
+              },
+              {
+                "name": "workspace",
+                "persistentVolumeClaim": {
+                  "claimName": "acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5",
+                  "readOnly": false
+                }
+              }
+            ]
+          }
+        },
+        "pod_uid": "7f97ebdf-9513-4d44-8bca-3b28403a5319",
+        "receipt": {
+          "data_inode": 51,
+          "filesystem_uuid": "a1068d43-6ef2-4228-ace0-39af1c1736a8",
+          "manifest_digest": "sha256:1be9c15a35757c7bc6fbc6e239f6d8b3171d17a896aa03f1c0f67ba71b10e1fa",
+          "path_ref": "organization/mount_probe_1791570397556327209/workspace/workspace_probe/candidates/candidate_two/generation/1/data",
+          "quota_bytes": 1073741824,
+          "request_digest": "sha256:7e0a99e4760cf56ad8b8397bf7841ab182aded6cbede15b510ccf939af434c12",
+          "version": 1,
+          "volume_uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+        },
+        "report": {
+          "challenge_digest": "sha256:641cf9d7be5b2e71e5b9c5c11377d792dd18b07e45a8d3fe8eaf9dcc657118de",
+          "grant_digest": "sha256:616136f566ee321c125a88d6083b47fb884107d136d8419d1e660145664c500c",
+          "report": {
+            "children_reaped": true,
+            "elapsed_ms": 100,
+            "execution_id": "exec_two",
+            "generation": 1,
+            "kill_sent": false,
+            "main_exit_code": 0,
+            "main_signal": null,
+            "outcome": "succeeded",
+            "reaped_processes": 1,
+            "request_digest": "sha256:c9e9db529ae1619752a79629b688b33a6be30ef471d0f3a3187788a0d333e0c8",
+            "stderr": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "stdout": {
+              "bytes": [
+                99,
+                97,
+                110,
+                100,
+                105,
+                100,
+                97,
+                116,
+                101,
+                45,
+                116,
+                119,
+                111,
+                45,
+                111,
+                107
+              ],
+              "eof": true,
+              "observed_bytes": 16,
+              "truncated": false
+            },
+            "version": 1
+          },
+          "version": 1
+        },
+        "request": {
+          "candidate": "candidate_two",
+          "computer": "computer_two",
+          "generation": 1,
+          "manifest": {
+            "entries": {
+              "input.txt": {
+                "executable": false,
+                "kind": "file",
+                "sha256": "sha256:8dad67c19e014964974206e4c2c52427fed1532fa7b412448136e982b2daaf04",
+                "size": 9
+              }
+            }
+          },
+          "manifest_digest": "sha256:1be9c15a35757c7bc6fbc6e239f6d8b3171d17a896aa03f1c0f67ba71b10e1fa",
+          "organization": "mount_probe_1791570397556327209",
+          "quota_bytes": 1073741824,
+          "volume_uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a",
+          "workspace": "workspace_probe"
+        }
+      }
+    ],
+    "filesystem_uuid": "a1068d43-6ef2-4228-ace0-39af1c1736a8",
+    "image": "registry.invalid/agent-computer/startup-component@sha256:9ef27f01e3f02a0ef8b02d958868001edc194f84e9b97b5452fc9309eb2d3cf3",
+    "limits": "fixture grants; no DB admission, execution completion or physical fencing",
+    "organization": "mount_probe_1791570397556327209",
+    "pv_uid": "96b185d0-d9b4-4a7b-be2e-53a92ec19fcb",
+    "pvc_name": "acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5",
+    "pvc_uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a",
+    "volume_path": "pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a",
+    "kubernetes_objects": {
+      "pvc": {
+        "apiVersion": "v1",
+        "kind": "PersistentVolumeClaim",
+        "metadata": {
+          "annotations": {
+            "agent-computer.io/volume-binding": "{\"identity\":{\"organization\":\"mount_probe_1791570397556327209\",\"resource_id\":\"volume_probe\",\"revision\":1,\"spec_digest\":\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"step_id\":\"step_probe\"},\"namespace\":\"ac-kube-component\",\"storage\":{\"driver_uid\":\"f7e2803a-5079-4bcd-8975-fb69e5b1e550\",\"name\":\"ac-juicefs\",\"reference\":\"id:pending\",\"secret_name\":\"ac-juicefs-secret\",\"secret_namespace\":\"kube-system\",\"uid\":\"5037567f-7c4a-45c1-a6b8-7b15eb2315ce\"},\"version\":1,\"volume\":{\"name\":\"data\",\"quotaBytes\":4294967296,\"reclaimPolicy\":\"Retain\",\"storageClass\":\"id:pending\"}}",
+            "pv.kubernetes.io/bind-completed": "yes",
+            "pv.kubernetes.io/bound-by-controller": "yes",
+            "volume.beta.kubernetes.io/storage-provisioner": "csi.juicefs.com",
+            "volume.kubernetes.io/storage-provisioner": "csi.juicefs.com"
+          },
+          "creationTimestamp": "2026-10-09T18:26:37Z",
+          "finalizers": [
+            "kubernetes.io/pvc-protection"
+          ],
+          "labels": {
+            "agent-computer.io/volume": "a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5"
+          },
+          "name": "acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5",
+          "namespace": "ac-kube-component",
+          "resourceVersion": "1318",
+          "uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteMany"
+          ],
+          "resources": {
+            "requests": {
+              "storage": "4Gi"
+            }
+          },
+          "storageClassName": "ac-juicefs",
+          "volumeMode": "Filesystem",
+          "volumeName": "pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+        },
+        "status": {
+          "accessModes": [
+            "ReadWriteMany"
+          ],
+          "capacity": {
+            "storage": "4Gi"
+          },
+          "conditions": [
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-09T18:26:46Z",
+              "message": "No pods are currently referencing this PVC",
+              "reason": "NoPodsUsingPVC",
+              "status": "True",
+              "type": "Unused"
+            }
+          ],
+          "phase": "Bound"
+        }
+      },
+      "pv": {
+        "apiVersion": "v1",
+        "kind": "PersistentVolume",
+        "metadata": {
+          "annotations": {
+            "pv.kubernetes.io/provisioned-by": "csi.juicefs.com",
+            "volume.kubernetes.io/provisioner-deletion-secret-name": "ac-juicefs-secret",
+            "volume.kubernetes.io/provisioner-deletion-secret-namespace": "kube-system"
+          },
+          "creationTimestamp": "2026-10-09T18:26:37Z",
+          "finalizers": [
+            "kubernetes.io/pv-protection"
+          ],
+          "name": "pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a",
+          "resourceVersion": "1246",
+          "uid": "96b185d0-d9b4-4a7b-be2e-53a92ec19fcb"
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteMany"
+          ],
+          "capacity": {
+            "storage": "4Gi"
+          },
+          "claimRef": {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "name": "acv-a76105c64bdadc8b4502eeba4f44ded6e2ac7729c85c55885bf5",
+            "namespace": "ac-kube-component",
+            "resourceVersion": "1241",
+            "uid": "f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+          },
+          "csi": {
+            "driver": "csi.juicefs.com",
+            "fsType": "juicefs",
+            "nodePublishSecretRef": {
+              "name": "ac-juicefs-secret",
+              "namespace": "kube-system"
+            },
+            "volumeAttributes": {
+              "capacity": "4294967296",
+              "juicefs/controller-quota-set": "true",
+              "storage.kubernetes.io/csiProvisionerIdentity": "1791569956085-1527-csi.juicefs.com",
+              "subPath": "pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+            },
+            "volumeHandle": "pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a"
+          },
+          "mountOptions": [
+            "writeback=false"
+          ],
+          "persistentVolumeReclaimPolicy": "Retain",
+          "storageClassName": "ac-juicefs",
+          "volumeMode": "Filesystem"
+        },
+        "status": {
+          "lastPhaseTransitionTime": "2026-10-09T18:26:37Z",
+          "phase": "Bound"
+        }
+      }
+    },
+    "mount_configuration": {
+      "filesystem_uuid": "a1068d43-6ef2-4228-ace0-39af1c1736a8",
+      "storage": "s3",
+      "writeback": false,
+      "fuse_writeback": false,
+      "subdir": ""
+    },
+    "environment": {
+      "kernel": "6.8.0-142-generic",
+      "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+      "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+      "juicefs": "juicefs version 1.4.1+2026-07-30.0b90c7d",
+      "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+      "seaweedfs": "version 30GB 4.48 530be3e37337488ecc34d58441e0bc476e121c93 linux amd64"
+    },
+    "csi_images": [
+      {
+        "pod": "juicefs-csi-controller-0",
+        "images": [
+          {
+            "name": "csi-provisioner",
+            "image": "sha256:80533ab25f66f12a48e07debc5b57d470dcf018a1771b6f1f996ba6b2915e6e5",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-provisioner@sha256:608640c92ee853e657ce663bc955f866910858d0f5c746da088ffb497d44a453"
+          },
+          {
+            "name": "csi-resizer",
+            "image": "sha256:78ad609286559ca56673d92f926d1bb9c374129c1aad77e04656a54156937d42",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-resizer@sha256:fc764369dcb1dd3a031b6a842e265b7a19766e6817acd1b7bcdd5c413275638b"
+          },
+          {
+            "name": "juicefs-plugin",
+            "image": "sha256:45b3bf470dd25fe2e14717818efbfd38add611b0a513302711a7a490fed83186",
+            "image_id": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754"
+          },
+          {
+            "name": "liveness-probe",
+            "image": "sha256:494ea5379400e4f01e49f20be885b1ff011794abebdf81dbd86f606e171d796d",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a"
+          }
+        ]
+      },
+      {
+        "pod": "juicefs-csi-node-9h6wf",
+        "images": [
+          {
+            "name": "juicefs-plugin",
+            "image": "sha256:45b3bf470dd25fe2e14717818efbfd38add611b0a513302711a7a490fed83186",
+            "image_id": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754"
+          },
+          {
+            "name": "liveness-probe",
+            "image": "sha256:494ea5379400e4f01e49f20be885b1ff011794abebdf81dbd86f606e171d796d",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a"
+          },
+          {
+            "name": "node-driver-registrar",
+            "image": "sha256:50013f94a28d1d5ce69a9745f7d64a2b5810767faeb270f74f6408ecd0b186ca",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9"
+          }
+        ]
+      }
+    ],
+    "fresh_client_reads": [
+      {
+        "candidate": "one",
+        "bytes": 13,
+        "sha256": "sha256:8bd3cebeea9610981ef941bfafadab572902033243b608ed5794e01026405f0e",
+        "inode": 4098
+      },
+      {
+        "candidate": "two",
+        "bytes": 13,
+        "sha256": "sha256:1581aaaf67ad4a7eec3884f7c14f6c1d71e9f3f3c88211a32ee5a7a230c9567a",
+        "inode": 5122
+      }
+    ],
+    "cold_cache": "new read-only client, memory cache, cache-size 0",
+    "object_get_metrics": [
+      "juicefs_object_request_data_bytes_GET 26",
+      "juicefs_object_request_durations_histogram_seconds_GET_total 2",
+      "juicefs_object_request_durations_histogram_seconds_GET_sum 0.003568986"
+    ]
+  },
+  "node_inspection": {
+    "pod": {
+      "name": "ac-dc2ac34a2af8b386afc5c08ac09161c1b05db10364b94d02f3a0",
+      "namespace": "ac-kube-component",
+      "uid": "b896d7fb-d271-4918-8134-8d1cffc87c39"
+    },
+    "container_id": "9e03e74d9e11e4c51d955ec82bc91617ef3d5ce351c6e21414e43581b936863c",
+    "runtime": {
+      "Name": "io.containerd.runsc.v1",
+      "Options": {
+        "type_url": "runtimeoptions.v1.Options",
+        "value": "Ch5pby5jb250YWluZXJkLnJ1bnNjLnYxLm9wdGlvbnMSGi9ldGMvY29udGFpbmVyZC9ydW5zYy50b21s"
+      }
+    },
+    "workspace_oci_mount": {
+      "destination": "/workspace",
+      "options": [
+        "rbind",
+        "rprivate",
+        "rw"
+      ],
+      "source": "/var/lib/kubelet/pods/b896d7fb-d271-4918-8134-8d1cffc87c39/volume-subpaths/pvc-f94e93e1-aae2-4bf8-9d5b-e67bf615f81a/sandbox/2",
+      "type": "bind"
+    },
+    "node_mount_stat": {
+      "inode": 45,
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 16832
+    },
+    "runsc_processes": "  22870     0 runsc-gofer --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417/log.json --log-format=json --panic-log=/var/log/pods/ac-kube-component_ac-dc2ac34a2af8b386afc5c08ac09161c1b05db10364b94d02f3a0_b896d7fb-d271-4918-8134-8d1cffc87c39/gvisor_panic.log --platform=systrap --log-fd=3 gofer --bundle /run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417 --gofer-mount-confs=lisafs:none,lisafs:none --spec-fd=4 --mounts-fd=5 --rpc-fd=6 --io-fds=7 --io-fds=8 --sync-chroot-fd=9 659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417\n  22871     0 runsc-sandbox --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417/log.json --log-format=json --panic-log=/var/log/pods/ac-kube-component_ac-dc2ac34a2af8b386afc5c08ac09161c1b05db10364b94d02f3a0_b896d7fb-d271-4918-8134-8d1cffc87c39/gvisor_panic.log --platform=systrap --root=/run/containerd/runsc/k8s.io --log-fd=3 --panic-log-fd=4 boot --bundle=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417 --gofer-mount-confs=lisafs:none,lisafs:none --apply-caps=true --setup-root --total-host-memory 6213013504 --cpu-num 2 --cpu-quota 50000 --cpu-period 100000 --total-memory 268435456 --io-fds=5 --io-fds=6 --dev-io-fd=-1 --mounts-fd=7 --start-sync-fd=8 --pin-ring-fd=9 --user-log-fd=10 --controller-fd=11 --spec-fd=12 --stdio-fds=13 --stdio-fds=14 --stdio-fds=15 659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417\n  22891     0 [gvisor_sentry]\n  22907     0 [gvisor_sentry]\n  22908     0 [gvisor_sentry]\n  22910     0 runsc --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417/log.json --log-format=json --panic-log=/var/log/pods/ac-kube-component_ac-dc2ac34a2af8b386afc5c08ac09161c1b05db10364b94d02f3a0_b896d7fb-d271-4918-8134-8d1cffc87c39/gvisor_panic.log --platform=systrap wait 659f96797d5bc546fa963678214125d066de53118f077b09ca1a04f48b605417\n  22957     0 runsc-gofer --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/9e03e74d9e11e4c51d955ec82bc91617ef3d5ce351c6e21414e43581b936863c/log.json --log-format=json --platform=systrap --log-fd=3 gofer --bundle /run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/9e03e74d9e11e4c51d955ec82bc91617ef3d5ce351c6e21414e43581b936863c --gofer-mount-confs=lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none --spec-fd=4 --mounts-fd=5 --rpc-fd=6 --io-fds=7 --io-fds=8 --io-fds=9 --io-fds=10 --io-fds=11 --io-fds=12 --io-fds=13 --sync-chroot-fd=14 9e03e74d9e11e4c51d955ec82bc91617ef3d5ce351c6e21414e43581b936863c\n  22976     0 [gvisor_sentry]\n  22977     0 [gvisor_sentry]\n  22978     0 runsc --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/9e03e74d9e11e4c51d955ec82bc91617ef3d5ce351c6e21414e43581b936863c/log.json --log-format=json --platform=systrap wait 9e03e74d9e11e4c51d955ec82bc91617ef3d5ce351c6e21414e43581b936863c\n",
+    "oci_root_readonly": true,
+    "pod_security_context": {
+      "runAsGroup": 1000,
+      "runAsNonRoot": true,
+      "runAsUser": 1000,
+      "seccompProfile": {
+        "type": "RuntimeDefault"
+      }
+    }
+  },
+  "cleanup": {
+    "vm_pid": 2565966,
+    "owned_command_verified": true,
+    "process_terminal": true,
+    "execution_pods_remaining": 0,
+    "removed_private_files": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "user-data",
+      "meta-data",
+      "known_hosts",
+      "serial.log",
+      "qemu.log",
+      "vm.json"
+    ],
+    "private_credentials_and_test_volumes_destroyed_with_vm_disk": true,
+    "public_input_caches_retained": true,
+    "not_product_fencing": true
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "test_exit_code": 101,
+      "reason": "CSI helper image download exceeded the 90-second Pod startup deadline; no application process started"
+    },
+    {
+      "attempt": 2,
+      "test_exit_code": 101,
+      "inspector_exit_code": 1,
+      "reason": "Node inspector incorrectly expected the Pod volume alias in kubelet volume-subpaths; actual CSI path uses the PV name. Inspector withheld marker; test timed out before hello/grant."
+    },
+    {
+      "attempt": 3,
+      "test_exit_code": 0,
+      "inspector_exit_code": 0,
+      "passed_candidate_cases": 2,
+      "reason": "Corrected external inspector checks the exact Pod UID subpath bind and receipt inode; unchanged committed test binary passes both cases"
+    }
+  ],
+  "test_command": "sudo env AGENT_COMPUTER_CANDIDATE_MOUNT_CONFIG=<private-file> candidate_mount_live_test --nocapture",
+  "limits": [
+    "Single disposable KVM VM; fixed test image contains locally built trusted supervisor and host tools, not product packaging.",
+    "Preparation and grants are component fixtures; no execution queue/dispatch/startup database worker was joined to this run.",
+    "Node inspection verifies the first actual subPath bind inode and UID/GID; API readback alone does not attest mount contents.",
+    "Two independent no-cache reads recorded two S3 GETs; no multi-node, object-store crash, network partition or durability quorum certification.",
+    "No product independent watchdog, physical fencing, writer-drain proof, object-output capture or durable completion acceptance.",
+    "Pod deletion and VM teardown are test cleanup only; T01-T43 remain not_run."
+  ]
+}
