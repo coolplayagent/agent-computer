@@ -49,6 +49,10 @@ AGENT_COMPUTER_KUBE_TEST_CONFIG=/private/component/config.json \
 
 The live test checks TLS, actual create/readback/conflict, Pod Running observation and conditional deletion. An optional `observation_file` pauses for up to 60 seconds while an external inspector captures logs and node runsc evidence; the inspector then creates the same path with the `.inspected` extension. Check the `AC_SECURITY_PROBE_OK` container log and actual containerd runtime separately. The test fails without explicit configuration; it is excluded from default Cargo tests by a feature and from `bazel test //...` by the manual tag. It is a component test, not T16 combination certification. Chromium, JuiceFS/S3, recovery and the full runtime matrix remain `not_run`.
 
-## 12.4 Deployment references
+## 12.4 Recorded component run
+
+On 2026-10-09, source commit `461d52c02e34750c3b6c761d8b6dc817aaa96cf7` passed the explicit Bazel live test in a disposable Ubuntu 24.04.5 KVM VM running K3s v1.37.1+k3s1, containerd 2.3.4-k3s1 and gVisor release-20261005.0. Independent node inspection confirmed `io.containerd.runsc.v1`, `systrap`, OCI root readonly, and the UID/token probe log. The test completed UID-bound creation, conflict/readback and conditional deletion followed by API absence. The [component record](../evidence/kubernetes-component-2026-10-09.json) pins source files and release/image digests and links the actual test log. This does not establish packet-level network isolation, physical fencing or the full runtime combination.
+
+## 12.5 Deployment references
 
 Use the upstream [gVisor installation guide](https://gvisor.dev/docs/user_guide/install/), [containerd setup](https://gvisor.dev/docs/user_guide/containerd/quick_start/) and [shim configuration](https://gvisor.dev/docs/user_guide/containerd/configuration/). Pin and verify release artifacts, including the complete gVisor archive. On containerd 2, use the version-3 runtime table; K3s supports an extension of its base template as described in [K3s advanced options](https://docs.k3s.io/advanced). Set the runsc platform explicitly to `systrap`; never substitute runc or grant privileged access when the component probe fails.

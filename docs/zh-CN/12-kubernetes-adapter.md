@@ -49,6 +49,10 @@ AGENT_COMPUTER_KUBE_TEST_CONFIG=/private/component/config.json \
 
 真实测试检查 TLS、实际创建/读回/冲突、Pod Running 观察和条件删除。可选 `observation_file` 会等待外部检查器至多 60 秒，由其收集日志与节点 runsc 证据，再建立同路径、扩展名改为 `.inspected` 的文件。另需检查容器日志 `AC_SECURITY_PROBE_OK` 和实际 containerd runtime。缺少显式配置时测试失败；Cargo 默认测试通过 feature 排除它，`bazel test //...` 通过 manual 标签排除它。这是组件测试，不是 T16 组合认证；Chromium、JuiceFS/S3、恢复及完整运行矩阵仍为 `not_run`。
 
-## 12.4 部署依据
+## 12.4 组件实测记录
+
+2026-10-09，源码提交 `461d52c02e34750c3b6c761d8b6dc817aaa96cf7` 在临时 Ubuntu 24.04.5 KVM 虚拟机中通过显式 Bazel 真实组件测试，环境为 K3s v1.37.1+k3s1、containerd 2.3.4-k3s1 和 gVisor release-20261005.0。独立节点检查确认 `io.containerd.runsc.v1`、`systrap`、OCI root readonly，以及 UID/token 探针日志。测试完成 UID 绑定的创建、冲突/读回和条件删除，并观察 API 对象消失。[组件证据](../evidence/kubernetes-component-2026-10-09.json) 固定源码文件及发行/镜像摘要，并引用实际测试日志；它不证明报文级网络隔离、物理 fencing 或完整运行组合。
+
+## 12.5 部署依据
 
 依据上游 [gVisor 安装指南](https://gvisor.dev/docs/user_guide/install/)、[containerd 接入](https://gvisor.dev/docs/user_guide/containerd/quick_start/) 与 [shim 配置](https://gvisor.dev/docs/user_guide/containerd/configuration/)，固定并校验发行产物，包括完整 gVisor 归档。containerd 2 使用 version 3 runtime 表；K3s 按[高级配置](https://docs.k3s.io/advanced)扩展 base 模板。显式配置 runsc `systrap` 平台；组件测试失败时不能替换为 runc 或放开 privileged。

@@ -13,7 +13,7 @@
 | 03 | ComputerSet schema/验证器、声明版本、计划与能力协商 | R01、R14、R31 / T01、T17、T36 | 部分实现：静态验证/摘要/Schema、独立不可变 SpecVersion 及授权 plan/apply 已交付；运行能力协商待实现 |
 | 04 | PostgreSQL 迁移、原子幂等记录、事件/Outbox、CAS | R06、R08–R10 / T09、T12、T13 | 部分实现：声明/资源发布迁移、原子幂等/CAS、事件/Outbox 与重放已交付；持久化协调租约/回执已实现，运行生命周期事务和外部投递进程待实现 |
 | 05 | API/OpenAPI、服务凭据/OIDC、授权和多对多 ConnectionSession | R02、R15、R22、R24、R33 / T02、T10、T18、T22、T38 | 部分实现：Axum 服务、OpenAPI 子集、限 scope 可撤销服务凭据及受保护验证及具有声明/引用 grant 的 plan/apply 已交付；OIDC、运行 grant 与连接待实现 |
-| 06 | Kubernetes/gVisor 协调器、实际 fencing、启动/停止/恢复 | R02、R09、R13、R16 / T03、T08、T16、T19；B01–B07 | 部分实现：数据库协调及受限临时 Pod HTTPS 适配器已实现；集成 worker、Workspace 挂载、物理 fencing 及真实环境认证待交付 |
+| 06 | Kubernetes/gVisor 协调器、实际 fencing、启动/停止/恢复 | R02、R09、R13、R16 / T03、T08、T16、T19；B01–B07 | 部分实现：数据库协调及受限临时 Pod HTTPS 适配器已实现；单虚拟机 gVisor 组件实测通过；集成 worker、Workspace 挂载、物理 fencing 及完整组合认证待交付 |
 | 07 | JuiceFS 文件、Candidate、S3 Artifact/Checkpoint 与 GC | R05、R06、R16 / T07、T09、T11、T19 | 待实现 |
 | 08 | 受控进程、输出限额、取消、租约 watchdog 与 Unknown 对账 | R04、R08、R09 / T06、T08、T11、T12 | 待实现 |
 | 09 | Browser Driver、视觉/结构化动作、profile、控制交接 | R03、R07、R19、R22 / T04、T05、T10、T24 | 待实现 |

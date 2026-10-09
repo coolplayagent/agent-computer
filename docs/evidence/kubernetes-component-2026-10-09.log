@@ -1,0 +1,20 @@
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //crates/kubernetes:kubernetes_live_test (0 packages loaded, 0 targets configured)
+Analyzing: target //crates/kubernetes:kubernetes_live_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //crates/kubernetes:kubernetes_live_test (0 packages loaded, 10 targets configured).
+[700 / 701] [Prepa] runfiles for //crates/kubernetes:kubernetes_live_test
+[701 / 702] Testing //crates/kubernetes:kubernetes_live_test; 1s processwrapper-sandbox
+[701 / 702] Testing //crates/kubernetes:kubernetes_live_test; 4s processwrapper-sandbox
+INFO: Found 1 test target...
+Target //crates/kubernetes:kubernetes_live_test up-to-date:
+  bazel-bin/crates/kubernetes/kubernetes_live_test
+INFO: Elapsed time: 5.517s, Critical Path: 5.28s
+INFO: 5 processes: 3 action cache hit, 2 internal, 4 processwrapper-sandbox.
+INFO: Build completed successfully, 5 total actions
+//crates/kubernetes:kubernetes_live_test                                 PASSED in 4.2s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.

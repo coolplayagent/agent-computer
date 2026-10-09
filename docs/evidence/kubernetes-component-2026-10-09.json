@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "test_id": "component-kubernetes-ephemeral-pod",
+  "status": "passed",
+  "recorded_at": "2026-10-09T11:45:40.222571+00:00",
+  "source_commit": "461d52c02e34750c3b6c761d8b6dc817aaa96cf7",
+  "source_files_sha256": {
+    "Cargo.lock": "acaeb6856ea1b6a7cae71dfd521e830de4ad62317b5a8f1a152197b0b04617a5",
+    "crates/kubernetes/src/client.rs": "6025035a130893b2426c7912be3550058cb68ad96187123e30aba99083fdfa7e",
+    "crates/kubernetes/src/plan.rs": "74141f9e9a13567c0b41d7cefd8bd495d361435d0bccf5e369ca0cc915c9b397",
+    "crates/kubernetes/src/verify.rs": "c805ccf12144890519ba2cf422ee8caf77d31866c262d3e0cfe6beabede01bde",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "deploy/testing/kubernetes-component.yaml": "83e98fb7408add353cd76c2259293c5b4952c21f54220fe1811b40a3ede02d4d"
+  },
+  "component_digests": {
+    "k3s": {
+      "version": "v1.37.1+k3s1",
+      "sha256": "92b94582eb7b34a8cf532e6006842b9ed215a6783cf56a3dd6271fd35243b2c0"
+    },
+    "gvisor_archive": {
+      "version": "release-20261005.0",
+      "sha256": "bd4eb2ca0ee74f0fbbb5f5273ba011e79c56a29fbb047393b88b981cd3230ede"
+    },
+    "ubuntu_cloud_image": {
+      "name": "noble-server-cloudimg-amd64.img",
+      "sha256": "6a81c37564db9b1ee84e141922625e1d7c5b389b99bb3c572e0243607d5bb4d2"
+    },
+    "container_image": "mirror.gcr.io/library/busybox@sha256:66a6306db78bf2dbf3487f293aa8d6990d8e506fdffab9cc43fe422becf886e4"
+  },
+  "environment": {
+    "isolation": "Disposable unprivileged QEMU/KVM VM; no host container-service or firewall changes",
+    "qemu": "10.2.1",
+    "guest": {
+      "architecture": "amd64",
+      "containerRuntimeVersion": "containerd://2.3.4-k3s1",
+      "kernelVersion": "6.8.0-142-generic",
+      "kubeletVersion": "v1.37.1+k3s1",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.5 LTS"
+    },
+    "vcpus": 4,
+    "ram_mib": 4096,
+    "rust": "1.97.1",
+    "bazel": "9.3.0",
+    "runsc_platform": "systrap",
+    "api_transport": "HTTPS through loopback port forwarding with explicit CA verification",
+    "authentication": "Expiring ac-adapter ServiceAccount token and checked-in restricted RBAC",
+    "storage": "No persistent volumes; two bounded memory emptyDir volumes",
+    "teardown": "VM powered off; loopback listeners closed; temporary disk, credentials and SSH keys removed. Public downloads retained in local cache."
+  },
+  "input_refs": [
+    "deploy/testing/kubernetes-component.yaml",
+    "crates/kubernetes/tests/live.rs"
+  ],
+  "expected": [
+    "Create one constrained Pod and bind its actual UID",
+    "Recover by readback; duplicate creation conflicts",
+    "Run the probe under runsc systrap as UID 1000 without a service-account token",
+    "Delete with UID/resourceVersion preconditions and observe API absence"
+  ],
+  "observed": {
+    "pod": {
+      "name": "ac-02339c9d010cc57dcce00a8ba8ae6acf9167eb87dc7380317c4a",
+      "namespace": "ac-kube-component",
+      "uid": "ee6f1f04-f8e9-481e-8f5d-a228ba4f4d5f"
+    },
+    "container_id": "1e738910cc542a39620d84d9a84060ab732d9154740e19c56fdbbecdfd3f8c87",
+    "containerd_runtime": "io.containerd.runsc.v1",
+    "oci_root_readonly": true,
+    "security_probe_log": "touch: /root-write-probe: Permission denied\nAC_SECURITY_PROBE_OK\n",
+    "runsc_process_evidence": [
+      "4703     0 runsc-gofer --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/1e738910cc542a39620d84d9a84060ab732d9154740e19c56fdbbecdfd3f8c87/log.json --log-format=json --platform=systrap --root=/run/containerd/runsc/k8s.io --log-fd=3 gofer --bundle /run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/1e738910cc542a39620d84d9a84060ab732d9154740e19c56fdbbecdfd3f8c87 --gofer-mount-confs=lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none --spec-fd=4 --mounts-fd=5 --rpc-fd=6 --io-fds=7 --io-fds=8 --io-fds=9 --io-fds=10 --io-fds=11 --io-fds=12 --sync-chroot-fd=13 1e738910cc542a39620d84d9a84060ab732d9154740e19c56fdbbecdfd3f8c87",
+      "4722     0 runsc --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/1e738910cc542a39620d84d9a84060ab732d9154740e19c56fdbbecdfd3f8c87/log.json --log-format=json --platform=systrap wait 1e738910cc542a39620d84d9a84060ab732d9154740e19c56fdbbecdfd3f8c87"
+    ],
+    "live_test": "passed; all create/readback/conflict/deletion assertions completed"
+  },
+  "evidence_refs": [
+    {
+      "path": "docs/evidence/kubernetes-component-2026-10-09.log",
+      "sha256": "ccaf5921433b247e898917394be180fdc4953682a0c4e6e00563205f52f7a6b2"
+    }
+  ],
+  "limits": [
+    "Single disposable KVM VM",
+    "No Chromium, JuiceFS or S3",
+    "No partition/physical fencing test",
+    "No packet-level NetworkPolicy assertion",
+    "Not T16 certification; all T01-T43 acceptance statuses remain not_run",
+    "Running phase is not browser/application readiness",
+    "API absence and this successful test are not physical fencing evidence"
+  ]
+}
