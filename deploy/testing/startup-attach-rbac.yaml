@@ -1,0 +1,26 @@
+# Additional permission for the explicit startup_live test, in a disposable cluster.
+# Apply kubernetes-component.yaml first. Only the trusted adapter can attach;
+# there is deliberately no pods/exec permission and no tenant-facing identity.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ac-startup-attach
+  namespace: ac-kube-component
+rules:
+  - apiGroups: [""]
+    resources: [pods/attach]
+    verbs: [get, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ac-startup-attach
+  namespace: ac-kube-component
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ac-startup-attach
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component

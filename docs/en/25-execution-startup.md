@@ -44,3 +44,5 @@ Each work directory must be new. The rootfs script runs `ldd` only on explicitly
 Still required: the strict Kubernetes Candidate Pod/attach adapter and worker, trusted supervisor packaging, CSI mount identity validation, an external watchdog and physical fencing, bounded output objects and accepted completion. The suspended-init fault remains a reason that local reports, startup grants and Pod API status cannot release the writer lease. Background execution remains a separate pending lifetime.
 
 The [source-bound component record](../evidence/sandbox-startup-2026-10-10.json) and [raw output](../evidence/sandbox-startup-2026-10-10.log) pin commit `fca66d3`, 196 verified build/source inputs and the tested supervisor binary `sha256:7fd896307105722606b10081ef01e1a891fd4de2cc2ae253106ed14e8e40eba0`. Both suites ran on that binary. The private test VM and its disk/SSH material were removed after collection.
+
+The subsequent [26 startup attach increment](26-kubernetes-startup-attach.md) adds a hello-gated Kubernetes transport for ephemeral Pods; Candidate dispatch and physical fencing remain pending.

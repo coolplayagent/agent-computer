@@ -113,6 +113,26 @@ sources:
   status: active
   version: 1
   description: Connection-scoped durable execution queue, fixed Sandbox/Candidate binding, writer reservation, retry and cancellation; paired English docs/en/23-execution-admission.md. Runtime dispatch and background lifetimes remain pending.
+- id: durable-execution-dispatch
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/24-execution-dispatch.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Atomic single execution dispatch intent, immutable recovery, cancellation requests and unresolved writer ownership; paired English docs/en/24-execution-dispatch.md. Actual Candidate Pod dispatch and fencing remain pending.
+- id: execution-startup-authorization
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/25-execution-startup.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: One-shot supervisor challenge, fresh original-credential startup grant, anchored budget and real gVisor component probes; paired English docs/en/25-execution-startup.md. Kubernetes attach, Candidate mounts and physical fencing remain pending.
 - id: kubernetes-adapter-guide
   topic: development
   kind: doc
@@ -123,6 +143,16 @@ sources:
   status: active
   version: 1
   description: 受限 Kubernetes HTTPS 适配器：临时实例、安全读回、派发不确定性与 UID 条件删除；Workspace 挂载和物理 fencing 待实现
+- id: kubernetes-startup-attach
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/26-kubernetes-startup-attach.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 有界 Kubernetes v5 启动通道、固定运行身份与组件验证边界
 - id: numbered-bilingual-docs
   topic: development
   kind: doc
@@ -193,4 +223,7 @@ route:
   - candidate-file-http-gateway
   - sandbox-process-supervisor
   - durable-execution-admission
+  - durable-execution-dispatch
+  - execution-startup-authorization
+  - kubernetes-startup-attach
   fallback: bounded-search

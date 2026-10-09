@@ -230,7 +230,7 @@ impl Client {
         }
     }
 
-    fn check_plan(&self, plan: &EphemeralSandboxPlan) -> Result<()> {
+    pub(crate) fn check_plan(&self, plan: &EphemeralSandboxPlan) -> Result<()> {
         if plan.namespace != self.deployment.namespace
             || plan.network_policy_ref != self.deployment.network_policy_ref
         {
@@ -239,7 +239,7 @@ impl Client {
         Ok(())
     }
 
-    fn pod_path(&self, plan: &EphemeralSandboxPlan, named: bool) -> String {
+    pub(crate) fn pod_path(&self, plan: &EphemeralSandboxPlan, named: bool) -> String {
         let collection = format!("/api/v1/namespaces/{}/pods", plan.namespace);
         if named {
             format!("{collection}/{}", plan.name)

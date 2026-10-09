@@ -157,12 +157,95 @@ fn digest<T: Serialize>(domain: &str, value: &T) -> Result<String> {
     Ok(format!("sha256:{:x}", hash.finalize()))
 }
 
-/// Serve exactly one startup on stdin/stdout as isolated PID 1. The first stdout
-/// line is a challenge; the caller then sends one JSON grant line on stdin. The
-/// returned report is only a local observation, never physical drain evidence.
+/// Attach clients send this non-authorizing hello before PID 1 emits a challenge.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StartupHello {
+    pub version: u32,
+    pub bootstrap_digest: String,
+}
+impl StartupHello {
+    pub fn for_bootstrap(bootstrap: &Bootstrap) -> Result<Self> {
+        Ok(Self {
+            version: STARTUP_PROTOCOL,
+            bootstrap_digest: bootstrap.digest()?,
+        })
+    }
+}
+
+struct Input {
+    stdin: std::io::Stdin,
+    term: tokio::signal::unix::Signal,
+    interrupt: tokio::signal::unix::Signal,
+    hangup: tokio::signal::unix::Signal,
+}
+impl Input {
+    fn new() -> Result<Self> {
+        use tokio::signal::unix::{SignalKind, signal};
+        let stdin = std::io::stdin();
+        rustix::fs::fcntl_setfl(&stdin, rustix::fs::OFlags::NONBLOCK).map_err(|_| Error::Setup)?;
+        Ok(Self {
+            stdin,
+            term: signal(SignalKind::terminate()).map_err(|_| Error::Setup)?,
+            interrupt: signal(SignalKind::interrupt()).map_err(|_| Error::Setup)?,
+            hangup: signal(SignalKind::hangup()).map_err(|_| Error::Setup)?,
+        })
+    }
+    async fn read(&mut self, anchor: Instant) -> Result<Vec<u8>> {
+        let mut input = Vec::new();
+        loop {
+            if anchor.elapsed() >= Duration::from_millis(STARTUP_WAIT_MS.into()) {
+                return Err(Error::StartupExpired);
+            }
+            let mut chunk = [0u8; 4096];
+            match self.stdin.lock().read(&mut chunk) {
+                Ok(0) => return Err(Error::InvalidRequest),
+                Ok(n) => {
+                    input.extend_from_slice(&chunk[..n]);
+                    if input.len() > MAX_REQUEST_BYTES {
+                        return Err(Error::InvalidRequest);
+                    }
+                    if let Some(end) = input.iter().position(|b| *b == b'\n') {
+                        if input[end + 1..].iter().any(|b| !b.is_ascii_whitespace()) {
+                            return Err(Error::InvalidRequest);
+                        }
+                        return Ok(input[..end].to_vec());
+                    }
+                }
+                Err(e)
+                    if e.kind() == std::io::ErrorKind::WouldBlock
+                        || e.kind() == std::io::ErrorKind::Interrupted => {}
+                Err(_) => return Err(Error::Setup),
+            }
+            tokio::select! {
+                _=self.term.recv()=>return Err(Error::StartupCancelled),
+                _=self.interrupt.recv()=>return Err(Error::StartupCancelled),
+                _=self.hangup.recv()=>return Err(Error::StartupCancelled),
+                _=tokio::time::sleep(Duration::from_millis(5))=>{},
+            }
+        }
+    }
+}
+
+/// Immediate challenge mode for a pre-attached trusted local channel.
 pub async fn startup(bootstrap: Bootstrap) -> Result<StartupReport> {
+    serve(bootstrap, false).await
+}
+/// Attach mode waits for a bounded hello before emitting its one-shot challenge.
+/// This avoids losing the challenge before Kubernetes connects container stdout.
+pub async fn startup_attached(bootstrap: Bootstrap) -> Result<StartupReport> {
+    serve(bootstrap, true).await
+}
+async fn serve(bootstrap: Bootstrap, attached: bool) -> Result<StartupReport> {
     bootstrap.validate()?;
     let namespace = supervisor::NamespaceInit::check()?;
+    let mut input = Input::new()?;
+    if attached {
+        let hello: StartupHello = bounded(&input.read(Instant::now()).await?)?;
+        if hello.version != STARTUP_PROTOCOL || hello.bootstrap_digest != bootstrap.digest()? {
+            return Err(Error::InvalidRequest);
+        }
+    }
     let mut random = [0u8; 32];
     getrandom::fill(&mut random).map_err(|_| Error::Setup)?;
     let challenge = StartupChallenge {
@@ -172,14 +255,6 @@ pub async fn startup(bootstrap: Bootstrap) -> Result<StartupReport> {
         bootstrap_digest: bootstrap.digest()?,
         nonce: random.iter().map(|b| format!("{b:02x}")).collect(),
     };
-    let stdin = std::io::stdin();
-    rustix::fs::fcntl_setfl(&stdin, rustix::fs::OFlags::NONBLOCK).map_err(|_| Error::Setup)?;
-    let mut term = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
-        .map_err(|_| Error::Setup)?;
-    let mut interrupt = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt())
-        .map_err(|_| Error::Setup)?;
-    let mut hangup = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::hangup())
-        .map_err(|_| Error::Setup)?;
     // This instant MUST precede challenge emission and is never reset by a grant.
     let anchor = Instant::now();
     {
@@ -190,38 +265,7 @@ pub async fn startup(bootstrap: Bootstrap) -> Result<StartupReport> {
             .and_then(|_| stdout.flush())
             .map_err(|_| Error::Setup)?;
     }
-    let mut input = Vec::new();
-    let grant = loop {
-        if anchor.elapsed() >= Duration::from_millis(STARTUP_WAIT_MS.into()) {
-            return Err(Error::StartupExpired);
-        }
-        let mut chunk = [0u8; 4096];
-        match stdin.lock().read(&mut chunk) {
-            Ok(0) => return Err(Error::InvalidRequest),
-            Ok(n) => {
-                input.extend_from_slice(&chunk[..n]);
-                if input.len() > MAX_REQUEST_BYTES {
-                    return Err(Error::InvalidRequest);
-                }
-                if let Some(end) = input.iter().position(|b| *b == b'\n') {
-                    if input[end + 1..].iter().any(|b| !b.is_ascii_whitespace()) {
-                        return Err(Error::InvalidRequest);
-                    }
-                    break StartupGrant::parse(&input[..end])?;
-                }
-            }
-            Err(e)
-                if e.kind() == std::io::ErrorKind::WouldBlock
-                    || e.kind() == std::io::ErrorKind::Interrupted => {}
-            Err(_) => return Err(Error::Setup),
-        }
-        tokio::select! {
-            _=term.recv()=>return Err(Error::StartupCancelled),
-            _=interrupt.recv()=>return Err(Error::StartupCancelled),
-            _=hangup.recv()=>return Err(Error::StartupCancelled),
-            _=tokio::time::sleep(Duration::from_millis(5))=>{},
-        }
-    };
+    let grant = StartupGrant::parse(&input.read(anchor).await?)?;
     grant.accept(&challenge, &bootstrap)?;
     if anchor.elapsed() >= Duration::from_millis(grant.lease_budget_ms.into()) {
         return Err(Error::StartupExpired);

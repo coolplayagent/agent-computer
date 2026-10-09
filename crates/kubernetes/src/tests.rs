@@ -10,6 +10,8 @@ use std::{
     time::{Duration, Instant},
 };
 
+mod attach;
+
 fn identity() -> InstanceIdentity {
     InstanceIdentity {
         organization: "org_a".into(),
@@ -313,6 +315,7 @@ enum Reply {
     Json(u16, Value),
     Drop,
     Raw(&'static str),
+    Upgrade(Box<dyn FnOnce(std::net::TcpStream, String) + Send>),
 }
 
 fn fixture(replies: Vec<Reply>) -> (Client, Captured, thread::JoinHandle<()>) {
@@ -324,6 +327,7 @@ fn fixture(replies: Vec<Reply>) -> (Client, Captured, thread::JoinHandle<()>) {
     let captured: Captured = Arc::default();
     let copy = captured.clone();
     let handle = thread::spawn(move || {
+        let mut upgrades = Vec::new();
         for reply in replies {
             let deadline = Instant::now() + Duration::from_secs(10);
             let mut stream = loop {
@@ -378,6 +382,10 @@ fn fixture(replies: Vec<Reply>) -> (Client, Captured, thread::JoinHandle<()>) {
             };
             copy.lock().unwrap().push((first, body));
             match reply {
+                Reply::Upgrade(script) => {
+                    let headers = String::from_utf8(bytes[..header_end].to_vec()).unwrap();
+                    upgrades.push(thread::spawn(move || script(stream, headers)));
+                }
                 Reply::Drop => (),
                 Reply::Raw(raw) => {
                     let _ = stream.write_all(raw.as_bytes());
@@ -392,6 +400,9 @@ fn fixture(replies: Vec<Reply>) -> (Client, Captured, thread::JoinHandle<()>) {
                     let _ = stream.write_all(&body);
                 }
             }
+        }
+        for handle in upgrades {
+            handle.join().unwrap();
         }
     });
     // This HTTP constructor exists only in unit tests; production Client::new requires TLS.

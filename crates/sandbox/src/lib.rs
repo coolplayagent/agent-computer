@@ -12,8 +12,8 @@ mod supervisor;
 pub use output::Output;
 pub use request::{MAX_REQUEST_BYTES, Request};
 pub use startup::{
-    Bootstrap, STARTUP_PROTOCOL, STARTUP_WAIT_MS, StartupChallenge, StartupGrant, StartupReport,
-    startup,
+    Bootstrap, STARTUP_PROTOCOL, STARTUP_WAIT_MS, StartupChallenge, StartupGrant, StartupHello,
+    StartupReport, startup, startup_attached,
 };
 pub use supervisor::{Outcome, Report, run};
 

@@ -4,6 +4,18 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: execution-startup-channel
+    domain: agent-infrastructure
+    canonical_name: ExecutionStartupChannel
+    definition: 可信控制器通过 Kubernetes v5 attach 建立的一次性监督器通道，绑定已观察 Pod UID、Bootstrap 与挑战，单次传输新鲜授权并返回有界原始观测；依赖独占运行身份，不构成数据库授权、完成接纳或写入者物理排空。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/kubernetes/src/attach.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/26-kubernetes-startup-attach.md
   - id: execution-startup-grant
     domain: agent-infrastructure
     canonical_name: ExecutionStartupGrant

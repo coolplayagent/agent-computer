@@ -7,10 +7,14 @@ license.workspace = true
 
 [dependencies]
 agent-computer-definitions = { path = "../definitions" }
+agent-computer-sandbox = { path = "../sandbox" }
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+futures-util.workspace = true
 reqwest.workspace = true
 rustls.workspace = true
 serde.workspace = true
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
 sha2.workspace = true
 
 [dev-dependencies]
@@ -21,6 +25,10 @@ live-test = []
 
 [[test]]
 name = "live"
+required-features = ["live-test"]
+
+[[test]]
+name = "startup_live"
 required-features = ["live-test"]
 
 [lints]

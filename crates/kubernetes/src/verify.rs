@@ -130,6 +130,7 @@ fn matches_spec(expected: &Value, actual: &Value, path: &str) -> bool {
                 | "/hostIPC"
                 | "/shareProcessNamespace"
                 | "/containers/*/securityContext/privileged"
+                | "/containers/*/tty"
         ),
         _ => expected == actual,
     }

@@ -5,13 +5,17 @@
 //! Creating a declaration alone is never a reason to call `create`.
 #![forbid(unsafe_code)]
 
+mod attach;
 mod client;
 mod plan;
+mod startup_plan;
 mod verify;
 pub mod volume;
 
+pub use attach::{StartupChannel, StartupObservation};
 pub use client::{Client, DeleteOutcome, Deployment, PodObservation, PodPhase};
 pub use plan::{EphemeralSandboxPlan, InstanceIdentity};
+pub use startup_plan::StartupSandboxPlan;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
