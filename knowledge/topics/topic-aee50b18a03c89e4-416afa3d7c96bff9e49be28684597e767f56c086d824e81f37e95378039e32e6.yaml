@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: deployment
+  title: deployment
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-deployment
+  topic: deployment
+  kind: doc
+  uri: codespec/design/deployment-automation.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: DP01–DP08：标准工具分工、部署状态、安装/升级/恢复与路径认证，尚未实现
+route:
+  topic: deployment
+  source_order:
+  - agent-computer-deployment
+  fallback: bounded-search

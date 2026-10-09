@@ -1,12 +1,12 @@
 # agent-computer 详细技术设计
 
-版本：设计基线 0.3；日期：2026-10-09；状态：待实现。
+版本：设计基线 0.4；日期：2026-10-09；状态：待实现。
 
-本文落实[产品需求 R01–R24](../requirements/agent-computer.md)。所有协议、命令和配置例子均为设计契约；当前仓库没有实现这些接口。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。
+本文落实[产品需求 R01–R32](../requirements/agent-computer.md)，R32 是后续可选评测扩展。所有协议、命令和配置例子均为设计契约；当前仓库没有实现这些接口。实现验收见[测试矩阵](../test/agent-computer.md)，CLI 责任与证据见[生态集成](ecosystem-integration.md)。0.4 的场景依据见[superpod 对照](../requirements/agentic-scenarios-and-gaps.md)，D16/D17 分别索引部署与 Agentic 运行契约。
 
 ## D01. 架构与技术决策
 
-计算与存储先按需求/硬约束、同层候选和完整组合比较，再形成以下默认选择。完整依据见[多维度选型分析 CS01–CS09](../decisions/compute-storage-selection.md)，包括调度、隔离、控制数据库、工作文件、对象存储实现、活动状态、成本、改选条件和待执行实验。下表是结论索引，不替代比较；这些方案均未完成本项目组合实测。
+计算与存储先按需求/硬约束、同层候选和完整组合比较，再形成以下参考选择。完整依据见[多维度选型分析 CS01–CS10](../decisions/compute-storage-selection.md)，包括调度、隔离、控制数据库、工作文件、对象存储实现、活动状态、成本、成熟度、采用条件和待执行实验。下表和架构图展示待认证参考组合，不替代比较；这些方案均未完成本项目组合实测。
 
 ```mermaid
 flowchart TB
@@ -39,11 +39,11 @@ flowchart TB
 | 决策 | 选择 | 取舍与边界 |
 | --- | --- | --- |
 | ADR-01 控制面 | Rust、Tokio、Axum、SQLx/PostgreSQL | 领域状态机无 Kubernetes/浏览器 SDK 依赖；存储与适配器位于边界 |
-| ADR-02 调度 | Kubernetes API；新建默认 K3s，已有合格集群则复用 | 对比 Compose/自建 worker、Nomad、现成 Sandbox 平台后选择，减少自研调度；CS02、CS07 |
+| ADR-02 调度 | Kubernetes API；优先复用合格现有/托管集群，自建参考 K3s | 对比 Compose/自建 worker、Nomad、现成 Sandbox 平台后选择，减少自研调度；CS02、CS07、DP01 |
 | ADR-03 隔离 | containerd + gVisor runsc RuntimeClass，默认 Systrap | 对比 runc、Kata、Firecracker、完整 VM；权衡宿主要求/隔离/兼容与 I/O 代价；不支持时拒绝，不降级；CS02、CS07 |
 | ADR-04 浏览器 | Chromium + Node.js/TypeScript Playwright Driver | 结构化定位与截图坐标操作同一入口；无需修改 Chromium 内核 |
 | ADR-05 控制数据 | PostgreSQL | 对比 MySQL、SQLite、etcd；事务/查询匹配产品状态，HA 另需同步确认与正确切换；CS03 |
-| ADR-06 工作文件 | JuiceFS CE + 独立 PostgreSQL 元数据库 + S3 文件块 | 对比 CephFS、HA NFS、块卷、本地同步、s3fs、AgentFS；已有 Ceph/NAS 或实测瓶颈时重新评估；CS04 |
+| ADR-06 工作文件 | 共享目录参考：JuiceFS CE + 独立 PostgreSQL 元数据库 + S3 文件块 | 对比 CephFS、HA NFS、块卷、本地同步、s3fs、AgentFS；已有 Ceph/NAS 优先比较复用，任何替代须同等认证；CS04、CS10 |
 | ADR-07 成果 | 独立 S3 对象 + PostgreSQL 清单；优先复用合格 S3 | 对比共享 FS/数据库大对象及 S3 实现；新建私有参考候选 SeaweedFS，已有 Ceph 优先 RGW，均需验收；CS05 |
 | ADR-08 事件 | PostgreSQL 持久事件 + Outbox + SSE | 首版不引入 Kafka/Redis；NOTIFY 仅作唤醒优化，不能代替事件记录 |
 | ADR-09 恢复 | 文件/应用检查点重建，活动 profile 本地独占 | 对比内存快照、独占块卷和共享目录；接受最近检查点 RPO，首版不承诺进程迁移；CS02、CS06 |
@@ -150,7 +150,7 @@ spec:
 ### 部署形态
 
 - Linux amd64 为首版发布验收平台。其他架构必须单独通过镜像和运行时矩阵后加入，不由依赖项目的支持列表推定。
-- 本地采用单节点 K3s；私有生产采用 HA K3s 控制面和多个执行节点。已有兼容 Kubernetes 可通过同一适配器接入，先执行能力探测。
+- 本地采用单节点 K3s；私有生产优先复用合格现有/托管 Kubernetes，自建参考采用 HA K3s 控制面和多个执行节点。通过同一适配器接入，先执行能力探测，支持条件见 DP01/DP05。
 - containerd 拉取固定 OCI digest；gVisor RuntimeClass 为 Browser 和不可信执行默认要求。
 - 默认选择 gVisor Systrap，部署探测固定到实际 runsc/内核版本；Kata、直接 microVM 和完整 VM 是条件化替代方向，须独立适配和验证，不在运行失败时自动切换。依据见选型分析 CS02。
 - Browser 与执行 Sandbox 是独立 Pod，分别配置资源、临时盘、网络和状态。需要只用 Browser 时不创建执行 Pod。
@@ -389,6 +389,8 @@ SSE 游标默认保留 7 天。过期返回 410 `cursor_expired` 和快照恢复
 
 规划中的二进制名为 `agent-computer`，子命令为 `validate/plan/apply`、`computer list/show/start/stop/recover/delete/link`、`connect/disconnect`、`exec/status/logs/cancel`、`browser observe/act`、`app list/start/stop`、`workspace files/commit`、`presentation create/show/activate/link`、`checkpoint`、`events`、`doctor`。link 返回无凭据稳定地址，connect 创建授权连接。`--json` 统一机器输出，诊断到 stderr；退出码 0 成功、1 操作失败/冲突、2 用法或检查不完整，长时提交通过 ID 表示尚未完成。
 
+平台安装使用独立 `deploy` 命令组，见 DP04；它不混入业务 ComputerSet 的 apply。绑定、intent、handoff、证据与能力协商的补充接口见 AR06；原生入口必须进入同一授权/派发路径，不能绕过动作许可。可选 MCP 适配未实现，A2A 任务权威属于外部 Harness/workflow。
+
 ComputerView 是人的日常操作界面，提供应用列表与切换、浏览器页面观看/输入、文件编辑与保存、成果入口和控制权状态，详见 D14。运维管理界面提供资源、配额、进程、审计及故障诊断。两者首版采用 TypeScript/React，调用同一 API；不引入业务聊天、任务规划或独立权限旁路。人工输入使用 WSS 网关，同样检查控制代次，不直连 CDP。
 
 ## D09. Browser Driver 与人机操作
@@ -444,7 +446,7 @@ RPO 对已确认 Artifact 提交以健康持久存储的成功确认语义为界
 
 ### 部署契约
 
-- 生产使用独立 PostgreSQL 与对象存储。K3s HA 控制面采用 3 个 server 的 embedded etcd 拓扑；worker 数量按容量增加。已有集群可替代 K3s，但需要相同验收。
+- 生产使用独立 PostgreSQL 与对象存储，优先复用合格托管/现有服务。自建参考路径的 K3s HA 控制面采用 3 个 server 的 embedded etcd 拓扑；worker 数量按容量增加。已有合格集群优先复用，各路径需要同等验收。
 - 多机不自动等于 HA：分别落实 K3s quorum、数据库同步确认、对象副本/恢复和节点 fencing。元数据库与对象服务的基础数据盘不能放在依赖其自身的 JuiceFS 上，避免启动与恢复循环依赖。
 - API 可多副本；协调器以数据库租约领取资源操作，外部 Kubernetes 动作用稳定 ID 对账。首版不共享内部 workflow 数据库表。
 - JuiceFS CSI 的挂载权限仅属于可信基础设施。组织/Workspace 目录边界由配置与挂载服务共同执行，应用不能读取元数据数据库密码。
@@ -480,7 +482,7 @@ OpenTelemetry 关联 trace、Principal、ConnectionSession、Computer、executio
 
 PostgreSQL 使用持续 WAL 归档与定期备份；JuiceFS 元数据备份和对象版本保留协同管理。恢复窗口内关闭会破坏历史引用的对象 GC，定期验证抽样及全量清单引用。单独备份 S3 bucket 不足以恢复 JuiceFS 文件名与目录。
 
-升级先跑迁移预检与备份，停止新修改并排空旧执行；数据库迁移显式执行，不能由任意服务副本启动时隐式修改。API `v1alpha1` 的破坏性变更需要新版本；旧实例保持原驱动/镜像直到排空。不可逆迁移的回滚采用备份恢复和新的恢复 epoch，不同时运行旧权威。
+升级先跑兼容/迁移预检与备份；兼容版本滚动更新控制服务、按执行池分批排空，旧实例保持固定镜像/驱动。破坏性变更按计划停写并排空相关执行，数据库迁移显式互斥执行，不能由任意服务副本启动时隐式修改。API `v1alpha1` 的破坏性变更需要新版本。不可逆迁移的回退采用备份恢复和新的恢复 epoch，不同时运行旧权威；详细步骤与资源管理权见 DP06/DP07。启动/执行准入、外部触发与公平预算见 AR05。
 
 ## D13. 交付顺序与验证边界
 
@@ -494,9 +496,12 @@ PostgreSQL 使用持续 WAL 归档与定期备份；JuiceFS 元数据备份和�
 | D5 | Browser Driver、ComputerView、链接/嵌入、文件交接与人机控制 | T04、T05、T10、T21–T24；无人启动 Agent 时也可完整使用 |
 | D6 | WebApplication、Presentation、隔离试用及资源生命周期 | T25–T27；过程可看与成品可用分别验证 |
 | D7 | workflow adapter 和其他 CLI 示例 | T14、T15、T17；业务结束不关闭人的活动会话 |
-| D8 | 多节点故障、观测、运维与发布矩阵 | 全部必需 T01–T27 证据完整 |
+| D8 | 多节点故障、观测、运维与发布矩阵 | 原有 T01–T27 证据完整，继续完成新增部署与场景门 |
+| 交付 9 | 标准部署发行件、状态归属、认证路径、升级/恢复 | DP01–DP08；T28–T30 |
+| 交付 10 | 会话绑定/委托、动作约束、环境交接、证据、准入和能力协商 | AR01–AR06；首版核心 T01–T36 完整，可选适配按实际声明验收 |
+| 扩展 11 | 后续隔离评测环境扩展 | AR07；启用时要求 T37，不引入模型训练权威 |
 
-所有 API 形状由这里的设计导出 OpenAPI/JSON Schema 后才能成为可执行协议。后续实现必须用真实测试反馈修订文档和兼容矩阵；不能通过取消 gVisor、禁用冲突检查或改成单机本地存储来宣称本设计验收完成。
+所有 API 形状由这里的设计导出 OpenAPI/JSON Schema 后才能成为可执行协议。后续实现必须用真实测试反馈修订文档和兼容矩阵；不能通过未经同等认证即撤去隔离层、禁用冲突检查或改成单机本地存储来宣称本设计验收完成。
 
 ## D14. 连接链接、ComputerView 与人的独立使用
 
@@ -617,3 +622,17 @@ Browser 与 WebApplication 使用不同 gVisor Sandbox，健康探测由受限�
 首版预览 Workspace 停止后默认保留 7 天，用户可在配额内延长；清理前可见到期时间，并尊重活跃引用/提交/备份。到期清理个人未提交试用状态不删除 Presentation 和 Artifact，再次打开可从固定版本创建新实例，界面不能声称恢复了已经过期的试用数据。永久删除 Presentation 须有独立授权，已有运行实例先排空；停止应用不等于永久删除。
 
 可交付的运行描述必须同时具备可读 Artifact、可启动 AppSpec、健康检测、受控访问、数据策略和预算。首版没有匿名公共发布、域名托管或在线服务 SLA；应用依赖外部系统的业务持久性仍由对应系统负责。
+
+## D16. 自动化部署与成熟度边界
+
+[部署契约 DP01–DP08](deployment-automation.md)定义已有集群、新建基础设施、单节点和离线路径，固定发行包、薄 CLI、标准工具管理权、远端状态、分阶段中断恢复、现场验收、升级扩缩容和数据保留卸载。没有安装器/Chart/IaC 实现前不能发布为可执行操作手册。
+
+gVisor 的隔离价值、JuiceFS 的跨节点文件需求、上游生产证据与本项目未验证组合分开记录于[CS10](../decisions/compute-storage-selection.md)。参考选型不强制所有客户自建集群或另装存储；已认证的版本/配置路径才构成产品支持范围，其他后端须先实现适配并通过同等测试。
+
+## D17. Agentic 产品场景支撑
+
+[场景审视 SC01–SC04](../requirements/agentic-scenarios-and-gaps.md)对照持续个人代理、AI-IM/团队协作、长任务、可运行成果和 Agentic RL，标明已有设计、部分/缺失及外部责任。所有运行能力仍待实现，新增规格不计为功能完成。
+
+[运行契约 AR01–AR07](agentic-runtime-contracts.md)补充 ContextBinding 与委托、ActionIntent/许可及凭据代理、EnvironmentVersion/HandoffManifest、ExecutionEvidenceBundle、外部触发/公平准入、版本能力协商与后续评测 Episode。它们沿用 D02–D11 的身份、租约、幂等、事件、Artifact 和故障权威，不增加另一套业务 Task/消息/记忆库。
+
+R26–R31 为首版核心补充，R32 的评测扩展为后续可选能力；Desktop、音视频、GPU、内存快照、通用训练与模型发布不因新增接口而成为已支持特性。具体责任见 E07，新增验收见 T31–T37。

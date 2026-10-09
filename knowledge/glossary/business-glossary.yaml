@@ -148,3 +148,66 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+  - id: context-binding
+    domain: agent-infrastructure
+    canonical_name: ContextBinding
+    definition: 可信宿主会话与 Computer/Workspace 的版本化绑定，声明个人、共享或临时用途及成员权威；消息和绑定引用本身不授予执行权限。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md
+  - id: action-intent
+    domain: agent-infrastructure
+    canonical_name: ActionIntent
+    definition: 执行前固定动作输入、目标、环境代次和策略版本的意图记录，用于预检和匹配有效许可；意图创建不执行副作用。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md
+  - id: approval-receipt
+    domain: agent-infrastructure
+    canonical_name: ApprovalReceipt
+    definition: 由许可权威签发、可核验且可撤销的动作许可回执，绑定意图、输入版本、范围与有效期；不替代资源授权、控制租约或执行结果。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md
+  - id: environment-version
+    domain: agent-infrastructure
+    canonical_name: EnvironmentVersion
+    definition: 固定运行镜像、驱动、依赖和策略版本的不可变环境配置清单，用于接续、证据和兼容认证；不是运行中内存快照。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md
+  - id: handoff-manifest
+    domain: agent-infrastructure
+    canonical_name: HandoffManifest
+    definition: 按当前权限生成的环境事实交接清单，包含代次、版本、执行状态与事件游标，注明观测或检查点一致性及缺口；不是授权令牌。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md
+  - id: execution-evidence-bundle
+    domain: agent-infrastructure
+    canonical_name: ExecutionEvidenceBundle
+    definition: 按对象、范围与用途授权导出的执行事实和来源清单，区分环境结果、外部业务验收与完整性；默认仅元数据和受控引用，不自动用于训练。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md
+  - id: evaluation-episode
+    domain: agent-infrastructure
+    canonical_name: EvaluationEpisode
+    definition: 后续可选的隔离评测回合，固定环境和 fixture，提供重置、步骤、独立验证与关闭契约；不包含策略训练或生产账户。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agentic-runtime-contracts.md

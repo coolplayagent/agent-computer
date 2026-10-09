@@ -12,8 +12,8 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 1
-  description: Documentation and future runtime acceptance
+  version: 3
+  description: T00 文档检查与待实现运行验收：首版 T01–T36、可选评测 T37，包含部署和 Agentic 产品场景
 route:
   topic: acceptance
   source_order:

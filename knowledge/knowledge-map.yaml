@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 10
-updated_at: unix:1791523805
+map_version: 18
+updated_at: unix:1791529240
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -55,16 +55,17 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - agent-computer-acceptance
-  ref: topics/topic-c1514c6cdad166c1-148e8976fa18d6d451473265078a8d3826a8287bb53a47a0c5b3d2daeb2d4679.yaml
-  digest: 148e8976fa18d6d451473265078a8d3826a8287bb53a47a0c5b3d2daeb2d4679
+  ref: topics/topic-c1514c6cdad166c1-45fd22bb82a112caab1e15c802a4099c945a2d2f9da09e8786eef26ccc7dfb91.yaml
+  digest: 45fd22bb82a112caab1e15c802a4099c945a2d2f9da09e8786eef26ccc7dfb91
 - id: architecture
   title: architecture
   description: Added by CLI source registration.
   source_ids:
+  - agent-computer-agentic-runtime
   - agent-computer-compute-storage-selection
   - agent-computer-design
-  ref: topics/topic-4ca303a3bf7ddf7b-b994bbfc7c42b0276a0cb36b42605058c81aaf97aea24fac12d17e99b3aad6dc.yaml
-  digest: b994bbfc7c42b0276a0cb36b42605058c81aaf97aea24fac12d17e99b3aad6dc
+  ref: topics/topic-4ca303a3bf7ddf7b-626a79b44b5415f8c8d983ffa2247c02e3daab84690fe4c668eb67ccd660aeae.yaml
+  digest: 626a79b44b5415f8c8d983ffa2247c02e3daab84690fe4c668eb67ccd660aeae
 - id: business-knowledge
   title: Business knowledge
   description: Version-controlled business domains, terminology, aliases, semantics, and technical mappings.
@@ -72,20 +73,28 @@ topics:
   - repository-business-glossary
   ref: topics/topic-17438b0266842113-79d9f29ebf10de1411c359a80aa9f343853d255098085e63fdc9e5c6c43d1adc.yaml
   digest: 79d9f29ebf10de1411c359a80aa9f343853d255098085e63fdc9e5c6c43d1adc
+- id: deployment
+  title: deployment
+  description: Added by CLI source registration.
+  source_ids:
+  - agent-computer-deployment
+  ref: topics/topic-aee50b18a03c89e4-416afa3d7c96bff9e49be28684597e767f56c086d824e81f37e95378039e32e6.yaml
+  digest: 416afa3d7c96bff9e49be28684597e767f56c086d824e81f37e95378039e32e6
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
   source_ids:
   - agent-computer-ecosystem
-  ref: topics/topic-7955c8192dc2275a-40bff11db15a713b6013f4a4c8e1f917babea02d9f8679e58b7ab9cc317bb0a9.yaml
-  digest: 40bff11db15a713b6013f4a4c8e1f917babea02d9f8679e58b7ab9cc317bb0a9
+  ref: topics/topic-7955c8192dc2275a-af0926dfd6637ab6dd05f67449fe4e9e4929ac5e5f577e3667e7e8831c02a362.yaml
+  digest: af0926dfd6637ab6dd05f67449fe4e9e4929ac5e5f577e3667e7e8831c02a362
 - id: product
   title: product
   description: Added by CLI source registration.
   source_ids:
+  - agent-computer-agentic-scenarios
   - agent-computer-product
-  ref: topics/topic-a8792157cb4f27fb-89c5421059ee946d057a92e75906700f7c1fbc3223b31b601a52f2fc0702a0f8.yaml
-  digest: 89c5421059ee946d057a92e75906700f7c1fbc3223b31b601a52f2fc0702a0f8
+  ref: topics/topic-a8792157cb4f27fb-1b958f0cd587743e9f0a996700aa661c5de109717615927d0a9ca6634a9a86f2.yaml
+  digest: 1b958f0cd587743e9f0a996700aa661c5de109717615927d0a9ca6634a9a86f2
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -94,16 +103,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 0
+  omitted_through: 2
   recent:
-  - version: 1
-    action: init
-    actor: cli
-    summary: Created knowledge map with repository software-model route.
-  - version: 2
-    action: source.add
-    actor: cli
-    summary: Added source 'agent-computer-product' to topic 'product'.
   - version: 3
     action: source.add
     actor: cli
@@ -136,3 +137,35 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'agent-computer-compute-storage-selection' to topic 'architecture'.
+  - version: 11
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-product'.
+  - version: 12
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-design'.
+  - version: 13
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-acceptance'.
+  - version: 14
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-ecosystem'.
+  - version: 15
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-compute-storage-selection'.
+  - version: 16
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-deployment' to topic 'deployment'.
+  - version: 17
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-agentic-runtime' to topic 'architecture'.
+  - version: 18
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-agentic-scenarios' to topic 'product'.

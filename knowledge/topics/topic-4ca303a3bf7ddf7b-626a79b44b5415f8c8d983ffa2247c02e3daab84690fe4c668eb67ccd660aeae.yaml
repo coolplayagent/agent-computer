@@ -4,6 +4,16 @@ topic:
   title: architecture
   description: Added by CLI source registration.
 sources:
+- id: agent-computer-agentic-runtime
+  topic: architecture
+  kind: doc
+  uri: codespec/design/agentic-runtime-contracts.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: AR01–AR07：绑定、许可、交接、证据、准入、协议与可选评测环境的待实现契约
 - id: agent-computer-compute-storage-selection
   topic: architecture
   kind: doc
@@ -12,8 +22,8 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 1
-  description: 计算与存储多维度对比：候选、权衡、CS01–CS09 选择理由、改选条件及 B01–B07 实验
+  version: 2
+  description: CS01–CS10：计算存储候选、成熟度、采用/改选条件、成本与未执行 B01–B07 实验
 - id: agent-computer-design
   topic: architecture
   kind: doc
@@ -22,11 +32,12 @@ sources:
   read_policy: direct
   write_policy: manual-review
   status: active
-  version: 2
-  description: 计算存储、统一连接与控制、ComputerView、Presentation 和 D01–D15 技术契约
+  version: 3
+  description: D01–D17：计算存储、连接控制、ComputerView、Presentation、部署与 Agentic 契约入口
 route:
   topic: architecture
   source_order:
   - agent-computer-design
   - agent-computer-compute-storage-selection
+  - agent-computer-agentic-runtime
   fallback: bounded-search

@@ -1,0 +1,32 @@
+schema_version: 4
+topic:
+  id: product
+  title: product
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-agentic-scenarios
+  topic: product
+  kind: doc
+  uri: codespec/requirements/agentic-scenarios-and-gaps.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: SC01–SC04：superpod 固定证据、Agentic 演进、12 类产品场景、设计覆盖/缺口与优先级
+- id: agent-computer-product
+  topic: product
+  kind: doc
+  uri: codespec/requirements/agent-computer.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 3
+  description: 人和 Agent 的可连接电脑：首版 R01–R31、可选 R32、产品场景与外部责任
+route:
+  topic: product
+  source_order:
+  - agent-computer-product
+  - agent-computer-agentic-scenarios
+  fallback: bounded-search

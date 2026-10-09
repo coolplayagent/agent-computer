@@ -1,6 +1,6 @@
 # 计算与存储技术选型对比
 
-版本：设计基线 0.3；资料核对日期：2026-10-09；状态：设计决策，尚未完成组合实测。
+版本：设计基线 0.4；资料核对日期：2026-10-09；状态：设计决策，尚未完成组合实测。
 
 本文展开 ADR-02、ADR-03、ADR-05、ADR-06、ADR-07、ADR-09 的比较依据，先分析约束和候选，再给出选择。产品边界以[产品定义](../requirements/agent-computer.md)为准；接口、生命周期与提交协议以[详细设计](../design/agent-computer.md)为准；验证入口是[验收设计](../test/agent-computer.md)中的 T00、T03、T08、T09、T16、T19、T20、T25–T27。
 
@@ -232,3 +232,22 @@ Artifact 不可变由固定对象引用、提交协议与禁止覆盖共同保�
 每轮先冻结硬件、内核、镜像、组件版本、配置、并发、输入 manifest、目标预算、样本量和采样窗口，输出原始证据与失败项。基准至少覆盖冷/热两组、多轮重复及稳态；尾延迟报告注明样本数量，样本不足不发布 p99 结论。当前没有组织批准的时延/吞吐/SLA 数字，实施阶段在首次测量前确定目标；硬正确性门不依赖这些待定性能目标。
 
 发布决策依据是“正确性/隔离门通过 + 实际场景满足预先约定预算 + 运维可承担”，不是组件官方 benchmark 的最快条目。若默认组合失败，先记录失败和原因，按 CS08 改选并更新详细设计、版本清单及对应验收；不能删除失败路径来保留原选型。
+
+## CS10. gVisor、JuiceFS 的成熟度与采用条件
+
+两者均有生产使用证据，但成熟度分为项目、具体功能/配置和本项目组合三个层面。当前只有前两层的上游资料，本项目仍没有运行验收；“官方生产使用”不能直接写成 agent-computer 已认证。
+
+| 组件 | 选择理由 | 成熟度证据 | 采用条件与保留问题 |
+| --- | --- | --- | --- |
+| gVisor | Agent 生成代码、第三方依赖和网页需要隔离；用户态应用内核减少直接暴露的宿主系统调用面，兼容 OCI/containerd；Systrap 不依赖 KVM | Google 的 GKE Sandbox 提供 gVisor；上游有生产、兼容和性能文档 | 首个认证运行时候选；需保留 Chromium 内部 sandbox，验证真实系统调用、构建、小文件、网络、取消和挂载链路；不保证任意 Linux 程序兼容 |
+| JuiceFS CE | Browser/Execution/WebApplication 可跨节点访问授权 Workspace；用文件接口复用对象存储，计算节点可替换 | 开源项目有生产说明；官网刊载的阶跃星辰技术分享明确包括社区版生产及规模优化 | 共享工作目录参考后端；元数据库、对象数据、CSI/FUSE 和缓存共同影响性能/恢复；不能将其他后端或企业版案例推定为 PostgreSQL CE 配置已验证 |
+
+gVisor 的事实依据：[生产指南](https://gvisor.dev/docs/user_guide/production/)、[GKE Sandbox](https://docs.cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods)、[Systrap 平台](https://gvisor.dev/docs/architecture_guide/platforms/)、[兼容性](https://gvisor.dev/docs/user_guide/compatibility/)、[性能机制](https://gvisor.dev/docs/architecture_guide/performance/)。系统调用、网络和文件路径的额外成本与负载相关，不给出未经实验的固定损耗比例；普通 OCI 应用可运行不等于 gVisor 已兼容。需要硬件虚拟化边界、完整内核功能或实际兼容/性能不达标时，按 CS02 比较 Kata/microVM，先适配验收，不自动降级到 runc。
+
+JuiceFS 的事实依据：[社区仓库](https://github.com/juicedata/juicefs)、[阶跃星辰社区版生产分享](https://juicefs.com/en/blog/user-stories/artificial-intelligence-storage-large-language-model-multimodal)、[架构](https://juicefs.com/docs/community/architecture/)、[PostgreSQL 元数据](https://juicefs.com/docs/community/databases_for_metadata/)。案例证明存在实际使用和工程投入，不证明本项目小文件/交互负载、当前发行版本或自建运维已满足要求。
+
+JuiceFS 默认 close-to-open 语义不能解释为所有已打开文件即时全局一致；open-cache 等选项会改变可见性，目录项删除/重建和外部共享挂载还涉及缓存失效。确认写入、交接、原子操作和配额必须走真实 runsc/CSI 路径验证。[缓存边界](https://juicefs.com/docs/community/guide/cache/) 元数据和对象块必须配套备份；在线 dump 不是一致快照，不可用“bucket 完整”替代可恢复性。[备份边界](https://juicefs.com/docs/community/metadata_dump_load/)
+
+人和 Agent 在同一 Computer 内接续本身不要求 JuiceFS。当前选择它的额外驱动力是不同节点上的组件共享持久工作目录。若组织已有可靠 NAS/CephFS，先比较复用；若调整为每个 Computer 的组件始终共置并使用独占持久卷，应同时验证迁移、并行度、跨节点恢复及产品需求，不能仅替换存储名就声称保留全部语义。持久 Artifact 仍使用独立固定对象，活跃 profile/SQLite 仍遵循 CS06。
+
+对外发布口径为“gVisor 为首个隔离认证候选，JuiceFS 为新建共享文件环境的参考候选；支持的是明确版本和配置组合”。云上优先复用合格现有/托管集群与服务，自建 K3s/对象服务只是一条交付路径。具体自动化、状态、升级和认证契约见[DP01–DP08](../design/deployment-automation.md)。
