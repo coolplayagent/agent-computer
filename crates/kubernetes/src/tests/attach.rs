@@ -3,6 +3,8 @@ use agent_computer_sandbox::{Bootstrap, Request, StartupChallenge, StartupGrant,
 use std::net::TcpStream;
 use tokio_tungstenite::tungstenite::{self, Message, WebSocket, protocol::Role};
 
+mod candidate;
+
 type Socket = WebSocket<TcpStream>;
 
 fn startup_plan() -> StartupSandboxPlan {

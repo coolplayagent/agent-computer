@@ -131,6 +131,8 @@ fn matches_spec(expected: &Value, actual: &Value, path: &str) -> bool {
                 | "/shareProcessNamespace"
                 | "/containers/*/securityContext/privileged"
                 | "/containers/*/tty"
+                | "/containers/*/volumeMounts/*/readOnly"
+                | "/volumes/*/persistentVolumeClaim/readOnly"
         ),
         _ => expected == actual,
     }

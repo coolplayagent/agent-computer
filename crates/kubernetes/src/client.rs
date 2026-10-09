@@ -179,7 +179,7 @@ impl Client {
     /// MutationUnconfirmed, persist uncertainty and observe this same instance identity.
     pub async fn create(&self, plan: &EphemeralSandboxPlan) -> Result<PodObservation> {
         self.check_plan(plan)?;
-        self.probe().await?;
+        self.probe_sandbox_storage(plan).await?;
         let response = self
             .request(Method::POST, &self.pod_path(plan, false), Some(&plan.pod))
             .await;

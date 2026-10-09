@@ -1,11 +1,12 @@
 //! Constrained Kubernetes transport for explicitly admitted, ephemeral sandbox instances.
 //!
-//! This library does not authorize users, allocate generations, mount Workspaces, or prove
+//! This library does not authorize users, allocate generations, prepare storage, or prove
 //! physical fencing. Its caller must persist admission and instance identity before dispatch.
 //! Creating a declaration alone is never a reason to call `create`.
 #![forbid(unsafe_code)]
 
 mod attach;
+mod candidate;
 mod client;
 mod plan;
 mod startup_plan;
@@ -13,6 +14,7 @@ mod verify;
 pub mod volume;
 
 pub use attach::{StartupChannel, StartupObservation};
+pub use candidate::CandidateMount;
 pub use client::{Client, DeleteOutcome, Deployment, PodObservation, PodPhase};
 pub use plan::{EphemeralSandboxPlan, InstanceIdentity};
 pub use startup_plan::StartupSandboxPlan;

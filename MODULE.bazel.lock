@@ -477,7 +477,7 @@
           "REPO_MAPPING:rules_rust+,bazel_skylib bazel_skylib+",
           "REPO_MAPPING:rules_rust+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_rust+,rules_cc rules_cc+",
-          "FILE:@@//Cargo.lock 24afc9439875f40f494b7253f1c2ebf49577a7096826bfc7da9c2186bc580a17",
+          "FILE:@@//Cargo.lock 6c27f7e9b483eb807651ee1e9af5059e93d0f433bedf747374ec10ca753dce85",
           "FILE:@@//Cargo.toml 9e182797cc6a0c6f708e8e0978edc7e574fc31886a902ef0d91a0cc2c4e96751",
           "FILE:@@//crates/core/Cargo.toml 203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
           "FILE:@@//crates/definitions/Cargo.toml 25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
@@ -486,7 +486,7 @@
           "FILE:@@//crates/storage/Cargo.toml 45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
           "FILE:@@//crates/test-support/Cargo.toml c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
           "FILE:@@//crates/server/Cargo.toml 432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
-          "FILE:@@//crates/kubernetes/Cargo.toml 02e4a2490ddb22ad41054e8473901d553b17c6f9fe46f448536f7971947013c3",
+          "FILE:@@//crates/kubernetes/Cargo.toml 2ee0b950d6b367cf344e58bf70ff2dd230d7318ea80cda2f0173c64364db55db",
           "FILE:@@//crates/worker/Cargo.toml d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
           "FILE:@@//crates/cli/Cargo.toml f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6"
         ],

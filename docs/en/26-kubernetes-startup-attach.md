@@ -59,3 +59,5 @@ bazel test //crates/kubernetes:startup_live_test --lockfile_mode=error --test_en
 The fixtures are not distributable supervisor packaging. Production image provenance, Candidate mounts, the database-backed dispatch worker, independent watchdog/fencing, output objects and accepted completion are still required. Runtime acceptance T01–T43 remains `not_run`.
 
 The [source-bound record](../evidence/kubernetes-startup-attach-2026-10-10.json) and [raw output](../evidence/kubernetes-startup-attach-2026-10-10.log) pin commit `d25fdd5`, 200 verified inputs, the exact test image and supervisor binary. The same binary also passes all 12 startup and 13 supervisor regression cases. The VM, private disk, SSH keys and Kubernetes credentials were removed.
+
+The subsequent [27 Candidate mount increment](27-candidate-pod-mounts.md) adds a prepared data-leaf mount; database worker integration and fencing remain pending.

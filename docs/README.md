@@ -28,6 +28,7 @@
 24. [持久化执行派发日志](zh-CN/24-execution-dispatch.md)
 25. [一次性执行启动授权](zh-CN/25-execution-startup.md)
 26. [有界 Kubernetes 启动通道](zh-CN/26-kubernetes-startup-attach.md)
+27. [执行 Pod 的 Candidate 数据挂载](zh-CN/27-candidate-pod-mounts.md)
 
 ## 02. English
 
@@ -57,6 +58,7 @@
 24. [Durable execution dispatch journal](en/24-execution-dispatch.md)
 25. [One-shot execution startup authorization](en/25-execution-startup.md)
 26. [Bounded Kubernetes startup attach](en/26-kubernetes-startup-attach.md)
+27. [Candidate data mounts for execution Pods](en/27-candidate-pod-mounts.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

@@ -8,7 +8,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/definitions", "//crates/sandbox"] + all_crate_deps(normal = True),
+    deps = ["//crates/definitions", "//crates/sandbox", "//crates/storage"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -17,6 +17,16 @@ rust_test(
     size = "small",
     crate = ":kubernetes",
     deps = all_crate_deps(normal_dev = True),
+)
+
+rust_test(
+    name = "candidate_mount_live_test",
+    size = "medium",
+    srcs = ["tests/candidate_live.rs"],
+    tags = ["manual", "requires-kubernetes", "requires-juicefs"],
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    deps = [":kubernetes", "//crates/definitions", "//crates/sandbox", "//crates/storage"] + all_crate_deps(normal = True, normal_dev = True),
 )
 
 rust_test(

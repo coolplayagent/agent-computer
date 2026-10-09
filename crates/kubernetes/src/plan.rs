@@ -26,6 +26,7 @@ pub struct EphemeralSandboxPlan {
     pub(crate) name: String,
     pub(crate) binding: String,
     pub(crate) network_policy_ref: String,
+    pub(crate) candidate: Option<Box<crate::CandidateMount>>,
 }
 
 impl EphemeralSandboxPlan {
@@ -37,6 +38,16 @@ impl EphemeralSandboxPlan {
         identity: InstanceIdentity,
         namespace: &str,
         command: Vec<String>,
+    ) -> Result<Self> {
+        Self::compile(definition, sandbox_name, identity, namespace, command, None)
+    }
+    pub(crate) fn compile(
+        definition: &ValidatedDefinition,
+        sandbox_name: &str,
+        identity: InstanceIdentity,
+        namespace: &str,
+        command: Vec<String>,
+        candidate: Option<&crate::CandidateMount>,
     ) -> Result<Self> {
         if !dns_label(namespace)
             || ![
@@ -69,7 +80,12 @@ impl EphemeralSandboxPlan {
             .iter()
             .find(|s| s.name == sandbox_name)
             .ok_or(Error::UnsupportedSandbox)?;
-        if sandbox.runtime_class != "gvisor" || !sandbox.mounts.is_empty() {
+        if sandbox.runtime_class != "gvisor" {
+            return Err(Error::UnsupportedSandbox);
+        }
+        if let Some(mount) = candidate {
+            mount.check_sandbox(sandbox, &identity, namespace)?;
+        } else if !sandbox.mounts.is_empty() {
             return Err(Error::UnsupportedSandbox);
         }
         // Names do not change with a command/spec retry: conflicting inputs must collide,
@@ -117,6 +133,7 @@ impl EphemeralSandboxPlan {
             name,
             binding,
             network_policy_ref: sandbox.network_policy_ref.clone(),
+            candidate: candidate.cloned().map(Box::new),
         })
     }
 

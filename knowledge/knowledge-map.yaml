@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 48
-updated_at: unix:1791569284
+map_version: 49
+updated_at: unix:1791570292
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -95,6 +95,7 @@ topics:
   source_ids:
   - bounded-candidate-file-saves
   - candidate-file-http-gateway
+  - candidate-pod-mounts
   - candidate-preparation-worker
   - candidate-storage-guide
   - candidate-writer-leases
@@ -113,8 +114,8 @@ topics:
   - runtime-authorization-guide
   - sandbox-process-supervisor
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-cace46e74dca9fa1bfeeaf6c02d0ee2cd3e7d39f4ed051e8f7a8c1066ab92e8a.yaml
-  digest: cace46e74dca9fa1bfeeaf6c02d0ee2cd3e7d39f4ed051e8f7a8c1066ab92e8a
+  ref: topics/topic-875b9380866e9d56-ef67bdcb393eca5ed25e1826bd07f2de3b832d14048c36743dd8ed35bd790645.yaml
+  digest: ef67bdcb393eca5ed25e1826bd07f2de3b832d14048c36743dd8ed35bd790645
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -138,12 +139,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 32
+  omitted_through: 33
   recent:
-  - version: 33
-    action: source.add
-    actor: cli
-    summary: Added source 'kubernetes-adapter-guide' to topic 'development'.
   - version: 34
     action: source.add
     actor: cli
@@ -204,3 +201,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'kubernetes-startup-attach' to topic 'development'.
+  - version: 49
+    action: source.add
+    actor: cli
+    summary: Added source 'candidate-pod-mounts' to topic 'development'.

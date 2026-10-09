@@ -4,6 +4,18 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: candidate-pod-mount
+    domain: agent-infrastructure
+    canonical_name: CandidatePodMount
+    definition: 从固定准备请求、回执和保留卷身份生成的执行 Pod 数据叶目录挂载，只暴露单个 generation 的 data；创建及启动阶段重核 PVC/PV 绑定，不递归修改卷组权限，也不授予写租约或证明实际 inode、完成和物理排空。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/kubernetes/src/candidate.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/27-candidate-pod-mounts.md
   - id: execution-startup-channel
     domain: agent-infrastructure
     canonical_name: ExecutionStartupChannel

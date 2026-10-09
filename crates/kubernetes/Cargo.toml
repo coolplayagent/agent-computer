@@ -8,6 +8,7 @@ license.workspace = true
 [dependencies]
 agent-computer-definitions = { path = "../definitions" }
 agent-computer-sandbox = { path = "../sandbox" }
+agent-computer-storage = { path = "../storage" }
 tokio.workspace = true
 tokio-tungstenite.workspace = true
 futures-util.workspace = true
@@ -29,6 +30,10 @@ required-features = ["live-test"]
 
 [[test]]
 name = "startup_live"
+required-features = ["live-test"]
+
+[[test]]
+name = "candidate_live"
 required-features = ["live-test"]
 
 [lints]

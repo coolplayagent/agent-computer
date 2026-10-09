@@ -261,6 +261,9 @@ impl Client {
         if current.phase() != PodPhase::Running {
             return Err(Error::PreconditionFailed);
         }
+        if plan.pod.candidate.is_some() {
+            self.probe_sandbox_storage(&plan.pod).await?;
+        }
         Ok(())
     }
 }
