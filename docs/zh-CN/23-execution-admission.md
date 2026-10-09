@@ -2,7 +2,7 @@
 
 ## 23.1 已交付行为
 
-迁移 12 与认证 HTTP API 可在 Prepared Candidate 上持久保存连接存续期内的命令队列。提交在同一事务中预留当前写租约 epoch，排斥竞争的文件派发，固定输入并写入事件/Outbox。运行派发器尚未接入：能力返回 `execution.admission: connection-queued`、`execution: unsupported`；当前所有执行均为 `dispatch_started: false`。
+迁移 12 与认证 HTTP API 可在 Prepared Candidate 上持久保存连接存续期内的命令队列。提交在同一事务中预留当前写租约 epoch，排斥竞争的文件派发，固定输入并写入事件/Outbox。运行派发器尚未接入：能力返回 `execution.admission: connection-queued`、`execution: unsupported`；仅排队记录为 `dispatch_started: false`。[24 派发日志](24-execution-dispatch.md) 进一步加入可信派发意图和派发后的未确定状态。
 
 本增量显式支持 `lifetime: connection`。原连接关闭、授权丢失、当前 Candidate 改变或固定排队期限到达后，查询/对账或释放写租约会取消未派发的预留。后台执行需要独立的执行生命周期/租约，仍待实现。HTTP 连接断开本身不会关闭 ConnectionSession 或撤销已提交准入；使用相同幂等键和输入重试。
 
@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | `POST /v1alpha1/computers/{id}/executions` | Idempotency-Key、SubmitExecution | 202 Queued；精确重试返回当前元数据，取消后为 200 |
 | `GET /v1alpha1/executions/{id}` | 原凭据 | 200 元数据；将已失效/过期的 Queued 对账为持久 Cancelled |
-| `POST /v1alpha1/executions/{id}/cancel` | Idempotency-Key、执行的 `expected_revision` | 200 Cancelled，不释放写租约 |
+| `POST /v1alpha1/executions/{id}/cancel` | Idempotency-Key、执行的 `expected_revision` | 派发前为 200 Cancelled，派发后为 CancelRequested/Unknown，不释放写租约 |
 
 请求必须是不超过 64 KiB 的未压缩 JSON，拒绝未知/重复字段。例如：
 
@@ -47,14 +47,16 @@
 
 每个写租约 epoch 只有一条执行记录。创建预留会增加写租约 revision，续租或释放前应重新读取租约。排队截止时间固定为准入时的写租约到期时间，重试和后续续租都不能延长；当前租约策略下最多 30 秒。已有派发拒绝执行排队；反之，Queued 预留会阻止公共/可信文件派发入口以及数据库派发 trigger。租约上的 `dispatch_recorded: false` 仅代表没有外部副作用意图，不代表未被预留。
 
-用户取消检查执行 revision CAS，不释放或续期写租约；取消后可进行文件派发，但再次提交执行需要新写租约 epoch。写租约释放会在同一事务中先取消 Queued，再写零派发证明并释放所有权。到期/撤权对账只能降低排队权限；Cancelled 不会恢复为 Queued。即使已进入下一 epoch，原提交的精确重试仍返回原终态。事件只包含 ID、状态与摘要，不含命令字节；取消/Outbox 失败回滚整个事务。
+派发前的用户取消检查执行 revision CAS，不释放或续期写租约；取消后可进行文件派发，但再次提交执行需要新写租约 epoch。写租约释放会在同一事务中先取消 Queued，再写零派发证明并释放所有权。到期/撤权对账只能降低排队权限；Cancelled 不会恢复为 Queued。即使已进入下一 epoch，原提交的精确重试仍返回原终态。事件只包含 ID、状态与摘要，不含命令字节；取消/Outbox 失败回滚整个事务。
 
-SQL 迁移仅允许 Queued → Cancelled，保留不可变输入/绑定/历史，并防止排队、派发和排空证明互相绕过。升级保留既有写派发，不凭空创建执行记录或排空证据。Running 与完成状态需要另行实现持久派发并迁移。
+迁移 12 仅允许 Queued → Cancelled，保留不可变输入/绑定/历史，并防止排队、派发和排空证明互相绕过。升级保留既有写派发，不凭空创建执行记录或排空证据。迁移 13 已扩展为持久派发日志；Running 与权威完成仍需要真实运行时证据。
 
 ## 23.4 验证与后续工作
 
 新增 11 项真实 PostgreSQL 场景覆盖 WAL 恢复、精确重试、固定绑定、不可变记录、旧代次/外部 Sandbox 拒绝、原凭据隔离、撤权/连接关闭、排队期限、文件派发竞争、准入与取消回滚以及迁移 12。另有两项 HTTP 场景覆盖排队/查询/取消/重试和非法、后台、超大、浏览器请求。准备收据为模拟证据，这些测试只证明控制状态行为。
 
-工作区默认测试现为 242 项，其中 PostgreSQL 104 项、HTTP 19 项。Cargo 测试、fmt、Clippy、Bazel 构建/测试、OpenAPI 元 Schema/本地引用和双语文档检查通过。现有 full Qualitygate 只检查换行，不建立运行验收；T01–T43 仍为 `not_run`。
+本次增量时工作区默认测试为 242 项，其中 PostgreSQL 104 项、HTTP 19 项。Cargo 测试、fmt、Clippy、Bazel 构建/测试、OpenAPI 元 Schema/本地引用和双语文档检查通过。现有 full Qualitygate 只检查换行，不建立运行验收；T01–T43 仍为 `not_run`。
 
-仍需实现运行 Pod/Candidate 挂载绑定、外部 watchdog/fencing、实际派发、持久输出对象、权威完成接受、后台生命周期与 Unknown 对账。独立监督器的 JSON 报告不能授权进程或释放这里的租约。
+仍需实现运行 Pod/Candidate 挂载绑定、外部 watchdog/fencing、实际派发、持久输出对象、权威完成接受、后台生命周期与 Unknown 物理对账。独立监督器的 JSON 报告不能授权进程或释放这里的租约。
+
+后续迁移 13 已加入单次派发意图、派发后 CancelRequested/Unknown 和禁止交接约束，见 [24 持久化执行派发日志](24-execution-dispatch.md)。本章的迁移 12 与测试数量保留该次增量记录；实际进程启动、可信完成与物理排空仍待实现。

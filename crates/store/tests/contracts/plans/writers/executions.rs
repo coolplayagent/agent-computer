@@ -1,3 +1,4 @@
+mod dispatch;
 use super::*;
 use serde_json::json;
 

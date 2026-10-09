@@ -103,6 +103,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0012_execution_admission.sql")),
                     false,
                 ),
+                Migration::new(
+                    13,
+                    Cow::Borrowed("execution dispatch"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0013_execution_dispatch.sql")),
+                    false,
+                ),
             ])
         })
     }

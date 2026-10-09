@@ -2726,7 +2726,7 @@
     "/v1alpha1/computers/{id}/executions": {
       "post": {
         "operationId": "submitCandidateExecution",
-        "description": "Requires runtime.connect/read/modify scopes, original active connection, exact writer lease CAS and independent Computer/Workspace grants. Reserves one execution per lease epoch, mutually exclusive with file dispatch. Stores fixed input, Sandbox spec, Candidate preparation/storage identity and events/Outbox atomically. Returns 202 while Queued; exact retry returns current metadata (200 if Cancelled), never another execution or a process permit. Runtime dispatch remains unsupported.",
+        "description": "Requires runtime.connect/read/modify scopes, original active connection, exact writer lease CAS and independent Computer/Workspace grants. Reserves one execution per lease epoch, mutually exclusive with file dispatch. Stores fixed input, Sandbox spec, Candidate preparation/storage identity and events/Outbox atomically. Returns 202 while Queued; exact retry returns current metadata (200 after leaving Queued), never another execution or a process permit. A trusted worker may commit a dispatch intent; actual Pod execution remains unsupported.",
         "security": [
           {
             "serviceBearer": []
@@ -2893,7 +2893,7 @@
     "/v1alpha1/executions/{id}": {
       "get": {
         "operationId": "getCandidateExecution",
-        "description": "Requires original credential and runtime.connect. Returns own metadata, reconciling an invalid or expired queued reservation to Cancelled with an event. History stays queryable with a valid original credential after the connection closes. No command/output bytes or stopped-process proof.",
+        "description": "Requires the original valid credential and runtime.connect. Returns metadata without command bytes or storage paths. Reconciliation cancels invalid Queued reservations; after dispatch it marks expired or unauthorized work Unknown and keeps the writer Draining. It does not terminate or fence a process.",
         "security": [
           {
             "serviceBearer": []
@@ -3017,7 +3017,7 @@
     "/v1alpha1/executions/{id}/cancel": {
       "post": {
         "operationId": "cancelCandidateExecution",
-        "description": "Requires original credential and runtime.connect, idempotency key and execution revision CAS. Atomically cancels an undispatched reservation. The writer lease remains Held until explicit release or authority loss; cancellation does not assert process termination.",
+        "description": "Requires original credential and runtime.connect, idempotency key and execution revision CAS. Queued becomes Cancelled and frees the queue reservation. Dispatching becomes CancelRequested and moves the writer to Draining. Unknown remains unresolved. Response metadata never asserts process termination or releases a dispatched writer.",
         "security": [
           {
             "serviceBearer": []
@@ -4918,7 +4918,7 @@
             "minimum": 1
           }
         },
-        "description": "CAS cancellation of an undispatched queued execution; does not release its writer lease."
+        "description": "CAS cancellation: Queued becomes Cancelled; Dispatching becomes CancelRequested and its writer starts draining. Unknown remains unresolved. No process termination or lease release is asserted."
       },
       "ExecutionRequest": {
         "type": "object",
@@ -4990,7 +4990,10 @@
             "type": "string",
             "enum": [
               "Queued",
-              "Cancelled"
+              "Cancelled",
+              "Dispatching",
+              "CancelRequested",
+              "Unknown"
             ]
           },
           "reason": {
@@ -4998,7 +5001,9 @@
             "enum": [
               "awaiting_runtime_dispatch",
               "user_requested",
-              "writer_unavailable"
+              "writer_unavailable",
+              "dispatch_committed",
+              "dispatch_unconfirmed"
             ]
           },
           "input_digest": {
@@ -5011,10 +5016,38 @@
           },
           "dispatch_started": {
             "type": "boolean",
-            "const": false
+            "description": "True after the durable dispatch intent commits; does not assert that a process started or stopped."
           }
         },
-        "description": "Current metadata only, bound to the original credential. No command bytes/storage paths, process-success status or fencing claim. Queue deadline is fixed at admission and never extended by retry or lease renewal."
+        "description": "Current metadata only, bound to the original credential. No command bytes/storage paths, process-success status or fencing claim. Queue deadline is fixed at admission and never extended by retry or lease renewal.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "enum": [
+                    "Queued",
+                    "Cancelled"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "dispatch_started": {
+                  "const": false
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "dispatch_started": {
+                  "const": true
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "responses": {

@@ -10,8 +10,23 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
-    /// Remove only migration 12 when constructing historical upgrade fixtures.
+    /// Restore migration 12 when constructing historical upgrade fixtures.
+    pub async fn remove_execution_dispatch(&self) {
+        sqlx::raw_sql("DROP TABLE execution_dispatch_intents; DROP FUNCTION guard_execution_dispatch(); DROP FUNCTION complete_execution_dispatch(); DROP TRIGGER check_execution_file_completion ON candidate_writer_completions; DELETE FROM _sqlx_migrations WHERE version=13;").execute(&self.pool).await.unwrap();
+        sqlx::raw_sql("ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_state_check; ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_reason_check; ALTER TABLE execution_requests ADD CHECK (state IN ('Queued','Cancelled')); ALTER TABLE execution_requests ADD CHECK (reason IN ('awaiting_runtime_dispatch','user_requested','writer_unavailable'));").execute(&self.pool).await.unwrap();
+        for function in include_str!("../../migrations/0012_execution_admission.sql")
+            .split("CREATE FUNCTION ")
+            .skip(1)
+        {
+            let body = function.split("$$;").next().unwrap();
+            sqlx::raw_sql(&format!("CREATE OR REPLACE FUNCTION {body}$$;"))
+                .execute(&self.pool)
+                .await
+                .unwrap();
+        }
+    }
     pub async fn remove_execution_admission(&self) {
+        self.remove_execution_dispatch().await;
         sqlx::raw_sql("DROP TABLE execution_requests; DROP FUNCTION guard_execution_request(); DROP TRIGGER check_execution_writer_dispatch ON candidate_writer_dispatches; DROP TRIGGER check_execution_writer_drain ON candidate_writer_drains; DROP FUNCTION guard_execution_writer_slot(); DELETE FROM _sqlx_migrations WHERE version=12;").execute(&self.pool).await.unwrap();
     }
     pub async fn new() -> Self {

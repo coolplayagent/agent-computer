@@ -18,7 +18,7 @@ rust_test(
     size = "large",
     srcs = glob(["tests/**/*.rs"]),
     crate_root = "tests/postgres_contracts.rs",
-    compile_data = ["//examples:research.computer.yaml"],
+    compile_data = ["//examples:research.computer.yaml", "migrations/0012_execution_admission.sql"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     tags = ["requires-postgresql"],

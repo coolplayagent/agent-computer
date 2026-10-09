@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: execution-dispatch-intent
+    domain: agent-infrastructure
+    canonical_name: ExecutionDispatchIntent
+    definition: 在原连接授权下与写入派发日志原子提交的单次执行意图，固定执行身份、输入、Candidate 绑定和期限；恢复只读、不可重派发，取消或不确定结果保留 Draining，不构成进程启动、终止或存储排空证据。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/executions/dispatch.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0013_execution_dispatch.sql
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/24-execution-dispatch.md
   - id: execution-admission
     domain: agent-infrastructure
     canonical_name: ExecutionAdmission

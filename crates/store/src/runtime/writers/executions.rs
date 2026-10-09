@@ -1,6 +1,8 @@
-//! Durable connection-scoped queue reservations. No runtime dispatcher exists yet.
+//! Durable connection-scoped admission and dispatch journal.
+mod dispatch;
 use super::*;
 use crate::plans::DefinitionKind;
+pub use dispatch::{ExecutionDispatchAttempt, ExecutionDispatchIntent};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -54,6 +56,9 @@ pub struct CancelExecution {
 pub enum ExecutionState {
     Queued,
     Cancelled,
+    Dispatching,
+    CancelRequested,
+    Unknown,
 }
 
 /// Metadata only. Command bytes and storage paths are not exposed in this view.
@@ -146,7 +151,10 @@ fn view(row: &PgRow) -> Result<ExecutionRequest> {
         binding_digest: row.try_get("binding_digest")?,
         created_at_ms: row.try_get("created_at_ms")?,
         queue_deadline_at_ms: row.try_get("queue_deadline_at_ms")?,
-        dispatch_started: false,
+        dispatch_started: matches!(
+            row.try_get::<String, _>("state")?.as_str(),
+            "Dispatching" | "CancelRequested" | "Unknown"
+        ),
     })
 }
 async fn own_execution(
@@ -171,7 +179,8 @@ async fn reconcile(
     row: &PgRow,
     seq: i64,
 ) -> Result<()> {
-    if row.try_get::<String, _>("state")? != "Queued" {
+    let state: String = row.try_get("state")?;
+    if matches!(state.as_str(), "Cancelled" | "Unknown") {
         return Ok(());
     }
     let lease: String = row.try_get("lease_id")?;
@@ -179,12 +188,17 @@ async fn reconcile(
     let owner = authority::row(tx, org, &lease).await?;
     let now = transactions::now(tx).await?;
     if owner.try_get::<i64, _>("epoch")? != epoch
-        || owner.try_get::<String, _>("state")? != "Held"
+        || !(owner.try_get::<String, _>("state")? == "Held"
+            || (state == "CancelRequested" && owner.try_get::<String, _>("state")? == "Draining"))
         || now >= row.try_get::<i64, _>("queue_deadline_at_ms")?
         || now >= owner.try_get::<i64, _>("expires_at_ms")?
         || !authority::active(tx, org, &owner).await?
     {
-        cancel_reserved(tx, org, &lease, epoch, "writer_unavailable", seq).await?;
+        if state == "Queued" {
+            cancel_reserved(tx, org, &lease, epoch, "writer_unavailable", seq).await?;
+        } else {
+            dispatch::uncertain(tx, org, row, "writer_unavailable", seq).await?;
+        }
     }
     Ok(())
 }
@@ -308,15 +322,29 @@ impl Store {
             if record.try_get::<i64, _>("revision")? != input.expected_revision {
                 return Err(Error::RuntimeConflict);
             }
-            cancel_reserved(
-                &mut tx,
-                org,
-                &record.try_get::<String, _>("lease_id")?,
-                record.try_get("epoch")?,
-                "user_requested",
-                seq,
-            )
-            .await?;
+            match record.try_get::<String, _>("state")?.as_str() {
+                "Queued" => {
+                    cancel_reserved(
+                        &mut tx,
+                        org,
+                        &record.try_get::<String, _>("lease_id")?,
+                        record.try_get("epoch")?,
+                        "user_requested",
+                        seq,
+                    )
+                    .await?;
+                }
+                "Dispatching" => {
+                    sqlx::query("UPDATE execution_requests SET state='CancelRequested',reason='user_requested',revision=revision+1 WHERE organization=$1 AND execution_id=$2")
+                        .bind(org).bind(id).execute(&mut *tx).await?;
+                    let seq = transactions::emit(&mut tx, org, seq, "execution.status_changed", serde_json::json!({"execution_id":id,"state":"CancelRequested","reason":"user_requested","dispatch_started":true})).await?;
+                    dispatch::stop_writer(&mut tx, org, &record, seq).await?;
+                }
+                // CancelRequested/Unknown already require external stopping;
+                // recording a retry receipt does not claim it has happened.
+                "Cancelled" | "CancelRequested" | "Unknown" => {}
+                _ => return Err(Error::InvalidStoredData),
+            }
             transactions::save_receipt(&mut tx, &identity, op, key, &hash, &id).await?;
         }
         let result = view(&row(&mut tx, org, id).await?)?;
@@ -325,7 +353,7 @@ impl Store {
         Ok(result)
     }
 
-    /// Trusted maintenance can lower queued authority even after credential revocation.
+    /// Trusted maintenance can lower authority even after credential revocation.
     pub async fn reconcile_candidate_execution(
         &self,
         org: &OrganizationId,

@@ -25,6 +25,7 @@
 21. [Candidate 文件 HTTP 网关](zh-CN/21-file-http-gateway.md)
 22. [Sandbox 进程监督器](zh-CN/22-sandbox-supervisor.md)
 23. [持久化执行准入](zh-CN/23-execution-admission.md)
+24. [持久化执行派发日志](zh-CN/24-execution-dispatch.md)
 
 ## 02. English
 
@@ -51,6 +52,7 @@
 21. [Candidate file HTTP gateway](en/21-file-http-gateway.md)
 22. [Sandbox process supervisor](en/22-sandbox-supervisor.md)
 23. [Durable execution admission](en/23-execution-admission.md)
+24. [Durable execution dispatch journal](en/24-execution-dispatch.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
