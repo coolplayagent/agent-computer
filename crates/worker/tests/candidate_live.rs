@@ -171,9 +171,14 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         .find(|p| p.resource_id == volume.resource_id)
         .unwrap()
         .step_id;
+    // The worker compiles a normalized single-volume declaration, independent
+    // of the original ComputerSet's local resource name.
+    let mut normalized_volume = document["spec"]["volumes"][0].clone();
+    normalized_volume["name"] = "volume".into();
+    let normalized = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"worker"},"spec":{"volumes":[normalized_volume]}});
     let volume_plan = VolumePlan::new(
-        &checked(&document),
-        "data",
+        &checked(&normalized),
+        "volume",
         VolumeIdentity {
             organization: org.as_str().into(),
             resource_id: volume.resource_id.clone(),
