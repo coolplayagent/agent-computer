@@ -4,6 +4,18 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: node-cgroup-watchdog
+    domain: agent-infrastructure
+    canonical_name: NodeCgroupWatchdog
+    definition: 在目标工作负载 cgroup 之外运行的一次性可信节点进程，固定 boot ID、inode 与绝对截止时间，通过原始内核句柄终止子树并记录递归存活状态；本地 EmptyObserved 不是 Pod/Candidate 身份证明、持久 fencing 或数据库写锁释放依据。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/watchdog/src/lib.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/30-node-watchdog.md
   - id: candidate-pod-mount
     domain: agent-infrastructure
     canonical_name: CandidatePodMount

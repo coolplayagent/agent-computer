@@ -10,6 +10,7 @@
 | `crates/server` | Axum HTTP、请求限额、服务认证、plan/apply 与本地凭据/授权/目录运维 |
 | `crates/kubernetes` | 受限 HTTPS Pod 与保留型 JuiceFS PVC/PV 适配器 |
 | `crates/worker` | 授权 Volume 意图派发、CSI 观察与后端身份持久化 |
+| `crates/watchdog` | 独立可信节点 cgroup 截止时间与本地终止观测；生产身份/租约接入待实现 |
 | `crates/test-support` | 仅用于集成测试的真实私有 PostgreSQL 集群 |
 | `crates/cli` | 原生 CLI；提供版本、能力状态、声明验证及 Schema 导出 |
 | `docs/zh-CN`、`docs/en` | 编号一致的用户与开发文档 |

@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 50
-updated_at: unix:1791571482
+map_version: 51
+updated_at: unix:1791572444
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -94,6 +94,7 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - bounded-candidate-file-saves
+  - candidate-execution-worker
   - candidate-file-http-gateway
   - candidate-pod-mounts
   - candidate-preparation-worker
@@ -115,8 +116,8 @@ topics:
   - runtime-authorization-guide
   - sandbox-process-supervisor
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-5eb0d731eadb186ea1f4ce92f51b2b5cb0a6d78b1a165fb8eec47922be7df9a2.yaml
-  digest: 5eb0d731eadb186ea1f4ce92f51b2b5cb0a6d78b1a165fb8eec47922be7df9a2
+  ref: topics/topic-875b9380866e9d56-ca7b7b0467563d822ef72ed2f3ebc06806033804b77b063ef8a775b657aae4c8.yaml
+  digest: ca7b7b0467563d822ef72ed2f3ebc06806033804b77b063ef8a775b657aae4c8
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -140,12 +141,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 34
+  omitted_through: 35
   recent:
-  - version: 35
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-storage-guide' to topic 'development'.
   - version: 36
     action: source.add
     actor: cli
@@ -206,3 +203,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'execution-pod-journal' to topic 'development'.
+  - version: 51
+    action: source.add
+    actor: cli
+    summary: Added source 'candidate-execution-worker' to topic 'development'.

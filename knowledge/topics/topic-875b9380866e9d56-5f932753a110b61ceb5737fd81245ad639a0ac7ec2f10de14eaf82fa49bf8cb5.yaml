@@ -14,6 +14,16 @@ sources:
   status: active
   version: 1
   description: Bounded atomic Candidate file saves, consumed dispatch permits and sealed drain evidence; paired English docs/en/20-bounded-file-saves.md
+- id: candidate-execution-worker
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/29-execution-worker.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 数据库授权、Candidate Pod 派发和仅观察恢复工作器
 - id: candidate-file-http-gateway
   topic: development
   kind: doc
@@ -133,6 +143,16 @@ sources:
   status: active
   version: 1
   description: Atomic single execution dispatch intent, immutable recovery, cancellation requests and unresolved writer ownership; paired English docs/en/24-execution-dispatch.md. Actual Candidate Pod dispatch and fencing remain pending.
+- id: execution-pod-journal
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/28-execution-pod-journal.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 执行 Pod 计划、单次创建凭据、不可变 UID 与恢复边界
 - id: execution-startup-authorization
   topic: development
   kind: doc
@@ -163,6 +183,16 @@ sources:
   status: active
   version: 1
   description: 有界 Kubernetes v5 启动通道、固定运行身份与组件验证边界
+- id: node-cgroup-watchdog
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/30-node-watchdog.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Rust node cgroup watchdog, absolute boot deadlines, kernel observations and integration limits
 - id: numbered-bilingual-docs
   topic: development
   kind: doc
@@ -237,4 +267,7 @@ route:
   - execution-startup-authorization
   - kubernetes-startup-attach
   - candidate-pod-mounts
+  - execution-pod-journal
+  - candidate-execution-worker
+  - node-cgroup-watchdog
   fallback: bounded-search

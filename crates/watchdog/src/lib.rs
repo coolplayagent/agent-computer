@@ -1,0 +1,199 @@
+//! Trusted Linux node component. Local kernel observations are not durable fences.
+//! No Kubernetes identity, database authority, journal or restart recovery is implied.
+#![forbid(unsafe_code)]
+
+mod cgroup;
+mod request;
+
+pub use request::{MAX_BUDGET_MS, MAX_REQUEST_BYTES, Request};
+use rustix::{
+    fd::{AsFd, OwnedFd},
+    time,
+};
+use serde::Serialize;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub enum Error {
+    InvalidRequest,
+    IdentityMismatch,
+    RootRequired,
+    CgroupRequired,
+    UntrustedCgroup,
+    PipeRequired,
+    Setup,
+    KillFailed,
+    ObservationFailed,
+    DrainTimeout,
+    OutputUnavailable,
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "node watchdog: {self:?}")
+    }
+}
+impl std::error::Error for Error {}
+impl From<rustix::io::Errno> for Error {
+    fn from(_: rustix::io::Errno) -> Self {
+        Self::Setup
+    }
+}
+pub type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Debug, Serialize)]
+pub enum Trigger {
+    Deadline,
+    ReceiptUnavailable,
+    TimerFailure,
+}
+
+#[derive(Debug, PartialEq, Serialize)]
+pub enum Observation {
+    EmptyObserved,
+    Unknown,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Report {
+    pub version: u8,
+    pub request: Request,
+    pub cgroup_device: u64,
+    pub armed_boottime_ms: u64,
+    pub kill_boottime_ms: u64,
+    pub observed_boottime_ms: u64,
+    pub trigger: Trigger,
+    pub observation: Observation,
+    pub error: Option<Error>,
+}
+
+#[derive(Serialize)]
+struct Armed<'a> {
+    version: u8,
+    event: &'static str,
+    request: &'a Request,
+    cgroup_device: u64,
+    armed_boottime_ms: u64,
+}
+
+/// Runs outside the target cgroup. The trusted caller must prevent migration into
+/// or out of that tree and launch this process independently from its controller.
+/// Output must be a pipe; neither closed readers nor backpressure may delay kill.
+pub fn run(request: Request, output: &impl AsFd) -> Result<Report> {
+    if !rustix::process::geteuid().is_root() {
+        return Err(Error::RootRequired);
+    }
+    prepare_output(output)?;
+    let boot_id = cgroup::read_small("/proc/sys/kernel/random/boot_id")?;
+    let own = cgroup::read_small("/proc/self/cgroup")?;
+    let own = own
+        .strip_prefix("0::")
+        .ok_or(Error::CgroupRequired)?
+        .trim_end_matches('\n');
+    request.check_node(boot_id.trim_end(), boottime_ms(), own)?;
+    let group = cgroup::Cgroup::open(&request)?;
+    let timer = timer(request.deadline_boottime_ms)?;
+    let armed_boottime_ms = boottime_ms();
+    let armed = Armed {
+        version: 1,
+        event: "armed",
+        request: &request,
+        cgroup_device: group.device,
+        armed_boottime_ms,
+    };
+    let trigger = if write_frame(output, &armed).is_err() {
+        Trigger::ReceiptUnavailable
+    } else if wait(&timer).is_err() {
+        Trigger::TimerFailure
+    } else {
+        Trigger::Deadline
+    };
+    let kill_boottime_ms = boottime_ms();
+    let result = group.kill().and_then(|()| observe_empty(&group));
+    Ok(Report {
+        version: 1,
+        request,
+        cgroup_device: group.device,
+        armed_boottime_ms,
+        kill_boottime_ms,
+        observed_boottime_ms: boottime_ms(),
+        trigger,
+        observation: if result.is_ok() {
+            Observation::EmptyObserved
+        } else {
+            Observation::Unknown
+        },
+        error: result.err(),
+    })
+}
+
+pub fn boottime_ms() -> u64 {
+    let now = time::clock_gettime(time::ClockId::Boottime);
+    (now.tv_sec as u64).saturating_mul(1000) + now.tv_nsec as u64 / 1_000_000
+}
+
+fn timer(deadline_ms: u64) -> Result<OwnedFd> {
+    let fd = time::timerfd_create(time::TimerfdClockId::Boottime, time::TimerfdFlags::CLOEXEC)?;
+    time::timerfd_settime(
+        &fd,
+        time::TimerfdTimerFlags::ABSTIME,
+        &time::Itimerspec {
+            it_interval: time::Timespec {
+                tv_sec: 0,
+                tv_nsec: 0,
+            },
+            it_value: time::Timespec {
+                tv_sec: (deadline_ms / 1000)
+                    .try_into()
+                    .map_err(|_| Error::InvalidRequest)?,
+                tv_nsec: ((deadline_ms % 1000) * 1_000_000) as _,
+            },
+        },
+    )?;
+    Ok(fd)
+}
+
+fn wait(timer: &OwnedFd) -> Result<()> {
+    let mut ticks = [0; 8];
+    loop {
+        match rustix::io::read(timer, &mut ticks) {
+            Ok(8) => return Ok(()),
+            Err(rustix::io::Errno::INTR) => continue,
+            _ => return Err(Error::Setup),
+        }
+    }
+}
+
+fn observe_empty(group: &cgroup::Cgroup) -> Result<()> {
+    let deadline = boottime_ms().saturating_add(5000);
+    loop {
+        if !group.populated()? {
+            return Ok(());
+        }
+        if boottime_ms() >= deadline {
+            return Err(Error::DrainTimeout);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+}
+
+fn prepare_output(output: &impl AsFd) -> Result<()> {
+    use rustix::fs::{FileType, OFlags, fcntl_getfl, fcntl_setfl, fstat};
+    if FileType::from_raw_mode(fstat(output)?.st_mode) != FileType::Fifo {
+        return Err(Error::PipeRequired);
+    }
+    fcntl_setfl(output, fcntl_getfl(output)? | OFlags::NONBLOCK)?;
+    Ok(())
+}
+
+/// One atomic nonblocking pipe frame, smaller than Linux PIPE_BUF (4096 bytes).
+pub fn write_frame(output: &impl AsFd, value: &impl Serialize) -> Result<()> {
+    let mut bytes = serde_json::to_vec(value).map_err(|_| Error::OutputUnavailable)?;
+    bytes.push(b'\n');
+    if bytes.len() > 4096 {
+        return Err(Error::OutputUnavailable);
+    }
+    match rustix::io::write(output, &bytes) {
+        Ok(n) if n == bytes.len() => Ok(()),
+        _ => Err(Error::OutputUnavailable),
+    }
+}

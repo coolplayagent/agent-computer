@@ -120,6 +120,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "agent-computer-watchdog"
+version = "0.1.0"
+dependencies = [
+ "rustix",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "agent-computer-worker"
 version = "0.1.0"
 dependencies = [

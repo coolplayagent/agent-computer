@@ -31,6 +31,7 @@
 27. [执行 Pod 的 Candidate 数据挂载](zh-CN/27-candidate-pod-mounts.md)
 28. [执行 Pod 身份持久化](zh-CN/28-execution-pod-journal.md)
 29. [数据库授权的 Candidate 执行工作器](zh-CN/29-execution-worker.md)
+30. [节点 cgroup watchdog](zh-CN/30-node-watchdog.md)
 
 ## 02. English
 
@@ -63,6 +64,7 @@
 27. [Candidate data mounts for execution Pods](en/27-candidate-pod-mounts.md)
 28. [Durable execution Pod identities](en/28-execution-pod-journal.md)
 29. [Database-backed Candidate execution worker](en/29-execution-worker.md)
+30. [Node cgroup watchdog](en/30-node-watchdog.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
