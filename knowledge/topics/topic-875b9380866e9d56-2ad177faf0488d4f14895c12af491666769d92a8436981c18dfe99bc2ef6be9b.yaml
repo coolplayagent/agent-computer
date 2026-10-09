@@ -4,6 +4,16 @@ topic:
   title: development
   description: Added by CLI source registration.
 sources:
+- id: candidate-storage-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/14-candidate-storage.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Candidate 存储准备、配额与重试；配套英文文档 docs/en/14-candidate-storage.md
 - id: control-service-guide
   topic: development
   kind: doc
@@ -34,6 +44,16 @@ sources:
   status: active
   version: 1
   description: Authorized definition plans, immutable SpecVersions and atomic apply with queued reconciliation; paired English guide in docs/en/10-plans-and-apply.md.
+- id: kubernetes-adapter-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/12-kubernetes-adapter.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 受限 Kubernetes HTTPS 适配器：临时实例、安全读回、派发不确定性与 UID 条件删除；Workspace 挂载和物理 fencing 待实现
 - id: numbered-bilingual-docs
   topic: development
   kind: doc
@@ -54,6 +74,16 @@ sources:
   status: active
   version: 1
   description: Durable coordinator leases, dispatch uncertainty, atomic receipts and progress; paired English guide in docs/en/11-reconciliation-coordination.md. Runtime backend workers and physical fencing remain pending.
+- id: volume-provisioning-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/13-volume-provisioning.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authorized retained JuiceFS Volume worker, immutable PVC/PV UID records and CSI verification; paired English guide in docs/en/13-volume-provisioning.md. Candidate readiness, physical fencing and full storage acceptance remain pending.
 route:
   topic: development
   source_order:
@@ -62,4 +92,7 @@ route:
   - control-service-guide
   - definition-plans-guide
   - reconciliation-coordination-guide
+  - kubernetes-adapter-guide
+  - volume-provisioning-guide
+  - candidate-storage-guide
   fallback: bounded-search

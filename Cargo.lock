@@ -63,6 +63,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "agent-computer-storage"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.4.3",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "url",
+]
+
+[[package]]
 name = "agent-computer-store"
 version = "0.1.0"
 dependencies = [
