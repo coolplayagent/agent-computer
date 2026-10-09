@@ -48,6 +48,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    6,
+                    Cow::Borrowed("runtime grants"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0006_runtime_grants.sql")),
+                    false,
+                ),
             ])
         })
     }

@@ -8,6 +8,7 @@ pub mod plans;
 mod reads;
 pub mod reconciliation;
 mod retention;
+pub mod runtime;
 mod types;
 mod writes;
 

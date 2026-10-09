@@ -90,7 +90,7 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         "--kind",
         "agent",
         "--scopes",
-        "definitions.validate,definitions.manage",
+        "definitions.validate,definitions.manage,runtime.read,runtime.app.use",
         "--ttl-seconds",
         "3600",
         "--output",
@@ -350,6 +350,74 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         .1["state"],
         "Failed"
     );
+    let profile = command(
+        &[
+            "catalog-register",
+            "--organization",
+            "acme",
+            "--kind",
+            "browser_profile",
+            "--name",
+            "private-profile",
+        ],
+        &database_file,
+    );
+    assert!(profile.status.success());
+    let profile: Value = serde_json::from_slice(&profile.stdout).unwrap();
+    let profile_id = profile["resource_id"].as_str().unwrap();
+    let access_path = format!("/v1alpha1/runtime-access/browser_profile/{profile_id}");
+    assert_eq!(http(address, "GET", &access_path, Some(token), "").0, 404);
+    for permission in ["read", "app.use"] {
+        let granted = command(
+            &[
+                "runtime-grant",
+                "--organization",
+                "acme",
+                "--principal",
+                "worker",
+                "--kind",
+                "browser_profile",
+                "--resource-id",
+                profile_id,
+                "--permission",
+                permission,
+            ],
+            &database_file,
+        );
+        assert!(
+            granted.status.success(),
+            "{}",
+            String::from_utf8_lossy(&granted.stderr)
+        );
+    }
+    let (status, access) = http(address, "GET", &access_path, Some(token), "");
+    assert_eq!(status, 200);
+    assert_eq!(
+        access["permissions"],
+        serde_json::json!(["app.use", "read"])
+    );
+    let revoked = command(
+        &[
+            "runtime-revoke",
+            "--organization",
+            "acme",
+            "--principal",
+            "worker",
+            "--kind",
+            "browser_profile",
+            "--resource-id",
+            profile_id,
+            "--permission",
+            "read",
+        ],
+        &database_file,
+    );
+    assert!(revoked.status.success());
+    assert_eq!(
+        serde_json::from_slice::<Value>(&revoked.stdout).unwrap()["process_termination_confirmed"],
+        false
+    );
+    assert_eq!(http(address, "GET", &access_path, Some(token), "").0, 404);
     let revoke = command(
         &[
             "credential-revoke",

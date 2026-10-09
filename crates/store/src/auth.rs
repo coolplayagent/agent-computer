@@ -27,16 +27,72 @@ impl PrincipalKind {
 pub enum ServiceScope {
     #[serde(rename = "definitions.validate")]
     DefinitionsValidate,
-    /// Plan/apply API scope; object grants are checked separately.
     #[serde(rename = "definitions.manage")]
     DefinitionsManage,
+    #[serde(rename = "runtime.connect")]
+    RuntimeConnect,
+    #[serde(rename = "runtime.read")]
+    RuntimeRead,
+    #[serde(rename = "runtime.observe")]
+    RuntimeObserve,
+    #[serde(rename = "runtime.app.use")]
+    RuntimeAppUse,
+    #[serde(rename = "runtime.activate")]
+    RuntimeActivate,
+    #[serde(rename = "runtime.execute")]
+    RuntimeExecute,
+    #[serde(rename = "runtime.modify")]
+    RuntimeModify,
+    #[serde(rename = "runtime.control")]
+    RuntimeControl,
+    #[serde(rename = "runtime.publish")]
+    RuntimePublish,
+    #[serde(rename = "runtime.manage")]
+    RuntimeManage,
+    #[serde(rename = "runtime.delete")]
+    RuntimeDelete,
 }
 impl ServiceScope {
+    pub const ALL: [Self; 13] = [
+        Self::DefinitionsValidate,
+        Self::DefinitionsManage,
+        Self::RuntimeConnect,
+        Self::RuntimeRead,
+        Self::RuntimeObserve,
+        Self::RuntimeAppUse,
+        Self::RuntimeActivate,
+        Self::RuntimeExecute,
+        Self::RuntimeModify,
+        Self::RuntimeControl,
+        Self::RuntimePublish,
+        Self::RuntimeManage,
+        Self::RuntimeDelete,
+    ];
     pub fn as_str(self) -> &'static str {
         match self {
             Self::DefinitionsValidate => "definitions.validate",
             Self::DefinitionsManage => "definitions.manage",
+            Self::RuntimeConnect => "runtime.connect",
+            Self::RuntimeRead => "runtime.read",
+            Self::RuntimeObserve => "runtime.observe",
+            Self::RuntimeAppUse => "runtime.app.use",
+            Self::RuntimeActivate => "runtime.activate",
+            Self::RuntimeExecute => "runtime.execute",
+            Self::RuntimeModify => "runtime.modify",
+            Self::RuntimeControl => "runtime.control",
+            Self::RuntimePublish => "runtime.publish",
+            Self::RuntimeManage => "runtime.manage",
+            Self::RuntimeDelete => "runtime.delete",
         }
+    }
+}
+impl std::str::FromStr for ServiceScope {
+    type Err = Error;
+    fn from_str(value: &str) -> Result<Self> {
+        Self::ALL
+            .into_iter()
+            .find(|scope| scope.as_str() == value)
+            .ok_or(Error::InvalidCredentialParameters)
     }
 }
 
@@ -121,7 +177,7 @@ impl Store {
         if !(1..=86400).contains(&seconds)
             || request.lifetime.subsec_nanos() != 0
             || request.scopes.is_empty()
-            || request.scopes.len() > 2
+            || request.scopes.len() > ServiceScope::ALL.len()
         {
             return Err(Error::InvalidCredentialParameters);
         }

@@ -4,6 +4,16 @@ topic:
   title: development
   description: Added by CLI source registration.
 sources:
+- id: candidate-storage-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/14-candidate-storage.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Candidate 存储准备、配额与重试；配套英文文档 docs/en/14-candidate-storage.md
 - id: control-service-guide
   topic: development
   kind: doc
@@ -64,6 +74,26 @@ sources:
   status: active
   version: 1
   description: Durable coordinator leases, dispatch uncertainty, atomic receipts and progress; paired English guide in docs/en/11-reconciliation-coordination.md. Runtime backend workers and physical fencing remain pending.
+- id: runtime-authorization-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/15-runtime-authorization.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 资源运行授权、scope 交集、撤权与激活上限；配套英文 docs/en/15-runtime-authorization.md
+- id: volume-provisioning-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/13-volume-provisioning.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authorized retained JuiceFS Volume worker, immutable PVC/PV UID records and CSI verification; paired English guide in docs/en/13-volume-provisioning.md. Candidate readiness, physical fencing and full storage acceptance remain pending.
 route:
   topic: development
   source_order:
@@ -73,4 +103,7 @@ route:
   - definition-plans-guide
   - reconciliation-coordination-guide
   - kubernetes-adapter-guide
+  - volume-provisioning-guide
+  - candidate-storage-guide
+  - runtime-authorization-guide
   fallback: bounded-search

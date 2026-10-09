@@ -2,6 +2,7 @@
 mod definition_admin;
 mod operator;
 mod reconciliation_admin;
+mod runtime_admin;
 mod volume_worker;
 
 #[tokio::main]

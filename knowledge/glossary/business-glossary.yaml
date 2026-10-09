@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: runtime-grant
+    domain: agent-infrastructure
+    canonical_name: RuntimeGrant
+    definition: 组织内主体对精确资源 ID 的独立运行权限，与凭据 scope 取交集；权限及关联资源不自动继承，激活上限不等于预算预留、修改租约或停止证明。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/mod.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/types.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/15-runtime-authorization.md
   - id: retained-volume-provisioning
     domain: agent-infrastructure
     canonical_name: VolumeProvisioning

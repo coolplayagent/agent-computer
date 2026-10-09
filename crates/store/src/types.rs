@@ -58,6 +58,9 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    InvalidRuntimeRequest,
+    RuntimeAccessUnavailable,
+    RuntimeBudgetExceeded,
     StaleReconcileLease,
     DispatchAlreadyStarted,
     InvalidReconcileResult,
@@ -93,6 +96,9 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::InvalidRuntimeRequest => "invalid runtime authorization request",
+            Self::RuntimeAccessUnavailable => "runtime resource is unavailable or inaccessible",
+            Self::RuntimeBudgetExceeded => "activation exceeds the granted runtime budget",
             Self::StaleReconcileLease => "reconciliation lease is expired or no longer owned",
             Self::DispatchAlreadyStarted => {
                 "dispatch may already have occurred; observe the stable effect identity"

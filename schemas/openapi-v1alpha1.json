@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, authorized definition plans, atomic apply and durable coordination progress. Runtime backend workers, OIDC and runtime grants remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply and durable coordination progress. Computer runtime admission, OIDC and execution remain unsupported."
   },
   "servers": [
     {
@@ -821,6 +821,117 @@
             }
           }
         ]
+      }
+    },
+    "/v1alpha1/runtime-access/{kind}/{id}": {
+      "get": {
+        "operationId": "getRuntimeAccess",
+        "description": "Inspect the authenticated principal own effective permissions. Requires runtime.read and an exact read grant on this target. Organization and principal are derived solely from the service credential. Browser Origin is rejected. The response grants no future execution authority.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "computer",
+                "workspace",
+                "app",
+                "browser_profile"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current effective permissions for the authenticated principal.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeAccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid target kind or resource ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing runtime.read scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is missing, disabled, in another organization, or lacks the caller read grant.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Only GET is accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request deadline exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
       }
     }
   },
@@ -1700,6 +1811,66 @@
           }
         },
         "description": "Durable coordination status. attempts is the monotonically increasing coordinator lease epoch, not runtime generation. dispatch_started means an external effect may have occurred; it is not proof of execution or process termination."
+      },
+      "RuntimeAccess": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "resource_id",
+          "permissions",
+          "max_runtime_seconds",
+          "checked_at_ms"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "computer",
+              "workspace",
+              "app",
+              "browser_profile"
+            ]
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "permissions": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 11,
+            "items": {
+              "type": "string",
+              "enum": [
+                "connect",
+                "read",
+                "observe",
+                "app.use",
+                "activate",
+                "execute",
+                "modify",
+                "control",
+                "publish",
+                "manage",
+                "delete"
+              ]
+            }
+          },
+          "max_runtime_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 86400
+          },
+          "checked_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "description": "Current caller grants intersected with this credential scopes. This is informational, not a reusable permit, lease, budget reservation or runtime readiness statement. No inheritance across permissions, resources or related objects."
       }
     },
     "responses": {

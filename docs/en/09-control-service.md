@@ -2,7 +2,7 @@
 
 ## 09.1 Start the development service
 
-`agent-computer-server` is the Rust/Tokio/Axum HTTP entry point, built with Bazel. It currently serves health, schema readiness, version/capabilities, OpenAPI, authenticated static ComputerSet validation, and [authorized plan/apply](10-plans-and-apply.md). Resource publication queues reconciliation intents; starting a Computer requires the future runtime worker.
+`agent-computer-server` is the Rust/Tokio/Axum HTTP entry point, built with Bazel. It currently serves health, schema readiness, version/capabilities, OpenAPI, authenticated static ComputerSet validation, [authorized plan/apply](10-plans-and-apply.md), and [runtime permission inspection](15-runtime-authorization.md). Resource publication queues reconciliation intents; starting a Computer requires the future runtime worker.
 
 Provision a PostgreSQL database and put its connection URL in a private regular file, mode `0600` or `0400`, under a trusted directory. Symlinks and group/other access are rejected; URL contents are limited to 8 KiB. The URL is supplied through a file, never a command-line value. Run migrations explicitly before serving:
 
@@ -65,6 +65,6 @@ The request handler permits 64 concurrent requests, has a 10-second timeout, and
 
 Operation progress, database coordination and local `reconciliation-inspect/resume/abandon` commands are documented in [11 Coordination](11-reconciliation-coordination.md).
 
-The shared `crates/test-support` starts real private PostgreSQL clusters for store and server tests. Three credential cases cover random issuance, stored hashes, principal binding, scope separation, tampering, expiry, revocation, disable, lifetime bounds and readiness checks. Seven service cases cover authorization before parsing, identity spoofing, no-side-effect validation, duplicate headers, protocol limits, readiness failures, private operator files, and an actual server process over TCP with issue/validate/grant/catalog/plan/apply/revoke/SIGTERM. Run the [database-enabled Bazel/Cargo suite](08-persistence.md).
+The shared `crates/test-support` starts real private PostgreSQL clusters for store and server tests. Four credential cases cover random issuance, stored hashes, principal binding, scope separation, tampering, expiry, revocation, disable, lifetime bounds and readiness checks. Eight service cases cover authorization before parsing, identity spoofing, no-side-effect validation, duplicate headers, protocol limits, readiness failures, private operator files, and an actual server process over TCP with issue/validate/grant/catalog/plan/apply/revoke/SIGTERM. Run the [database-enabled Bazel/Cargo suite](08-persistence.md).
 
-[Definition grants and transactional plan/apply](10-plans-and-apply.md) are implemented. OIDC, organization membership and runtime Workspace/Computer/App grants, ConnectionSession/ViewerSession, protected streaming, deployment and Computer runtime are still pending. This increment does not satisfy full T10/T18/T22 acceptance or establish production security certification.
+[Definition grants and transactional plan/apply](10-plans-and-apply.md) are implemented. [Exact resource runtime grants and effective-access inspection](15-runtime-authorization.md) are also implemented. OIDC, organization membership administration, lifecycle admission, ConnectionSession/ViewerSession, protected streaming, deployment and Computer runtime are still pending. This increment does not satisfy full T10/T18/T22 acceptance or establish production security certification.

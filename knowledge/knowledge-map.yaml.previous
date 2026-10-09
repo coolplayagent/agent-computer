@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 34
-updated_at: unix:1791548453
+map_version: 35
+updated_at: unix:1791551358
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -93,6 +93,7 @@ topics:
   title: development
   description: Added by CLI source registration.
   source_ids:
+  - candidate-storage-guide
   - control-service-guide
   - declaration-persistence-guide
   - definition-plans-guide
@@ -100,8 +101,8 @@ topics:
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-c0a0151317439e56296075fe8ae19d434044dde0c61ab014904754e6ea6c2311.yaml
-  digest: c0a0151317439e56296075fe8ae19d434044dde0c61ab014904754e6ea6c2311
+  ref: topics/topic-875b9380866e9d56-2ad177faf0488d4f14895c12af491666769d92a8436981c18dfe99bc2ef6be9b.yaml
+  digest: 2ad177faf0488d4f14895c12af491666769d92a8436981c18dfe99bc2ef6be9b
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -125,12 +126,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 18
+  omitted_through: 19
   recent:
-  - version: 19
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-product'.
   - version: 20
     action: source.update
     actor: cli
@@ -191,3 +188,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'volume-provisioning-guide' to topic 'development'.
+  - version: 35
+    action: source.add
+    actor: cli
+    summary: Added source 'candidate-storage-guide' to topic 'development'.

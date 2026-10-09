@@ -33,6 +33,24 @@ impl RequestContext {
     pub fn store_error(&self, error: agent_computer_store::Error) -> Response {
         use agent_computer_store::Error;
         match error {
+            Error::InvalidRuntimeRequest => self.error(
+                StatusCode::BAD_REQUEST,
+                "invalid_request",
+                "Invalid runtime authorization request.",
+                false,
+            ),
+            Error::RuntimeAccessUnavailable => self.error(
+                StatusCode::NOT_FOUND,
+                "not_found",
+                "The resource is unavailable or inaccessible.",
+                false,
+            ),
+            Error::RuntimeBudgetExceeded => self.error(
+                StatusCode::FORBIDDEN,
+                "runtime_budget_exceeded",
+                "Activation exceeds the granted runtime budget.",
+                false,
+            ),
             Error::PreconditionRequired => self.error(
                 StatusCode::PRECONDITION_REQUIRED,
                 "precondition_required",

@@ -43,6 +43,10 @@ pub fn router(store: Store) -> Router {
             "/v1alpha1/operations/{id}",
             get(crate::plans::get_operation),
         )
+        .route(
+            "/v1alpha1/runtime-access/{kind}/{id}",
+            get(crate::runtime::access),
+        )
         .fallback(not_found)
         .method_not_allowed_fallback(method_not_allowed)
         .layer(middleware::from_fn_with_state(state.clone(), envelope))
@@ -105,7 +109,7 @@ async fn ready(
 async fn capabilities() -> Json<serde_json::Value> {
     Json(
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
-            "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported",
+            "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported",
             "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"

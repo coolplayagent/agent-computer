@@ -187,3 +187,54 @@ async fn credential_bounds_kind_conflicts_and_schema_readiness() {
         .unwrap();
     assert!(matches!(db.store.ready().await, Err(Error::SchemaNotReady)));
 }
+
+#[tokio::test]
+async fn runtime_scope_migration_preserves_existing_credentials_without_granting_access() {
+    let db = Database::new().await;
+    // Reconstruct the exact predecessor constraint/history in this disposable
+    // database, with no runtime rows. No production downgrade API is provided.
+    sqlx::raw_sql("DROP TABLE runtime_grants; ALTER TABLE service_credentials DROP CONSTRAINT service_credentials_scopes_check; ALTER TABLE service_credentials ADD CONSTRAINT service_credentials_scopes_check CHECK (cardinality(scopes) BETWEEN 1 AND 2 AND scopes <@ ARRAY['definitions.validate','definitions.manage']::TEXT[]); DELETE FROM _sqlx_migrations WHERE version=6;")
+        .execute(&db.pool).await.unwrap();
+    let credential = db
+        .store
+        .issue_credential(IssueCredential {
+            organization: &org("acme"),
+            principal: &principal("legacy"),
+            kind: PrincipalKind::Human,
+            scopes: &[ServiceScope::DefinitionsManage],
+            lifetime: Duration::from_secs(3600),
+        })
+        .await
+        .unwrap();
+    let before: serde_json::Value =
+        sqlx::query_scalar("SELECT to_jsonb(c) FROM service_credentials c WHERE credential_id=$1")
+            .bind(credential.id())
+            .fetch_one(&db.pool)
+            .await
+            .unwrap();
+    assert!(matches!(db.store.ready().await, Err(Error::SchemaNotReady)));
+    db.store.migrate().await.unwrap();
+    db.store.ready().await.unwrap();
+    let after: serde_json::Value =
+        sqlx::query_scalar("SELECT to_jsonb(c) FROM service_credentials c WHERE credential_id=$1")
+            .bind(credential.id())
+            .fetch_one(&db.pool)
+            .await
+            .unwrap();
+    assert_eq!(before, after);
+    db.store
+        .authorize_service(credential.expose_token(), ServiceScope::DefinitionsManage)
+        .await
+        .unwrap();
+    assert!(matches!(
+        db.store
+            .authorize_service(credential.expose_token(), ServiceScope::RuntimeRead)
+            .await,
+        Err(Error::Forbidden)
+    ));
+    let grants: i64 = sqlx::query_scalar("SELECT count(*) FROM runtime_grants")
+        .fetch_one(&db.pool)
+        .await
+        .unwrap();
+    assert_eq!(grants, 0);
+}

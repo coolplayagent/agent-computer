@@ -31,7 +31,7 @@ pub(crate) fn failed(message: &'static str) -> Failure {
 pub async fn run(args: Vec<String>) -> Result<(), Failure> {
     if args.is_empty() || args == ["--help"] || args == ["help"] {
         println!(
-            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes definitions.validate[,definitions.manage] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n  reconciliation-volumes-once --database-url-file PATH --organization ID --worker-id ID --config-file PATH\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
+            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes SCOPE[,SCOPE...] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  runtime-grant|runtime-revoke --database-url-file PATH --organization ID --principal ID --kind computer|workspace|app|browser_profile --resource-id ID --permission PERMISSION [--max-runtime-seconds SECONDS]\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n  reconciliation-volumes-once --database-url-file PATH --organization ID --worker-id ID --config-file PATH\n\nScopes: definitions.validate, definitions.manage, runtime.connect, runtime.read, runtime.observe, runtime.app.use, runtime.activate, runtime.execute, runtime.modify, runtime.control, runtime.publish, runtime.manage, runtime.delete.\nRuntime activate grants require a 1..86400 second limit; revoke omits the limit.\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
         );
         return Ok(());
     }
@@ -57,6 +57,15 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             "kind",
             "name",
             "permission",
+        ],
+        "runtime-grant" | "runtime-revoke" => &[
+            "database-url-file",
+            "organization",
+            "principal",
+            "kind",
+            "resource-id",
+            "permission",
+            "max-runtime-seconds",
         ],
         "catalog-register" => &["database-url-file", "organization", "kind", "name"],
         "catalog-disable" => &["database-url-file", "organization", "resource-id"],
@@ -102,6 +111,9 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             .await
             .map_err(|_| failed("Database schema is not ready. Run migrate first."))?;
         match command {
+            "runtime-grant" | "runtime-revoke" => {
+                crate::runtime_admin::run(command, &store, &options).await?
+            }
             "reconciliation-volumes-once" => crate::volume_worker::run(&store, &options).await?,
             "reconciliation-inspect" | "reconciliation-resume" | "reconciliation-abandon" => {
                 crate::reconciliation_admin::run(command, &store, &options).await?
@@ -146,11 +158,7 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
                 };
                 let scopes: Result<Vec<_>, _> = required("scopes")?
                     .split(',')
-                    .map(|s| match s {
-                        "definitions.validate" => Ok(ServiceScope::DefinitionsValidate),
-                        "definitions.manage" => Ok(ServiceScope::DefinitionsManage),
-                        _ => Err(usage()),
-                    })
+                    .map(|s| s.parse::<ServiceScope>().map_err(|_| usage()))
                     .collect();
                 let seconds = required("ttl-seconds")?
                     .parse::<u64>()

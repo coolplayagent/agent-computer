@@ -2,7 +2,7 @@
 
 ## 09.1 启动开发服务
 
-`agent-computer-server` 是由 Bazel 构建的 Rust/Tokio/Axum HTTP 入口。目前提供探活、Schema 就绪检查、版本/能力、OpenAPI，带认证的 ComputerSet 静态验证及[授权 plan/apply](10-plans-and-apply.md)。资源发布只排入协调意图，启动 Computer 仍需后续运行 worker。
+`agent-computer-server` 是由 Bazel 构建的 Rust/Tokio/Axum HTTP 入口。目前提供探活、Schema 就绪检查、版本/能力、OpenAPI，带认证的 ComputerSet 静态验证、[授权 plan/apply](10-plans-and-apply.md)及[运行权限查询](15-runtime-authorization.md)。资源发布只排入协调意图，启动 Computer 仍需后续运行 worker。
 
 准备 PostgreSQL 数据库，将连接 URL 放入可信目录下、权限为 `0600` 或 `0400` 的普通文件。拒绝符号链接及组/其他用户可访问的文件，URL 最多 8 KiB。通过文件提供 URL，不将秘密放在命令行参数中。启动前显式迁移：
 
@@ -65,6 +65,6 @@ bazel run //:agent-computer-server -- principal-disable \
 
 operation 进度、数据库协调及本地 `reconciliation-inspect/resume/abandon` 命令见 [11 持久化协调](11-reconciliation-coordination.md)。
 
-共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。3 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。7 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/授权/目录管理/plan/apply/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
+共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。4 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。8 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/授权/目录管理/plan/apply/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
 
-[声明 grant 和事务内 plan/apply](10-plans-and-apply.md)已实现。OIDC、组织成员和运行时 Workspace/Computer/App grant、ConnectionSession/ViewerSession、受保护流、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。
+[声明 grant 和事务内 plan/apply](10-plans-and-apply.md)已实现。[精确资源运行 grant 与有效权限查询](15-runtime-authorization.md)也已实现。OIDC、组织成员管理、生命周期准入、ConnectionSession/ViewerSession、受保护流、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。
