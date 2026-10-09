@@ -1,0 +1,858 @@
+{
+  "test_id": "candidate-file-save-component-2026-10-09",
+  "status": "passed",
+  "scope": "One real Rust/Bazel component test: three Candidate preparations and six bounded file dispatches; not full Computer runtime acceptance",
+  "source_commit": "06f3d14002bdf1599cca496eee4cb6951a30b92b",
+  "source_worktree_dirty_at_execution": false,
+  "source_files": {
+    ".bazelrc": "sha256:11f23e668b547a8909c5afc2ac62eebee9cb92dfbb0646e8ddb8b9fd847ea2d1",
+    ".bazelversion": "sha256:14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "Cargo.lock": "sha256:992b4da196dd54d0b13fa7ce569d929036653156c8c42ba36d6473ba74b4edb6",
+    "Cargo.toml": "sha256:b5542b7765357891d9737b3d6e86f42d3ab1dbcf17f0dfcfeff244086db9f869",
+    "MODULE.bazel": "sha256:77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "sha256:df968bbc2416ca197b1c1cfdbeb877cbe226685961bcfce864fbfcda4c1e3f75",
+    "crates/cli/BUILD.bazel": "sha256:be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "sha256:f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "sha256:82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "sha256:a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "sha256:0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "sha256:1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "sha256:203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "sha256:6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "sha256:cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "sha256:a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "sha256:3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "sha256:afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "sha256:2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "sha256:aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "sha256:437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "sha256:186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "sha256:3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "sha256:fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "sha256:4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/definitions/BUILD.bazel": "sha256:68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "sha256:25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "sha256:5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "sha256:5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "sha256:8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "sha256:af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "sha256:9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "sha256:49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "sha256:04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "sha256:e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "sha256:790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "sha256:023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/kubernetes/BUILD.bazel": "sha256:776718f6898ccfec54baea2310a895d99047afc284b3c5faceaf3ddc8130eaff",
+    "crates/kubernetes/Cargo.toml": "sha256:293ae865c955164a7b025c3e9d62d3d82be02352a30f4a5e0c253fe6547cab7b",
+    "crates/kubernetes/src/client.rs": "sha256:828d1b842fa252cf09c19ea7984b9659f71a8f4f7bc4d14c42373dabec9ae006",
+    "crates/kubernetes/src/lib.rs": "sha256:1d85803e81141f033e4e41a6ea3f7ac73a83efae2f0e507ff61670406e99bcf9",
+    "crates/kubernetes/src/plan.rs": "sha256:74141f9e9a13567c0b41d7cefd8bd495d361435d0bccf5e369ca0cc915c9b397",
+    "crates/kubernetes/src/tests.rs": "sha256:1b7bbd3435a0ccc65db2cbeb52212f3f38156ef97404ed9ab65fdf9cabc5d11f",
+    "crates/kubernetes/src/verify.rs": "sha256:c805ccf12144890519ba2cf422ee8caf77d31866c262d3e0cfe6beabede01bde",
+    "crates/kubernetes/src/volume.rs": "sha256:c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/live.rs": "sha256:48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/server/BUILD.bazel": "sha256:c1904a5c01613b035affda85ce32c7f367fc0c14e39df8d096333e0f36ec9aaf",
+    "crates/server/Cargo.toml": "sha256:432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/candidate_worker.rs": "sha256:2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "sha256:df3c1e9eb873ff063310dfcd48259050eb9e8d683de0d84370d331096efc449f",
+    "crates/server/src/connections.rs": "sha256:f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "sha256:2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "sha256:0e4bb50236e7bcc2e1d6da0b7a335066efc32641d2a000f8b6c101d075168af7",
+    "crates/server/src/http.rs": "sha256:c845d351dbdf1e9f5627a53e7d44c4944c3a2f6f8052cacf8c6e6402822579f7",
+    "crates/server/src/lib.rs": "sha256:6541957c9391b70de03dc00164df22e6f0590b0a5309bd3fac48b1157679a519",
+    "crates/server/src/main.rs": "sha256:abdc3333b484b74091aef03af97ceb8d6d713da32d3d67a2ae5f2dc12e897e45",
+    "crates/server/src/operator.rs": "sha256:5c107c333fb9783d2ce9b4ebaaa6895697c9aaa79328ec068003dc4056630d28",
+    "crates/server/src/plans.rs": "sha256:5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "sha256:e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "sha256:f3c0ab653eb4eba647a332368fcb30c8cec8c803e21d8431cae351b3cecdcaf0",
+    "crates/server/src/runtime.rs": "sha256:d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "sha256:aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "sha256:11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "sha256:2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/authentication.rs": "sha256:3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "sha256:46b814d494bab789c564cb6c0e8660673f06837c004bbd8186f4d6dabb3a804b",
+    "crates/server/tests/cases/plans.rs": "sha256:836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "sha256:a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "sha256:aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "sha256:57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "sha256:d9332b8cbfc244f60ac9132523a6d9e602b0a8b2a06916d1f25fecfa6ec6d8b6",
+    "crates/server/tests/cases/writers.rs": "sha256:1a145ebeb122260e606fa6c4ec83e7b7644e346c959f6a138d0c3bbd8ed1840e",
+    "crates/server/tests/server_contracts.rs": "sha256:c43cd662b695bd8416ea5da3296372c05cf69be49261fa44324d6cdf8d7f1b16",
+    "crates/server/tests/support/mod.rs": "sha256:872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "sha256:e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "sha256:45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/directory.rs": "sha256:d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "sha256:61fafa581a02a4c3618afd70a3719052404195a35dc19b8b0a57b0ea108b5a5e",
+    "crates/storage/src/files/tests.rs": "sha256:85611ef204df539df26afb17147c0ac9b450671eced86cf1c5b25cdfa1c7ca5a",
+    "crates/storage/src/lib.rs": "sha256:1d7cd717cd002481a504b0aa8fbaef733ca282be966bc43e5a0f66243417cf14",
+    "crates/storage/src/main.rs": "sha256:1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "sha256:aeb8cb0f27e00590958188f10b3ab743a0b51cfb2c2d04e61a59535b4142156a",
+    "crates/storage/src/model.rs": "sha256:d688269a013be354bf9ca7c385e4e0c2d3cc63f7060eae20f7b28ba7d46ca293",
+    "crates/storage/src/quota.rs": "sha256:143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "sha256:d4dbf90c48affe28deee800b55634935771b7cff7282d364110dcdb5f0fcd58b",
+    "crates/store/BUILD.bazel": "sha256:9dc43e25d04ca43aaac3d30ab0aa6a725d480438d717c6ce998481569c9d5f0d",
+    "crates/store/Cargo.toml": "sha256:708a36606e1631d892c2f8ff6d603ebdc4d3de2f4e9b94a6577c60c99b15e24c",
+    "crates/store/migrations/0001_declaration_registry.sql": "sha256:222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "sha256:f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "sha256:b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "sha256:77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "sha256:590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "sha256:7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "sha256:0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "sha256:903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "sha256:d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "sha256:4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "sha256:560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/src/auth.rs": "sha256:91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "sha256:09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "sha256:2d25777284c18be7f504b314ce4681a5b14d9aeacc92b723d8fb1496f7a807c1",
+    "crates/store/src/plans/access.rs": "sha256:3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "sha256:89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "sha256:a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "sha256:d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "sha256:54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "sha256:35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "sha256:7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "sha256:e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "sha256:129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "sha256:0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "sha256:d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "sha256:a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "sha256:b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "sha256:a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "sha256:ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/connections/mod.rs": "sha256:b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "sha256:4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/inputs.rs": "sha256:c8d34e89733792ae58155e65a29c63d9089fb2832326f16144368b9b8b5d8a37",
+    "crates/store/src/runtime/mod.rs": "sha256:786e9fcbb15ed0cf608b7888a95b7f6922b81dfb27aa05deab5bec25f8b231ae",
+    "crates/store/src/runtime/preparation.rs": "sha256:ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "sha256:a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "sha256:2c7f78f85c4dad955490bb496a51ea8e3b02fb36a36b76cfba0c0e39d7df961f",
+    "crates/store/src/runtime/start/types.rs": "sha256:8de756f8fdd65557fa95766a351d5d6755b9e4d9b0f670dcfbe309e762281b61",
+    "crates/store/src/runtime/types.rs": "sha256:7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "sha256:54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/files.rs": "sha256:59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "sha256:363d62fa4baa73a519d420eca8963587ffc19b4d8f56755cac1b7ec1a00b49aa",
+    "crates/store/src/runtime/writers/types.rs": "sha256:bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "sha256:ff652fe0240c571d75aa42c1b1968b98a007295aab9e8f858036fbaabf65e8c1",
+    "crates/store/src/writes.rs": "sha256:6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "sha256:57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "sha256:d499f8152fa6a52624dadb7291d37ad8454559e53ea35a102b3a537b5254b47e",
+    "crates/store/tests/contracts/concurrency.rs": "sha256:4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "sha256:27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/connections.rs": "sha256:4c39be0e806c469ba79a2bb549b43057b2a348014648431829033147a32629f2",
+    "crates/store/tests/contracts/plans/mod.rs": "sha256:429d9d5e6064e738cfd6048db10b35dd7544498e19d9439b1864648ef2df0862",
+    "crates/store/tests/contracts/plans/preparation.rs": "sha256:63698718ac4ea2b24f7dd6cb4e8fdca8b24d7f9cc18ad4eb18be7d7f8d832968",
+    "crates/store/tests/contracts/plans/publication.rs": "sha256:fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "sha256:ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "sha256:90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "sha256:451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "sha256:3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "sha256:987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "sha256:722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "sha256:0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "sha256:8534d0db05f080c6a6f23d8aa123f094bc8ee36b4adfa008669248aa6dac2f23",
+    "crates/store/tests/contracts/plans/starts.rs": "sha256:1ae17e197bd03859ab5c077ffc66c869629d9cc646d24844178c60b2842eec7f",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "sha256:6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "sha256:739062bd1da890a4f3f341f8d5a3dfaec661ee450080ea41ca9e221419196651",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "sha256:7bfa131a922aca98b5f78140a94eb4f25a06f24347153a789dd7f3e6910ea2f6",
+    "crates/store/tests/contracts/registry.rs": "sha256:99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "sha256:abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "sha256:03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "sha256:a75b0aad41cda6ebf6726764dfb207c4a9f206cd1c391ef1d6dcb645172b945a",
+    "crates/test-support/BUILD.bazel": "sha256:92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "sha256:c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "sha256:128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/worker/BUILD.bazel": "sha256:8fe9a70445f7e13112c54b5b2d7b986ea9feff80d8ea4c84144da636f4d0d9fc",
+    "crates/worker/Cargo.toml": "sha256:d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
+    "crates/worker/src/candidate.rs": "sha256:b7bf6055c255a6196bc919ffe15b9a79704db022a0840851502f85e528fe854f",
+    "crates/worker/src/files.rs": "sha256:72bbb951bbe23cc1bd8739ba7ec576095f4201fb43bd733213b3e7c6f01580ca",
+    "crates/worker/src/lib.rs": "sha256:dc52ef3ae9cdfeaddadbd29288fc21cf2eeb5f7852d6add2e02a0781ae92b4f1",
+    "crates/worker/tests/candidate_live.rs": "sha256:ea23f2f9286a2c83efc2be013da26a0413780fdbfc12deb0942cb2ae9daa02b5",
+    "crates/worker/tests/live.rs": "sha256:131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/file_writer.rs": "sha256:eb68779aac754098fab3b2a99452a74924e73a2c321ca71fa70509c153622d29",
+    "deploy/testing/juicefs-component-rbac.yaml": "sha256:81bff185f8625557153e5c0364927af206a1bedafcfd97e9bc9bd7c97c3d26cb",
+    "deploy/testing/kubernetes-component.yaml": "sha256:83e98fb7408add353cd76c2259293c5b4952c21f54220fe1811b40a3ede02d4d"
+  },
+  "component_digests": {
+    "candidate_worker_live_test": "sha256:315320f18c95898ebd9e06b0cf95e2ca1fb4938d775a0f453c23e42883d0d7a0",
+    "server": "sha256:3716376c1f970a1a6bc4a17d2d5341601cf5d0afb5fc37cda3a71422c0e30388",
+    "juicefs": "sha256:1e111b642668992e04d62377e218a24e263f76af12370facb9097353e5b8d208",
+    "guest_image": "sha256:6a81c37564db9b1ee84e141922625e1d7c5b389b99bb3c572e0243607d5bb4d2",
+    "k3s_binary": "sha256:92b94582eb7b34a8cf532e6006842b9ed215a6783cf56a3dd6271fd35243b2c0",
+    "juicefs_archive": "sha256:01ee09a21a9351a465e09906f113845e1c6a19bea70f530e5e2b2125b2dd3b82",
+    "seaweedfs_archive": "sha256:4a7d108384d044d95212d1342cdda9533fa55842c1c9b41f606ca3c8a9561124",
+    "csi_manifest": "sha256:e24fe740a89d095296e785c16911cd65a24589c17de098fd467b6081e802aaff"
+  },
+  "environment": {
+    "kernel": "6.8.0-142-generic",
+    "os": "Ubuntu 24.04.5 LTS",
+    "juicefs": "juicefs version 1.4.1+2026-07-30.0b90c7d",
+    "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+    "seaweedfs": "version 30GB 4.48 530be3e37337488ecc34d58441e0bc476e121c93 linux amd64",
+    "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+    "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+    "isolation": "Disposable KVM guest; 4 vCPU, 6144 MiB RAM, 24 GiB writable overlay",
+    "databases": "Separate accontrol/jfsmeta databases and roles; fsync and synchronous_commit on",
+    "transport": "Single-VM PostgreSQL sslmode=disable and HTTP S3 with private random credentials; Kubernetes CA verification enabled",
+    "cluster_scope": "CSI controller 4/4 and node 3/3 Ready; CoreDNS Running; gateway CRD install Completed; no product Pods launched"
+  },
+  "input_refs": {
+    "test_target": "//crates/worker:candidate_worker_live_test",
+    "test_configuration_environment": "AGENT_COMPUTER_CANDIDATE_TEST_CONFIG",
+    "definition": "One 30 GiB retained Volume; three empty Workspaces and Computers; no Sandbox/App; each Candidate reserves 10 GiB",
+    "workspace_input": "Immutable empty manifest revision 1 published by apply, then pinned by start",
+    "operator_candidate_configuration": {
+      "mount_root": "/mnt/ac-juicefs",
+      "object_cache": "/root/storage-probe/objects",
+      "quota": {
+        "executable": "/usr/local/bin/juicefs",
+        "executable_sha256": "sha256:1e111b642668992e04d62377e218a24e263f76af12370facb9097353e5b8d208",
+        "metadata_url": "postgres://jfsmeta@10.0.2.15:5432/jfsmeta?sslmode=disable",
+        "password_file": "/root/storage-probe/metadata-password",
+        "timeout_seconds": 30
+      },
+      "target": {
+        "filesystem_uuid": "73c416bc-beee-49d0-abd5-0a33b7c9ce81",
+        "namespace_uid": "cc898c2e-07a4-48c9-8169-0d5596cd88dc",
+        "pv_uid": "f7b02b26-35c7-4b52-8a2d-2204ba527dad",
+        "pvc_uid": "1cbc4255-b380-4529-9524-77d42bf06d71",
+        "volume_id": "res_ff05e53fa5aa99583e6068c3438986f0",
+        "volume_path": "pvc-1cbc4255-b380-4529-9524-77d42bf06d71",
+        "writer_gid": 1000,
+        "writer_uid": 1000
+      }
+    },
+    "kubernetes_configuration": {
+      "api_url": "https://127.0.0.1:6443/",
+      "deployment": {
+        "namespace": "ac-kube-component",
+        "namespace_uid": "cc898c2e-07a4-48c9-8169-0d5596cd88dc",
+        "runtime_class_uid": "9fe6b45d-7f52-48cb-83e2-31de24cc9abe",
+        "deny_policy_uid": "39744e22-b66d-4a07-aab7-66eda5a37626",
+        "network_policy_ref": "id:unused"
+      },
+      "storage": {
+        "reference": "id:pending",
+        "name": "ac-juicefs",
+        "uid": "04211816-a331-4562-9b47-c7c92773b586",
+        "driver_uid": "2233c893-7840-4565-b3c4-ad59497f5870",
+        "secret_name": "ac-juicefs-secret",
+        "secret_namespace": "kube-system"
+      }
+    }
+  },
+  "expected": [
+    "Actual Volume and preparation workers persist real PVC/PV/receipt identities; Prepared remains ready=false",
+    "Trusted CLI consumes the first writer dispatch; exact retry returns metadata without replacing the saved inode",
+    "Next epoch atomically replaces the file; stale content version returns Conflict without changing bytes",
+    "Revocation after actual IO records observed Applied but accepted Unknown, with sealed drain evidence allowing release",
+    "Injected Outbox failure rolls back completion/event/proof; same sealed outcome then commits without repeating IO",
+    "A symlink target returns Unknown with drain_confirmed=false; new acquisition and reconcile cannot release or take over",
+    "Database contains six completions, six completion events and six corresponding Outbox rows, but only five bounded file drain proofs",
+    "A fresh read-only JuiceFS client with zero disk cache reads the final saved file and the separate lost-preparation-ack file through S3 GETs"
+  ],
+  "observed": {
+    "file_writer": {
+      "candidate_ready": false,
+      "cli_create_and_exact_retry": true,
+      "final_file": {
+        "drain_confirmed": true,
+        "state": "Applied",
+        "version": {
+          "executable": false,
+          "sha256": "sha256:f2a0af3094888f9f2dbc856033fac3ac88e3efdbdef36f3c1b55f33e1266c097",
+          "size": 23
+        }
+      },
+      "final_path": "saved.bin",
+      "outbox_rollback_and_same_evidence_retry": true,
+      "revoked_completion": {
+        "drain_confirmed": true,
+        "state": "Unknown",
+        "version": {
+          "executable": false,
+          "sha256": "sha256:376ce07ea3083251934ff362c02a5a868e1704ece89b89f0ec8f61dc3e22b368",
+          "size": 21
+        }
+      },
+      "saved_inode": 16,
+      "stale_version": {
+        "drain_confirmed": true,
+        "state": "Conflict",
+        "version": {
+          "executable": false,
+          "sha256": "sha256:9bccb1bfa9e2a9d5d7e3c070c7b70b6480ae93f9213fe03d97e8eb70cf33dfd7",
+          "size": 11
+        }
+      },
+      "uncertain_io_blocks_handoff": {
+        "candidate_id": "candidate_c15fbd5a5717ce885aecfb9734289bfc",
+        "checked_at_ms": 1791561294778,
+        "computer_id": "res_3f2a770e09f7f9aa8930f4fcd150de35",
+        "connection_session_id": "conn_2b277cf422341c6dca82ad63c323b36d",
+        "dispatch_recorded": true,
+        "epoch": 6,
+        "expires_at_ms": 1791561324756,
+        "file_edit": {
+          "drain_confirmed": false,
+          "state": "Unknown",
+          "version": null
+        },
+        "generation": 1,
+        "lease_id": "lease_31ad2fb2ca226b25f64606f2baa33bf3",
+        "release_proof": null,
+        "revision": 23,
+        "state": "Draining"
+      }
+    },
+    "filesystem_uuid": "73c416bc-beee-49d0-abd5-0a33b7c9ce81",
+    "limits": [
+      "single VM",
+      "initial empty inputs only; Artifact publication and nonempty input retrieval pending",
+      "bounded file gateway only; no product Pod launch or general process fencing",
+      "no power loss or HA test"
+    ],
+    "observations": [
+      {
+        "control_revision": 4,
+        "observed_existing_publication": false,
+        "ready": false,
+        "receipt": {
+          "data_inode": 11,
+          "filesystem_uuid": "73c416bc-beee-49d0-abd5-0a33b7c9ce81",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/candidate_probe_1791561288372482031/workspace/res_b2abcde40267ad563a4a5bf13e7fd713/candidates/candidate_c15fbd5a5717ce885aecfb9734289bfc/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:abd761951901a0f2b91fc4626f70a9c7fcec9762f882aabad73ce3cba738ba1f",
+          "version": 1,
+          "volume_uid": "1cbc4255-b380-4529-9524-77d42bf06d71"
+        },
+        "request_id": "start_b5200c174553b7f6031f273bf5e9140c"
+      },
+      {
+        "control_revision": 4,
+        "observed_existing_publication": true,
+        "ready": false,
+        "receipt": {
+          "data_inode": 23,
+          "filesystem_uuid": "73c416bc-beee-49d0-abd5-0a33b7c9ce81",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/candidate_probe_1791561288372482031/workspace/res_8e73ba2942985262dee9eb37630c02eb/candidates/candidate_b3c783dc8658209ba91e34432fee8e30/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:4ee2110ffef2501aa50978e0eff05fba340b5fe2a20967dc3bf12552447a1706",
+          "version": 1,
+          "volume_uid": "1cbc4255-b380-4529-9524-77d42bf06d71"
+        },
+        "request_id": "start_9d5167c076260fd1761895e9114ec52f"
+      },
+      {
+        "missing_publication_not_recreated": true,
+        "request_id": "start_ff7a324d9ddf25a298477bfcc04a48ab",
+        "state": "Preparing"
+      }
+    ],
+    "organization": "candidate_probe_1791561288372482031",
+    "pv_uid": "f7b02b26-35c7-4b52-8a2d-2204ba527dad",
+    "pvc_uid": "1cbc4255-b380-4529-9524-77d42bf06d71",
+    "volume_path": "pvc-1cbc4255-b380-4529-9524-77d42bf06d71",
+    "database": {
+      "fsync": "on",
+      "synchronous_commit": "on",
+      "requests": [
+        {
+          "request_id": "start_9d5167c076260fd1761895e9114ec52f",
+          "state": "Prepared",
+          "generation": 1,
+          "storage_bytes": 10737418240,
+          "dispatch_started": true,
+          "lease_epoch": 2,
+          "lease_owner": null,
+          "reason": null,
+          "has_receipt": true,
+          "input_revision": 1,
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f"
+        },
+        {
+          "request_id": "start_b5200c174553b7f6031f273bf5e9140c",
+          "state": "Prepared",
+          "generation": 1,
+          "storage_bytes": 10737418240,
+          "dispatch_started": true,
+          "lease_epoch": 1,
+          "lease_owner": null,
+          "reason": null,
+          "has_receipt": true,
+          "input_revision": 1,
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f"
+        },
+        {
+          "request_id": "start_ff7a324d9ddf25a298477bfcc04a48ab",
+          "state": "Preparing",
+          "generation": 1,
+          "storage_bytes": 10737418240,
+          "dispatch_started": true,
+          "lease_epoch": 2,
+          "lease_owner": null,
+          "reason": "storage_unknown",
+          "has_receipt": false,
+          "input_revision": 1,
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f"
+        }
+      ]
+    },
+    "writer_database": {
+      "epochs": 6,
+      "dispatches": 6,
+      "completions": [
+        {
+          "epoch": 1,
+          "dispatch_id": "file-cli",
+          "observed": {
+            "state": "Applied",
+            "version": {
+              "size": 10,
+              "sha256": "sha256:e4a24ec1a38d472811fa6b1efd6b167b053085e00d01475fbc609a807f36df91",
+              "executable": false
+            },
+            "drain_confirmed": true
+          },
+          "accepted": {
+            "state": "Applied",
+            "version": {
+              "size": 10,
+              "sha256": "sha256:e4a24ec1a38d472811fa6b1efd6b167b053085e00d01475fbc609a807f36df91",
+              "executable": false
+            },
+            "drain_confirmed": true
+          }
+        },
+        {
+          "epoch": 2,
+          "dispatch_id": "file-update",
+          "observed": {
+            "state": "Applied",
+            "version": {
+              "size": 11,
+              "sha256": "sha256:9bccb1bfa9e2a9d5d7e3c070c7b70b6480ae93f9213fe03d97e8eb70cf33dfd7",
+              "executable": false
+            },
+            "drain_confirmed": true
+          },
+          "accepted": {
+            "state": "Applied",
+            "version": {
+              "size": 11,
+              "sha256": "sha256:9bccb1bfa9e2a9d5d7e3c070c7b70b6480ae93f9213fe03d97e8eb70cf33dfd7",
+              "executable": false
+            },
+            "drain_confirmed": true
+          }
+        },
+        {
+          "epoch": 3,
+          "dispatch_id": "file-stale-version",
+          "observed": {
+            "state": "Conflict",
+            "version": {
+              "size": 11,
+              "sha256": "sha256:9bccb1bfa9e2a9d5d7e3c070c7b70b6480ae93f9213fe03d97e8eb70cf33dfd7",
+              "executable": false
+            },
+            "drain_confirmed": true
+          },
+          "accepted": {
+            "state": "Conflict",
+            "version": {
+              "size": 11,
+              "sha256": "sha256:9bccb1bfa9e2a9d5d7e3c070c7b70b6480ae93f9213fe03d97e8eb70cf33dfd7",
+              "executable": false
+            },
+            "drain_confirmed": true
+          }
+        },
+        {
+          "epoch": 4,
+          "dispatch_id": "file-revoked-completion",
+          "observed": {
+            "state": "Applied",
+            "version": {
+              "size": 21,
+              "sha256": "sha256:376ce07ea3083251934ff362c02a5a868e1704ece89b89f0ec8f61dc3e22b368",
+              "executable": false
+            },
+            "drain_confirmed": true
+          },
+          "accepted": {
+            "state": "Unknown",
+            "version": {
+              "size": 21,
+              "sha256": "sha256:376ce07ea3083251934ff362c02a5a868e1704ece89b89f0ec8f61dc3e22b368",
+              "executable": false
+            },
+            "drain_confirmed": true
+          }
+        },
+        {
+          "epoch": 5,
+          "dispatch_id": "file-rollback-completion",
+          "observed": {
+            "state": "Applied",
+            "version": {
+              "size": 23,
+              "sha256": "sha256:f2a0af3094888f9f2dbc856033fac3ac88e3efdbdef36f3c1b55f33e1266c097",
+              "executable": false
+            },
+            "drain_confirmed": true
+          },
+          "accepted": {
+            "state": "Applied",
+            "version": {
+              "size": 23,
+              "sha256": "sha256:f2a0af3094888f9f2dbc856033fac3ac88e3efdbdef36f3c1b55f33e1266c097",
+              "executable": false
+            },
+            "drain_confirmed": true
+          }
+        },
+        {
+          "epoch": 6,
+          "dispatch_id": "file-unsafe-target",
+          "observed": {
+            "state": "Unknown",
+            "version": null,
+            "drain_confirmed": false
+          },
+          "accepted": {
+            "state": "Unknown",
+            "version": null,
+            "drain_confirmed": false
+          }
+        }
+      ],
+      "proofs": [
+        {
+          "epoch": 1,
+          "proof": "bounded_file_drained"
+        },
+        {
+          "epoch": 2,
+          "proof": "bounded_file_drained"
+        },
+        {
+          "epoch": 3,
+          "proof": "bounded_file_drained"
+        },
+        {
+          "epoch": 4,
+          "proof": "bounded_file_drained"
+        },
+        {
+          "epoch": 5,
+          "proof": "bounded_file_drained"
+        }
+      ],
+      "completion_events": 6,
+      "completion_outbox": 6
+    },
+    "metadata_database": {
+      "fsync": "on",
+      "synchronous_commit": "on"
+    },
+    "kubernetes_objects": {
+      "pvc": {
+        "apiVersion": "v1",
+        "kind": "PersistentVolumeClaim",
+        "metadata": {
+          "annotations": {
+            "agent-computer.io/volume-binding": "{\"identity\":{\"organization\":\"candidate_probe_1791561288372482031\",\"resource_id\":\"res_ff05e53fa5aa99583e6068c3438986f0\",\"revision\":1,\"spec_digest\":\"sha256:c8821ce333c91df80052a1d5ad22492d3c79eee794d3155041f4bc365d83a882\",\"step_id\":\"step_da2aee2ecfd0808b24ec12f2bee8d489\"},\"namespace\":\"ac-kube-component\",\"storage\":{\"driver_uid\":\"2233c893-7840-4565-b3c4-ad59497f5870\",\"name\":\"ac-juicefs\",\"reference\":\"id:ref_df4de88222570004d6011b94153be5fe\",\"secret_name\":\"ac-juicefs-secret\",\"secret_namespace\":\"kube-system\",\"uid\":\"04211816-a331-4562-9b47-c7c92773b586\"},\"version\":1,\"volume\":{\"name\":\"volume\",\"quotaBytes\":32212254720,\"reclaimPolicy\":\"Retain\",\"storageClass\":\"id:ref_df4de88222570004d6011b94153be5fe\"}}",
+            "pv.kubernetes.io/bind-completed": "yes",
+            "pv.kubernetes.io/bound-by-controller": "yes",
+            "volume.beta.kubernetes.io/storage-provisioner": "csi.juicefs.com",
+            "volume.kubernetes.io/storage-provisioner": "csi.juicefs.com"
+          },
+          "creationTimestamp": "2026-10-09T15:54:48Z",
+          "finalizers": [
+            "kubernetes.io/pvc-protection"
+          ],
+          "labels": {
+            "agent-computer.io/volume": "5eb8d777ab08dbe232f3097899aa1048084578792af585ae5559"
+          },
+          "name": "acv-5eb8d777ab08dbe232f3097899aa1048084578792af585ae5559",
+          "namespace": "ac-kube-component",
+          "resourceVersion": "963",
+          "uid": "1cbc4255-b380-4529-9524-77d42bf06d71"
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteMany"
+          ],
+          "resources": {
+            "requests": {
+              "storage": "30Gi"
+            }
+          },
+          "storageClassName": "ac-juicefs",
+          "volumeMode": "Filesystem",
+          "volumeName": "pvc-1cbc4255-b380-4529-9524-77d42bf06d71"
+        },
+        "status": {
+          "accessModes": [
+            "ReadWriteMany"
+          ],
+          "capacity": {
+            "storage": "30Gi"
+          },
+          "conditions": [
+            {
+              "lastProbeTime": null,
+              "lastTransitionTime": "2026-10-09T15:54:48Z",
+              "message": "No pods are currently referencing this PVC",
+              "reason": "NoPodsUsingPVC",
+              "status": "True",
+              "type": "Unused"
+            }
+          ],
+          "phase": "Bound"
+        }
+      },
+      "pv": {
+        "apiVersion": "v1",
+        "kind": "PersistentVolume",
+        "metadata": {
+          "annotations": {
+            "pv.kubernetes.io/provisioned-by": "csi.juicefs.com",
+            "volume.kubernetes.io/provisioner-deletion-secret-name": "ac-juicefs-secret",
+            "volume.kubernetes.io/provisioner-deletion-secret-namespace": "kube-system"
+          },
+          "creationTimestamp": "2026-10-09T15:54:48Z",
+          "finalizers": [
+            "kubernetes.io/pv-protection"
+          ],
+          "name": "pvc-1cbc4255-b380-4529-9524-77d42bf06d71",
+          "resourceVersion": "959",
+          "uid": "f7b02b26-35c7-4b52-8a2d-2204ba527dad"
+        },
+        "spec": {
+          "accessModes": [
+            "ReadWriteMany"
+          ],
+          "capacity": {
+            "storage": "30Gi"
+          },
+          "claimRef": {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "name": "acv-5eb8d777ab08dbe232f3097899aa1048084578792af585ae5559",
+            "namespace": "ac-kube-component",
+            "resourceVersion": "954",
+            "uid": "1cbc4255-b380-4529-9524-77d42bf06d71"
+          },
+          "csi": {
+            "driver": "csi.juicefs.com",
+            "fsType": "juicefs",
+            "nodePublishSecretRef": {
+              "name": "ac-juicefs-secret",
+              "namespace": "kube-system"
+            },
+            "volumeAttributes": {
+              "capacity": "32212254720",
+              "juicefs/controller-quota-set": "true",
+              "storage.kubernetes.io/csiProvisionerIdentity": "1791561230581-4609-csi.juicefs.com",
+              "subPath": "pvc-1cbc4255-b380-4529-9524-77d42bf06d71"
+            },
+            "volumeHandle": "pvc-1cbc4255-b380-4529-9524-77d42bf06d71"
+          },
+          "mountOptions": [
+            "writeback=false"
+          ],
+          "persistentVolumeReclaimPolicy": "Retain",
+          "storageClassName": "ac-juicefs",
+          "volumeMode": "Filesystem"
+        },
+        "status": {
+          "lastPhaseTransitionTime": "2026-10-09T15:54:48Z",
+          "phase": "Bound"
+        }
+      }
+    },
+    "csi_containers": [
+      {
+        "pod": "juicefs-csi-controller-0",
+        "containers": [
+          {
+            "name": "csi-provisioner",
+            "ready": true,
+            "image": "sha256:80533ab25f66f12a48e07debc5b57d470dcf018a1771b6f1f996ba6b2915e6e5",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-provisioner@sha256:608640c92ee853e657ce663bc955f866910858d0f5c746da088ffb497d44a453"
+          },
+          {
+            "name": "csi-resizer",
+            "ready": true,
+            "image": "sha256:78ad609286559ca56673d92f926d1bb9c374129c1aad77e04656a54156937d42",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-resizer@sha256:fc764369dcb1dd3a031b6a842e265b7a19766e6817acd1b7bcdd5c413275638b"
+          },
+          {
+            "name": "juicefs-plugin",
+            "ready": true,
+            "image": "sha256:45b3bf470dd25fe2e14717818efbfd38add611b0a513302711a7a490fed83186",
+            "image_id": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754"
+          },
+          {
+            "name": "liveness-probe",
+            "ready": true,
+            "image": "sha256:494ea5379400e4f01e49f20be885b1ff011794abebdf81dbd86f606e171d796d",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a"
+          }
+        ]
+      },
+      {
+        "pod": "juicefs-csi-node-qdfzk",
+        "containers": [
+          {
+            "name": "juicefs-plugin",
+            "ready": true,
+            "image": "sha256:45b3bf470dd25fe2e14717818efbfd38add611b0a513302711a7a490fed83186",
+            "image_id": "mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754"
+          },
+          {
+            "name": "liveness-probe",
+            "ready": true,
+            "image": "sha256:494ea5379400e4f01e49f20be885b1ff011794abebdf81dbd86f606e171d796d",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a"
+          },
+          {
+            "name": "node-driver-registrar",
+            "ready": true,
+            "image": "sha256:50013f94a28d1d5ce69a9745f7d64a2b5810767faeb270f74f6408ecd0b186ca",
+            "image_id": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9"
+          }
+        ]
+      }
+    ],
+    "mount": {
+      "storage": "s3",
+      "filesystem_uuid": "73c416bc-beee-49d0-abd5-0a33b7c9ce81",
+      "subdir": "",
+      "writeback": false,
+      "fuse_writeback": false,
+      "read_only": false
+    },
+    "environment": {
+      "kernel": "6.8.0-142-generic",
+      "os": "Ubuntu 24.04.5 LTS",
+      "juicefs": "juicefs version 1.4.1+2026-07-30.0b90c7d",
+      "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+      "seaweedfs": "version 30GB 4.48 530be3e37337488ecc34d58441e0bc476e121c93 linux amd64",
+      "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+      "runsc": "runsc version release-20261005.0\nspec: 1.2.1"
+    },
+    "binaries": {
+      "candidate_worker_live_test": "sha256:315320f18c95898ebd9e06b0cf95e2ca1fb4938d775a0f453c23e42883d0d7a0",
+      "server": "sha256:3716376c1f970a1a6bc4a17d2d5341601cf5d0afb5fc37cda3a71422c0e30388",
+      "juicefs": "sha256:1e111b642668992e04d62377e218a24e263f76af12370facb9097353e5b8d208"
+    },
+    "fresh_saved_file_read": {
+      "bytes": 23,
+      "sha256": "sha256:f2a0af3094888f9f2dbc856033fac3ac88e3efdbdef36f3c1b55f33e1266c097",
+      "cache": "new read-only client; cache-dir memory; cache-size 0"
+    },
+    "fresh_client_read": {
+      "bytes": 27,
+      "sha256": "sha256:59c71d190a322eab5b578e2f2ada008552b868ed5966c5b2ab12f794ee00c35a",
+      "cache": "new read-only client; cache-dir memory; cache-size 0",
+      "object_get_metrics": [
+        "juicefs_object_request_data_bytes_GET 50",
+        "juicefs_object_request_durations_histogram_seconds_GET_total 2",
+        "juicefs_object_request_durations_histogram_seconds_GET_sum 0.003864111"
+      ]
+    }
+  },
+  "probe_inputs": {
+    "scripts": {
+      "boot.py": {
+        "script": "import os,pathlib,subprocess,socket,json\np=pathlib.Path('/home/tdp/.cache/agent-computer-kube-vm');q=pathlib.Path('/tmp/agent-computer-kube-vm/qemu')\nenv=os.environ.copy();env['LD_LIBRARY_PATH']=str(q/'usr/lib/x86_64-linux-gnu')\nif not (p/'id_ed25519').exists():subprocess.run(['ssh-keygen','-q','-t','ed25519','-N','','-f',str(p/'id_ed25519')],check=True)\n(p/'meta-data').write_text('instance-id: ac-kube-validation-001\\nlocal-hostname: ac-kube-validation\\n')\n(p/'user-data').write_text('#cloud-config\\nusers:\\n  - name: ac-test\\n    groups: [sudo]\\n    shell: /bin/bash\\n    sudo: ALL=(ALL) NOPASSWD:ALL\\n    lock_passwd: true\\n    ssh_authorized_keys:\\n      - '+(p/'id_ed25519.pub').read_text().strip()+'\\nssh_pwauth: false\\ndisable_root: true\\n')\nsubprocess.run([str(q/'usr/bin/genisoimage'),'-quiet','-output',str(p/'seed.iso'),'-volid','cidata','-joliet','-rock',str(p/'user-data'),str(p/'meta-data')],check=True,env=env)\nif not (p/'disk.qcow2').exists():subprocess.run([str(q/'usr/bin/qemu-img'),'create','-f','qcow2','-F','qcow2','-b',str(p/'noble-server-cloudimg-amd64.img'),str(p/'disk.qcow2'),'24G'],check=True,env=env)\nports=[]\nfor _ in range(2):\n with socket.socket() as s:s.bind(('127.0.0.1',0));ports.append(s.getsockname()[1])\nssh_port,api_port=ports\nargs=[str(q/'usr/bin/qemu-system-x86_64'),'-enable-kvm','-cpu','host','-smp','4','-m','6144','-machine','q35','-display','none','-vga','none','-monitor','none','-serial','file:'+str(p/'serial.log'),'-L',str(q/'usr/share/qemu'),'-bios',str(q/'usr/share/seabios/bios-256k.bin'),'-drive','file='+str(p/'disk.qcow2')+',if=virtio,format=qcow2','-drive','file='+str(p/'seed.iso')+',media=cdrom,readonly=on','-netdev',f'user,id=n0,hostfwd=tcp:127.0.0.1:{ssh_port}-:22,hostfwd=tcp:127.0.0.1:{api_port}-:6443','-device','virtio-net-pci,netdev=n0,romfile=']\nprocess=subprocess.Popen(args,env=env,stdin=subprocess.DEVNULL,stdout=(p/'qemu.log').open('ab'),stderr=subprocess.STDOUT,start_new_session=True)\n(p/'vm.json').write_text(json.dumps({'pid':process.pid,'ssh_port':ssh_port,'api_port':api_port}));print('VM',process.pid,ssh_port,api_port)\n",
+        "sha256": "sha256:3beae93769be06945b21cb5ce48fcaa60d1365640057900f4258fb122d15a5db"
+      },
+      "setup.sh": {
+        "script": "set -eu\nsudo install -m 0755 /home/ac-test/k3s /usr/local/bin/k3s\nsudo python3 -m tarfile -e /home/ac-test/gvisor-x86_64.tar.bz2 /usr/local/bin\nsudo mkdir -p /etc/containerd /var/lib/rancher/k3s/agent/etc/containerd\nsudo tee /etc/containerd/runsc.toml >/dev/null <<'EOF'\n[runsc_config]\n  platform = \"systrap\"\nEOF\nsudo tee /var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.tmpl >/dev/null <<'EOF'\n{{ template \"base\" . }}\n[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runsc]\n  runtime_type = \"io.containerd.runsc.v1\"\n[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runsc.options]\n  TypeUrl = \"io.containerd.runsc.v1.options\"\n  ConfigPath = \"/etc/containerd/runsc.toml\"\nEOF\nsudo tee /etc/systemd/system/ac-k3s.service >/dev/null <<'EOF'\n[Unit]\nDescription=Temporary agent-computer Kubernetes component test\nAfter=network-online.target\nWants=network-online.target\n[Service]\nType=notify\nEnvironment=\"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"\nEnvironment=\"HTTP_PROXY=http://10.0.2.2:7897\"\nEnvironment=\"HTTPS_PROXY=http://10.0.2.2:7897\"\nEnvironment=\"NO_PROXY=127.0.0.1,localhost,10.0.2.15,10.42.0.0/16,10.43.0.0/16,::1\"\nExecStart=/usr/local/bin/k3s server --node-name ac-component-node --tls-san 127.0.0.1 --disable traefik --disable servicelb --disable metrics-server --disable local-storage --write-kubeconfig-mode 600\nKillMode=process\nDelegate=yes\nLimitNOFILE=1048576\nTasksMax=infinity\nRestart=on-failure\nRestartSec=5s\n[Install]\nWantedBy=multi-user.target\nEOF\nsudo systemctl daemon-reload\nsudo systemctl start ac-k3s\nsudo /usr/local/bin/k3s --version\n/usr/local/bin/runsc --version\n",
+        "sha256": "sha256:c4d36a789d8f008f86cffa85ff1c9e1ec311ca6a4ca467e2799a97b78b2b9c4c"
+      },
+      "storage-setup.py": {
+        "script": "import json,secrets,pathlib,subprocess\np=pathlib.Path('/home/ac-test/storage-private');p.mkdir(mode=0o700,exist_ok=True)\npassword=secrets.token_hex(24);access=secrets.token_hex(12);secret=secrets.token_hex(24)\n(p/'credentials.json').write_text(json.dumps({'metadata_password':password,'s3_access':access,'s3_secret':secret}));(p/'credentials.json').chmod(0o600)\ndef sudo(args,body=None):return subprocess.run(['sudo',*args],input=body,text=True,check=True,stdout=subprocess.DEVNULL)\nsudo(['-u','postgres','psql','-v','ON_ERROR_STOP=1'],f\"CREATE ROLE jfsmeta LOGIN PASSWORD '{password}';\\nCREATE DATABASE jfsmeta OWNER jfsmeta;\\n\")\nsudo(['tee','/etc/postgresql/16/main/conf.d/agent-computer.conf'],\"listen_addresses = '127.0.0.1,10.0.2.15'\\nfsync = on\\nsynchronous_commit = on\\n\")\nsudo(['tee','-a','/etc/postgresql/16/main/pg_hba.conf'],'\\nhost jfsmeta jfsmeta 10.0.2.0/24 scram-sha-256\\nhost jfsmeta jfsmeta 10.42.0.0/16 scram-sha-256\\n')\nsudo(['systemctl','restart','postgresql'])\nsudo(['mkdir','-p','/etc/agent-computer-test','/var/lib/agent-computer-s3'])\nsudo(['tee','/etc/agent-computer-test/s3.json'],json.dumps({'identities':[{'name':'jfsmeta-test','credentials':[{'accessKey':access,'secretKey':secret}],'actions':['Admin','Read','Write','List','Tagging']}]}))\nsudo(['chmod','600','/etc/agent-computer-test/s3.json'])\nunit='''[Unit]\nDescription=Disposable component-test S3 service\nAfter=network-online.target\n[Service]\nWorkingDirectory=/var/lib/agent-computer-s3\nExecStart=/usr/local/bin/weed server -dir=/var/lib/agent-computer-s3 -ip=10.0.2.15 -filer -s3 -s3.config=/etc/agent-computer-test/s3.json -volume.max=16 -master.volumeSizeLimitMB=512\nRestart=on-failure\n[Install]\nWantedBy=multi-user.target\n'''\nsudo(['tee','/etc/systemd/system/ac-s3.service'],unit);sudo(['systemctl','daemon-reload']);sudo(['systemctl','start','ac-s3'])\nprint('Dedicated PostgreSQL database/role and S3 service configured; credentials retained privately inside VM.')\n",
+        "sha256": "sha256:11c83ef4a681d57edb93f545fd870fb4ae52f181334f53ac52621a201ac1115f"
+      },
+      "prepare-storage-mount.py": {
+        "script": "import pathlib,json,subprocess,os,hashlib\np=pathlib.Path('/home/ac-test/storage-private');c=json.loads((p/'credentials.json').read_text())\nenv=os.environ.copy();env.update(META_PASSWORD=c['metadata_password'],ACCESS_KEY=c['s3_access'],SECRET_KEY=c['s3_secret'])\nurl='postgres://jfsmeta@10.0.2.15:5432/jfsmeta?sslmode=disable'\nr=subprocess.run(['/usr/local/bin/juicefs','format','--storage','s3','--bucket','http://10.0.2.15:8333/ac-juicefs','--no-update',url,'ac-component'],env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)\n(p/'format.log').write_text(r.stdout);(p/'format.log').chmod(0o600)\nif r.returncode:print('format failed; private log retained');raise SystemExit(r.returncode)\npassword=p/'metadata-password';password.write_text(c['metadata_password']);password.chmod(0o600)\nsubprocess.run(['sudo','mkdir','-p','/mnt/ac-juicefs'],check=True)\nr=subprocess.run(['sudo','env','META_PASSWORD_FILE='+str(password),'/usr/local/bin/juicefs','mount','-d','--no-usage-report','--cache-dir','memory','--cache-size','0','--buffer-size','64',url,'/mnt/ac-juicefs'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)\n(p/'mount.log').write_text(r.stdout);(p/'mount.log').chmod(0o600)\nif r.returncode:print('mount failed; private log retained');raise SystemExit(r.returncode)\nconfig=json.loads(subprocess.check_output(['sudo','cat','/mnt/ac-juicefs/.config']))\nprint(json.dumps({'uuid':config['Format']['UUID'],'version':config['Version'],'storage':config['Format']['Storage'],'writeback':config['Chunk']['Writeback'],'fuse_writeback':config['FuseOpts']['EnableWriteback'],'options':config['FuseOpts']['Options'],'readonly':config['Meta']['ReadOnly'],'subdir':config.get('Subdir','')}))\nsubprocess.run(['sudo','install','-d','-m','700','/mnt/ac-juicefs/volume-preparation'],check=True)\nsubprocess.run(['sudo','install','-d','-m','700','/root/storage-probe/objects'],check=True)\nsubprocess.run(['sudo','install','-m','600',str(password),'/root/storage-probe/metadata-password'],check=True)\n",
+        "sha256": "sha256:eca9764dbd99b14056dd743c2ac50c5cffce3a5362e573690e422d3b5bca34ad"
+      },
+      "prepare-worker-config.py": {
+        "script": "import pathlib,json,subprocess,secrets,hashlib\np=pathlib.Path('/root/storage-probe');p.mkdir(mode=0o700,exist_ok=True)\nc=json.loads(pathlib.Path('/home/ac-test/storage-private/credentials.json').read_text())\ndef save(path,data):\n path.write_text(data if isinstance(data,str) else json.dumps(data));path.chmod(0o600)\ndef kubectl(args):\n return subprocess.check_output(['/usr/local/bin/k3s','kubectl',*args])\nsecret={'apiVersion':'v1','kind':'Secret','metadata':{'name':'ac-juicefs-secret','namespace':'kube-system'},'type':'Opaque','stringData':{'name':'ac-component','metaurl':'postgres://jfsmeta:'+c['metadata_password']+'@10.0.2.15:5432/jfsmeta?sslmode=disable'}}\nsave(p/'csi-secret.json',secret)\nsubprocess.run(['/usr/local/bin/k3s','kubectl','apply','-f',str(p/'csi-secret.json')],check=True,stdout=subprocess.DEVNULL)\npassword=secrets.token_hex(24)\nsubprocess.run(['sudo','-u','postgres','psql','-v','ON_ERROR_STOP=1'],input=f\"CREATE ROLE accontrol LOGIN PASSWORD '{password}';\\nCREATE DATABASE accontrol OWNER accontrol;\\n\",text=True,check=True,stdout=subprocess.DEVNULL)\nsave(p/'control-url','postgres://accontrol:'+password+'@127.0.0.1:5432/accontrol?sslmode=disable')\nsave(p/'api-token',kubectl(['-n','ac-kube-component','create','token','ac-adapter','--duration=30m']).decode().strip())\nsave(p/'api-ca.pem',pathlib.Path('/var/lib/rancher/k3s/server/tls/server-ca.crt').read_text())\ndef resource(args):return json.loads(kubectl([*args,'-o','json']))\nns=resource(['get','namespace','ac-kube-component']);rc=resource(['get','runtimeclass','gvisor']);np=resource(['get','networkpolicy','-n','ac-kube-component','ac-deny-all']);sc=resource(['get','storageclass','ac-juicefs']);driver=resource(['get','csidriver','csi.juicefs.com'])\nmount=json.loads(pathlib.Path('/mnt/ac-juicefs/.config').read_text());uuid=mount['Format']['UUID']\nconfig={'database_url_file':str(p/'control-url'),'observation_file':str(p/'worker-observation.json'),'kubernetes':{'api_url':'https://127.0.0.1:6443/','ca_file':str(p/'api-ca.pem'),'token_file':str(p/'api-token'),'deployment':{'namespace':'ac-kube-component','namespace_uid':ns['metadata']['uid'],'runtime_class_uid':rc['metadata']['uid'],'deny_policy_uid':np['metadata']['uid'],'network_policy_ref':'id:unused'},'storage':{'reference':'id:pending','name':'ac-juicefs','uid':sc['metadata']['uid'],'driver_uid':driver['metadata']['uid'],'secret_name':'ac-juicefs-secret','secret_namespace':'kube-system'}},'candidate':{'mount_root':'/mnt/ac-juicefs','object_cache':str(p/'objects'),'target':{'volume_id':'pending','namespace_uid':ns['metadata']['uid'],'pvc_uid':'pending','pv_uid':'pending','filesystem_uuid':uuid,'volume_path':'pending','writer_uid':1000,'writer_gid':1000},'quota':{'executable':'/usr/local/bin/juicefs','executable_sha256':'sha256:'+hashlib.file_digest(open('/usr/local/bin/juicefs','rb'),'sha256').hexdigest(),'metadata_url':'postgres://jfsmeta@10.0.2.15:5432/jfsmeta?sslmode=disable','password_file':str(p/'metadata-password'),'timeout_seconds':30}}}\nsave(p/'worker-config.json',config)\nprint('Private Candidate worker configuration created; control and metadata use separate databases and roles.')\n",
+        "sha256": "sha256:f44ac46c41a40708c4d74265c1602955115ec45509ae439e0651fc8dd31be111"
+      },
+      "collect-candidate-file-save.py": {
+        "script": "import hashlib,json,os,pathlib,subprocess,urllib.parse\np=pathlib.Path('/root/storage-probe')\nresult=json.loads((p/'worker-observation.json').read_text())\nconfig=json.loads((p/'worker-config.json').read_text())\ndef run(args,**kw):\n    return subprocess.check_output(args,text=True,**kw).strip()\ndef digest(path):\n    with open(path,'rb') as f:return 'sha256:'+hashlib.file_digest(f,'sha256').hexdigest()\ndef kube(*args):return json.loads(run(['/usr/local/bin/k3s','kubectl',*args,'-o','json']))\ndef sql(db,query):\n    return json.loads(run(['sudo','-u','postgres','psql','-X','-A','-t','-d',db,'-c',query]))\norg=result['organization']\nassert org.startswith('candidate_probe_') and org.removeprefix('candidate_probe_').isdigit()\nresult['database']=sql('accontrol',f\"SELECT json_build_object('fsync',current_setting('fsync'),'synchronous_commit',current_setting('synchronous_commit'),'requests',(SELECT json_agg(json_build_object('request_id',r.request_id,'state',r.state,'generation',r.generation,'storage_bytes',r.storage_bytes,'dispatch_started',p.dispatch_started,'lease_epoch',p.lease_epoch,'lease_owner',p.lease_owner,'reason',p.reason,'has_receipt',p.receipt IS NOT NULL,'input_revision',i.revision,'manifest_digest',v.digest)) FROM runtime_start_requests r JOIN candidate_preparations p USING(organization,request_id) JOIN runtime_start_inputs i USING(organization,request_id) JOIN workspace_input_versions v ON v.organization=i.organization AND v.workspace_id=i.workspace_id AND v.revision=i.revision WHERE r.organization='{org}'))\")\nresult['writer_database']=sql('accontrol',f\"SELECT json_build_object('epochs',(SELECT count(*) FROM candidate_writer_epochs WHERE organization='{org}'),'dispatches',(SELECT count(*) FROM candidate_writer_dispatches WHERE organization='{org}'),'completions',(SELECT json_agg(json_build_object('epoch',epoch,'dispatch_id',dispatch_id,'observed',observed,'accepted',accepted) ORDER BY epoch) FROM candidate_writer_completions WHERE organization='{org}'),'proofs',(SELECT json_agg(json_build_object('epoch',epoch,'proof',proof) ORDER BY epoch) FROM candidate_writer_drains WHERE organization='{org}'),'completion_events',(SELECT count(*) FROM events WHERE organization='{org}' AND kind='writer.file_completed'),'completion_outbox',(SELECT count(*) FROM outbox o JOIN events e USING(organization,sequence) WHERE e.organization='{org}' AND e.kind='writer.file_completed'))\")\nresult['metadata_database']=sql('jfsmeta',\"SELECT json_build_object('fsync',current_setting('fsync'),'synchronous_commit',current_setting('synchronous_commit'))\")\npvc=next(x for x in kube('get','pvc','-n','ac-kube-component')['items'] if x['metadata']['uid']==result['pvc_uid'])\npv=next(x for x in kube('get','pv')['items'] if x['metadata']['uid']==result['pv_uid'])\nresult['kubernetes_objects']={'pvc':pvc,'pv':pv}\npods=kube('get','pods','-n','kube-system','-l','app.kubernetes.io/name=juicefs-csi-driver')['items']\nresult['csi_containers']=[{'pod':x['metadata']['name'],'containers':[{'name':c['name'],'ready':c['ready'],'image':c['image'],'image_id':c['imageID']} for c in x['status']['containerStatuses']]} for x in pods]\nmount=json.loads(pathlib.Path('/mnt/ac-juicefs/.config').read_text())\nresult['mount']={'storage':mount['Format']['Storage'],'filesystem_uuid':mount['Format']['UUID'],'subdir':mount.get('Subdir',''),'writeback':mount.get('Chunk',{}).get('Writeback'),'fuse_writeback':mount.get('FuseOpts',{}).get('EnableWriteback'),'read_only':mount.get('Meta',{}).get('ReadOnly')}\nresult['environment']={'kernel':run(['uname','-r']),'os':run(['lsb_release','-ds']),'juicefs':run(['/usr/local/bin/juicefs','version']),'postgresql':run(['/usr/lib/postgresql/16/bin/postgres','--version']),'seaweedfs':run(['/usr/local/bin/weed','version']),'k3s':run(['/usr/local/bin/k3s','--version']),'runsc':run(['/usr/local/bin/runsc','--version'])}\nresult['binaries']={name:digest(path) for name,path in {'candidate_worker_live_test':'/home/ac-test/candidate_worker_live_test','server':'/home/ac-test/agent-computer-server','juicefs':'/usr/local/bin/juicefs'}.items()}\nresult['operator_candidate_configuration']=json.loads((p/'candidate-command.json').read_text())\nresult['kubernetes_configuration']={k:v for k,v in config['kubernetes'].items() if k not in ('token_file','ca_file')}\n# A new read-only client has no local disk cache. Check the file written and\n# synchronized before the deliberately lost database acknowledgement.\ncold=pathlib.Path('/mnt/ac-worker-cold');cold.mkdir(exist_ok=True)\nenv=os.environ.copy();env['META_PASSWORD_FILE']=str(p/'metadata-password')\nargs=['/usr/local/bin/juicefs','mount','-d','--read-only','--no-usage-report','--cache-dir','memory','--cache-size','0','--buffer-size','64','postgres://jfsmeta@10.0.2.15:5432/jfsmeta?sslmode=disable',str(cold)]\nmounted=subprocess.run(args,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)\n(p/'worker-cold-mount.log').write_text(mounted.stdout);(p/'worker-cold-mount.log').chmod(0o600)\nassert mounted.returncode==0,'cold mount failed; private log retained'\ntry:\n    receipt=result['observations'][1]['receipt']\n    file=cold/result['volume_path']/receipt['path_ref']/'preserved.txt'\n    data=file.read_bytes();assert data==b'preserve-before-observation'\n    saved_receipt=result['observations'][0]['receipt']\n    saved=cold/result['volume_path']/saved_receipt['path_ref']/result['file_writer']['final_path']\n    saved_bytes=saved.read_bytes();assert saved_bytes==b'retained-after-rollback'\n    saved_hash='sha256:'+hashlib.sha256(saved_bytes).hexdigest()\n    assert saved_hash==result['file_writer']['final_file']['version']['sha256']\n    assert len(saved_bytes)==result['file_writer']['final_file']['version']['size']\n    result['fresh_saved_file_read']={'bytes':len(saved_bytes),'sha256':saved_hash,'cache':'new read-only client; cache-dir memory; cache-size 0'}\n    stats=(cold/'.stats').read_text()\n    result['fresh_client_read']={'bytes':len(data),'sha256':'sha256:'+hashlib.sha256(data).hexdigest(),'cache':'new read-only client; cache-dir memory; cache-size 0','object_get_metrics':[s for s in stats.splitlines() if not s.startswith('#') and 'object' in s and 'get' in s.lower()]}\nfinally:\n    subprocess.run(['umount',str(cold)],check=True)\n(p/'candidate-file-save-result.json').write_text(json.dumps(result,indent=2)+'\\n');(p/'candidate-file-save-result.json').chmod(0o600)\nprint('Bounded file-save evidence and fresh-client reads collected.')\n",
+        "sha256": "sha256:f99ec7fe3e57dc57bd7d3c9357c596fa6776f9bad46bbec6d2a8dc995572f682"
+      }
+    },
+    "csi_manifest": {
+      "yaml": "apiVersion: v1\nkind: ServiceAccount\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-controller-sa\n  namespace: kube-system\n---\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-dashboard-sa\n  namespace: kube-system\n---\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-node-sa\n  namespace: kube-system\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-dashboard-role\nrules:\n- apiGroups:\n  - ''\n  resources:\n  - persistentvolumes\n  - persistentvolumeclaims\n  - persistentvolumeclaims/status\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - pods\n  verbs:\n  - get\n  - list\n  - watch\n  - update\n- apiGroups:\n  - storage.k8s.io\n  resources:\n  - storageclasses\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - events\n  verbs:\n  - get\n  - list\n  - watch\n  - create\n  - update\n  - patch\n- apiGroups:\n  - ''\n  resources:\n  - pods/log\n  verbs:\n  - get\n- apiGroups:\n  - batch\n  resources:\n  - jobs\n  verbs:\n  - get\n  - list\n  - watch\n  - create\n  - delete\n  - update\n- apiGroups:\n  - ''\n  resources:\n  - nodes/proxy\n  verbs:\n  - '*'\n- apiGroups:\n  - ''\n  resources:\n  - persistentvolumes\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - coordination.k8s.io\n  resources:\n  - leases\n  verbs:\n  - get\n  - watch\n  - list\n  - delete\n  - update\n  - create\n- apiGroups:\n  - ''\n  resources:\n  - configmaps\n  verbs:\n  - get\n  - watch\n  - list\n  - delete\n  - update\n  - create\n  - patch\n- apiGroups:\n  - ''\n  resources:\n  - secrets\n  verbs:\n  - list\n  - get\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - pods/exec\n  verbs:\n  - create\n- apiGroups:\n  - ''\n  resources:\n  - nodes\n  verbs:\n  - get\n  - patch\n  - update\n  - list\n  - watch\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-external-node-service-role\nrules:\n- apiGroups:\n  - ''\n  resources:\n  - pods\n  verbs:\n  - get\n  - list\n  - create\n  - update\n  - delete\n  - patch\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - pods/log\n  verbs:\n  - get\n- apiGroups:\n  - ''\n  resources:\n  - secrets\n  verbs:\n  - get\n  - create\n  - update\n  - delete\n  - patch\n- apiGroups:\n  - batch\n  resources:\n  - jobs\n  verbs:\n  - get\n  - create\n  - update\n  - delete\n  - patch\n- apiGroups:\n  - ''\n  resources:\n  - nodes\n  verbs:\n  - get\n  - list\n- apiGroups:\n  - ''\n  resources:\n  - nodes/proxy\n  verbs:\n  - '*'\n- apiGroups:\n  - ''\n  resources:\n  - persistentvolumes\n  - persistentvolumeclaims\n  verbs:\n  - get\n  - list\n- apiGroups:\n  - ''\n  resources:\n  - pods/exec\n  verbs:\n  - create\n- apiGroups:\n  - ''\n  resources:\n  - events\n  verbs:\n  - create\n  - get\n- apiGroups:\n  - storage.k8s.io\n  resources:\n  - storageclasses\n  verbs:\n  - get\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - configmaps\n  verbs:\n  - get\n  - update\n- apiGroups:\n  - ''\n  resources:\n  - nodes\n  verbs:\n  - list\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-external-provisioner-role\nrules:\n- apiGroups:\n  - ''\n  resources:\n  - persistentvolumes\n  verbs:\n  - get\n  - list\n  - watch\n  - create\n  - delete\n  - patch\n- apiGroups:\n  - ''\n  resources:\n  - persistentvolumeclaims\n  - persistentvolumeclaims/status\n  verbs:\n  - get\n  - list\n  - watch\n  - update\n  - patch\n- apiGroups:\n  - storage.k8s.io\n  resources:\n  - storageclasses\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - events\n  verbs:\n  - list\n  - watch\n  - create\n  - update\n  - patch\n- apiGroups:\n  - storage.k8s.io\n  resources:\n  - csinodes\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - nodes\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - secrets\n  verbs:\n  - get\n  - list\n  - watch\n  - create\n  - update\n  - patch\n  - delete\n- apiGroups:\n  - ''\n  resources:\n  - pods\n  - pods/log\n  verbs:\n  - get\n  - list\n  - watch\n  - create\n  - update\n  - patch\n  - delete\n- apiGroups:\n  - batch\n  resources:\n  - jobs\n  verbs:\n  - get\n  - create\n  - update\n  - patch\n  - delete\n  - list\n  - watch\n- apiGroups:\n  - ''\n  resources:\n  - endpoints\n  verbs:\n  - get\n  - list\n  - watch\n  - create\n  - update\n  - patch\n- apiGroups:\n  - apps\n  resources:\n  - daemonsets\n  verbs:\n  - get\n  - list\n- apiGroups:\n  - coordination.k8s.io\n  resources:\n  - leases\n  verbs:\n  - get\n  - watch\n  - list\n  - delete\n  - update\n  - create\n- apiGroups:\n  - ''\n  resources:\n  - configmaps\n  verbs:\n  - get\n  - watch\n  - list\n  - delete\n  - update\n  - create\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-external-snapshotter-role\nrules:\n- apiGroups:\n  - ''\n  resources:\n  - events\n  verbs:\n  - list\n  - watch\n  - create\n  - update\n  - patch\n- apiGroups:\n  - snapshot.storage.k8s.io\n  resources:\n  - volumesnapshotclasses\n  verbs:\n  - get\n  - list\n  - watch\n- apiGroups:\n  - snapshot.storage.k8s.io\n  resources:\n  - volumesnapshotcontents\n  verbs:\n  - create\n  - get\n  - list\n  - watch\n  - update\n  - delete\n  - patch\n- apiGroups:\n  - snapshot.storage.k8s.io\n  resources:\n  - volumesnapshotcontents/status\n  verbs:\n  - update\n  - patch\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRoleBinding\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-dashboard-rolebinding\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: ClusterRole\n  name: juicefs-csi-dashboard-role\nsubjects:\n- kind: ServiceAccount\n  name: juicefs-csi-dashboard-sa\n  namespace: kube-system\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRoleBinding\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-node-service-binding\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: ClusterRole\n  name: juicefs-csi-external-node-service-role\nsubjects:\n- kind: ServiceAccount\n  name: juicefs-csi-node-sa\n  namespace: kube-system\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRoleBinding\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-provisioner-binding\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: ClusterRole\n  name: juicefs-external-provisioner-role\nsubjects:\n- kind: ServiceAccount\n  name: juicefs-csi-controller-sa\n  namespace: kube-system\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRoleBinding\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-snapshotter-binding\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: ClusterRole\n  name: juicefs-external-snapshotter-role\nsubjects:\n- kind: ServiceAccount\n  name: juicefs-csi-controller-sa\n  namespace: kube-system\n---\napiVersion: v1\ndata:\n  config.yaml: \"enableControllerSetQuota: true\\nenableNodeSelector: false\\nenableSetQuota:\\\n    \\ true\\nmountPodPatch:\\n- ceMountImage: mirror.gcr.io/juicedata/mount@sha256:e7fff4153156a112ffdc69517c70c2be1665800add19d7cfdfa7c0362a9bd1d9\\n\\\n    \\  mountOptions:\\n  - buffer-size=64\\n  resources:\\n    limits:\\n      cpu: '1'\\n\\\n    \\      memory: 1Gi\\n    requests:\\n      cpu: 100m\\n      memory: 256Mi\\n\"\nkind: ConfigMap\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-driver-config\n  namespace: kube-system\n---\napiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  labels:\n    app.kubernetes.io/component: controller\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-controller\n  namespace: kube-system\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: juicefs-csi-controller\n      app.kubernetes.io/instance: juicefs-csi-driver\n      app.kubernetes.io/name: juicefs-csi-driver\n      app.kubernetes.io/version: master\n  serviceName: juicefs-csi-controller\n  template:\n    metadata:\n      labels:\n        app: juicefs-csi-controller\n        app.kubernetes.io/instance: juicefs-csi-driver\n        app.kubernetes.io/name: juicefs-csi-driver\n        app.kubernetes.io/version: master\n    spec:\n      containers:\n      - args:\n        - --endpoint=$(CSI_ENDPOINT)\n        - --logtostderr\n        - --nodeid=$(NODE_NAME)\n        - --leader-election\n        - --config=/etc/config/config.yaml\n        env:\n        - name: CSI_ENDPOINT\n          value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock\n        - name: NODE_NAME\n          valueFrom:\n            fieldRef:\n              fieldPath: spec.nodeName\n        - name: JUICEFS_MOUNT_NAMESPACE\n          valueFrom:\n            fieldRef:\n              fieldPath: metadata.namespace\n        - name: POD_NAME\n          valueFrom:\n            fieldRef:\n              fieldPath: metadata.name\n        - name: JUICEFS_MOUNT_PATH\n          value: /var/lib/juicefs/volume\n        - name: JUICEFS_CONFIG_PATH\n          value: /var/lib/juicefs/config\n        image: mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754\n        livenessProbe:\n          failureThreshold: 5\n          httpGet:\n            path: /healthz\n            port: healthz\n          initialDelaySeconds: 10\n          periodSeconds: 10\n          timeoutSeconds: 3\n        name: juicefs-plugin\n        ports:\n        - containerPort: 9909\n          name: healthz\n          protocol: TCP\n        resources:\n          limits:\n            cpu: 1000m\n            memory: 1Gi\n          requests:\n            cpu: 100m\n            memory: 512Mi\n        securityContext:\n          capabilities:\n            add:\n            - SYS_ADMIN\n          privileged: true\n        volumeMounts:\n        - mountPath: /var/lib/csi/sockets/pluginproxy/\n          name: socket-dir\n        - mountPath: /jfs\n          mountPropagation: Bidirectional\n          name: jfs-dir\n        - mountPath: /root/.juicefs\n          mountPropagation: Bidirectional\n          name: jfs-root-dir\n        - mountPath: /etc/config\n          name: juicefs-config\n        imagePullPolicy: IfNotPresent\n      - args:\n        - --csi-address=$(ADDRESS)\n        - --timeout=60s\n        - --leader-election\n        - --v=5\n        env:\n        - name: ADDRESS\n          value: /var/lib/csi/sockets/pluginproxy/csi.sock\n        image: mirror.gcr.io/rancher/mirrored-sig-storage-csi-provisioner@sha256:608640c92ee853e657ce663bc955f866910858d0f5c746da088ffb497d44a453\n        name: csi-provisioner\n        volumeMounts:\n        - mountPath: /var/lib/csi/sockets/pluginproxy/\n          name: socket-dir\n        imagePullPolicy: IfNotPresent\n      - args:\n        - --csi-address=$(ADDRESS)\n        - --timeout=20s\n        - --leader-election\n        - --v=2\n        env:\n        - name: ADDRESS\n          value: /var/lib/csi/sockets/pluginproxy/csi.sock\n        image: mirror.gcr.io/rancher/mirrored-sig-storage-csi-resizer@sha256:fc764369dcb1dd3a031b6a842e265b7a19766e6817acd1b7bcdd5c413275638b\n        name: csi-resizer\n        volumeMounts:\n        - mountPath: /var/lib/csi/sockets/pluginproxy/\n          name: socket-dir\n        imagePullPolicy: IfNotPresent\n      - args:\n        - --csi-address=$(ADDRESS)\n        - --health-port=$(HEALTH_PORT)\n        env:\n        - name: ADDRESS\n          value: /csi/csi.sock\n        - name: HEALTH_PORT\n          value: '9909'\n        image: mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a\n        name: liveness-probe\n        volumeMounts:\n        - mountPath: /csi\n          name: socket-dir\n        imagePullPolicy: IfNotPresent\n      priorityClassName: system-cluster-critical\n      serviceAccount: juicefs-csi-controller-sa\n      tolerations:\n      - key: CriticalAddonsOnly\n        operator: Exists\n      volumes:\n      - emptyDir: {}\n        name: socket-dir\n      - hostPath:\n          path: /var/lib/juicefs/volume\n          type: DirectoryOrCreate\n        name: jfs-dir\n      - hostPath:\n          path: /var/lib/juicefs/config\n          type: DirectoryOrCreate\n        name: jfs-root-dir\n      - configMap:\n          defaultMode: 420\n          name: juicefs-csi-driver-config\n        name: juicefs-config\n  volumeClaimTemplates: []\n---\napiVersion: apps/v1\nkind: DaemonSet\nmetadata:\n  labels:\n    app.kubernetes.io/component: node\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: juicefs-csi-node\n  namespace: kube-system\nspec:\n  selector:\n    matchLabels:\n      app: juicefs-csi-node\n      app.kubernetes.io/instance: juicefs-csi-driver\n      app.kubernetes.io/name: juicefs-csi-driver\n      app.kubernetes.io/version: master\n  template:\n    metadata:\n      labels:\n        app: juicefs-csi-node\n        app.kubernetes.io/instance: juicefs-csi-driver\n        app.kubernetes.io/name: juicefs-csi-driver\n        app.kubernetes.io/version: master\n    spec:\n      containers:\n      - args:\n        - --endpoint=$(CSI_ENDPOINT)\n        - --logtostderr\n        - --nodeid=$(NODE_NAME)\n        - --enable-manager=true\n        - --config=/etc/config/config.yaml\n        env:\n        - name: CSI_ENDPOINT\n          value: unix:/csi/csi.sock\n        - name: NODE_NAME\n          valueFrom:\n            fieldRef:\n              fieldPath: spec.nodeName\n        - name: JUICEFS_MOUNT_NAMESPACE\n          valueFrom:\n            fieldRef:\n              fieldPath: metadata.namespace\n        - name: POD_NAME\n          valueFrom:\n            fieldRef:\n              fieldPath: metadata.name\n        - name: HOST_IP\n          valueFrom:\n            fieldRef:\n              fieldPath: status.hostIP\n        - name: KUBELET_PORT\n          value: '10250'\n        - name: JUICEFS_MOUNT_PATH\n          value: /var/lib/juicefs/volume\n        - name: JUICEFS_CONFIG_PATH\n          value: /var/lib/juicefs/config\n        image: mirror.gcr.io/juicedata/juicefs-csi-driver@sha256:f221e9090fb72098d3261fd6bc6ec1b3b1dec8a372882c9659bd993ca198c754\n        livenessProbe:\n          failureThreshold: 5\n          httpGet:\n            path: /healthz\n            port: healthz\n          initialDelaySeconds: 10\n          periodSeconds: 10\n          timeoutSeconds: 3\n        name: juicefs-plugin\n        ports:\n        - containerPort: 9909\n          name: healthz\n          protocol: TCP\n        resources:\n          limits:\n            cpu: 1000m\n            memory: 1Gi\n          requests:\n            cpu: 100m\n            memory: 512Mi\n        securityContext:\n          privileged: true\n        volumeMounts:\n        - mountPath: /var/lib/kubelet\n          mountPropagation: Bidirectional\n          name: kubelet-dir\n        - mountPath: /csi\n          name: plugin-dir\n        - mountPath: /dev\n          name: device-dir\n        - mountPath: /jfs\n          mountPropagation: Bidirectional\n          name: jfs-dir\n        - mountPath: /root/.juicefs\n          mountPropagation: Bidirectional\n          name: jfs-root-dir\n        - mountPath: /etc/config\n          name: juicefs-config\n        - mountPath: /tmp\n          name: jfs-fuse-fd\n        imagePullPolicy: IfNotPresent\n      - args:\n        - --csi-address=$(ADDRESS)\n        - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)\n        - --v=5\n        env:\n        - name: ADDRESS\n          value: /csi/csi.sock\n        - name: DRIVER_REG_SOCK_PATH\n          value: /var/lib/kubelet/csi-plugins/csi.juicefs.com/csi.sock\n        image: mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9\n        name: node-driver-registrar\n        volumeMounts:\n        - mountPath: /csi\n          name: plugin-dir\n        - mountPath: /registration\n          name: registration-dir\n        imagePullPolicy: IfNotPresent\n      - args:\n        - --csi-address=$(ADDRESS)\n        - --health-port=$(HEALTH_PORT)\n        env:\n        - name: ADDRESS\n          value: /csi/csi.sock\n        - name: HEALTH_PORT\n          value: '9909'\n        image: mirror.gcr.io/rancher/mirrored-sig-storage-livenessprobe@sha256:4a1e22167d03746e6748cdc41b6374262c666bc85999e90112edc236dfb2c95a\n        name: liveness-probe\n        volumeMounts:\n        - mountPath: /csi\n          name: plugin-dir\n        imagePullPolicy: IfNotPresent\n      dnsPolicy: ClusterFirstWithHostNet\n      priorityClassName: system-node-critical\n      serviceAccount: juicefs-csi-node-sa\n      tolerations:\n      - key: CriticalAddonsOnly\n        operator: Exists\n      volumes:\n      - hostPath:\n          path: /var/lib/kubelet\n          type: Directory\n        name: kubelet-dir\n      - hostPath:\n          path: /var/lib/kubelet/csi-plugins/csi.juicefs.com/\n          type: DirectoryOrCreate\n        name: plugin-dir\n      - hostPath:\n          path: /var/lib/kubelet/plugins_registry/\n          type: Directory\n        name: registration-dir\n      - hostPath:\n          path: /dev\n          type: Directory\n        name: device-dir\n      - hostPath:\n          path: /var/lib/juicefs/volume\n          type: DirectoryOrCreate\n        name: jfs-dir\n      - hostPath:\n          path: /var/lib/juicefs/config\n          type: DirectoryOrCreate\n        name: jfs-root-dir\n      - configMap:\n          defaultMode: 420\n          name: juicefs-csi-driver-config\n        name: juicefs-config\n      - hostPath:\n          path: /var/run/juicefs-csi\n          type: DirectoryOrCreate\n        name: jfs-fuse-fd\n---\napiVersion: storage.k8s.io/v1\nkind: CSIDriver\nmetadata:\n  labels:\n    app.kubernetes.io/instance: juicefs-csi-driver\n    app.kubernetes.io/name: juicefs-csi-driver\n    app.kubernetes.io/version: master\n  name: csi.juicefs.com\nspec:\n  attachRequired: false\n  podInfoOnMount: true\n",
+      "sha256": "sha256:e24fe740a89d095296e785c16911cd65a24589c17de098fd467b6081e802aaff"
+    },
+    "config_patch_before_execution": {
+      "server_binary": "/home/ac-test/agent-computer-server",
+      "api_token": "Refreshed for 30 minutes in a private root-owned file; token not retained",
+      "registry_mirror": "mirrors:\n  docker.io:\n    endpoint:\n      - https://mirror.gcr.io\n",
+      "apt_sources": "Ubuntu source URLs switched from HTTP to HTTPS after proxy 502; signed package verification retained"
+    },
+    "commands": [
+      "bazel build //crates/worker:candidate_worker_live_test //crates/server:agent-computer-server --lockfile_mode=error",
+      "sudo env AGENT_COMPUTER_CANDIDATE_TEST_CONFIG=/root/storage-probe/worker-config.json /home/ac-test/candidate_worker_live_test --nocapture",
+      "sudo python3 /home/ac-test/collect-candidate-file-save.py"
+    ]
+  },
+  "setup_observations": [
+    {
+      "outcome": "Ubuntu HTTP package requests returned proxy 502; initial Docker Hub pause pull reset; first CSI rollout wait expired before image downloads completed",
+      "resolution": "Used HTTPS Ubuntu sources and mirror.gcr.io; pulled the same pause tag and waited for both CSI workloads to be Ready before executing the single passing test. No product identity checks were disabled."
+    }
+  ],
+  "evidence_refs": [
+    {
+      "path": "candidate-file-save-2026-10-09.log",
+      "sha256": "sha256:27098538d2c06a3f6dfb1ecc2b1f95c4e89e461d75f4df2d092a5c743e446435"
+    }
+  ],
+  "limits": [
+    "Component scope only; T01-T43 remain not_run",
+    "At most 1 MiB per file through the exclusive trusted gateway; no HTTP file API or product file UI",
+    "All Candidate writers must use the gateway; arbitrary mounted writers are not isolated",
+    "Uncertain-IO path here is a rejected symlink; no hung FUSE, process/node death, deadline overrun or physical fencing test",
+    "No product Pod mount, general process executor, Artifact publication, stop/recover or cleanup controller",
+    "No power loss, S3 outage, replication, multi-node or HA test; Outbox failure is an explicit database trigger injection",
+    "A worker lost before persisting sealed completion still leaves unresolved dispatch and cannot automatically retry IO",
+    "Operator binds the actual full mount, filesystem UUID and CSI Volume directory; test tightens CSI-created Volume root to mode 0700",
+    "Quota confirmation exercised; this probe does not repeat independent EDQUOT tests",
+    "Environment teardown is not product cleanup or fencing evidence"
+  ],
+  "cleanup": {
+    "completed_at_utc": "2026-10-09T15:56:35.671492+00:00",
+    "vm_pid": 2104440,
+    "process_stopped": true,
+    "removed_local_artifacts": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "user-data",
+      "meta-data",
+      "known_hosts",
+      "serial.log",
+      "qemu.log",
+      "vm.json"
+    ],
+    "guest_state": "Disposable overlay removed, including PostgreSQL databases, S3 objects, Kubernetes credentials, generated connection credentials and FUSE mounts",
+    "preserved": "Existing upstream image/binary/manifest cache and sanitized evidence only; no host-wide pruning",
+    "limit": "Environment teardown is not product cleanup or fencing evidence"
+  }
+}

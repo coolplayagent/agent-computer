@@ -1,0 +1,27 @@
+Source commit: 06f3d14002bdf1599cca496eee4cb6951a30b92b; clean worktree at execution.
+
+running 1 test
+CANDIDATE_WORKER_REAL_PREPARATION_AND_OBSERVATION_PASSED
+test actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.91s
+
+
+Fresh client collection:
+
+For enterprise users, please visit https://seaweedfs.com for the SeaweedFS Enterprise Edition,
+which has advanced features, including data recovery, self-healing storage, customizable erasure coding, EC vacuum and repair, etc.
+Bounded file-save evidence and fresh-client reads collected.
+
+Final environment:
+NAMESPACE     NAME                                 READY   STATUS      RESTARTS   AGE   IP           NODE                NOMINATED NODE   READINESS GATES
+kube-system   coredns-577d995dff-shgmr             1/1     Running     0          12m   10.42.0.26   ac-component-node   <none>           <none>
+kube-system   helm-install-gateway-api-crd-q6s4z   0/1     Completed   0          12m   10.42.0.27   ac-component-node   <none>           <none>
+kube-system   juicefs-csi-controller-0             4/4     Running     0          11m   10.42.0.29   ac-component-node   <none>           <none>
+kube-system   juicefs-csi-node-qdfzk               3/3     Running     0          11m   10.42.0.28   ac-component-node   <none>           <none>
+TARGET          FSTYPE
+/mnt/ac-juicefs fuse.juicefs
+
+Saved file: 23 bytes; sha256:f2a0af3094888f9f2dbc856033fac3ac88e3efdbdef36f3c1b55f33e1266c097.
+Fresh client read both saved and preserved files: 50 S3 GET bytes in 2 requests.
+Six immutable file completions/events/Outbox rows; five bounded_file_drained proofs; final epoch 6 remains Draining.
