@@ -6,6 +6,8 @@ The baseline is Linux x86_64, Bazel 9.3.0, Rust 1.97.1 (edition 2024), and rules
 
 Bazel is the project build and test entry point, using `rust_library`, `rust_binary`, and `rust_test` directly. It does not invoke Cargo through a shell. The Cargo workspace supports editors, formatting, and Clippy over the same Rust sources. External crates use crate_universe over the same Cargo.toml/Cargo.lock. After dependency updates, run Bazel and commit Cargo.lock and MODULE.bazel.lock.
 
+`REPO.bazel` excludes Cargo’s `target/` output from Bazel package discovery, preventing races with Cargo incremental directory cleanup. See [Bazel ignore_directories](https://bazel.build/rules/lib/globals/repo#ignore_directories).
+
 ## 02.2 Commands
 
 Run from the repository root:

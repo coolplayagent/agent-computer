@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 mod definition_admin;
 mod operator;
+mod reconciliation_admin;
 
 #[tokio::main]
 async fn main() -> std::process::ExitCode {

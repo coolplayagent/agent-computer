@@ -145,6 +145,10 @@ pub struct DefinitionOperation {
     pub state: String,
     pub resources: Vec<Dependency>,
     pub event_sequence: i64,
+    #[serde(default)]
+    pub progress: Vec<crate::reconciliation::IntentProgress>,
+    #[serde(default)]
+    pub watermark: i64,
 }
 
 pub(super) fn random_id(prefix: &str) -> Result<String> {
@@ -155,7 +159,7 @@ pub(super) fn random_id(prefix: &str) -> Result<String> {
         bytes.iter().map(|b| format!("{b:02x}")).collect::<String>()
     ))
 }
-pub(super) fn digest(domain: &str, value: &impl Serialize) -> Result<String> {
+pub(crate) fn digest(domain: &str, value: &impl Serialize) -> Result<String> {
     use sha2::{Digest, Sha256};
     let mut hash = Sha256::new();
     hash.update(domain);

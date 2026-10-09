@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, authorized definition plans and atomic apply. Apply publishes immutable resource versions and queued reconciliation intents. Runtime reconciliation, OIDC and runtime grants remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, authorized definition plans, atomic apply and durable coordination progress. Runtime backend workers, OIDC and runtime grants remain unsupported."
   },
   "servers": [
     {
@@ -1568,7 +1568,9 @@
           "plan_id",
           "state",
           "resources",
-          "event_sequence"
+          "event_sequence",
+          "progress",
+          "watermark"
         ],
         "properties": {
           "operation_id": {
@@ -1598,9 +1600,20 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 9223372036854775807
+          },
+          "progress": {
+            "type": "array",
+            "maxItems": 1024,
+            "items": {
+              "$ref": "#/components/schemas/IntentProgress"
+            }
+          },
+          "watermark": {
+            "type": "integer",
+            "minimum": 1
           }
         },
-        "description": "Current operation metadata. This release creates Queued operations and Pending intents; no runtime worker is available. event_sequence is the original publication event sequence."
+        "description": "Current operation metadata and per-intent progress from one organization-locked snapshot. event_sequence is the publication event; watermark is the observation stream position. Apply creates Queued/Pending metadata. Trusted coordination APIs can advance it, but this release has no runtime backend worker; database fixtures do not certify runtime success."
       },
       "ApplyDefinitionPlan": {
         "type": "object",
@@ -1614,6 +1627,79 @@
             "pattern": "^sha256:[0-9a-f]{64}$"
           }
         }
+      },
+      "IntentProgress": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "resource_id",
+          "revision",
+          "state",
+          "attempts",
+          "dispatch_started",
+          "reason",
+          "available_at_ms",
+          "event_sequence"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "pattern": "^step_[0-9a-f]{32}$"
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^res_[0-9a-f]{32}$"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "state": {
+            "enum": [
+              "Pending",
+              "Running",
+              "Succeeded",
+              "Failed",
+              "Blocked"
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dispatch_started": {
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "authorization_revoked",
+                  "reference_unavailable",
+                  "backend_unavailable",
+                  "backend_transient",
+                  "backend_rejected",
+                  "runtime_unknown",
+                  "resource_conflict",
+                  "operator_abandoned"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "available_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "event_sequence": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "description": "Durable coordination status. attempts is the monotonically increasing coordinator lease epoch, not runtime generation. dispatch_started means an external effect may have occurred; it is not proof of execution or process termination."
       }
     },
     "responses": {

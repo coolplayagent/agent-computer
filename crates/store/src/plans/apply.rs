@@ -8,7 +8,7 @@ use sqlx::{Postgres, Row, Transaction};
 
 const APPLY_OPERATION: &str = "definitions.apply.v1";
 
-async fn load_plan(
+pub(crate) async fn load_plan(
     tx: &mut Transaction<'_, Postgres>,
     identity: &AuthenticatedPrincipal,
     id: &str,
@@ -32,16 +32,25 @@ async fn operation(
 ) -> Result<Option<DefinitionOperation>> {
     let row=sqlx::query("SELECT operation_id,state,event_sequence FROM operations WHERE organization=$1 AND principal=$2 AND plan_id=$3")
         .bind(identity.organization().as_str()).bind(identity.principal().as_str()).bind(&plan.plan_id).fetch_optional(&mut **tx).await?;
-    row.map(|row| {
-        Ok(DefinitionOperation {
-            operation_id: row.try_get("operation_id")?,
-            plan_id: plan.plan_id.clone(),
-            state: row.try_get("state")?,
-            resources: plan.resources.iter().map(references::dependency).collect(),
-            event_sequence: row.try_get("event_sequence")?,
-        })
-    })
-    .transpose()
+    let Some(row) = row else { return Ok(None) };
+    let operation_id: String = row.try_get("operation_id")?;
+    let progress =
+        crate::reconciliation::progress(tx, identity.organization().as_str(), &operation_id)
+            .await?;
+    let watermark =
+        sqlx::query_scalar("SELECT last_sequence FROM organization_streams WHERE organization=$1")
+            .bind(identity.organization().as_str())
+            .fetch_one(&mut **tx)
+            .await?;
+    Ok(Some(DefinitionOperation {
+        operation_id,
+        plan_id: plan.plan_id.clone(),
+        state: row.try_get("state")?,
+        resources: plan.resources.iter().map(references::dependency).collect(),
+        event_sequence: row.try_get("event_sequence")?,
+        progress,
+        watermark,
+    }))
 }
 
 impl Store {
@@ -154,8 +163,8 @@ impl Store {
         )
         .await?;
         let operation_id = random_id("op")?;
-        sqlx::query("INSERT INTO operations (organization,operation_id,principal,plan_id,event_sequence) VALUES ($1,$2,$3,$4,$5)")
-            .bind(org).bind(&operation_id).bind(identity.principal().as_str()).bind(id).bind(seq.checked_add(1).ok_or(Error::CounterExhausted)?).execute(&mut *tx).await?;
+        sqlx::query("INSERT INTO operations (organization,operation_id,principal,plan_id,event_sequence,credential_id) VALUES ($1,$2,$3,$4,$5,$6)")
+            .bind(org).bind(&operation_id).bind(identity.principal().as_str()).bind(id).bind(seq.checked_add(1).ok_or(Error::CounterExhausted)?).bind(crate::auth::token_id(token)?).execute(&mut *tx).await?;
         for (ordinal, resource) in plan.resources.iter().enumerate() {
             if resource.change != Change::Unchanged {
                 sqlx::query("INSERT INTO resource_definitions (organization,resource_id,kind,name,revision) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (organization,resource_id) DO UPDATE SET revision=EXCLUDED.revision")
@@ -171,11 +180,13 @@ impl Store {
                 resource.expected_revision == 0,
             )
             .await?;
-            sqlx::query("INSERT INTO reconcile_intents (organization,operation_id,ordinal,resource_id,revision,requires_drain) VALUES ($1,$2,$3,$4,$5,$6)")
-                .bind(org).bind(&operation_id).bind(ordinal as i32).bind(&resource.resource_id).bind(resource.revision).bind(resource.requires_drain).execute(&mut *tx).await?;
+            sqlx::query("INSERT INTO reconcile_intents (organization,operation_id,ordinal,resource_id,revision,requires_drain,step_id,event_sequence) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)")
+                .bind(org).bind(&operation_id).bind(ordinal as i32).bind(&resource.resource_id).bind(resource.revision).bind(resource.requires_drain).bind(random_id("step")?).bind(seq.checked_add(1).ok_or(Error::CounterExhausted)?).execute(&mut *tx).await?;
         }
         let event_sequence=transactions::emit(&mut tx,org,seq,"definition.applied",serde_json::json!({"operation_id":operation_id,"plan_id":id,"declaration_name":plan.declaration_name,"revision":revision})).await?;
         let response = DefinitionOperation {
+            watermark: event_sequence,
+            progress: crate::reconciliation::progress(&mut tx, org, &operation_id).await?,
             operation_id,
             plan_id: id.into(),
             state: "Queued".into(),

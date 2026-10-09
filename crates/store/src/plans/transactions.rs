@@ -54,7 +54,7 @@ pub(super) async fn save_receipt(
     sqlx::query("INSERT INTO request_records (organization,principal,operation,request_key,input_digest,response) VALUES ($1,$2,$3,$4,$5,$6)").bind(identity.organization().as_str()).bind(identity.principal().as_str()).bind(operation).bind(key.as_str()).bind(input_hash(input)).bind(serde_json::to_value(response).map_err(|_|Error::InvalidStoredData)?).execute(&mut **tx).await?;
     Ok(())
 }
-pub(super) async fn emit(
+pub(crate) async fn emit(
     tx: &mut Transaction<'_, Postgres>,
     org: &str,
     previous: i64,
@@ -81,7 +81,7 @@ pub(super) async fn emit(
         .await?;
     Ok(sequence)
 }
-pub(super) async fn now(tx: &mut Transaction<'_, Postgres>) -> Result<i64> {
+pub(crate) async fn now(tx: &mut Transaction<'_, Postgres>) -> Result<i64> {
     Ok(
         sqlx::query_scalar("SELECT floor(extract(epoch FROM clock_timestamp())*1000)::bigint")
             .fetch_one(&mut **tx)

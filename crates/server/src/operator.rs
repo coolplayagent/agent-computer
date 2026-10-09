@@ -31,7 +31,7 @@ pub(crate) fn failed(message: &'static str) -> Failure {
 pub async fn run(args: Vec<String>) -> Result<(), Failure> {
     if args.is_empty() || args == ["--help"] || args == ["help"] {
         println!(
-            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes definitions.validate[,definitions.manage] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
+            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes definitions.validate[,definitions.manage] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
         );
         return Ok(());
     }
@@ -60,6 +60,9 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
         ],
         "catalog-register" => &["database-url-file", "organization", "kind", "name"],
         "catalog-disable" => &["database-url-file", "organization", "resource-id"],
+        "reconciliation-inspect" | "reconciliation-resume" | "reconciliation-abandon" => {
+            &["database-url-file", "organization", "operation"]
+        }
         _ => return Err(usage()),
     };
     if !(args.len() - 1).is_multiple_of(2) {
@@ -93,6 +96,9 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             .await
             .map_err(|_| failed("Database schema is not ready. Run migrate first."))?;
         match command {
+            "reconciliation-inspect" | "reconciliation-resume" | "reconciliation-abandon" => {
+                crate::reconciliation_admin::run(command, &store, &options).await?
+            }
             "definition-grant" | "definition-revoke" | "catalog-register" | "catalog-disable" => {
                 crate::definition_admin::run(command, &store, &options).await?
             }

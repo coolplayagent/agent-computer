@@ -4,7 +4,7 @@
 
 控制 API 现可规划并发布 ComputerSet 的六类资源：Volume、Workspace、Sandbox、App、Agent、Computer。计划包含解析后的前后规格、稳定资源 ID、固定依赖 revision/digest 及排空要求。apply 在 PostgreSQL 一次事务中提交声明版本、变更资源的 SpecVersion、创建者授权、operation、协调意图、幂等回执和事件/Outbox。
 
-服务将 `definitions.plan`、`definitions.apply` 标记为 `control-plane`。operation 保持 `Queued`，意图保持 `Pending`：目前没有协调 worker，不启动 Kubernetes 资源、文件系统、浏览器或托管 Agent。`requires_drain` 记录后续 worker 的要求，不证明任何进程已经停止。[运行验收矩阵](../../codespec/test/agent-computer.md)仍未执行。
+服务将 `definitions.plan`、`definitions.apply` 标记为 `control-plane`。apply 创建 `Queued` operation 和 `Pending` 意图。[持久化协调接口](11-reconciliation-coordination.md)可推进这些状态，但尚无后端 worker 启动 Kubernetes 资源、文件系统、浏览器或托管 Agent。`requires_drain` 记录后续 worker 的要求，不证明任何进程已经停止。[运行验收矩阵](../../codespec/test/agent-computer.md)仍未执行。
 
 ## 10.2 Scope 与资源权限
 

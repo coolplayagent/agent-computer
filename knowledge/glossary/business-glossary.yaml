@@ -4,6 +4,27 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: reconciliation-lease
+    domain: agent-infrastructure
+    canonical_name: ReconcileLease
+    definition: 可信协调 worker 在数据库时钟下领取的限时资源意图租约；单调 epoch 拒绝旧 worker 的权威写回，不能证明外部进程终止或替代 Computer generation。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/reconciliation/claims.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/11-reconciliation-coordination.md
+  - id: reconciliation-effect-receipt
+    domain: agent-infrastructure
+    canonical_name: EffectReceipt
+    definition: 可信后端适配器核验后提交的固定 step/资源/revision/spec digest、实际对象 UID 与证据引用；数据库只验证绑定和原子持久化，不从回执字符串推断运行事实。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/reconciliation/completion.rs
   - id: definition-plan
     domain: agent-infrastructure
     canonical_name: DefinitionPlan

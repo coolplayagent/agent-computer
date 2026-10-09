@@ -100,7 +100,7 @@ fn hash(token: &str) -> Vec<u8> {
     digest.update(token.as_bytes());
     digest.finalize().to_vec()
 }
-fn token_id(token: &str) -> Result<&str> {
+pub(crate) fn token_id(token: &str) -> Result<&str> {
     let value = token.strip_prefix("acsk_").ok_or(Error::Unauthenticated)?;
     let (id, secret) = value.split_once('_').ok_or(Error::Unauthenticated)?;
     let lower_hex = |s: &str| {
@@ -179,6 +179,28 @@ impl Store {
         decode_principal(row, token, required)
     }
 
+    /// Revalidate the admission credential already bound by authenticated apply.
+    /// Only trusted database workers use this path; no client supplies this ID.
+    pub(crate) async fn authorize_operation_in(
+        tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        organization: &str,
+        operation: &str,
+    ) -> Result<AuthenticatedPrincipal> {
+        let row = sqlx::query("SELECT c.organization,c.principal,p.kind,c.scopes,(NOT c.revoked AND p.enabled AND c.expires_at > clock_timestamp()) AS active FROM operations o JOIN service_credentials c ON c.credential_id=o.credential_id AND c.organization=o.organization AND c.principal=o.principal JOIN principals p ON p.organization=c.organization AND p.principal=c.principal WHERE o.organization=$1 AND o.operation_id=$2 FOR SHARE OF c,p")
+            .bind(organization).bind(operation).fetch_optional(&mut **tx).await?.ok_or(Error::Unauthenticated)?;
+        let scopes: Vec<String> = row.try_get("scopes")?;
+        if !row.try_get::<bool, _>("active")? {
+            return Err(Error::Unauthenticated);
+        }
+        if !scopes
+            .iter()
+            .any(|s| s == ServiceScope::DefinitionsManage.as_str())
+        {
+            return Err(Error::Forbidden);
+        }
+        identity_from_row(&row)
+    }
+
     pub async fn revoke_credential(&self, organization: &OrganizationId, id: &str) -> Result<bool> {
         Ok(sqlx::query("UPDATE service_credentials SET revoked=TRUE WHERE organization=$1 AND credential_id=$2")
             .bind(organization.as_str()).bind(id).execute(&self.pool).await?.rows_affected() == 1)
@@ -218,6 +240,10 @@ fn decode_principal(
     if !scopes.iter().any(|s| s == required.as_str()) {
         return Err(Error::Forbidden);
     }
+    identity_from_row(&row)
+}
+
+fn identity_from_row(row: &sqlx::postgres::PgRow) -> Result<AuthenticatedPrincipal> {
     let kind = match row.try_get::<String, _>("kind")?.as_str() {
         "human" => PrincipalKind::Human,
         "agent" => PrincipalKind::Agent,

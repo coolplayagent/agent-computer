@@ -106,7 +106,7 @@ async fn capabilities() -> Json<serde_json::Value> {
     Json(
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported",
-            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation":"unsupported", "computer":"unsupported",
+            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported",
             "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),

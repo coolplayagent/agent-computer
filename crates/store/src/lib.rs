@@ -1,11 +1,12 @@
-//! PostgreSQL declaration registry. This internal API assumes an authorized caller;
-//! recording a declaration does not apply resources or dispatch runtime work.
+//! PostgreSQL control state: authorized publication and trusted worker coordination.
+//! The raw registry and worker administration APIs require trusted database access.
 #![forbid(unsafe_code)]
 
 pub mod auth;
 mod migrations;
 pub mod plans;
 mod reads;
+pub mod reconciliation;
 mod retention;
 mod types;
 mod writes;

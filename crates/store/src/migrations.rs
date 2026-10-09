@@ -32,6 +32,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0003_definition_plans.sql")),
                     false,
                 ),
+                Migration::new(
+                    4,
+                    Cow::Borrowed("reconciliation leases"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0004_reconciliation_leases.sql")),
+                    false,
+                ),
             ])
         })
     }

@@ -63,6 +63,8 @@ The request handler permits 64 concurrent requests, has a 10-second timeout, and
 
 ## 09.4 Verification and remaining scope
 
+Operation progress, database coordination and local `reconciliation-inspect/resume/abandon` commands are documented in [11 Coordination](11-reconciliation-coordination.md).
+
 The shared `crates/test-support` starts real private PostgreSQL clusters for store and server tests. Three credential cases cover random issuance, stored hashes, principal binding, scope separation, tampering, expiry, revocation, disable, lifetime bounds and readiness checks. Seven service cases cover authorization before parsing, identity spoofing, no-side-effect validation, duplicate headers, protocol limits, readiness failures, private operator files, and an actual server process over TCP with issue/validate/grant/catalog/plan/apply/revoke/SIGTERM. Run the [database-enabled Bazel/Cargo suite](08-persistence.md).
 
 [Definition grants and transactional plan/apply](10-plans-and-apply.md) are implemented. OIDC, organization membership and runtime Workspace/Computer/App grants, ConnectionSession/ViewerSession, protected streaming, deployment and Computer runtime are still pending. This increment does not satisfy full T10/T18/T22 acceptance or establish production security certification.

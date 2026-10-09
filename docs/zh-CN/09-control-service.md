@@ -63,6 +63,8 @@ bazel run //:agent-computer-server -- principal-disable \
 
 ## 09.4 验证与剩余范围
 
+operation 进度、数据库协调及本地 `reconciliation-inspect/resume/abandon` 命令见 [11 持久化协调](11-reconciliation-coordination.md)。
+
 共享 `crates/test-support` 为 store/server 测试启动真实、私有 PostgreSQL 集群。3 个凭据场景覆盖随机签发、仅存摘要、主体绑定、scope 分离、篡改、到期、撤销、禁用、时限约束与就绪检查。7 个服务场景覆盖先认证后解析、身份伪造、无副作用验证、重复请求头、协议限制、依赖故障、私有运维文件，以及独立服务进程经 TCP 的签发/验证/授权/目录管理/plan/apply/撤销/SIGTERM。运行方式见[数据库版 Bazel/Cargo 测试](08-persistence.md)。
 
 [声明 grant 和事务内 plan/apply](10-plans-and-apply.md)已实现。OIDC、组织成员和运行时 Workspace/Computer/App grant、ConnectionSession/ViewerSession、受保护流、部署和 Computer 运行时仍待实现。本增量不等于完整 T10/T18/T22 通过，也不代表生产安全认证。

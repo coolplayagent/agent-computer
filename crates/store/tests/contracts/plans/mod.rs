@@ -9,6 +9,7 @@ use std::time::Duration;
 
 mod admission;
 mod publication;
+mod reconciliation;
 mod references;
 
 const EXAMPLE: &[u8] = include_bytes!("../../../../../examples/research.computer.yaml");

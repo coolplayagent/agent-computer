@@ -26,7 +26,7 @@ pub(super) async fn require(
         Err(Error::Forbidden)
     }
 }
-pub(super) async fn authorize_plan(
+pub(crate) async fn authorize_plan(
     tx: &mut Transaction<'_, Postgres>,
     identity: &AuthenticatedPrincipal,
     plan: &DefinitionPlan,

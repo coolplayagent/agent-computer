@@ -1,0 +1,3 @@
+# Cargo mutates incremental build directories while Bazel discovers packages.
+# https://bazel.build/rules/lib/globals/repo#ignore_directories
+ignore_directories(["target"])

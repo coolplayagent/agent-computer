@@ -6,7 +6,7 @@
 | --- | --- |
 | `crates/core` | 无基础设施依赖的领域契约与状态机 |
 | `crates/definitions` | 有界解析、声明语义、固定摘要和结构 Schema |
-| `crates/store` | PostgreSQL 计划、声明权限、不可变 SpecVersion、原子幂等/CAS 与事件/Outbox 事务 |
+| `crates/store` | PostgreSQL 计划、声明权限、不可变 SpecVersion、原子幂等/CAS、worker 租约/回执与事件/Outbox 事务 |
 | `crates/server` | Axum HTTP、请求限额、服务认证、plan/apply 与本地凭据/授权/目录运维 |
 | `crates/test-support` | 仅用于集成测试的真实私有 PostgreSQL 集群 |
 | `crates/cli` | 原生 CLI；提供版本、能力状态、声明验证及 Schema 导出 |

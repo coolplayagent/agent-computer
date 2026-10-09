@@ -118,6 +118,11 @@ async fn plan_apply_and_operation_routes_bind_keys_digests_and_revisions() {
         .await;
     assert_eq!(status, StatusCode::ACCEPTED);
     assert_eq!(operation["state"], "Queued");
+    assert_eq!(operation["progress"][0]["state"], "Pending");
+    assert_eq!(
+        operation["progress"][0]["event_sequence"],
+        operation["event_sequence"]
+    );
     let retry = service
         .send(request(
             token,
@@ -139,6 +144,47 @@ async fn plan_apply_and_operation_routes_bind_keys_digests_and_revisions() {
             .await
             .1["state"],
         "Queued"
+    );
+    use agent_computer_store::reconciliation::{
+        ClaimOutcome, ReconcileOutcome, ReconcileReason, WorkerId,
+    };
+    let ClaimOutcome::Claimed(lease) = service
+        .store
+        .claim_reconciliation(
+            &OrganizationId::new("acme").unwrap(),
+            &WorkerId::new("worker").unwrap(),
+            std::time::Duration::from_secs(30),
+        )
+        .await
+        .unwrap()
+    else {
+        panic!("expected claim")
+    };
+    service
+        .store
+        .finish_reconciliation(
+            &lease,
+            ReconcileOutcome::Blocked {
+                reason: ReconcileReason::BackendUnavailable,
+            },
+        )
+        .await
+        .unwrap();
+    let (status, blocked) = service
+        .send(request(token, "GET", &operation_path, None, Value::Null))
+        .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(blocked["state"], "Blocked");
+    assert_eq!(blocked["progress"][0]["reason"], "backend_unavailable");
+    assert_eq!(blocked["progress"][0]["attempts"], 1);
+    assert!(
+        !blocked["progress"][0]["dispatch_started"]
+            .as_bool()
+            .unwrap()
+    );
+    assert!(
+        blocked["watermark"].as_i64().unwrap()
+            >= blocked["progress"][0]["event_sequence"].as_i64().unwrap()
     );
     assert_eq!(
         service

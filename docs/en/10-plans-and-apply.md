@@ -4,7 +4,7 @@
 
 The control API can now plan and publish all six ComputerSet resource kinds: Volume, Workspace, Sandbox, App, Agent and Computer. Plans contain resolved before/after specs, stable resource IDs, pinned dependency revisions/digests and drain requirements. Apply commits the declaration version, changed resource SpecVersions, creator grants, an operation, reconciliation intents, an idempotency receipt and event/Outbox together in PostgreSQL.
 
-The server advertises `definitions.plan` and `definitions.apply` as `control-plane`. Operations remain `Queued` and intents `Pending`: no reconciliation worker, Kubernetes resource, filesystem, browser or hosted Agent is started. `requires_drain` records a future worker requirement. It does not prove that any process has stopped. The [runtime acceptance matrix](../../codespec/test/agent-computer.md) remains unexecuted.
+The server advertises `definitions.plan` and `definitions.apply` as `control-plane`. Apply creates `Queued` operations and `Pending` intents. [Durable coordination APIs](11-reconciliation-coordination.md) can advance these states, but there is no backend worker to start Kubernetes resources, filesystems, browsers or hosted Agents. `requires_drain` records a future worker requirement. It does not prove that any process has stopped. The [runtime acceptance matrix](../../codespec/test/agent-computer.md) remains unexecuted.
 
 ## 10.2 Scope and resource authority
 

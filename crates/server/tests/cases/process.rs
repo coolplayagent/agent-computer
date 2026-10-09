@@ -254,6 +254,102 @@ async fn operator_commands_and_real_http_reject_revoked_credentials() {
         .status
         .success()
     );
+    let operation_id = operation["operation_id"].as_str().unwrap();
+    let inspect = command(
+        &[
+            "reconciliation-inspect",
+            "--organization",
+            "acme",
+            "--operation",
+            operation_id,
+        ],
+        &database_file,
+    );
+    assert!(inspect.status.success());
+    let status: Value = serde_json::from_slice(&inspect.stdout).unwrap();
+    assert_eq!(status["progress"][0]["state"], "Pending");
+    let store = agent_computer_store::Store::new(database.pool.clone());
+    use agent_computer_store::reconciliation::{
+        ClaimOutcome, ReconcileOutcome, ReconcileReason, WorkerId,
+    };
+    let ClaimOutcome::Claimed(lease) = store
+        .claim_reconciliation(
+            &agent_computer_core::identity::OrganizationId::new("acme").unwrap(),
+            &WorkerId::new("process-test").unwrap(),
+            Duration::from_secs(30),
+        )
+        .await
+        .unwrap()
+    else {
+        panic!("expected claim")
+    };
+    store
+        .finish_reconciliation(
+            &lease,
+            ReconcileOutcome::Blocked {
+                reason: ReconcileReason::BackendUnavailable,
+            },
+        )
+        .await
+        .unwrap();
+    let resumed = command(
+        &[
+            "reconciliation-resume",
+            "--organization",
+            "acme",
+            "--operation",
+            operation_id,
+        ],
+        &database_file,
+    );
+    assert!(resumed.status.success());
+    let resumed: Value = serde_json::from_slice(&resumed.stdout).unwrap();
+    assert_eq!(resumed["progress"][0]["state"], "Pending");
+    let ClaimOutcome::Claimed(lease) = store
+        .claim_reconciliation(
+            &agent_computer_core::identity::OrganizationId::new("acme").unwrap(),
+            &WorkerId::new("process-test").unwrap(),
+            Duration::from_secs(30),
+        )
+        .await
+        .unwrap()
+    else {
+        panic!("expected claim")
+    };
+    store
+        .finish_reconciliation(
+            &lease,
+            ReconcileOutcome::Blocked {
+                reason: ReconcileReason::BackendUnavailable,
+            },
+        )
+        .await
+        .unwrap();
+    let abandoned = command(
+        &[
+            "reconciliation-abandon",
+            "--organization",
+            "acme",
+            "--operation",
+            operation_id,
+        ],
+        &database_file,
+    );
+    assert!(abandoned.status.success());
+    let abandoned: Value = serde_json::from_slice(&abandoned.stdout).unwrap();
+    assert_eq!(abandoned["state"], "Failed");
+    assert_eq!(abandoned["progress"][0]["reason"], "operator_abandoned");
+    assert_eq!(
+        http(
+            address,
+            "GET",
+            &format!("/v1alpha1/operations/{operation_id}"),
+            Some(token),
+            ""
+        )
+        .1["state"],
+        "Failed"
+    );
     let revoke = command(
         &[
             "credential-revoke",

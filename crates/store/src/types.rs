@@ -58,6 +58,10 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    StaleReconcileLease,
+    DispatchAlreadyStarted,
+    InvalidReconcileResult,
+    OperationNotBlocked,
     PreconditionRequired,
     ReferenceUnavailable,
     PlanNotFound,
@@ -89,6 +93,12 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::StaleReconcileLease => "reconciliation lease is expired or no longer owned",
+            Self::DispatchAlreadyStarted => {
+                "dispatch may already have occurred; observe the stable effect identity"
+            }
+            Self::InvalidReconcileResult => "invalid reconciliation result or effect binding",
+            Self::OperationNotBlocked => "operation is not blocked",
             Self::PreconditionRequired => "expected revision is required for existing definitions",
             Self::ReferenceUnavailable => {
                 "reference is missing, inaccessible, disabled or incompatible"

@@ -6,6 +6,8 @@
 
 Bazel 是项目构建与测试入口，直接使用 `rust_library`、`rust_binary` 和 `rust_test`，不通过 shell 转调 Cargo。Cargo 工作区用于编辑器、格式化和 Clippy，二者使用同一 Rust 源码。外部 crate 通过 crate_universe 从同一 Cargo.toml/Cargo.lock 解析；更新依赖后运行 Bazel 并提交 Cargo.lock 与 MODULE.bazel.lock。
 
+`REPO.bazel` 将 Cargo 的 `target/` 产物排除于 Bazel 包发现之外，避免与 Cargo 增量目录清理竞争。依据见 [Bazel ignore_directories](https://bazel.build/rules/lib/globals/repo#ignore_directories)。
+
 ## 02.2 命令
 
 在仓库根目录运行：
