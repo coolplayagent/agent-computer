@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: integrations
+  title: integrations
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-ecosystem
+  topic: integrations
+  kind: doc
+  uri: codespec/design/ecosystem-integration.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 2
+  description: CLI 权威分工、宿主接入、workflow 成果桥接与人的会话生命周期
+route:
+  topic: integrations
+  source_order:
+  - agent-computer-ecosystem
+  fallback: bounded-search

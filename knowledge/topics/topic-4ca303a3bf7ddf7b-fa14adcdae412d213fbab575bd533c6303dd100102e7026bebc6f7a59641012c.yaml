@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: architecture
+  title: architecture
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-design
+  topic: architecture
+  kind: doc
+  uri: codespec/design/agent-computer.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 2
+  description: 计算存储、统一连接与控制、ComputerView、Presentation 和 D01–D15 技术契约
+route:
+  topic: architecture
+  source_order:
+  - agent-computer-design
+  fallback: bounded-search

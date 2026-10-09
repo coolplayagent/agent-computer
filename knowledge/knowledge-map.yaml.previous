@@ -1,0 +1,133 @@
+schema_version: 4
+artifact_kind: map
+map_type: knowledge
+map_version: 9
+updated_at: unix:1791518477
+directories:
+- directory: domain
+  purpose: Domain concepts, models, and business rules.
+  content_scope:
+  - knowledge/domain/**
+  key_files:
+  - knowledge/domain/README.md
+  load_hint: on_demand
+  relations: []
+  update_rule: reviewed
+- directory: guides
+  purpose: Task-oriented repository knowledge guides.
+  content_scope:
+  - knowledge/guides/**
+  key_files:
+  - knowledge/guides/README.md
+  load_hint: on_demand
+  relations: []
+  update_rule: reviewed
+- directory: ops
+  purpose: Operational procedures and diagnostics.
+  content_scope:
+  - knowledge/ops/**
+  key_files:
+  - knowledge/ops/README.md
+  load_hint: on_demand
+  relations: []
+  update_rule: reviewed
+- directory: glossary
+  purpose: Business terminology, aliases, and technical mappings.
+  content_scope:
+  - knowledge/glossary/**
+  key_files:
+  - knowledge/glossary/README.md
+  load_hint: on_demand
+  relations: []
+  update_rule: reviewed
+- directory: best-practices
+  purpose: Reviewed engineering and knowledge-management practices.
+  content_scope:
+  - knowledge/best-practices/**
+  key_files:
+  - knowledge/best-practices/README.md
+  load_hint: on_demand
+  relations: []
+  update_rule: reviewed
+topics:
+- id: acceptance
+  title: acceptance
+  description: Added by CLI source registration.
+  source_ids:
+  - agent-computer-acceptance
+  ref: topics/topic-c1514c6cdad166c1-148e8976fa18d6d451473265078a8d3826a8287bb53a47a0c5b3d2daeb2d4679.yaml
+  digest: 148e8976fa18d6d451473265078a8d3826a8287bb53a47a0c5b3d2daeb2d4679
+- id: architecture
+  title: architecture
+  description: Added by CLI source registration.
+  source_ids:
+  - agent-computer-design
+  ref: topics/topic-4ca303a3bf7ddf7b-fa14adcdae412d213fbab575bd533c6303dd100102e7026bebc6f7a59641012c.yaml
+  digest: fa14adcdae412d213fbab575bd533c6303dd100102e7026bebc6f7a59641012c
+- id: business-knowledge
+  title: Business knowledge
+  description: Version-controlled business domains, terminology, aliases, semantics, and technical mappings.
+  source_ids:
+  - repository-business-glossary
+  ref: topics/topic-17438b0266842113-79d9f29ebf10de1411c359a80aa9f343853d255098085e63fdc9e5c6c43d1adc.yaml
+  digest: 79d9f29ebf10de1411c359a80aa9f343853d255098085e63fdc9e5c6c43d1adc
+- id: integrations
+  title: integrations
+  description: Added by CLI source registration.
+  source_ids:
+  - agent-computer-ecosystem
+  ref: topics/topic-7955c8192dc2275a-40bff11db15a713b6013f4a4c8e1f917babea02d9f8679e58b7ab9cc317bb0a9.yaml
+  digest: 40bff11db15a713b6013f4a4c8e1f917babea02d9f8679e58b7ab9cc317bb0a9
+- id: product
+  title: product
+  description: Added by CLI source registration.
+  source_ids:
+  - agent-computer-product
+  ref: topics/topic-a8792157cb4f27fb-89c5421059ee946d057a92e75906700f7c1fbc3223b31b601a52f2fc0702a0f8.yaml
+  digest: 89c5421059ee946d057a92e75906700f7c1fbc3223b31b601a52f2fc0702a0f8
+- id: software-model
+  title: Whole-software model
+  description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
+  source_ids:
+  - repository-software-model
+  ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
+  digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
+history:
+  omitted_through: 0
+  recent:
+  - version: 1
+    action: init
+    actor: cli
+    summary: Created knowledge map with repository software-model route.
+  - version: 2
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-product' to topic 'product'.
+  - version: 3
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-design' to topic 'architecture'.
+  - version: 4
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-ecosystem' to topic 'integrations'.
+  - version: 5
+    action: source.add
+    actor: cli
+    summary: Added source 'agent-computer-acceptance' to topic 'acceptance'.
+  - version: 6
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-product'.
+  - version: 7
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-design'.
+  - version: 8
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-ecosystem'.
+  - version: 9
+    action: source.update
+    actor: cli
+    summary: Updated source 'agent-computer-acceptance'.

@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: acceptance
+  title: acceptance
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-acceptance
+  topic: acceptance
+  kind: doc
+  uri: codespec/test/agent-computer.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Documentation and future runtime acceptance
+route:
+  topic: acceptance
+  source_order:
+  - agent-computer-acceptance
+  fallback: bounded-search

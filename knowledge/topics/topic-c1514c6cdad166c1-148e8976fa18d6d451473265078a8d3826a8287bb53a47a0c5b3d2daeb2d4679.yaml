@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: acceptance
+  title: acceptance
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-acceptance
+  topic: acceptance
+  kind: doc
+  uri: codespec/test/agent-computer.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 2
+  description: 文档 T00 与待实现 T01–T27：独立操作、连接交接、运行成果及故障验收
+route:
+  topic: acceptance
+  source_order:
+  - agent-computer-acceptance
+  fallback: bounded-search

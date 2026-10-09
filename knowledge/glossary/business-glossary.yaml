@@ -1,0 +1,150 @@
+schema_version: 1
+domains:
+  - id: agent-infrastructure
+    name: 人与 Agent 电脑基础设施
+    description: 本项目设计术语；技术映射指向设计文件，不声明运行实现已存在。
+terms:
+  - id: computer
+    domain: agent-infrastructure
+    canonical_name: Computer
+    definition: 人与 Agent 可连接和操作的稳定电脑身份，组合持久 Workspace、可替换 Sandbox 与 App；链接不随重建改变，人的使用不依赖 Agent 或 workflow。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: sandbox
+    domain: agent-infrastructure
+    canonical_name: Sandbox
+    definition: 提供进程、资源和网络隔离的执行域；运行实例与持久存储生命周期独立。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: workspace
+    domain: agent-infrastructure
+    canonical_name: Workspace
+    definition: Computer 服务拥有的长期授权协作范围，包含可修改工作文件、候选修改与成果版本，不等于 workflow attempt workspace。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: artifact
+    domain: agent-infrastructure
+    canonical_name: Artifact
+    definition: 已提交的不可变成果版本，由内容字节、哈希、清单、权限及生产执行引用共同确定。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: candidate
+    domain: agent-infrastructure
+    canonical_name: Candidate
+    definition: 绑定输入版本和执行代次的独立可写工作目录，提交前排空写入并封存。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: execution
+    domain: agent-infrastructure
+    canonical_name: Execution
+    definition: 一次受控工具或环境操作的持久记录，拥有状态、输入和结果，但不等于业务 Task。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: checkpoint
+    domain: agent-infrastructure
+    canonical_name: Checkpoint
+    definition: 已提交的环境恢复状态清单，引用工作文件和应用状态，不包含任意进程内存恢复承诺。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: connection-session
+    domain: agent-infrastructure
+    canonical_name: ConnectionSession
+    definition: 人或 Agent 主体与 Computer 的有时效、可撤销授权连接；AgentSpec 可选，连接不自动取得修改或页面控制权，也不拥有 Computer 生命周期。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: generation
+    domain: agent-infrastructure
+    canonical_name: Generation
+    definition: 环境或控制权的执行代次，用于拒绝旧实例、旧拥有者和迟到回执的权威更新。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: fencing
+    domain: agent-infrastructure
+    canonical_name: Fencing
+    definition: 在转移执行权前使旧执行者失去实际操作能力；数据库租约过期或 Pod 对象删除本身不足以证明完成。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: harness
+    domain: agent-infrastructure
+    canonical_name: Harness
+    definition: 维护模型循环、上下文、规划与业务动作决策的上层执行框架，通过 Computer 工具接口操作环境。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: app
+    domain: agent-infrastructure
+    canonical_name: App
+    definition: 具有独立定义、实例、状态、健康与操作驱动的应用资源，首版内置 Browser 和 WebApplication，人可直接启动并操作授权应用。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: principal
+    domain: agent-infrastructure
+    canonical_name: Principal
+    definition: 服务端从组织身份或服务凭据确定的人或 Agent 授权主体；客户端声明的身份和链接不直接授予资源权限。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: viewer-session
+    domain: agent-infrastructure
+    canonical_name: ViewerSession
+    definition: 从属于 ConnectionSession、绑定应用实例代次的画面及输入传输会话；输入另需控制租约，断流不证明在途动作已停止。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: computer-view
+    domain: agent-infrastructure
+    canonical_name: ComputerView
+    definition: 人的日常电脑界面，独立认证链接与嵌入共用权限和能力，支持应用、浏览器、文件、成果及控制交接；不另建资源权威状态。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md
+  - id: presentation
+    domain: agent-infrastructure
+    canonical_name: Presentation
+    definition: 固定 ArtifactVersion 的可运行描述，绑定 AppSpec、入口、健康、数据策略、授权与预算；复用 AppInstance 运行，默认试用状态独立，保存产生新成果版本。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: codespec/design/agent-computer.md

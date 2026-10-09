@@ -1,0 +1,4 @@
+# relay-knowledge transient writer locks
+/codespec-map.yaml.lock
+/codespec-map.yaml.lock.prepared.*
+/topics/*.retired

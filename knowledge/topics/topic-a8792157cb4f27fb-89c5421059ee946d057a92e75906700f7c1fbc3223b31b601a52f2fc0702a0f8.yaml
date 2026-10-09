@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: product
+  title: product
+  description: Added by CLI source registration.
+sources:
+- id: agent-computer-product
+  topic: product
+  kind: doc
+  uri: codespec/requirements/agent-computer.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 2
+  description: 人和 Agent 的可连接电脑：链接/嵌入、运行成果、产品边界与 R01–R24
+route:
+  topic: product
+  source_order:
+  - agent-computer-product
+  fallback: bounded-search

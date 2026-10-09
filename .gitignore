@@ -1,0 +1,3 @@
+.qualitygate/
+codespec/*.lock
+knowledge/*.lock
