@@ -4,14 +4,14 @@ use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub(super) struct PinnedResource {
+pub(crate) struct PinnedResource {
     pub reference: Dependency,
     pub spec: Value,
     pub dependencies: Vec<Dependency>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub(super) struct Snapshot {
+pub(crate) struct Snapshot {
     pub resources: Vec<PinnedResource>,
     pub requirements: Vec<RuntimeRequirement>,
 }
@@ -82,7 +82,7 @@ fn reference_id(value: &Value) -> Result<&str> {
 }
 
 impl Snapshot {
-    fn resource(&self, kind: DefinitionKind, id: &str) -> Result<&PinnedResource> {
+    pub(crate) fn resource(&self, kind: DefinitionKind, id: &str) -> Result<&PinnedResource> {
         self.resources
             .iter()
             .find(|r| r.reference.kind == kind && r.reference.resource_id == id)
@@ -242,4 +242,43 @@ pub(super) async fn reauthorize(
     }
     authorize_in(tx, token, &snapshot.requirements).await?;
     Ok(())
+}
+
+/// Recheck the original admitted credential, all grants and catalog versions.
+pub(crate) async fn authorize_bound(
+    tx: &mut Transaction<'_, Postgres>,
+    org: &str,
+    request: &str,
+) -> Result<Snapshot> {
+    let row = sqlx::query("SELECT r.snapshot,r.snapshot_digest,r.credential_id,r.principal FROM runtime_start_requests r JOIN runtime_controls c ON c.organization=r.organization AND c.computer_id=r.computer_id AND c.active_request=r.request_id AND c.generation=r.generation WHERE r.organization=$1 AND r.request_id=$2 AND r.state IN ('Queued','Preparing','Prepared')")
+        .bind(org).bind(request).fetch_optional(&mut **tx).await?.ok_or(Error::RuntimeConflict)?;
+    let snapshot: Snapshot =
+        serde_json::from_value(row.try_get("snapshot")?).map_err(|_| Error::InvalidStoredData)?;
+    if digest("agent-computer/start-snapshot-v1", &snapshot)?
+        != row.try_get::<String, _>("snapshot_digest")?
+    {
+        return Err(Error::InvalidStoredData);
+    }
+    let credential: String = row.try_get("credential_id")?;
+    let principal: String = row.try_get("principal")?;
+    if snapshot.requirements.is_empty() || snapshot.requirements.len() > 32 {
+        return Err(Error::InvalidStoredData);
+    }
+    for requirement in &snapshot.requirements {
+        let identity = Store::authorize_bound_runtime_in(
+            tx,
+            org,
+            &principal,
+            &credential,
+            requirement.permission.scope(),
+        )
+        .await?;
+        require_in(tx, &identity, requirement).await?;
+    }
+    for resource in &snapshot.resources {
+        if resource.reference.kind.catalog() {
+            load(tx, org, &resource.reference).await?;
+        }
+    }
+    Ok(snapshot)
 }

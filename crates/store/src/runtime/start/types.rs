@@ -20,6 +20,7 @@ pub struct CancelQueuedStart {
 pub enum StartState {
     Queued,
     Preparing,
+    Prepared,
     Cancelled,
 }
 
@@ -33,6 +34,10 @@ pub struct StartReceipt {
     pub generation: i64,
     pub candidate_id: String,
     pub snapshot_digest: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_revision: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_manifest_digest: Option<String>,
     pub state: StartState,
     pub reason: String,
     pub cpu_millis: i64,

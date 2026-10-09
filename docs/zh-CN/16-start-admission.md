@@ -4,7 +4,7 @@
 
 迁移 7 新增持久化启动请求和 Computer 控制计数器。服务可接收启动请求并保存为 `Queued`，在响应丢失后返回原始回执，查询当前准入状态，并取消尚未派发的请求。能力 `computer.start_admission` 为 `control-plane`；`computer` 仍为 `unsupported`。
 
-准入不选择 Artifact 输入 manifest，不初始化空 Workspace，不准备文件、不授予修改租约、不创建 Pod，也不报告 Ready。已有 Workspace 不会被默认为空。仍需将 [Candidate 准备器](14-candidate-storage.md) 接入授权 worker，并实现输入发布、派发隔离和驱动健康检查。本增量没有开放运行时启动 worker。
+后续 [17 Candidate 准备 worker](17-candidate-preparation-worker.md) 已在准入时绑定已提交 Workspace 输入，并提供独立的授权存储 worker。新 Workspace 创建时记录明确的空初始输入；已有 Workspace 缺少输入时不会默认为空。非空 Artifact 发布、写入租约、Pod 派发、隔离与驱动健康仍待实现。启动准入本身不准备文件，也不报告 Ready。
 
 ## 16.2 原子准入
 
@@ -42,13 +42,13 @@
 | 每 Volume Candidate 存储预留 | 固定 Volume 的 `quotaBytes` |
 | 每主体请求运行时长预留总和 | 86,400 秒 |
 
-每请求汇总不同固定 Sandbox 的资源量。`Queued` 与 `Preparing` 均占用预留。容量不足的 Volume 会被拒绝，不对声明取整或扩容。容量不足返回 429，且不创建请求。这些预留是准入账目，不代表实际 Kubernetes 调度、文件系统用量或计费。公平调度、运维预算配置和历史累计计费仍待实现。
+每请求汇总不同固定 Sandbox 的资源量。`Queued`、`Preparing` 和 `Prepared` 均占用预留。容量不足的 Volume 会被拒绝，不对声明取整或扩容。容量不足返回 429，且不创建请求。这些预留是准入账目，不代表实际 Kubernetes 调度、文件系统用量或计费。公平调度、运维预算配置和历史累计计费仍待实现。
 
 数据库分配 15 分钟队列截止时间。未来 dispatcher 必须拒绝过期请求，并在任何副作用前重新校验原始凭据、授权、预算与输入。目前没有自动队列过期 worker，可通过取消释放未派发请求的预留。截止时间或凭据撤销均不能释放可能已派发的写入者。运行时长是后续执行必须落实的限制；准入本身尚未启动运行时 watchdog。
 
 ## 16.4 回执、查询与取消
 
-成功返回 202，包含稳定的 `request_id`、`candidate_id`、generation、控制/规格版本、快照摘要、资源预留、截止时间和事件序号。状态为 `Queued`，原因为 `awaiting_runtime_preparation`。相同键与输入的重试重新校验当前授权，并返回原始回执；不同输入返回 409，已退休键返回 410。其他键不能分配第二个活动 generation。取消后的重放仍返回原始准入回执，不会重新激活请求。
+成功返回 202，包含稳定的 `request_id`、`candidate_id`、generation、控制/规格版本、快照摘要、输入版本/manifest 摘要、资源预留、截止时间和事件序号。旧回执不含输入字段。状态为 `Queued`，原因为 `awaiting_runtime_preparation`。相同键与输入的重试重新校验当前授权，并返回原始回执；不同输入返回 409，已退休键返回 410。其他键不能分配第二个活动 generation。取消后的重放仍返回原始准入回执，不会重新激活请求。
 
 `GET /v1alpha1/computers/{id}/runtime` 要求 Computer `read` 和 `runtime.read`，返回当前版本、generation、活动请求 ID 与启动状态；本阶段 `ready` 始终为 false。未启动的 Computer 查询为版本 1、generation 0，不创建运行记录。响应不披露私有依赖图或 credential ID。
 
@@ -67,4 +67,4 @@
 
 11 项真实 PostgreSQL 测试覆盖迁移保留、并发重试、不可变快照、授权/scope 隔离、目录禁用、等待准入时撤销、Volume/Workspace 容量竞争、主体队列上限、回执/Outbox 失败回滚、提交前凭据过期、WAL 重启恢复，以及准备开始后拒绝取消。1 项 HTTP 测试覆盖解析、服务端身份字段、版本、重放、查询、取消、scope 与 Origin 拒绝。这些属于组件契约，T01–T43 仍为 `not_run`。
 
-下一步需把不可变输入 manifest 和真实 Volume 身份绑定到已分配 Candidate，实现持久化准备认领与回执，派发时复核写入权限，并接入 Pod/驱动观测。物理隔离、stop/recover、checkpoint、租约 watchdog 和完整运行时验收仍未完成。
+后续 [17 准备 worker](17-candidate-preparation-worker.md) 已实现已提交输入绑定、Volume 身份核验及持久化准备认领/收据。下一步需发布并授权读取非空 Artifact 输入，落实写入租约，并接入 Pod/驱动观测。物理隔离、stop/recover、checkpoint、租约 watchdog 和完整运行时验收仍未完成。

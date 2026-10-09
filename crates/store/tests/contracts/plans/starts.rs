@@ -10,7 +10,7 @@ fn start() -> StartRequest {
         max_runtime_seconds: 300,
     }
 }
-async fn grants(db: &Database) {
+pub(super) async fn grants(db: &Database) {
     for row in sqlx::query("SELECT resource_id,kind FROM resource_definitions WHERE organization='acme' UNION ALL SELECT resource_id,kind FROM catalog_references WHERE organization='acme' AND kind='browser_profile'").fetch_all(&db.pool).await.unwrap() {
         let id: String = row.try_get("resource_id").unwrap();
         let kind: String = row.try_get("kind").unwrap();
@@ -653,7 +653,7 @@ async fn admission_migration_preserves_existing_definitions_and_grants_without_a
     .await
     .unwrap();
     let permissions = count(&db, "runtime_grants").await;
-    sqlx::raw_sql("DROP TABLE runtime_controls,runtime_start_requests CASCADE; DROP FUNCTION guard_runtime_start_mutation(); DELETE FROM _sqlx_migrations WHERE version=7;").execute(&db.pool).await.unwrap();
+    sqlx::raw_sql("DROP TABLE candidate_preparations,runtime_start_inputs,workspace_input_heads,workspace_input_versions; DROP FUNCTION guard_candidate_preparation(); DROP TABLE runtime_controls,runtime_start_requests CASCADE; DROP FUNCTION guard_runtime_start_mutation(); DELETE FROM _sqlx_migrations WHERE version>=7;").execute(&db.pool).await.unwrap();
     assert!(matches!(db.store.ready().await, Err(Error::SchemaNotReady)));
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();

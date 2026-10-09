@@ -9,7 +9,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/core", "//crates/definitions"] + all_crate_deps(normal = True),
+    deps = ["//crates/core", "//crates/definitions", "//crates/storage"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -22,6 +22,6 @@ rust_test(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     tags = ["requires-postgresql"],
-    deps = [":store", "//crates/core", "//crates/definitions", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
+    deps = [":store", "//crates/core", "//crates/definitions", "//crates/storage", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
     proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
 )

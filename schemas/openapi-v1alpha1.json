@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Runtime preparation/dispatch, Ready, OIDC and execution remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported."
   },
   "servers": [
     {
@@ -1031,7 +1031,7 @@
     "/v1alpha1/computers/{id}/start": {
       "post": {
         "operationId": "admitComputerStart",
-        "description": "Requires Computer activate, Workspace read/modify, App app.use/activate, private profile app.use and corresponding credential scopes. Pins the immutable dependency graph, allocates a generation and Candidate ID and reserves capacity atomically. Returns Queued only. No input manifest is selected and no storage/Pod dispatch occurs. Replays require current authorization and do not transfer the original credential binding.",
+        "description": "Requires Computer activate, Workspace read/modify, App app.use/activate, private profile app.use and corresponding credential scopes. Pins the immutable dependency graph, allocates a generation and Candidate ID and reserves capacity atomically. Returns Queued only. A committed Workspace input is pinned; missing input returns 409. Storage preparation runs through a separate trusted worker; this HTTP call dispatches no storage/Pod operation. Replays require current authorization and do not transfer the original credential binding.",
         "security": [
           {
             "serviceBearer": []
@@ -1123,7 +1123,7 @@
             }
           },
           "409": {
-            "description": "Control revision/active request mismatch, or key reused for different intent.",
+            "description": "Control revision/active request mismatch, missing Workspace input, or key reused for different intent.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2427,6 +2427,16 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 9223372036854775807
+          },
+          "input_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Pinned committed Workspace input version; absent only in legacy receipts."
+          },
+          "input_manifest_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "Pinned input manifest digest; absent only in legacy receipts."
           }
         }
       },
@@ -2467,6 +2477,7 @@
             "enum": [
               "Queued",
               "Preparing",
+              "Prepared",
               "Cancelled",
               null
             ]

@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+mod candidate_worker;
 mod definition_admin;
 mod operator;
 mod reconciliation_admin;

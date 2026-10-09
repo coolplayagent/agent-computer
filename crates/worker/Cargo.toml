@@ -10,6 +10,8 @@ agent-computer-core = { path = "../core" }
 agent-computer-definitions = { path = "../definitions" }
 agent-computer-kubernetes = { path = "../kubernetes" }
 agent-computer-store = { path = "../store" }
+agent-computer-storage = { path = "../storage" }
+tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 
@@ -23,6 +25,10 @@ live-test = []
 
 [[test]]
 name = "live"
+required-features = ["live-test"]
+
+[[test]]
+name = "candidate_live"
 required-features = ["live-test"]
 
 [lints]

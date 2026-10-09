@@ -4,6 +4,24 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: candidate-preparation
+    domain: agent-infrastructure
+    canonical_name: CandidatePreparation
+    definition: 绑定已提交 Workspace 输入、实际 Volume 身份与写入身份的持久化文件准备；过期派发只观察原发布路径，确认配额/inode/收据后原子标记 Prepared，不等于写入租约、fencing 或 Computer Ready。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/preparation.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/inputs.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/worker/src/candidate.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/17-candidate-preparation-worker.md
   - id: computer-start-admission
     domain: agent-infrastructure
     canonical_name: ComputerStartAdmission

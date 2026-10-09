@@ -1,6 +1,8 @@
 //! Exact resource runtime grants, separate from declaration management.
 //! No permission implies another, and successful checks do not establish a lease,
 //! a generation, physical fencing, stopped processes, or actual runtime readiness.
+pub(crate) mod inputs;
+pub mod preparation;
 mod start;
 mod types;
 use crate::{

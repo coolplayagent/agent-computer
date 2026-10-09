@@ -133,6 +133,48 @@ fn copies_independent_inodes_with_modes_and_private_receipt() {
         b"echo hello\n"
     );
 }
+
+#[test]
+fn observation_never_creates_missing_or_partial_generations_and_preserves_edits() {
+    let root = private_temp();
+    let volume = MountedVolume::local(root.path()).unwrap();
+    let req = request(b"input");
+    let quota = RecordingQuota::default();
+    assert!(volume.observe_prepared(&req, &quota).unwrap().is_none());
+    assert_eq!(fs::read_dir(root.path()).unwrap().count(), 0);
+    assert!(quota.calls.lock().unwrap().is_empty());
+    let receipt = volume.prepare(&req, &source(b"input"), &quota).unwrap();
+    fs::write(path(root.path(), &req).join("src/main.sh"), b"edited").unwrap();
+    assert_eq!(
+        volume.observe_prepared(&req, &quota).unwrap(),
+        Some(receipt)
+    );
+    assert_eq!(
+        fs::read(path(root.path(), &req).join("src/main.sh")).unwrap(),
+        b"edited"
+    );
+    let mut next = req.clone();
+    next.generation = 2;
+    assert!(volume.observe_prepared(&next, &quota).unwrap().is_none());
+    assert!(!path(root.path(), &next).exists());
+    fs::create_dir_all(root.path().join(next.parent()).join("staging_partial/data")).unwrap();
+    assert!(volume.observe_prepared(&next, &quota).unwrap().is_none());
+    assert!(!path(root.path(), &next).exists());
+}
+
+#[test]
+fn durable_binding_digest_rejects_unsafe_owner_path_and_manifest() {
+    let req = request(b"input");
+    assert!(req.binding_digest("../escape", 1000, 1000).is_err());
+    assert!(req.binding_digest("volume", 0, 1000).is_err());
+    assert!(req.binding_digest("volume", 1000, u32::MAX).is_err());
+    let hash = req.binding_digest("volume", 1000, 1000).unwrap();
+    assert_ne!(hash, req.binding_digest("volume", 1001, 1000).unwrap());
+    assert_ne!(hash, req.binding_digest("other", 1000, 1000).unwrap());
+    let mut changed = req;
+    changed.manifest_digest = "wrong".into();
+    assert!(changed.binding_digest("volume", 1000, 1000).is_err());
+}
 #[test]
 fn retry_preserves_mutated_files_and_does_not_read_source() {
     let root = private_temp();

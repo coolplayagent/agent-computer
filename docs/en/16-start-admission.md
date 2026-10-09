@@ -4,7 +4,7 @@
 
 Migration 7 adds durable start requests and Computer control counters. The service can admit a request into `Queued`, return its original receipt after a lost response, inspect current admission state, and cancel an undispatched request. The capability `computer.start_admission` is `control-plane`; `computer` remains `unsupported`.
 
-An admission does not select an Artifact input manifest, initialize an empty Workspace, prepare files, grant a modification lease, create a Pod or report Ready. In particular, an existing Workspace is never silently treated as empty. Connecting the [Candidate preparer](14-candidate-storage.md) to an authorized worker, input publication, dispatch fencing and driver health checks remain necessary. No runtime start worker is exposed in this increment.
+[17 Candidate preparation worker](17-candidate-preparation-worker.md) now pins committed Workspace input at admission and provides a separate authorized storage worker. New Workspace creation records an explicit empty genesis input; existing Workspaces without input are never silently treated as empty. Nonempty Artifact publication, writer leases, Pod dispatch, fencing and driver health remain pending. Start admission itself prepares no files and reports no Ready state.
 
 ## 16.2 Atomic admission
 
@@ -42,13 +42,13 @@ These conservative platform ceilings are enforced in the database transaction; c
 | Reserved Candidate storage per Volume | Pinned Volume `quotaBytes` |
 | Sum of requested run durations per principal | 86,400 seconds |
 
-Each request sums the distinct pinned Sandbox resources. Both `Queued` and `Preparing` consume reservations. An undersized Volume is rejected without rounding or changing its declaration. Capacity exhaustion returns 429 and creates no request. These reservations are admission accounting, not measurements of actual Kubernetes scheduling, filesystem usage or billed cost. Fair scheduling, operator budget configuration and cumulative historical billing remain pending.
+Each request sums the distinct pinned Sandbox resources. `Queued`, `Preparing` and `Prepared` all consume reservations. An undersized Volume is rejected without rounding or changing its declaration. Capacity exhaustion returns 429 and creates no request. These reservations are admission accounting, not measurements of actual Kubernetes scheduling, filesystem usage or billed cost. Fair scheduling, operator budget configuration and cumulative historical billing remain pending.
 
 The database assigns a 15-minute queue deadline. A future dispatcher must reject expired requests and revalidate the original credential, grants, budget and input before any effect. There is currently no automatic queue expiry worker; cancellation releases an undispatched reservation. Neither a deadline nor a revoked credential releases a possibly dispatched writer. The granted run duration is a bound to enforce when runtime execution is implemented; admission itself starts no elapsed-runtime watchdog.
 
 ## 16.4 Receipts, reads and cancellation
 
-A successful admission returns 202 with stable `request_id`, `candidate_id`, generation, control/spec revisions, snapshot digest, reserved resources, deadline and event sequence. Its state is `Queued`, with reason `awaiting_runtime_preparation`. Repeating the same key and input rechecks current permissions and returns the original receipt. Changed input returns 409; a retired key returns 410. A different key cannot allocate a second active generation. A retry after cancellation still returns the original admission receipt and never reactivates it.
+A successful admission returns 202 with stable `request_id`, `candidate_id`, generation, control/spec revisions, snapshot digest, input revision/manifest digest, reserved resources, deadline and event sequence. Legacy receipts omit the input fields. Its state is `Queued`, with reason `awaiting_runtime_preparation`. Repeating the same key and input rechecks current permissions and returns the original receipt. Changed input returns 409; a retired key returns 410. A different key cannot allocate a second active generation. A retry after cancellation still returns the original admission receipt and never reactivates it.
 
 `GET /v1alpha1/computers/{id}/runtime` requires Computer `read` and `runtime.read`. It returns current revision, generation, active request ID and start state; `ready` is always false at this stage. An untouched Computer reads as revision 1, generation 0, without creating runtime rows. The endpoint does not expose the private graph or credential ID.
 
@@ -67,4 +67,4 @@ Cancellation must name the active request at the current revision. It atomically
 
 Eleven real PostgreSQL cases cover upgrade preservation, concurrent retries, immutable snapshots, grant/scope separation, catalog disable, revocation while waiting for admission, Volume/Workspace contention, principal queue limits, rollback on receipt/Outbox failure, late credential expiry, WAL crash recovery and cancellation after preparation begins. One HTTP case covers request parsing, server-owned fields, revisions, replay, read, cancellation, scope and Origin rejection. These are component contracts; T01–T43 remain `not_run`.
 
-Next work must bind an immutable input manifest and real Volume identity to the allocated Candidate, implement durable preparation claims and receipts, recheck writer authority at dispatch, and integrate Pod/driver observation. Physical fencing, stop/recover, checkpoints, lease watchdogs and full runtime acceptance remain unfinished.
+[17 Preparation](17-candidate-preparation-worker.md) adds committed input binding, Volume identity verification and durable preparation claims/receipts. Next work must publish and authorize nonempty Artifact input, enforce writer leases and integrate Pod/driver observation. Physical fencing, stop/recover, checkpoints, lease watchdogs and full runtime acceptance remain unfinished.

@@ -110,6 +110,17 @@ impl PrepareRequest {
     pub fn path_ref(&self) -> String {
         format!("{}/{}/data", self.parent(), self.generation)
     }
+    /// Stable binding shared by the durable dispatcher and the storage adapter.
+    pub fn binding_digest(&self, volume_path: &str, uid: u32, gid: u32) -> Result<String> {
+        self.validate()?;
+        if !relative(volume_path) || uid == 0 || uid == u32::MAX || gid == 0 || gid == u32::MAX {
+            return Err(Error::InvalidRequest);
+        }
+        digest(
+            "agent-computer/candidate-preparation-v1",
+            &(self, volume_path, uid, gid),
+        )
+    }
 }
 
 /// Persistent preparation receipt outside the application-mounted data directory.

@@ -172,6 +172,9 @@ impl Store {
                 sqlx::query("INSERT INTO resource_spec_versions (organization,resource_id,revision,digest,spec,dependencies) VALUES ($1,$2,$3,$4,$5,$6)")
                     .bind(org).bind(&resource.resource_id).bind(resource.revision).bind(&resource.digest).bind(&resource.after).bind(serde_json::to_value(&resource.dependencies).map_err(|_|Error::InvalidStoredData)?).execute(&mut *tx).await?;
             }
+            if resource.kind == DefinitionKind::Workspace && resource.expected_revision == 0 {
+                crate::runtime::inputs::initialize(&mut tx, org, &resource.resource_id).await?;
+            }
             creator_grant(
                 &mut tx,
                 &identity,

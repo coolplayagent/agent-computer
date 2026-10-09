@@ -190,6 +190,26 @@ impl MountedVolume {
         self.existing(&parent, request, &receipt.request_digest, quota)?
             .ok_or(Error::Io)
     }
+    /// Observe the original publication after an uncertain dispatch. Never creates
+    /// a staging directory or recopies input, even when no receipt is found.
+    pub fn observe_prepared(
+        &self,
+        request: &PrepareRequest,
+        quota: &impl Quota,
+    ) -> Result<Option<Prepared>> {
+        request.validate()?;
+        if request.volume_uid != self.volume_uid {
+            return Err(Error::IdentityConflict);
+        }
+        let digest = model::digest(
+            "agent-computer/candidate-preparation-v1",
+            &(request, &self.volume_path, self.uid, self.gid),
+        )?;
+        let Some(parent) = self.root.try_open(&request.parent())? else {
+            return Ok(None);
+        };
+        self.existing(&parent, request, &digest, quota)
+    }
     fn quota(&self, quota: &impl Quota, path: &str, bytes: u64) -> Result<()> {
         quota.ensure(
             &self.filesystem_uuid,

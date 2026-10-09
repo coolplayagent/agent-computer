@@ -1,6 +1,6 @@
 //! Durable start admission only. There is deliberately no external-effect dispatcher
 //! here: input publication, storage preparation, leases and fencing remain required.
-mod graph;
+pub(super) mod graph;
 mod types;
 use super::*;
 use crate::plans::types::{digest, random_id};
@@ -142,6 +142,9 @@ impl Store {
         }
         let admission = graph::capture(&mut tx, org, computer, request).await?;
         authorize_in(&mut tx, token, &admission.snapshot.requirements).await?;
+        let input_revision = super::inputs::current(&mut tx, org, &admission.workspace).await?;
+        let input_digest: String = sqlx::query_scalar("SELECT digest FROM workspace_input_versions WHERE organization=$1 AND workspace_id=$2 AND revision=$3")
+            .bind(org).bind(&admission.workspace).bind(input_revision).fetch_one(&mut *tx).await?;
         capacity(
             &mut tx,
             org,
@@ -164,6 +167,8 @@ impl Store {
                 .ok_or(Error::CounterExhausted)?,
             candidate_id: random_id("candidate")?,
             snapshot_digest: digest("agent-computer/start-snapshot-v1", &admission.snapshot)?,
+            input_revision: Some(input_revision),
+            input_manifest_digest: Some(input_digest),
             state: StartState::Queued,
             reason: "awaiting_runtime_preparation".into(),
             cpu_millis: admission.cpu,
@@ -184,6 +189,8 @@ impl Store {
             .bind(admission.cpu).bind(admission.memory).bind(CANDIDATE_BYTES).bind(request.max_runtime_seconds as i32).bind(receipt.queue_deadline_at_ms)
             .bind(serde_json::to_value(&admission.snapshot).map_err(|_|Error::InvalidStoredData)?).bind(&receipt.snapshot_digest)
             .bind(serde_json::to_value(&receipt).map_err(|_|Error::InvalidStoredData)?).execute(&mut *tx).await?;
+        sqlx::query("INSERT INTO runtime_start_inputs (organization,request_id,workspace_id,revision) VALUES ($1,$2,$3,$4)")
+            .bind(org).bind(&receipt.request_id).bind(&admission.workspace).bind(input_revision).execute(&mut *tx).await?;
         sqlx::query("UPDATE runtime_controls SET revision=$3,generation=$4,active_request=$5 WHERE organization=$1 AND computer_id=$2")
             .bind(org).bind(computer).bind(receipt.control_revision).bind(receipt.generation).bind(&receipt.request_id).execute(&mut *tx).await?;
         transactions::emit(&mut tx, org, seq, "computer.start_queued", serde_json::json!({"computer_id":computer,"request_id":receipt.request_id,"generation":receipt.generation,"revision":receipt.control_revision,"ready":false})).await?;

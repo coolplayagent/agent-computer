@@ -170,6 +170,29 @@ pub(crate) fn token_id(token: &str) -> Result<&str> {
 }
 
 impl Store {
+    /// A trusted worker rechecks the credential bound by a prior authenticated
+    /// admission. This does not authenticate an untrusted credential-ID caller.
+    pub(crate) async fn authorize_bound_runtime_in(
+        tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        org: &str,
+        principal: &str,
+        credential: &str,
+        required: ServiceScope,
+    ) -> Result<AuthenticatedPrincipal> {
+        let row = sqlx::query("SELECT c.organization,c.principal,p.kind,c.scopes,(p.enabled AND NOT c.revoked AND c.expires_at>clock_timestamp()) AS active FROM service_credentials c JOIN principals p USING (organization,principal) WHERE c.credential_id=$1 AND c.organization=$2 AND c.principal=$3 FOR SHARE OF c,p")
+            .bind(credential).bind(org).bind(principal).fetch_optional(&mut **tx).await?.ok_or(Error::Unauthenticated)?;
+        if !row.try_get::<bool, _>("active")? {
+            return Err(Error::Unauthenticated);
+        }
+        if !row
+            .try_get::<Vec<String>, _>("scopes")?
+            .iter()
+            .any(|s| s == required.as_str())
+        {
+            return Err(Error::Forbidden);
+        }
+        identity_from_row(&row)
+    }
     /// Local administrator operation; possession of a service token cannot call
     /// this API remotely. Existing disabled principals are never reactivated.
     pub async fn issue_credential(&self, request: IssueCredential<'_>) -> Result<IssuedCredential> {

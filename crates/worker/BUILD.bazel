@@ -8,7 +8,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/store"] + all_crate_deps(normal = True),
+    deps = ["//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/store", "//crates/storage"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -20,4 +20,14 @@ rust_test(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/store", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
+)
+
+rust_test(
+    name = "candidate_worker_live_test",
+    size = "large",
+    srcs = ["tests/candidate_live.rs"],
+    tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/storage", "//crates/store"] + all_crate_deps(normal = True, normal_dev = True),
 )

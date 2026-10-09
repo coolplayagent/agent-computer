@@ -33,6 +33,12 @@ impl RequestContext {
     pub fn store_error(&self, error: agent_computer_store::Error) -> Response {
         use agent_computer_store::Error;
         match error {
+            Error::WorkspaceInputUnavailable => self.error(
+                StatusCode::CONFLICT,
+                "workspace_input_unavailable",
+                "The Workspace has no committed input version.",
+                false,
+            ),
             Error::RuntimeConflict => self.error(
                 StatusCode::CONFLICT,
                 "runtime_conflict",
