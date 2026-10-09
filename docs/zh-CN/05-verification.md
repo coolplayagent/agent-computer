@@ -13,7 +13,7 @@
 
 ## 05.2 当前记录
 
-2026-10-09：Bazel 构建、CLI JSON 输出与错误退出码、Cargo fmt/Clippy、本地文档链接与双语编号检查通过；核心领域规则尚待实现。运行验收 T01–T43 全部 `not_run`。现有设计检查 T00 不等于产品交付。
+2026-10-09（阶段 01–02）：Bazel 构建、CLI JSON 输出与错误退出码、Cargo fmt/Clippy、本地文档链接与双语编号检查通过；核心领域规则通过 28 项 Bazel 契约测试。运行验收 T01–T43 全部 `not_run`。现有设计检查 T00 不等于产品交付。
 
 本地 Qualitygate 报告保存在已忽略的 `.qualitygate/`；提交前对最终工作区运行 `check --worktree --profile full`。报告需满足非空交付、无 pending checks、`gate.complete: true`、`gate.decision: pass` 与退出码 0，另外执行 Bazel 和静态检查。保留报告的 snapshot/policy digest，不把默认行尾检查扩大解释为功能质量保证。
 

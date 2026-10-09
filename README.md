@@ -10,7 +10,7 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 
 ## 当前阶段
 
-渐进式实现阶段，完整目标保留设计基线 0.5。已建立 Rust + Bazel 工作区及 `version/capabilities` CLI；尚无产品服务或已验证的运行时。构建方法与各阶段进度见 [编号中英文文档](docs/README.md)。下列能力仍是首版设计目标，CodeSpec 中的 API、业务命令和声明示例是待实现契约。
+渐进式实现阶段，完整目标保留设计基线 0.5。已建立 Rust + Bazel 工作区、`version/capabilities` CLI 及 Computer/Lease/Execution/幂等领域规则（28 项契约测试）；尚无产品服务或已验证的运行时。构建方法与各阶段进度见 [编号中英文文档](docs/README.md)。下列能力仍是首版设计目标，CodeSpec 中的 API、业务命令和声明示例是待实现契约。
 
 - 开发者与平台团队负责集成部署；人和 Agent 都是直接使用者。私有多机 Linux，本地采用同构单节点环境。
 - 认证后的稳定连接链接与嵌入视图提供同等能力；日常 ComputerView 与运维管理界面分开。

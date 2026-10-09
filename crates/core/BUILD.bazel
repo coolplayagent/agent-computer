@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 
 rust_library(
     name = "core",
@@ -7,4 +7,14 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
+)
+
+rust_test(
+    name = "core_contracts_test",
+    size = "small",
+    srcs = glob(["tests/**/*.rs"]),
+    crate_root = "tests/core_contracts.rs",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    deps = [":core"],
 )

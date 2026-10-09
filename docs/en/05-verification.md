@@ -13,7 +13,7 @@
 
 ## 05.2 Current record
 
-2026-10-09: Bazel builds, CLI JSON output and error exit codes, Cargo fmt/Clippy, local documentation links, and bilingual numbering passed; domain rules are pending. Runtime acceptance T01–T43 is entirely `not_run`. Existing T00 design checks do not establish product delivery.
+2026-10-09 (stages 01–02): Bazel builds, CLI JSON output and error exit codes, Cargo fmt/Clippy, local documentation links, and bilingual numbering passed; domain rules pass 28 Bazel contract tests. Runtime acceptance T01–T43 is entirely `not_run`. Existing T00 design checks do not establish product delivery.
 
 Local Qualitygate reports are retained in ignored `.qualitygate/`. Before each commit, run `check --worktree --profile full` on the final worktree. Require a nonempty delivery, no pending checks, `gate.complete: true`, `gate.decision: pass`, and exit code 0, plus separate Bazel and static checks. Retain the report's snapshot/policy digests; the default line-ending check is not functional verification.
 

@@ -9,7 +9,7 @@ Commit reviewable, buildable capability increments. A stage may span several com
 | Stage | Deliverable | Requirements / acceptance | Status |
 | --- | --- | --- | --- |
 | 01 | Rust + Bazel, CLI foundation, numbered bilingual docs | R18 / T00 | Implemented; build, CLI, fmt/Clippy, and docs checked |
-| 02 | Typed identities and Computer/Lease/Execution state constraints | R01, R08, R09, R21 / domain tests for D02, D04, D06, D08 | Pending |
+| 02 | Typed identities and Computer/Lease/Execution state constraints | R01, R08, R09, R21 / domain tests for D02, D04, D06, D08 | Implemented; 28 contract tests passed, runtime adapters pending |
 | 03 | ComputerSet schema/validation, definition versions, plans, capabilities | R01, R14, R31 / T01, T17, T36 | Pending |
 | 04 | PostgreSQL migrations, atomic idempotency, events/Outbox, CAS | R06, R08–R10 / T09, T12, T13 | Pending |
 | 05 | API/OpenAPI, service credentials/OIDC, grants, many-to-many connections | R02, R15, R22, R24, R33 / T02, T10, T18, T22, T38 | Pending |

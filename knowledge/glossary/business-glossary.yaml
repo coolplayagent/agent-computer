@@ -2,7 +2,7 @@ schema_version: 1
 domains:
   - id: agent-infrastructure
     name: 人与 Agent 电脑基础设施
-    description: 本项目设计术语；技术映射指向设计文件，不声明运行实现已存在。
+    description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
   - id: computer
     domain: agent-infrastructure
@@ -13,6 +13,9 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+      - relation: represented_by
+        target_kind: file
+        target: crates/core/src/computer.rs
   - id: sandbox
     domain: agent-infrastructure
     canonical_name: Sandbox
@@ -58,6 +61,9 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+      - relation: represented_by
+        target_kind: file
+        target: crates/core/src/execution.rs
   - id: checkpoint
     domain: agent-infrastructure
     canonical_name: Checkpoint
@@ -85,6 +91,9 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+      - relation: represented_by
+        target_kind: file
+        target: crates/core/src/identity.rs
   - id: fencing
     domain: agent-infrastructure
     canonical_name: Fencing
@@ -94,6 +103,9 @@ terms:
       - relation: represented_by
         target_kind: file
         target: codespec/design/agent-computer.md
+      - relation: represented_by
+        target_kind: file
+        target: crates/core/src/lease.rs
   - id: harness
     domain: agent-infrastructure
     canonical_name: Harness
