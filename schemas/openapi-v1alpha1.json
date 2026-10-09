@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported. Credential-bound logical ConnectionSession creation, current views, bounded heartbeats and close are implemented; OIDC/browser login, connection tokens, ViewerSession and lease consumers remain unsupported. Candidate modify leases now provide durable connection-owned acquisition, renewal, guarded one-time internal dispatch journaling and zero-dispatch release. Writer executors, watchdogs, physical fencing and control leases remain unsupported."
+    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported. Credential-bound logical ConnectionSession creation, current views, bounded heartbeats and close are implemented; OIDC/browser login, connection tokens, ViewerSession and lease consumers remain unsupported. Candidate modify leases now provide durable connection-owned acquisition, renewal, guarded one-time internal dispatch journaling and zero-dispatch release. A trusted one-shot bounded file save worker now consumes a dispatch, enforces a conservative local deadline and records closed IO evidence. HTTP file mutation, general process executors/watchdogs, physical fencing and GUI control leases remain unsupported."
   },
   "servers": [
     {
@@ -2253,7 +2253,7 @@
     "/v1alpha1/leases/{id}/release": {
       "post": {
         "operationId": "releaseCandidateWriter",
-        "description": "Requires the exact original credential, runtime.connect scope and owner/generation/epoch/revision CAS. Removes future admission. Returns 200 Released only with immutable no_dispatch journal proof; returns 202 Draining after recorded dispatch. Neither expiry nor caller-supplied stopped flags prove physical drain. Release does not cancel compute, release resource reservations or publish an Artifact.",
+        "description": "Requires the exact original credential, runtime.connect scope and owner/generation/epoch/revision CAS. Removes future admission. Returns 200 Released only with immutable zero-dispatch or bounded-file drain proof; returns 202 Draining otherwise. Caller-supplied stopped flags are rejected. Does not cancel compute, release reservations or publish an Artifact.",
         "security": [
           {
             "serviceBearer": []
@@ -3852,7 +3852,8 @@
           "expires_at_ms",
           "checked_at_ms",
           "dispatch_recorded",
-          "release_proof"
+          "release_proof",
+          "file_edit"
         ],
         "properties": {
           "lease_id": {
@@ -3909,11 +3910,79 @@
             ],
             "enum": [
               "no_dispatch",
+              "bounded_file_drained",
               null
+            ]
+          },
+          "file_edit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FileEditReport"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
-        "description": "Current own-epoch control metadata, not an IO capability or stopped-process proof. Held becomes effectively Draining on expiry or authority loss. Released requires a durable no_dispatch proof; a recorded dispatch remains Draining until a future physical drain/fence adapter is implemented. Ready remains false."
+        "description": "Current own-epoch control metadata, not an IO capability. Held becomes effectively Draining on expiry or authority loss. Released requires zero-dispatch proof or a sealed bounded file adapter completion with confirmed drain. Uncertain IO without such proof remains Draining. Ready remains false."
+      },
+      "FileVersion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sha256",
+          "size",
+          "executable"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048576
+          },
+          "executable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FileEditReport": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state",
+          "version",
+          "drain_confirmed"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "Applied",
+              "Conflict",
+              "Expired",
+              "Unknown"
+            ]
+          },
+          "version": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FileVersion"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "drain_confirmed": {
+            "type": "boolean"
+          }
+        },
+        "description": "Result of the bounded trusted file adapter. Unknown may have a version and confirmed drain when physical IO completed but authorization was lost before database acceptance. Unknown IO without confirmed drain blocks handoff. This is not a general process fencing receipt."
       }
     },
     "responses": {

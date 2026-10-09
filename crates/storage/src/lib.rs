@@ -5,6 +5,7 @@
 compile_error!("Candidate storage currently requires Linux openat2 and renameat2");
 
 mod directory;
+pub mod files;
 mod materialize;
 mod model;
 pub mod quota;

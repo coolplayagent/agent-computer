@@ -17,7 +17,7 @@ All endpoints require the exact original connection credential and `runtime.conn
 | `POST /v1alpha1/computers/{id}/leases` | 201 with current modify-lease metadata |
 | `GET /v1alpha1/leases/{id}` | 200 with the current own-epoch view |
 | `POST /v1alpha1/leases/{id}/renew` | 200 after exact owner/generation/epoch/revision checks |
-| `POST /v1alpha1/leases/{id}/release` | 200 Released with `no_dispatch` proof, or 202 Draining when dispatch is recorded |
+| `POST /v1alpha1/leases/{id}/release` | 200 Released with confirmed drain proof, or 202 Draining when dispatch is unconfirmed |
 
 Acquisition uses IDs from the current start and connection responses:
 
@@ -51,9 +51,9 @@ Lease metadata includes IDs, generation, epoch, revision, state, expiry/check ti
 
 Expiry or loss of authority derives Draining in a current read. Closing a connection or revoking a relevant Computer/Workspace grant also atomically persists Draining for Held leases and records the changed count in the enclosing event. Regranting does not revive that epoch. Credential revocation and principal disable prevent further authenticated requests; trusted reconciliation can still lower authority. Explicit release accepts a valid original credential after connection close or grant loss so the owner can finish a safe handoff.
 
-The trusted Rust `begin_candidate_writer_dispatch` boundary commits one dispatch ID and normalized-operation digest before returning a non-cloneable permit bound to the preparation receipt. It admits **one dispatch per ownership epoch**. Repeats, including after a lost acknowledgement or WAL restart, never reissue the permit. There is no HTTP dispatch endpoint or executor consuming this permit yet. A future executor must enforce the deadline locally and record actual drain/fence evidence.
+The trusted Rust `begin_candidate_writer_dispatch` boundary commits one dispatch ID and normalized-operation digest before returning a non-cloneable permit bound to the preparation receipt. It admits **one dispatch per ownership epoch**. Repeats, including after a lost acknowledgement or WAL restart, never reissue the permit. There is no HTTP dispatch endpoint. The bounded file worker now consumes this permit and enforces a conservative local deadline; general process executors still need supervision and actual drain/fence evidence.
 
-Release first removes future admission. Only an epoch with no committed dispatch can receive immutable `no_dispatch` proof and become Released. Dispatch/proof inserts lock the same lease head; SQL guards reject stale epochs, forged zero-dispatch proof after dispatch, history mutation and unproved release. This proof describes the journal, not process termination. Once a dispatch is recorded, release, expiry, connection close and reconciliation retain Draining. No caller flag, timeout or database lease alone permits takeover. Compute/storage reservations remain held.
+Release first removes future admission. An epoch with no committed dispatch can receive immutable `no_dispatch` proof and become Released; migration 11 additionally permits sealed `bounded_file_drained` evidence. Dispatch/proof inserts lock the same lease head; SQL guards reject stale epochs, forged zero-dispatch proof after dispatch, history mutation and unproved release. This proof describes the journal, not process termination. Once a dispatch is recorded, release, expiry, connection close and reconciliation retain Draining unless a sealed bounded-file completion proves drain; that later path is described in [20 File saves](20-bounded-file-saves.md). No caller flag, timeout or database lease alone permits takeover. Compute/storage reservations remain held.
 
 The operator can perform one reconciliation using a private database URL file:
 
@@ -63,10 +63,10 @@ agent-computer-server writer-lease-reconcile \
   --organization acme --lease-id lease-example
 ```
 
-This command leaves live leases alone, releases only zero-dispatch invalid/expired ownership, and returns Draining for recorded dispatch. It is not a supervisor, periodic scheduler or physical fence. Mutations hold the organization lock and commit lease history, idempotency receipts, events and Outbox together. Final authorization/expiry checks roll back late failures.
+This command leaves live leases alone, releases only invalid/expired ownership with zero-dispatch or sealed bounded-file drain proof, and retains Draining otherwise. It is not a supervisor, periodic scheduler or physical fence. Mutations hold the organization lock and commit lease history, idempotency receipts, events and Outbox together. Final authorization/expiry checks roll back late failures.
 
 ## 19.4 Verification and next boundary
 
 Twelve new PostgreSQL cases cover WAL recovery, competing connections, stale commands, deadlines, replay, monotonic epochs, independent grants, collaborator credentials, revocation, immutable dispatch/proofs, pinned catalog drift, Outbox rollback, late credential expiry and migration checksums. Two HTTP cases cover lifecycle, 200 versus 202 release, strict request shapes and credential isolation. The existing independent TCP-process test now also acquires a lease, closes its connection and invokes the reconciliation command.
 
-These tests run real PostgreSQL with synthetic preparation receipts; they verify control authority, not physical IO cessation. Default Cargo/Bazel suites contain 204 tests. Supervised file/process writers, watchdogs, physical draining/fencing, Workspace Pod mounts, GUI control leases, Artifact publication and full Computer execution remain pending. T01–T43 runtime acceptance remains `not_run`. See [17 Candidate preparation](17-candidate-preparation-worker.md), [18 Connections](18-connection-sessions.md) and [04 Full plan](04-implementation-plan.md).
+These tests run real PostgreSQL with synthetic preparation receipts; they verify control authority, not physical IO cessation. Default Cargo/Bazel suites now contain 213 tests; the later bounded file path is documented in [20 File saves](20-bounded-file-saves.md). General process writers, watchdogs, physical draining/fencing, Workspace Pod mounts, GUI control leases, Artifact publication and full Computer execution remain pending. T01–T43 runtime acceptance remains `not_run`. See [17 Candidate preparation](17-candidate-preparation-worker.md), [18 Connections](18-connection-sessions.md) and [04 Full plan](04-implementation-plan.md).

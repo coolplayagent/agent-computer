@@ -35,12 +35,12 @@ impl ObjectSource for ObjectCache {
 
 /// Trusted full-filesystem mount; applications may only receive a prepared data leaf.
 pub struct MountedVolume {
-    root: Dir,
-    filesystem_uuid: String,
-    volume_uid: String,
+    pub(crate) root: Dir,
+    pub(crate) filesystem_uuid: String,
+    pub(crate) volume_uid: String,
     volume_path: String,
-    uid: u32,
-    gid: u32,
+    pub(crate) uid: u32,
+    pub(crate) gid: u32,
 }
 impl MountedVolume {
     pub fn open(

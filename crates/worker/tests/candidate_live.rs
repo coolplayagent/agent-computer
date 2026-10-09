@@ -26,6 +26,9 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+#[path = "support/file_writer.rs"]
+mod file_writer;
+
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
 }
@@ -218,7 +221,12 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         let (kind, permissions): (RuntimeKind, &[RuntimePermission]) = match resource.kind {
             DefinitionKind::Computer => (
                 RuntimeKind::Computer,
-                &[RuntimePermission::Read, RuntimePermission::Activate],
+                &[
+                    RuntimePermission::Read,
+                    RuntimePermission::Activate,
+                    RuntimePermission::Connect,
+                    RuntimePermission::Modify,
+                ],
             ),
             DefinitionKind::Workspace => (
                 RuntimeKind::Workspace,
@@ -245,6 +253,7 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         }
     }
     let mut observations = vec![];
+    let mut file_evidence = Value::Null;
     for (index, name) in ["one", "two", "three"].into_iter().enumerate() {
         let computer = &plan
             .resources
@@ -386,9 +395,24 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
             .unwrap();
         assert_eq!(current.start_state, Some(StartState::Prepared));
         assert!(!current.ready);
+        if index == 0 {
+            file_evidence = file_writer::verify(file_writer::Context {
+                store: &store,
+                pool: &pool,
+                token: credential.expose_token(),
+                org: &org,
+                actor: &actor,
+                computer,
+                start: &admitted,
+                worker: &worker_config,
+                config: &config,
+                data: &data,
+            })
+            .await;
+        }
         observations.push(json!({"request_id":admitted.request_id,"receipt":receipt,"control_revision":current.revision,"ready":current.ready,"observed_existing_publication":index==1}));
     }
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"limits":["single VM","initial empty inputs only; Artifact publication and nonempty input retrieval pending","no product Pod launch, writer lease or physical fencing","no power loss or HA test"]});
+    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","initial empty inputs only; Artifact publication and nonempty input retrieval pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
     fs::write(
         config["observation_file"].as_str().unwrap(),
         serde_json::to_vec_pretty(&evidence).unwrap(),

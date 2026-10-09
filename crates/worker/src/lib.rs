@@ -2,6 +2,7 @@
 //! mounting are separate admissions; a definition is never an implicit Pod start.
 #![forbid(unsafe_code)]
 pub mod candidate;
+pub mod files;
 
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_definitions::{Format, validate_bytes};

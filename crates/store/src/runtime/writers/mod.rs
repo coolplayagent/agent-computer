@@ -1,9 +1,11 @@
 //! Durable Candidate modification ownership. Expiry revokes admission, not IO.
 mod authority;
+mod files;
 mod types;
 use super::*;
 use crate::plans::types::{digest, random_id};
 use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
+pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;
 pub use types::*;
 
@@ -141,16 +143,21 @@ async fn drain(
         .await?;
     }
     // This proof is only about our admission journal. A dispatched writer needs
-    // real execution/fencing evidence; no caller-supplied stopped flag is accepted.
-    if !row.try_get::<bool, _>("dispatched")? {
-        sqlx::query("INSERT INTO candidate_writer_drains (organization,lease_id,epoch,proof) VALUES ($1,$2,$3,'no_dispatch')").bind(org).bind(id).bind(epoch).execute(&mut **tx).await?;
+    // sealed bounded-file completion or real fencing evidence; no caller-supplied stopped flag is accepted.
+    let proof = if !row.try_get::<bool, _>("dispatched")? {
+        Some("no_dispatch")
+    } else if sqlx::query_scalar::<_,bool>("SELECT EXISTS(SELECT 1 FROM candidate_writer_completions WHERE organization=$1 AND lease_id=$2 AND epoch=$3 AND observed->>'drain_confirmed'='true')").bind(org).bind(id).bind(epoch).fetch_one(&mut **tx).await? {
+        Some("bounded_file_drained")
+    } else { None };
+    if let Some(proof) = proof {
+        sqlx::query("INSERT INTO candidate_writer_drains (organization,lease_id,epoch,proof) VALUES ($1,$2,$3,$4)").bind(org).bind(id).bind(epoch).bind(proof).execute(&mut **tx).await?;
         sqlx::query("UPDATE candidate_writer_leases SET state='Released',revision=revision+1 WHERE organization=$1 AND lease_id=$2").bind(org).bind(id).execute(&mut **tx).await?;
         transactions::emit(
             tx,
             org,
             seq,
             "writer.released",
-            serde_json::json!({"lease_id":id,"epoch":epoch,"proof":"no_dispatch"}),
+            serde_json::json!({"lease_id":id,"epoch":epoch,"proof":proof}),
         )
         .await?;
     }
@@ -341,8 +348,8 @@ impl Store {
         Ok(result)
     }
 
-    /// Trusted one-shot maintenance. Only a zero-dispatch journal can release
-    /// ownership; a recorded effect stays Draining until real fencing is added.
+    /// Trusted one-shot maintenance. Only zero-dispatch or sealed bounded-file
+    /// drain evidence can release ownership; uncertain effects stay Draining.
     pub async fn reconcile_candidate_writer(
         &self,
         org: &OrganizationId,
@@ -362,7 +369,7 @@ impl Store {
         Ok(result)
     }
 
-    /// Internal dispatch boundary for a future supervised writer. The caller
+    /// Internal dispatch boundary for a supervised writer. The caller
     /// supplies a digest of its normalized operation, not a reusable HTTP permit.
     /// This implementation admits one writer dispatch per ownership epoch and
     /// deliberately provides no asserted-stopped/fence bypass.
@@ -373,6 +380,7 @@ impl Store {
         input: &WriterLeaseCommand,
         dispatch: WriterDispatch<'_>,
     ) -> Result<WriterDispatchPermit> {
+        let local_started = std::time::Instant::now();
         valid_id(dispatch.dispatch_id)?;
         if dispatch.input_digest.len() != 71
             || !dispatch.input_digest.starts_with("sha256:")
@@ -402,6 +410,11 @@ impl Store {
         }
         tx.commit().await?;
         Ok(WriterDispatchPermit {
+            organization: identity.organization().as_str().into(),
+            deadline: local_started
+                + std::time::Duration::from_millis(
+                    (lease.expires_at_ms - lease.checked_at_ms).max(0) as u64,
+                ),
             lease,
             dispatch_id: dispatch.dispatch_id.into(),
             input_digest: dispatch.input_digest.into(),

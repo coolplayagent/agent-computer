@@ -4,10 +4,28 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: candidate-file-save
+    domain: agent-infrastructure
+    canonical_name: CandidateFileSave
+    definition: 消费单次写入许可并核对旧内容版本的有界原子文件保存；文件/目录同步读回与有效授权分别核验，未知 IO 不产生排空证明，不替代任意进程 fencing 或 Artifact 发布。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/storage/src/files.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/files.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/worker/src/files.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/20-bounded-file-saves.md
   - id: candidate-writer-lease
     domain: agent-infrastructure
     canonical_name: CandidateWriterLease
-    definition: 绑定原凭据连接、当前 generation/Candidate 及准备收据的持久化修改所有权；单调 epoch 与派发日志约束交接，仅零派发证明可释放，过期或撤权不等于实际写入停止。
+    definition: 绑定原凭据连接、当前 generation/Candidate 及准备收据的持久化修改所有权；单调 epoch 与派发日志约束交接，仅零派发或封闭文件执行排空证明可释放，过期或撤权不等于实际写入停止。
     language: zh-CN
     mappings:
       - relation: represented_by

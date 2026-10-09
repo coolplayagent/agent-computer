@@ -462,7 +462,7 @@ async fn failed_completion_or_late_expiry_rolls_back_receipt_state_and_outbox() 
 #[tokio::test]
 async fn upgrade_never_infers_empty_inputs_for_legacy_workspaces_or_queued_requests() {
     let (db, token, computer, start, target) = setup().await;
-    sqlx::raw_sql("DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DROP TABLE connection_sessions; DROP FUNCTION guard_connection_session_mutation(); DROP TABLE candidate_preparations,runtime_start_inputs,workspace_input_heads,workspace_input_versions; DROP FUNCTION guard_candidate_preparation(); DELETE FROM _sqlx_migrations WHERE version>=8;").execute(&db.pool).await.unwrap();
+    sqlx::raw_sql("DROP TABLE candidate_writer_completions; DROP FUNCTION guard_writer_completion(); DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DROP TABLE connection_sessions; DROP FUNCTION guard_connection_session_mutation(); DROP TABLE candidate_preparations,runtime_start_inputs,workspace_input_heads,workspace_input_versions; DROP FUNCTION guard_candidate_preparation(); DELETE FROM _sqlx_migrations WHERE version>=8;").execute(&db.pool).await.unwrap();
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
     assert_eq!(count(&db, "workspace_input_versions").await, 0);

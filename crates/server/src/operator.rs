@@ -31,7 +31,7 @@ pub(crate) fn failed(message: &'static str) -> Failure {
 pub async fn run(args: Vec<String>) -> Result<(), Failure> {
     if args.is_empty() || args == ["--help"] || args == ["help"] {
         println!(
-            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes SCOPE[,SCOPE...] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  runtime-grant|runtime-revoke --database-url-file PATH --organization ID --principal ID --kind computer|workspace|app|browser_profile --resource-id ID --permission PERMISSION [--max-runtime-seconds SECONDS]\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n  reconciliation-volumes-once --database-url-file PATH --organization ID --worker-id ID --config-file PATH\n  candidate-prepare-once --database-url-file PATH --organization ID --worker-id ID --request-id ID --config-file PATH\n  workspace-initialize-empty --database-url-file PATH --organization ID --workspace-id ID\n  writer-lease-reconcile --database-url-file PATH --organization ID --lease-id ID\n\nScopes: definitions.validate, definitions.manage, runtime.connect, runtime.read, runtime.observe, runtime.app.use, runtime.activate, runtime.execute, runtime.modify, runtime.control, runtime.publish, runtime.manage, runtime.delete.\nRuntime activate grants require a 1..86400 second limit; revoke omits the limit.\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
+            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes SCOPE[,SCOPE...] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  runtime-grant|runtime-revoke --database-url-file PATH --organization ID --principal ID --kind computer|workspace|app|browser_profile --resource-id ID --permission PERMISSION [--max-runtime-seconds SECONDS]\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n  reconciliation-volumes-once --database-url-file PATH --organization ID --worker-id ID --config-file PATH\n  candidate-prepare-once --database-url-file PATH --organization ID --worker-id ID --request-id ID --config-file PATH\n  workspace-initialize-empty --database-url-file PATH --organization ID --workspace-id ID\n  writer-lease-reconcile --database-url-file PATH --organization ID --lease-id ID\n  candidate-file-save-once --database-url-file PATH --credential-file PATH --lease-id ID --request-file PATH --config-file PATH\n\nScopes: definitions.validate, definitions.manage, runtime.connect, runtime.read, runtime.observe, runtime.app.use, runtime.activate, runtime.execute, runtime.modify, runtime.control, runtime.publish, runtime.manage, runtime.delete.\nRuntime activate grants require a 1..86400 second limit; revoke omits the limit.\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
         );
         return Ok(());
     }
@@ -87,6 +87,13 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
         ],
         "workspace-initialize-empty" => &["database-url-file", "organization", "workspace-id"],
         "writer-lease-reconcile" => &["database-url-file", "organization", "lease-id"],
+        "candidate-file-save-once" => &[
+            "database-url-file",
+            "credential-file",
+            "lease-id",
+            "request-file",
+            "config-file",
+        ],
         _ => return Err(usage()),
     };
     if !(args.len() - 1).is_multiple_of(2) {
@@ -121,6 +128,21 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             .map_err(|_| failed("Database schema is not ready. Run migrate first."))?;
         match command {
             "candidate-prepare-once" => crate::candidate_worker::run(&store, &options).await?,
+            "candidate-file-save-once" => {
+                let token = private_file(required("credential-file")?)?;
+                let config = serde_json::from_str(&private_file(required("config-file")?)?)
+                    .map_err(|_| failed("Invalid private file worker configuration."))?;
+                let input = agent_computer_worker::files::read_request(&working_path(required(
+                    "request-file",
+                )?))
+                .map_err(|_| failed("Invalid private file save request."))?;
+                let result = agent_computer_worker::files::save_once(&store,token.trim(),required("lease-id")?,input,config).await.map_err(|_|failed("File save was not acknowledged. Query the existing lease/dispatch; do not issue a replacement write for an unknown outcome."))?;
+                println!(
+                    "{}",
+                    serde_json::to_string(&result)
+                        .map_err(|_| failed("Unable to encode file save result."))?
+                );
+            }
             "writer-lease-reconcile" => {
                 let org = OrganizationId::new(required("organization")?).map_err(|_| usage())?;
                 let result=store.reconcile_candidate_writer(&org,required("lease-id")?).await.map_err(|_|failed("Writer lease reconciliation failed; no stopped-process assertion is accepted."))?;

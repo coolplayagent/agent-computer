@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 41
-updated_at: unix:1791559496
+map_version: 42
+updated_at: unix:1791560954
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -93,6 +93,7 @@ topics:
   title: development
   description: Added by CLI source registration.
   source_ids:
+  - bounded-candidate-file-saves
   - candidate-preparation-worker
   - candidate-storage-guide
   - candidate-writer-leases
@@ -106,8 +107,8 @@ topics:
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-77d6ce8f3ec063aad3884e7a12a2da11fb06f47d1c2ddbc8c95cc7e6a7760ccf.yaml
-  digest: 77d6ce8f3ec063aad3884e7a12a2da11fb06f47d1c2ddbc8c95cc7e6a7760ccf
+  ref: topics/topic-875b9380866e9d56-47924eeb119d1aea16ec3ffa8978c1ccc71ea0cb32ce71b62bd9a39d553a8e6e.yaml
+  digest: 47924eeb119d1aea16ec3ffa8978c1ccc71ea0cb32ce71b62bd9a39d553a8e6e
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -131,12 +132,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 25
+  omitted_through: 26
   recent:
-  - version: 26
-    action: source.add
-    actor: cli
-    summary: Added source 'computer-set-declaration-schema' to topic 'api'.
   - version: 27
     action: source.add
     actor: cli
@@ -197,3 +194,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'candidate-writer-leases' to topic 'development'.
+  - version: 42
+    action: source.add
+    actor: cli
+    summary: Added source 'bounded-candidate-file-saves' to topic 'development'.

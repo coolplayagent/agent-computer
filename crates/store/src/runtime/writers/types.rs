@@ -57,6 +57,7 @@ pub struct WriterLease {
     pub checked_at_ms: i64,
     pub dispatch_recorded: bool,
     pub release_proof: Option<String>,
+    pub file_edit: Option<agent_computer_storage::files::FileEditReport>,
 }
 
 /// Trusted integration input; never accepted by the HTTP lease routes.
@@ -66,9 +67,12 @@ pub struct WriterDispatch<'a> {
 }
 
 /// One-time admission returned only after committing the dispatch journal.
-/// No Clone/Deserialize and no retry can reissue this permit. A future executor
-/// must enforce the deadline locally; database time does not stop a process.
+/// No Clone/Deserialize and no retry can reissue this permit. The bounded file
+/// adapter enforces a conservative local deadline; general process supervision
+/// remains separate because database time does not stop a process.
 pub struct WriterDispatchPermit {
+    pub(super) organization: String,
+    pub(super) deadline: std::time::Instant,
     pub(super) lease: WriterLease,
     pub(super) dispatch_id: String,
     pub(super) input_digest: String,

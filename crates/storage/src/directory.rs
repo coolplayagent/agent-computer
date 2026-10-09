@@ -60,21 +60,30 @@ impl Dir {
         Ok(current)
     }
     pub fn file(&self, path: &str) -> Result<File> {
-        let fd = fs::openat2(
+        self.try_file(path)?.ok_or(Error::InvalidFilesystemObject)
+    }
+    pub fn try_file(&self, path: &str) -> Result<Option<File>> {
+        let fd = match fs::openat2(
             &self.0,
             path,
             OFlags::PATH | OFlags::NOFOLLOW | OFlags::CLOEXEC,
             Mode::empty(),
             RESOLVE,
-        )
-        .map_err(|_| Error::InvalidFilesystemObject)?;
+        ) {
+            Ok(fd) => fd,
+            Err(rustix::io::Errno::NOENT) => return Ok(None),
+            Err(_) => return Err(Error::InvalidFilesystemObject),
+        };
         let stat = fs::fstat(&fd)?;
         if !FileType::from_raw_mode(stat.st_mode).is_file() || stat.st_nlink != 1 {
             return Err(Error::InvalidFilesystemObject);
         }
         // Reopen the pinned inode, not the attacker-changeable pathname. O_PATH
         // lets us reject a FIFO/device without opening or blocking on that object.
-        Ok(File::open(format!("/proc/self/fd/{}", fd.as_raw_fd()))?)
+        Ok(Some(File::open(format!(
+            "/proc/self/fd/{}",
+            fd.as_raw_fd()
+        ))?))
     }
     pub fn create(&self, path: &str) -> Result<File> {
         Ok(File::from(fs::openat2(

@@ -3,7 +3,7 @@ use agent_computer_storage::Prepared;
 use sqlx::postgres::PgRow;
 
 pub(super) async fn row(tx: &mut Transaction<'_, Postgres>, org: &str, id: &str) -> Result<PgRow> {
-    sqlx::query("SELECT l.*,r.computer_id,r.candidate_id,r.workspace_id,r.generation, EXISTS(SELECT 1 FROM candidate_writer_dispatches d WHERE d.organization=l.organization AND d.lease_id=l.lease_id AND d.epoch=l.epoch) AS dispatched, (SELECT proof FROM candidate_writer_drains d WHERE d.organization=l.organization AND d.lease_id=l.lease_id AND d.epoch=l.epoch) AS proof FROM candidate_writer_leases l JOIN runtime_start_requests r USING(organization,request_id) WHERE l.organization=$1 AND l.lease_id=$2")
+    sqlx::query("SELECT l.*,r.computer_id,r.candidate_id,r.workspace_id,r.generation, EXISTS(SELECT 1 FROM candidate_writer_dispatches d WHERE d.organization=l.organization AND d.lease_id=l.lease_id AND d.epoch=l.epoch) AS dispatched, (SELECT proof FROM candidate_writer_drains d WHERE d.organization=l.organization AND d.lease_id=l.lease_id AND d.epoch=l.epoch) AS proof, (SELECT accepted FROM candidate_writer_completions d WHERE d.organization=l.organization AND d.lease_id=l.lease_id AND d.epoch=l.epoch) AS file_edit FROM candidate_writer_leases l JOIN runtime_start_requests r USING(organization,request_id) WHERE l.organization=$1 AND l.lease_id=$2")
         .bind(org).bind(id).fetch_optional(&mut **tx).await?.ok_or(Error::RuntimeAccessUnavailable)
 }
 
@@ -145,6 +145,11 @@ pub(super) async fn view(
         checked_at_ms: now,
         dispatch_recorded: row.try_get("dispatched")?,
         release_proof: row.try_get("proof")?,
+        file_edit: row
+            .try_get::<Option<serde_json::Value>, _>("file_edit")?
+            .map(serde_json::from_value)
+            .transpose()
+            .map_err(|_| Error::InvalidStoredData)?,
     })
 }
 

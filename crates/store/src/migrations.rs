@@ -87,6 +87,15 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    11,
+                    Cow::Borrowed("candidate file completions"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!(
+                        "../migrations/0011_candidate_file_completions.sql"
+                    )),
+                    false,
+                ),
             ])
         })
     }

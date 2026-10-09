@@ -1,6 +1,110 @@
 use super::*;
 
 #[tokio::test]
+async fn missing_file_completion_never_reissues_io_and_proof_cannot_be_inferred() {
+    use agent_computer_storage::files::FileEdit;
+    let (db, token, computer, input) = setup().await;
+    let lease = acquire(&db, &token, &computer, &input).await;
+    let request = FileEdit {
+        path: "saved".into(),
+        expected: None,
+        content: b"body".to_vec(),
+        executable: false,
+    };
+    let (prepared, _) = db
+        .store
+        .candidate_writer_storage(&token, &lease.lease_id, &command(&lease))
+        .await
+        .unwrap();
+    let digest = request.digest(&prepared).unwrap();
+    let permit = db
+        .store
+        .begin_candidate_writer_dispatch(
+            &token,
+            &lease.lease_id,
+            &command(&lease),
+            WriterDispatch {
+                dispatch_id: "file-lost",
+                input_digest: &digest,
+            },
+        )
+        .await
+        .unwrap();
+    drop(permit); // Crash/lost reply before there is any trusted closed-IO evidence.
+    assert!(matches!(
+        db.store
+            .candidate_file_edit_result(
+                &token,
+                &lease.lease_id,
+                &command(&lease),
+                "file-lost",
+                &request
+            )
+            .await,
+        Err(Error::DispatchAlreadyStarted)
+    ));
+    let changed = FileEdit {
+        content: b"other".to_vec(),
+        ..request.clone()
+    };
+    assert!(matches!(
+        db.store
+            .candidate_file_edit_result(
+                &token,
+                &lease.lease_id,
+                &command(&lease),
+                "file-lost",
+                &changed
+            )
+            .await,
+        Err(Error::IdempotencyConflict)
+    ));
+    let current = db
+        .store
+        .candidate_writer(&token, &lease.lease_id)
+        .await
+        .unwrap();
+    db.store
+        .release_candidate_writer(&token, &key("release"), &lease.lease_id, &command(&current))
+        .await
+        .unwrap();
+    assert!(sqlx::query("INSERT INTO candidate_writer_drains (organization,lease_id,epoch,proof) SELECT organization,lease_id,epoch,'bounded_file_drained' FROM candidate_writer_leases").execute(&db.pool).await.is_err());
+    assert_eq!(
+        db.store
+            .reconcile_candidate_writer(&org("acme"), &lease.lease_id)
+            .await
+            .unwrap()
+            .state,
+        WriterLeaseState::Draining
+    );
+    assert_eq!(count(&db, "candidate_writer_completions").await, 0);
+}
+
+#[tokio::test]
+async fn migration_eleven_preserves_unconfirmed_dispatch_without_creating_drain_evidence() {
+    let (db, token, computer, input) = setup().await;
+    let lease = acquire(&db, &token, &computer, &input).await;
+    let permit = dispatch(&db, &token, &lease).await;
+    sqlx::raw_sql("DROP TABLE candidate_writer_completions; DROP FUNCTION guard_writer_completion(); DELETE FROM _sqlx_migrations WHERE version=11;").execute(&db.pool).await.unwrap();
+    db.store.migrate().await.unwrap();
+    db.store.ready().await.unwrap();
+    let current = db
+        .store
+        .candidate_writer(&token, &lease.lease_id)
+        .await
+        .unwrap();
+    assert!(current.dispatch_recorded);
+    assert!(current.file_edit.is_none());
+    assert!(current.release_proof.is_none());
+    assert_eq!(current.epoch, permit.lease().epoch);
+    sqlx::query("UPDATE _sqlx_migrations SET checksum='\\x00'::bytea WHERE version=11")
+        .execute(&db.pool)
+        .await
+        .unwrap();
+    assert!(matches!(db.store.ready().await, Err(Error::SchemaNotReady)));
+}
+
+#[tokio::test]
 async fn recorded_dispatch_never_reissues_and_cannot_claim_zero_dispatch_drain() {
     let (mut db, token, computer, input) = setup().await;
     let lease = acquire(&db, &token, &computer, &input).await;
@@ -199,7 +303,7 @@ async fn outbox_failure_and_late_credential_expiry_roll_back_all_writer_records(
 #[tokio::test]
 async fn migration_ten_does_not_infer_owners_and_readiness_detects_checksum_drift() {
     let (db, token, computer, input) = setup().await;
-    sqlx::raw_sql("DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DELETE FROM _sqlx_migrations WHERE version=10;").execute(&db.pool).await.unwrap();
+    sqlx::raw_sql("DROP TABLE candidate_writer_completions; DROP FUNCTION guard_writer_completion(); DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DELETE FROM _sqlx_migrations WHERE version>=10;").execute(&db.pool).await.unwrap();
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
     assert_eq!(count(&db, "candidate_writer_leases").await, 0);
