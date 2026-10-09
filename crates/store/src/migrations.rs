@@ -96,6 +96,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    12,
+                    Cow::Borrowed("execution admission"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0012_execution_admission.sql")),
+                    false,
+                ),
             ])
         })
     }

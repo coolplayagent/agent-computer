@@ -4,6 +4,7 @@
 mod computers;
 mod connections;
 mod error;
+mod executions;
 mod files;
 mod http;
 mod plans;

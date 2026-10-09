@@ -58,6 +58,15 @@ fn configured_router(
             post(crate::connections::heartbeat),
         )
         .route("/v1alpha1/openapi.json", get(openapi))
+        .route(
+            "/v1alpha1/computers/{id}/executions",
+            post(crate::executions::submit),
+        )
+        .route("/v1alpha1/executions/{id}", get(crate::executions::get))
+        .route(
+            "/v1alpha1/executions/{id}/cancel",
+            post(crate::executions::cancel),
+        )
         .route("/v1alpha1/workspaces/{id}/files", get(crate::files::read))
         .route("/v1alpha1/leases/{id}/file", post(crate::files::save))
         .route(
@@ -159,7 +168,7 @@ async fn capabilities(State(state): State<ServiceState>) -> Json<serde_json::Val
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane",
             "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
-            "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
+            "execution.admission":"connection-queued", "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
     )
 }

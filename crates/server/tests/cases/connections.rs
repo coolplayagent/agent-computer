@@ -9,6 +9,14 @@ use axum::{
 use serde_json::{Value, json};
 
 pub(super) async fn provision(store: &Store, token: &str, actor: &str) -> String {
+    provision_with_sandbox(store, token, actor, false).await
+}
+pub(super) async fn provision_with_sandbox(
+    store: &Store,
+    token: &str,
+    actor: &str,
+    with_sandbox: bool,
+) -> String {
     let org = OrganizationId::new("acme").unwrap();
     let principal = PrincipalId::new(actor).unwrap();
     for kind in [
@@ -48,11 +56,45 @@ pub(super) async fn provision(store: &Store, token: &str, actor: &str) -> String
         )
         .await
         .unwrap();
-    let document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"connections"},"spec":{
+    let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"connections"},"spec":{
         "volumes":[{"name":"data","storageClass":"connection-storage","quotaBytes":10737418240_i64,"reclaimPolicy":"Retain"}],
         "workspaces":[{"name":"work","volumeRef":"data","conflictPolicy":"explicit"}],
         "computers":[{"name":"computer","workspaceRef":"work","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"}]
     }});
+    if with_sandbox {
+        store
+            .set_definition_grant(
+                DefinitionGrant {
+                    organization: &org,
+                    principal: &principal,
+                    kind: DefinitionKind::Sandbox,
+                    name: "*",
+                    permission: DefinitionPermission::Create,
+                },
+                true,
+            )
+            .await
+            .unwrap();
+        store
+            .register_catalog_reference(&org, DefinitionKind::NetworkPolicy, "deny-all")
+            .await
+            .unwrap();
+        store
+            .set_definition_grant(
+                DefinitionGrant {
+                    organization: &org,
+                    principal: &principal,
+                    kind: DefinitionKind::NetworkPolicy,
+                    name: "deny-all",
+                    permission: DefinitionPermission::Reference,
+                },
+                true,
+            )
+            .await
+            .unwrap();
+        document["spec"]["sandboxes"] = json!([{"name":"exec","runtimeClass":"gvisor","image":format!("registry.example.invalid/tools@sha256:{}","a".repeat(64)),"resources":{"cpuMillis":500,"memoryMiB":256},"networkPolicyRef":"deny-all"}]);
+        document["spec"]["computers"][0]["sandboxRefs"] = json!(["exec"]);
+    }
     let plan = store
         .create_definition_plan(
             token,

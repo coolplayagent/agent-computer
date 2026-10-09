@@ -477,18 +477,18 @@
           "REPO_MAPPING:rules_rust+,bazel_skylib bazel_skylib+",
           "REPO_MAPPING:rules_rust+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_rust+,rules_cc rules_cc+",
-          "FILE:@@//Cargo.lock 1984e602f2180947126e3ec986105642382a343d3deec8ab19a44c1900eb45e2",
+          "FILE:@@//Cargo.lock 4fbfe9efc643f0e4192af5ec5d2d8cf872cf257367ccfc44736ab8d3999f34e7",
           "FILE:@@//Cargo.toml f1809a00d8476141a7550114f726b9c74b6c5f80328ca0be5783409767b83775",
           "FILE:@@//crates/core/Cargo.toml 203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
           "FILE:@@//crates/definitions/Cargo.toml 25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
-          "FILE:@@//crates/store/Cargo.toml 708a36606e1631d892c2f8ff6d603ebdc4d3de2f4e9b94a6577c60c99b15e24c",
+          "FILE:@@//crates/store/Cargo.toml f63c2bea26d70602e04aefc8a66712d3465b87fc1eac34edac3a6a6cd186dadb",
+          "FILE:@@//crates/sandbox/Cargo.toml 6bb11c9a557b4e8b23de5015ba2df3541c2052dae796459fe6b54f093264895f",
           "FILE:@@//crates/storage/Cargo.toml 45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
           "FILE:@@//crates/test-support/Cargo.toml c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
           "FILE:@@//crates/server/Cargo.toml 432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
           "FILE:@@//crates/kubernetes/Cargo.toml 293ae865c955164a7b025c3e9d62d3d82be02352a30f4a5e0c253fe6547cab7b",
           "FILE:@@//crates/worker/Cargo.toml d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
-          "FILE:@@//crates/cli/Cargo.toml f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
-          "FILE:@@//crates/sandbox/Cargo.toml 6bb11c9a557b4e8b23de5015ba2df3541c2052dae796459fe6b54f093264895f"
+          "FILE:@@//crates/cli/Cargo.toml f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6"
         ],
         "generatedRepoSpecs": {
           "crates": {

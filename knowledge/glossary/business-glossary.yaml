@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: execution-admission
+    domain: agent-infrastructure
+    canonical_name: ExecutionAdmission
+    definition: 绑定原凭据连接、当前写租约 epoch、固定 Sandbox 版本与 Candidate 准备证据的持久命令队列；与文件派发互斥，固定期限与原子取消仅管理未派发状态，不产生进程、后台生命周期或 fencing 证明。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/writers/executions.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0012_execution_admission.sql
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/23-execution-admission.md
   - id: sandbox-process-supervisor
     domain: agent-infrastructure
     canonical_name: SandboxProcessSupervisor

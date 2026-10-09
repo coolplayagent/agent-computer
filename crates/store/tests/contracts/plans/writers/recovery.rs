@@ -85,6 +85,7 @@ async fn migration_eleven_preserves_unconfirmed_dispatch_without_creating_drain_
     let (db, token, computer, input) = setup().await;
     let lease = acquire(&db, &token, &computer, &input).await;
     let permit = dispatch(&db, &token, &lease).await;
+    db.remove_execution_admission().await;
     sqlx::raw_sql("DROP TABLE candidate_writer_completions; DROP FUNCTION guard_writer_completion(); DELETE FROM _sqlx_migrations WHERE version=11;").execute(&db.pool).await.unwrap();
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
@@ -303,6 +304,7 @@ async fn outbox_failure_and_late_credential_expiry_roll_back_all_writer_records(
 #[tokio::test]
 async fn migration_ten_does_not_infer_owners_and_readiness_detects_checksum_drift() {
     let (db, token, computer, input) = setup().await;
+    db.remove_execution_admission().await;
     sqlx::raw_sql("DROP TABLE candidate_writer_completions; DROP FUNCTION guard_writer_completion(); DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DELETE FROM _sqlx_migrations WHERE version>=10;").execute(&db.pool).await.unwrap();
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();

@@ -653,6 +653,7 @@ async fn admission_migration_preserves_existing_definitions_and_grants_without_a
     .await
     .unwrap();
     let permissions = count(&db, "runtime_grants").await;
+    db.remove_execution_admission().await;
     sqlx::raw_sql("DROP TABLE candidate_writer_completions; DROP FUNCTION guard_writer_completion(); DROP TABLE candidate_writer_drains,candidate_writer_dispatches,candidate_writer_epochs,candidate_writer_leases; DROP FUNCTION guard_writer_record_insert(); DROP FUNCTION guard_writer_lease_mutation(); DROP TABLE connection_sessions; DROP FUNCTION guard_connection_session_mutation(); DROP TABLE candidate_preparations,runtime_start_inputs,workspace_input_heads,workspace_input_versions; DROP FUNCTION guard_candidate_preparation(); DROP TABLE runtime_controls,runtime_start_requests CASCADE; DROP FUNCTION guard_runtime_start_mutation(); DELETE FROM _sqlx_migrations WHERE version>=7;").execute(&db.pool).await.unwrap();
     assert!(matches!(db.store.ready().await, Err(Error::SchemaNotReady)));
     db.store.migrate().await.unwrap();

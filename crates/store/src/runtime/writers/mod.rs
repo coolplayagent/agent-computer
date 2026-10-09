@@ -1,10 +1,15 @@
 //! Durable Candidate modification ownership. Expiry revokes admission, not IO.
 mod authority;
+mod executions;
 mod files;
 mod types;
 use super::*;
 use crate::plans::types::{digest, random_id};
 use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
+pub use executions::{
+    CancelExecution, ExecutionCommand, ExecutionLifetime, ExecutionRequest, ExecutionState,
+    SubmitExecution,
+};
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;
 pub use types::*;
@@ -150,6 +155,7 @@ async fn drain(
         Some("bounded_file_drained")
     } else { None };
     if let Some(proof) = proof {
+        seq = executions::cancel_reserved(tx, org, id, epoch, "writer_unavailable", seq).await?;
         sqlx::query("INSERT INTO candidate_writer_drains (organization,lease_id,epoch,proof) VALUES ($1,$2,$3,$4)").bind(org).bind(id).bind(epoch).bind(proof).execute(&mut **tx).await?;
         sqlx::query("UPDATE candidate_writer_leases SET state='Released',revision=revision+1 WHERE organization=$1 AND lease_id=$2").bind(org).bind(id).execute(&mut **tx).await?;
         transactions::emit(
@@ -394,6 +400,9 @@ impl Store {
         let (row, _, prepared) = live(&mut tx, token, &identity, id).await?;
         if row.try_get::<bool, _>("dispatched")? {
             return Err(Error::DispatchAlreadyStarted);
+        }
+        if executions::reserved(&mut tx, identity.organization().as_str(), id, input.epoch).await? {
+            return Err(Error::WriterLeaseBusy);
         }
         authority::command(&row, input)?;
         let used:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM candidate_writer_dispatches WHERE organization=$1 AND dispatch_id=$2)").bind(identity.organization().as_str()).bind(dispatch.dispatch_id).fetch_one(&mut *tx).await?;

@@ -8,6 +8,7 @@ use agent_computer_store::{
 };
 
 mod authority;
+mod executions;
 mod reads;
 mod recovery;
 

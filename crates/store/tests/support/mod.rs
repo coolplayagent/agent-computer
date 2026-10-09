@@ -10,6 +10,10 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    /// Remove only migration 12 when constructing historical upgrade fixtures.
+    pub async fn remove_execution_admission(&self) {
+        sqlx::raw_sql("DROP TABLE execution_requests; DROP FUNCTION guard_execution_request(); DROP TRIGGER check_execution_writer_dispatch ON candidate_writer_dispatches; DROP TRIGGER check_execution_writer_drain ON candidate_writer_drains; DROP FUNCTION guard_execution_writer_slot(); DELETE FROM _sqlx_migrations WHERE version=12;").execute(&self.pool).await.unwrap();
+    }
     pub async fn new() -> Self {
         let postgres = Postgres::new().await;
         let pool = postgres.pool.clone();

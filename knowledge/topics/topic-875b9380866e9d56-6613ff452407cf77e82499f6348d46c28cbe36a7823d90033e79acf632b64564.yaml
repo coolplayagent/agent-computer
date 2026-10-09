@@ -14,6 +14,16 @@ sources:
   status: active
   version: 1
   description: Bounded atomic Candidate file saves, consumed dispatch permits and sealed drain evidence; paired English docs/en/20-bounded-file-saves.md
+- id: candidate-file-http-gateway
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/21-file-http-gateway.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authenticated bounded Candidate HTTP read/save, independent read grants and IO capacity across cancellation; paired English docs/en/21-file-http-gateway.md
 - id: candidate-preparation-worker
   topic: development
   kind: doc
@@ -93,6 +103,16 @@ sources:
   status: active
   version: 1
   description: Authorized definition plans, immutable SpecVersions and atomic apply with queued reconciliation; paired English guide in docs/en/10-plans-and-apply.md.
+- id: durable-execution-admission
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/23-execution-admission.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Connection-scoped durable execution queue, fixed Sandbox/Candidate binding, writer reservation, retry and cancellation; paired English docs/en/23-execution-admission.md. Runtime dispatch and background lifetimes remain pending.
 - id: kubernetes-adapter-guide
   topic: development
   kind: doc
@@ -133,6 +153,16 @@ sources:
   status: active
   version: 1
   description: 资源运行授权、scope 交集、撤权与激活上限；配套英文 docs/en/15-runtime-authorization.md
+- id: sandbox-process-supervisor
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/22-sandbox-supervisor.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Single-use isolated PID 1, structured argv, bounded output and descendant cleanup; paired English docs/en/22-sandbox-supervisor.md. Durable admission, external watchdog and fencing remain pending.
 - id: volume-provisioning-guide
   topic: development
   kind: doc
@@ -160,4 +190,7 @@ route:
   - connection-sessions-guide
   - candidate-writer-leases
   - bounded-candidate-file-saves
+  - candidate-file-http-gateway
+  - sandbox-process-supervisor
+  - durable-execution-admission
   fallback: bounded-search

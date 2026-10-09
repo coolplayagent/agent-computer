@@ -2722,6 +2722,454 @@
           }
         }
       }
+    },
+    "/v1alpha1/computers/{id}/executions": {
+      "post": {
+        "operationId": "submitCandidateExecution",
+        "description": "Requires runtime.connect/read/modify scopes, original active connection, exact writer lease CAS and independent Computer/Workspace grants. Reserves one execution per lease epoch, mutually exclusive with file dispatch. Stores fixed input, Sandbox spec, Candidate preparation/storage identity and events/Outbox atomically. Returns 202 while Queued; exact retry returns current metadata (200 if Cancelled), never another execution or a process permit. Runtime dispatch remains unsupported.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 64 KiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current execution metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Selected Sandbox is unavailable, incompatible, outside the pinned Computer or shared with an App.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Durably Queued, awaiting a future runtime dispatcher; no process has started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRequest"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitExecution"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/executions/{id}": {
+      "get": {
+        "operationId": "getCandidateExecution",
+        "description": "Requires original credential and runtime.connect. Returns own metadata, reconciling an invalid or expired queued reservation to Cancelled with an event. History stays queryable with a valid original credential after the connection closes. No command/output bytes or stopped-process proof.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current execution metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Selected Sandbox is unavailable, incompatible, outside the pinned Computer or shared with an App.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/executions/{id}/cancel": {
+      "post": {
+        "operationId": "cancelCandidateExecution",
+        "description": "Requires original credential and runtime.connect, idempotency key and execution revision CAS. Atomically cancels an undispatched reservation. The writer lease remains Held until explicit release or authority loss; cancellation does not assert process termination.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 64 KiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current execution metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Selected Sandbox is unavailable, incompatible, outside the pinned Computer or shared with an App.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelExecution"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4382,6 +4830,191 @@
             "$ref": "#/components/schemas/FileEdit"
           }
         }
+      },
+      "ExecutionCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "argv",
+          "cwd",
+          "timeout_seconds",
+          "term_grace_ms",
+          "output_limit_bytes"
+        ],
+        "properties": {
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 128,
+            "items": {
+              "type": "string"
+            },
+            "description": "Absolute executable in argv[0], no NUL, total argv at most 32768 UTF-8 bytes; explicit interpreter required for scripts."
+          },
+          "cwd": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Empty or normalized relative directory: no slash prefix, backslash, NUL, dot/dot-dot or empty segments; at most 32 segments of 255 UTF-8 bytes."
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600
+          },
+          "term_grace_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          },
+          "output_limit_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048576
+          }
+        },
+        "description": "Shared supervisor bounds. Timeout also cannot exceed the pinned Computer start budget. No env/stdin references yet."
+      },
+      "SubmitExecution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lease_id",
+          "lease",
+          "sandbox_id",
+          "lifetime",
+          "command"
+        ],
+        "properties": {
+          "lease_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "lease": {
+            "$ref": "#/components/schemas/WriterLeaseCommand"
+          },
+          "sandbox_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "lifetime": {
+            "type": "string",
+            "const": "connection"
+          },
+          "command": {
+            "$ref": "#/components/schemas/ExecutionCommand"
+          }
+        },
+        "description": "Connection-scoped queue reservation only. Selected gVisor Sandbox must belong to the pinned Computer snapshot and cannot host an App. Admission increments writer revision; re-read the lease before renewal/release. Background lifetime and runtime dispatch remain unsupported."
+      },
+      "CancelExecution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "description": "CAS cancellation of an undispatched queued execution; does not release its writer lease."
+      },
+      "ExecutionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "execution_id",
+          "computer_id",
+          "candidate_id",
+          "sandbox_id",
+          "lease_id",
+          "generation",
+          "sandbox_revision",
+          "epoch",
+          "revision",
+          "created_at_ms",
+          "queue_deadline_at_ms",
+          "state",
+          "reason",
+          "input_digest",
+          "binding_digest",
+          "dispatch_started"
+        ],
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "sandbox_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "lease_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sandbox_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "epoch": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "queue_deadline_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Queued",
+              "Cancelled"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "awaiting_runtime_dispatch",
+              "user_requested",
+              "writer_unavailable"
+            ]
+          },
+          "input_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "binding_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "dispatch_started": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "description": "Current metadata only, bound to the original credential. No command bytes/storage paths, process-success status or fencing claim. Queue deadline is fixed at admission and never extended by retry or lease renewal."
       }
     },
     "responses": {

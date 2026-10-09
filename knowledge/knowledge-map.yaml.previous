@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 43
-updated_at: unix:1791562357
+map_version: 44
+updated_at: unix:1791564511
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -107,9 +107,10 @@ topics:
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
   - runtime-authorization-guide
+  - sandbox-process-supervisor
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-ecbb905d6ad7e1cd4d1305c60bdc11cd4081f1b808f7b940e555f1ffe27f76df.yaml
-  digest: ecbb905d6ad7e1cd4d1305c60bdc11cd4081f1b808f7b940e555f1ffe27f76df
+  ref: topics/topic-875b9380866e9d56-fcea5a1c28fcd54a6d5456d75274befc48ffc2a43d81e89a1e63631bb1e8a4d9.yaml
+  digest: fcea5a1c28fcd54a6d5456d75274befc48ffc2a43d81e89a1e63631bb1e8a4d9
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -133,12 +134,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 27
+  omitted_through: 28
   recent:
-  - version: 28
-    action: source.add
-    actor: cli
-    summary: Added source 'control-service-guide' to topic 'development'.
   - version: 29
     action: source.add
     actor: cli
@@ -199,3 +196,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'candidate-file-http-gateway' to topic 'development'.
+  - version: 44
+    action: source.add
+    actor: cli
+    summary: Added source 'sandbox-process-supervisor' to topic 'development'.

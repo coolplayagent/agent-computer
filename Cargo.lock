@@ -92,6 +92,7 @@ version = "0.1.0"
 dependencies = [
  "agent-computer-core",
  "agent-computer-definitions",
+ "agent-computer-sandbox",
  "agent-computer-storage",
  "agent-computer-test-support",
  "getrandom 0.4.3",
