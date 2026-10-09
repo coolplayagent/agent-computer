@@ -1,0 +1,795 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "agent-computer control API",
+    "version": "0.1.0",
+    "description": "Development service credential and static declaration validation surface. OIDC, resource grants, plan/apply and Computer runtime remain unsupported."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process is alive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "ready",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Database connectivity and exact migration checksums are ready.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1alpha1/version": {
+      "get": {
+        "operationId": "version",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Build and API version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1alpha1/capabilities": {
+      "get": {
+        "operationId": "capabilities",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Implemented and unsupported capabilities.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1alpha1/openapi.json": {
+      "get": {
+        "operationId": "openapi",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "This OpenAPI document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1alpha1/definitions/validate": {
+      "post": {
+        "operationId": "validateDefinition",
+        "description": "Authenticated, side-effect-free static JSON validation. Requires definitions.validate. No resources are applied. Body limit 1 MiB. Browser Origin and content encoding are rejected. This query does not require an Idempotency-Key.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComputerSet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Static validation report; this does not grant authority.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "valid",
+                    "definition_digest",
+                    "diagnostics",
+                    "scope"
+                  ],
+                  "properties": {
+                    "valid": {
+                      "const": true
+                    },
+                    "definition_digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "diagnostics": {
+                      "type": "array"
+                    },
+                    "scope": {
+                      "const": "static"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unreadable body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, expired, disabled or revoked credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Scope missing or browser authentication unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request timeout.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body exceeds 1 MiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported content type or encoding.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid ComputerSet. details.validation contains diagnostics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable or capacity limit reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "serviceBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "acsk_<credential-id>_<secret>"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "retryable",
+          "request_id",
+          "details"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      },
+      "ComputerSet": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "ComputerSet",
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "$ref": "#/components/schemas/ComputerSet/$defs/ApiVersion"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ComputerSet/$defs/DocumentKind"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ComputerSet/$defs/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ComputerSet/$defs/SetSpec"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "$defs": {
+          "Agent": {
+            "type": "object",
+            "properties": {
+              "adapter": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/AgentAdapter"
+              },
+              "capabilities": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Capability"
+                }
+              },
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "mode": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/AgentMode"
+              },
+              "name": {
+                "type": "string"
+              },
+              "sandboxRef": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "secretRefs": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "mode",
+              "adapter"
+            ]
+          },
+          "AgentAdapter": {
+            "type": "string",
+            "enum": [
+              "tools-api"
+            ]
+          },
+          "AgentMode": {
+            "type": "string",
+            "enum": [
+              "external",
+              "hosted"
+            ]
+          },
+          "ApiVersion": {
+            "type": "string",
+            "enum": [
+              "agent-computer/v1alpha1"
+            ]
+          },
+          "App": {
+            "type": "object",
+            "properties": {
+              "argv": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cwd": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "driver": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/AppDriver"
+              },
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "exportPaths": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "health": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ComputerSet/$defs/Health"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "name": {
+                "type": "string"
+              },
+              "profileRef": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sandboxRef": {
+                "type": "string"
+              },
+              "statePaths": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "driver",
+              "sandboxRef"
+            ]
+          },
+          "AppDriver": {
+            "type": "string",
+            "enum": [
+              "chromium-playwright",
+              "web-application"
+            ]
+          },
+          "Capability": {
+            "type": "string",
+            "enum": [
+              "browser.observe",
+              "browser.act",
+              "files.read",
+              "files.write",
+              "execution.submit",
+              "artifacts.read",
+              "artifacts.commit"
+            ]
+          },
+          "Computer": {
+            "type": "object",
+            "properties": {
+              "appRefs": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "desiredState": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/DesiredState"
+              },
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "name": {
+                "type": "string"
+              },
+              "sandboxRefs": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "workspaceRef": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "workspaceRef",
+              "desiredState"
+            ]
+          },
+          "ConflictPolicy": {
+            "type": "string",
+            "enum": [
+              "explicit"
+            ]
+          },
+          "DesiredState": {
+            "type": "string",
+            "enum": [
+              "Running",
+              "Stopped"
+            ]
+          },
+          "DocumentKind": {
+            "type": "string",
+            "enum": [
+              "ComputerSet"
+            ]
+          },
+          "Health": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "port": {
+                "type": "integer",
+                "format": "uint16",
+                "maximum": 65535,
+                "minimum": 0
+              },
+              "startupTimeoutSeconds": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "port",
+              "path",
+              "startupTimeoutSeconds"
+            ]
+          },
+          "Metadata": {
+            "type": "object",
+            "properties": {
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name"
+            ]
+          },
+          "Mount": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "readOnly": {
+                "type": "boolean"
+              },
+              "workspaceRef": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "workspaceRef",
+              "path",
+              "readOnly"
+            ]
+          },
+          "ReclaimPolicy": {
+            "type": "string",
+            "enum": [
+              "Retain"
+            ]
+          },
+          "Resources": {
+            "type": "object",
+            "properties": {
+              "cpuMillis": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "memoryMiB": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "cpuMillis",
+              "memoryMiB"
+            ]
+          },
+          "Sandbox": {
+            "type": "object",
+            "properties": {
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "image": {
+                "type": "string"
+              },
+              "mounts": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Mount"
+                }
+              },
+              "name": {
+                "type": "string"
+              },
+              "networkPolicyRef": {
+                "type": "string"
+              },
+              "resources": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/Resources"
+              },
+              "runtimeClass": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "runtimeClass",
+              "image",
+              "resources",
+              "networkPolicyRef"
+            ]
+          },
+          "SetSpec": {
+            "type": "object",
+            "properties": {
+              "agents": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Agent"
+                }
+              },
+              "apps": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/App"
+                }
+              },
+              "computers": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Computer"
+                }
+              },
+              "sandboxes": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Sandbox"
+                }
+              },
+              "volumes": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Volume"
+                }
+              },
+              "workspaces": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/ComputerSet/$defs/Workspace"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "Volume": {
+            "type": "object",
+            "properties": {
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "name": {
+                "type": "string"
+              },
+              "quotaBytes": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0
+              },
+              "reclaimPolicy": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/ReclaimPolicy"
+              },
+              "storageClass": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "storageClass",
+              "quotaBytes",
+              "reclaimPolicy"
+            ]
+          },
+          "Workspace": {
+            "type": "object",
+            "properties": {
+              "conflictPolicy": {
+                "$ref": "#/components/schemas/ComputerSet/$defs/ConflictPolicy"
+              },
+              "expectedRevision": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "uint64",
+                "minimum": 0
+              },
+              "name": {
+                "type": "string"
+              },
+              "volumeRef": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "volumeRef",
+              "conflictPolicy"
+            ]
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unavailable": {
+        "description": "Service unavailable.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

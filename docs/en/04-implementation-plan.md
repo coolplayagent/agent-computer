@@ -12,7 +12,7 @@ Commit reviewable, buildable capability increments. A stage may span several com
 | 02 | Typed identities and Computer/Lease/Execution state constraints | R01, R08, R09, R21 / domain tests for D02, D04, D06, D08 | Implemented; 28 contract tests passed, runtime adapters pending |
 | 03 | ComputerSet schema/validation, definition versions, plans, capabilities | R01, R14, R31 / T01, T17, T36 | Partial: static validation/digests/schema and persisted declaration registry delivered; resource SpecVersions, plans and runtime capability negotiation pending |
 | 04 | PostgreSQL migrations, atomic idempotency, events/Outbox, CAS | R06, R08–R10 / T09, T12, T13 | Partial: registry migrations, atomic retries/CAS, events/Outbox and replay implemented; other resource transactions and external delivery workers pending |
-| 05 | API/OpenAPI, service credentials/OIDC, grants, many-to-many connections | R02, R15, R22, R24, R33 / T02, T10, T18, T22, T38 | Pending |
+| 05 | API/OpenAPI, service credentials/OIDC, grants, many-to-many connections | R02, R15, R22, R24, R33 / T02, T10, T18, T22, T38 | Partial: Axum service, OpenAPI subset, revocable scoped service credentials and protected validation delivered; OIDC, resource grants and connections pending |
 | 06 | Kubernetes/gVisor reconciliation, real fencing, start/stop/recovery | R02, R09, R13, R16 / T03, T08, T16, T19; B01–B07 | Pending implementation and real environment certification |
 | 07 | JuiceFS files, Candidates, S3 Artifacts/Checkpoints, GC | R05, R06, R16 / T07, T09, T11, T19 | Pending |
 | 08 | Controlled processes, bounded output, cancellation, lease watchdogs, Unknown reconciliation | R04, R08, R09 / T06, T08, T11, T12 | Pending |

@@ -10,6 +10,7 @@
 6. [领域状态契约](zh-CN/06-domain-contracts.md)
 7. [ComputerSet 声明验证](zh-CN/07-declarations.md)
 8. [PostgreSQL 声明持久化](zh-CN/08-persistence.md)
+9. [控制服务与服务凭据](zh-CN/09-control-service.md)
 
 ## 02. English
 
@@ -21,6 +22,7 @@
 6. [Domain state contracts](en/06-domain-contracts.md)
 7. [ComputerSet declaration validation](en/07-declarations.md)
 8. [PostgreSQL declaration persistence](en/08-persistence.md)
+9. [Control service and service credentials](en/09-control-service.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

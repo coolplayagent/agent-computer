@@ -10,15 +10,45 @@ type Resolved<'a> =
 impl<'s> MigrationSource<'s> for Embedded {
     fn resolve(self) -> Resolved<'s> {
         Box::pin(async {
-            Ok(vec![Migration::new(
-                1,
-                Cow::Borrowed("declaration registry"),
-                MigrationType::Simple,
-                Cow::Borrowed(include_str!("../migrations/0001_declaration_registry.sql")),
-                false,
-            )])
+            Ok(vec![
+                Migration::new(
+                    1,
+                    Cow::Borrowed("declaration registry"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0001_declaration_registry.sql")),
+                    false,
+                ),
+                Migration::new(
+                    2,
+                    Cow::Borrowed("service credentials"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0002_service_credentials.sql")),
+                    false,
+                ),
+            ])
         })
     }
+}
+
+pub(crate) async fn ready(pool: &sqlx::PgPool) -> crate::Result<()> {
+    use sqlx::Row;
+    let migrator = Migrator::new(Embedded).await?;
+    let applied =
+        sqlx::query("SELECT version, checksum, success FROM _sqlx_migrations ORDER BY version")
+            .fetch_all(pool)
+            .await?;
+    if applied.len() != migrator.iter().count() {
+        return Err(crate::Error::SchemaNotReady);
+    }
+    for (row, expected) in applied.into_iter().zip(migrator.iter()) {
+        if row.try_get::<i64, _>("version")? != expected.version
+            || row.try_get::<Vec<u8>, _>("checksum")? != expected.checksum.as_ref()
+            || !row.try_get::<bool, _>("success")?
+        {
+            return Err(crate::Error::SchemaNotReady);
+        }
+    }
+    Ok(())
 }
 
 pub(crate) async fn run(pool: &sqlx::PgPool) -> Result<(), MigrateError> {

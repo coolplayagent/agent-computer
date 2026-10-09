@@ -4,6 +4,18 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: service-credential
+    domain: agent-infrastructure
+    canonical_name: ServiceCredential
+    definition: 服务端生成、按组织和主体绑定的可撤销限时 bearer 凭据，仅持久保存摘要；API scope 不等于资源 grant、连接或控制租约。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/auth.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0002_service_credentials.sql
   - id: declaration-registry-version
     domain: agent-infrastructure
     canonical_name: DeclarationRegistryVersion

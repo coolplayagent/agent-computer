@@ -14,7 +14,7 @@
 
 ## 05.2 当前记录
 
-2026-10-09（阶段 01–02、03–04 部分能力）：Bazel 构建、CLI JSON 输出与错误退出码、Cargo fmt/Clippy、本地文档链接与双语编号检查通过；Bazel 共通过 71 项测试（28 领域、28 声明、7 CLI 进程、8 真实 PostgreSQL 集成场景）。另以 Python 独立验证 Draft 2020-12 Schema 和示例 SHA-256；Cargo 测试与 Clippy 同样通过。数据库实测环境为 Linux x86_64、PostgreSQL 18.6 私有临时集群，保留耐久配置；覆盖并发幂等/CAS、回滚、不可变版本、迁移校验和、快照/重放一致性、Outbox 保留及 WAL 崩溃恢复。复现命令和限制见 [08 持久化](08-persistence.md)。运行验收 T01–T43 全部 `not_run`。现有设计检查 T00 不等于产品交付。
+2026-10-09（阶段 01–02、03–05 部分能力）：Bazel 构建、CLI JSON 输出与错误退出码、Cargo fmt/Clippy、本地文档链接与双语编号检查通过；Bazel 共通过 80 项测试（28 领域、28 声明、7 CLI 进程、11 PostgreSQL、6 服务场景）。另以 Python 独立验证 Draft 2020-12 Schema 和示例 SHA-256；Cargo 测试与 Clippy 同样通过。数据库实测环境为 Linux x86_64、PostgreSQL 18.6 私有临时集群，保留耐久配置；覆盖并发幂等/CAS、回滚、不可变版本、迁移校验和、快照/重放一致性、Outbox 保留及 WAL 崩溃恢复。复现命令和限制见 [08 持久化](08-persistence.md)。服务测试还验证独立 TCP 进程的凭据签发、验证、撤销及优雅退出；存储测试覆盖到期、scope 隔离和主体禁用。OpenAPI 文件通过官方 3.1 元 Schema 和内嵌 ComputerSet 引用检查，见 [09 控制服务](09-control-service.md)。运行验收 T01–T43 全部 `not_run`。现有设计检查 T00 不等于产品交付。
 
 本地 Qualitygate 报告保存在已忽略的 `.qualitygate/`；提交前对最终工作区运行 `check --worktree --profile full`。报告需满足非空交付、无 pending checks、`gate.complete: true`、`gate.decision: pass` 与退出码 0，另外执行 Bazel 和静态检查。保留报告的 snapshot/policy digest，不把默认行尾检查扩大解释为功能质量保证。
 

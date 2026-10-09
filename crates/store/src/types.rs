@@ -58,6 +58,12 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    Unauthenticated,
+    Forbidden,
+    InvalidCredentialParameters,
+    PrincipalConflict,
+    EntropyUnavailable,
+    SchemaNotReady,
     RevisionConflict,
     IdempotencyConflict,
     IdempotencyGone,
@@ -76,6 +82,12 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::Unauthenticated => "invalid or inactive credential",
+            Self::Forbidden => "credential does not grant the required scope",
+            Self::InvalidCredentialParameters => "invalid credential parameters",
+            Self::PrincipalConflict => "principal is disabled or has a different kind",
+            Self::EntropyUnavailable => "secure random source unavailable",
+            Self::SchemaNotReady => "database schema is not ready",
             Self::RevisionConflict => "declaration revision conflict",
             Self::IdempotencyConflict => "idempotency key has different intent",
             Self::IdempotencyGone => "idempotency key is retired",

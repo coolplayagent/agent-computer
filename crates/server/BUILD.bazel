@@ -1,0 +1,38 @@
+load("@crates//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+
+rust_library(
+    name = "server",
+    srcs = ["src/lib.rs", "src/http.rs", "src/error.rs"],
+    compile_data = ["//schemas:openapi-v1alpha1.json"],
+    crate_name = "agent_computer_server",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    visibility = ["//visibility:public"],
+    deps = ["//crates/core", "//crates/definitions", "//crates/store"] + all_crate_deps(normal = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+)
+
+rust_binary(
+    name = "agent-computer-server",
+    srcs = ["src/main.rs", "src/operator.rs"],
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    visibility = ["//visibility:public"],
+    deps = [":server", "//crates/core", "//crates/store"] + all_crate_deps(normal = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+)
+
+rust_test(
+    name = "server_contracts_test",
+    size = "large",
+    srcs = glob(["tests/**/*.rs"]),
+    crate_root = "tests/server_contracts.rs",
+    data = [":agent-computer-server"],
+    rustc_env = {"AGENT_COMPUTER_SERVER_BIN": "$(rootpath :agent-computer-server)"},
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    tags = ["requires-postgresql"],
+    deps = [":server", "//crates/core", "//crates/definitions", "//crates/store", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
+)

@@ -4,7 +4,7 @@ agent-computer 为人和 Agent 提供可连接、可交互、可持久化的电�
 
 ## 01.1 当前进度
 
-项目进入渐进式实现阶段。已加入 Rust 工作区、Bazel 构建入口及 CLI 的 `version`、`capabilities`、`validate` 和 `schema` 命令。Computer 生命周期、租约交接、Execution/Unknown 与幂等领域规则已通过 28 项契约测试，详见 [06 领域状态契约](06-domain-contracts.md)。[07 声明验证](07-declarations.md) 提供 ComputerSet YAML/JSON 静态检查、固定摘要与 JSON Schema。尚无可运行的 Computer 服务；CLI 对运行能力明确返回 `unsupported`。设计基线 0.5 是完整目标，不是当前功能列表。
+项目进入渐进式实现阶段。已加入 Rust 工作区、Bazel 构建入口及 CLI 的 `version`、`capabilities`、`validate` 和 `schema` 命令。Computer 生命周期、租约交接、Execution/Unknown 与幂等领域规则已通过 28 项契约测试，详见 [06 领域状态契约](06-domain-contracts.md)。[07 声明验证](07-declarations.md) 提供 ComputerSet YAML/JSON 静态检查、固定摘要与 JSON Schema。[08 持久化](08-persistence.md) 提供声明事务，[09 控制服务](09-control-service.md) 提供服务凭据及带认证的静态验证 API。Computer 运行时尚未交付；CLI 对运行能力明确返回 `unsupported`。设计基线 0.5 是完整目标，不是当前功能列表。
 
 ## 01.2 首版范围
 

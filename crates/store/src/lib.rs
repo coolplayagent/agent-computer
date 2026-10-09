@@ -2,6 +2,7 @@
 //! recording a declaration does not apply resources or dispatch runtime work.
 #![forbid(unsafe_code)]
 
+pub mod auth;
 mod migrations;
 mod reads;
 mod retention;
@@ -25,6 +26,11 @@ impl Store {
     pub async fn migrate(&self) -> Result<()> {
         migrations::run(&self.pool).await?;
         Ok(())
+    }
+
+    /// Check connectivity and exact migration history without modifying the database.
+    pub async fn ready(&self) -> Result<()> {
+        migrations::ready(&self.pool).await
     }
 
     async fn lock_stream(tx: &mut Transaction<'_, Postgres>, org: &str) -> Result<i64> {

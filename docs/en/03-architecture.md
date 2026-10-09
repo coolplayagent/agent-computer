@@ -7,12 +7,14 @@
 | `crates/core` | Domain contracts and state machines without infrastructure dependencies |
 | `crates/definitions` | Bounded parsing, declaration semantics, fixed digests, structural schema |
 | `crates/store` | PostgreSQL declaration versions, atomic retries/CAS and event/Outbox transactions |
+| `crates/server` | Axum HTTP routes, bounded requests, service authentication and local credential administration |
+| `crates/test-support` | Private real PostgreSQL clusters for integration tests only |
 | `crates/cli` | Native CLI with version, capability status, declaration validation, and schema export |
 | `docs/zh-CN`, `docs/en` | User and developer documentation with matching numbering |
 | `codespec` | Authoritative detailed requirements, designs, decisions, and acceptance |
 | `knowledge` | Glossary and CLI-managed navigation maps |
 
-The Rust control service will use Tokio/Axum/SQLx/PostgreSQL, with trusted workers outside user Sandboxes. Browser Driver and ComputerView adapters retain the TypeScript/Playwright/React boundaries in the design. Core logic, control services, and CLI use Rust; Bazel manages the builds.
+The Rust control service uses Tokio/Axum/SQLx/PostgreSQL, with trusted workers outside user Sandboxes. Browser Driver and ComputerView adapters retain the TypeScript/Playwright/React boundaries in the design. Core logic, control services, and CLI use Rust; Bazel manages the builds.
 
 ## 03.2 Required invariants
 

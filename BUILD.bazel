@@ -5,3 +5,9 @@ alias(
 )
 
 exports_files(["rust-toolchain.toml", "Cargo.toml", "Cargo.lock"])
+
+alias(
+    name = "agent-computer-server",
+    actual = "//crates/server:agent-computer-server",
+    visibility = ["//visibility:public"],
+)

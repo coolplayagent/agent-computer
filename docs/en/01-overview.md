@@ -4,7 +4,7 @@ agent-computer provides connectable, interactive, persistent computer infrastruc
 
 ## 01.1 Current progress
 
-Incremental implementation has started with a Rust workspace, Bazel builds, and CLI `version`, `capabilities`, `validate`, and `schema` commands. Computer lifecycle, lease handoff, Execution/Unknown, and idempotency domain rules now pass 28 contract tests; see [06 Domain contracts](06-domain-contracts.md). [07 Declaration validation](07-declarations.md) provides ComputerSet YAML/JSON static checks, fixed digests, and a JSON Schema. There is no running Computer service yet; the CLI reports runtime features as `unsupported`. Design baseline 0.5 describes the full target, not the currently available features.
+Incremental implementation has started with a Rust workspace, Bazel builds, and CLI `version`, `capabilities`, `validate`, and `schema` commands. Computer lifecycle, lease handoff, Execution/Unknown, and idempotency domain rules now pass 28 contract tests; see [06 Domain contracts](06-domain-contracts.md). [07 Declaration validation](07-declarations.md) provides ComputerSet YAML/JSON static checks, fixed digests, and a JSON Schema. [08 Persistence](08-persistence.md) adds transactional storage; [09 Control service](09-control-service.md) adds service credentials and an authenticated static validation API. There is no running Computer runtime yet; the CLI reports runtime features as `unsupported`. Design baseline 0.5 describes the full target, not the currently available features.
 
 ## 01.2 First release scope
 

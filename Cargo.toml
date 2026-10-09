@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/core", "crates/definitions", "crates/store", "crates/cli"]
+members = ["crates/core", "crates/definitions", "crates/store", "crates/server", "crates/test-support", "crates/cli"]
 resolver = "3"
 
 [workspace.package]
@@ -18,6 +18,11 @@ oci-spec = { version = "0.10", default-features = false, features = ["distributi
 sqlx = { version = "0.8.6", default-features = false, features = ["runtime-tokio", "tls-rustls-ring", "postgres", "json", "migrate"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "time", "sync"] }
 tempfile = "3"
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio"] }
+getrandom = "0.4"
+subtle = "2.6"
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

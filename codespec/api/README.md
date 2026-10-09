@@ -1,6 +1,6 @@
 # 公共接口
 
-首版 API、CLI、事件与声明契约集中在[技术设计 D03、D08、D14、D15](../design/agent-computer.md)，包括人的独立连接、嵌入和运行成果。当前已交付 Rust CLI 的 `version/capabilities/validate/schema`，以及 [ComputerSet JSON Schema](../../schemas/computer-set-v1alpha1.json)；用法与语义边界见 [docs 07](../../docs/zh-CN/07-declarations.md)。内部 PostgreSQL 声明库及事务边界见 [docs 08](../../docs/zh-CN/08-persistence.md)；它不对外提供数据库端点，不执行资源 apply。HTTP/OpenAPI、plan/apply 和运行服务尚未实现。
+首版 API、CLI、事件与声明契约集中在[技术设计 D03、D08、D14、D15](../design/agent-computer.md)，包括人的独立连接、嵌入和运行成果。当前已交付 Rust CLI 的 `version/capabilities/validate/schema`，以及 [ComputerSet JSON Schema](../../schemas/computer-set-v1alpha1.json)；用法与语义边界见 [docs 07](../../docs/zh-CN/07-declarations.md)。内部 PostgreSQL 声明库及事务边界见 [docs 08](../../docs/zh-CN/08-persistence.md)；它不对外提供数据库端点，不执行资源 apply。现已交付 [HTTP/OpenAPI 子集](../../schemas/openapi-v1alpha1.json) 与可撤销服务凭据，启动/路由/限制见 [docs 09](../../docs/zh-CN/09-control-service.md)。OIDC、资源授权、plan/apply 和 Computer 运行服务尚未实现。
 
 ComputerSet Schema 验证结构，Rust 验证器补充静态引用、预算和 driver 约束。后续运行协议仍需真实适配测试验证兼容；不能将声明验证成功当作已可调用服务。
 

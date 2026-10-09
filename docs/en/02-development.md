@@ -13,6 +13,7 @@ Run from the repository root:
 ```bash
 bazel build //...
 bazel test //...
+bazel run //:agent-computer-server -- --help
 bazel run //:agent-computer -- version --json
 bazel run //:agent-computer -- capabilities --json
 bazel run //:agent-computer -- validate examples/research.computer.yaml --json
@@ -20,6 +21,8 @@ bazel run //:agent-computer -- schema computer-set --json
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
+
+Service setup, credential administration, HTTP routes and OpenAPI are documented in [09 Control service](09-control-service.md).
 
 The PostgreSQL integration suite requires locally installed server/client binaries and a non-root user; see [08 Persistence](08-persistence.md) for setup and Bazel environment flags. Tests fail if PostgreSQL is missing.
 

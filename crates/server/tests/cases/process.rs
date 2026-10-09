@@ -1,0 +1,221 @@
+use crate::support::document;
+use agent_computer_test_support::Postgres;
+use serde_json::Value;
+use std::{
+    fs,
+    io::{BufRead, BufReader, Read, Write},
+    net::{SocketAddr, TcpStream},
+    os::unix::fs::PermissionsExt,
+    path::{Path, PathBuf},
+    process::{Child, Command, Output, Stdio},
+    time::{Duration, Instant},
+};
+
+fn binary() -> PathBuf {
+    PathBuf::from(
+        option_env!("CARGO_BIN_EXE_agent-computer-server")
+            .or(option_env!("AGENT_COMPUTER_SERVER_BIN"))
+            .expect("test binary path"),
+    )
+}
+fn command(args: &[&str], database_file: &Path) -> Output {
+    Command::new(binary())
+        .args(args)
+        .arg("--database-url-file")
+        .arg(database_file)
+        .output()
+        .unwrap()
+}
+struct Server(Child);
+impl Drop for Server {
+    fn drop(&mut self) {
+        let _ = self.0.kill();
+        let _ = self.0.wait();
+    }
+}
+fn http(
+    address: SocketAddr,
+    method: &str,
+    path: &str,
+    token: Option<&str>,
+    body: &str,
+) -> (u16, Value) {
+    let mut stream = TcpStream::connect_timeout(&address, Duration::from_secs(5)).unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(5)))
+        .unwrap();
+    stream
+        .set_write_timeout(Some(Duration::from_secs(5)))
+        .unwrap();
+    let authentication = token
+        .map(|token| format!("Authorization: Bearer {token}\r\n"))
+        .unwrap_or_default();
+    write!(stream, "{method} {path} HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\nContent-Type: application/json\r\nContent-Length: {}\r\n{authentication}\r\n{body}", body.len()).unwrap();
+    let mut response = String::new();
+    stream.read_to_string(&mut response).unwrap();
+    let (head, body) = response.split_once("\r\n\r\n").unwrap();
+    let status = head.split_whitespace().nth(1).unwrap().parse().unwrap();
+    (status, serde_json::from_str(body).unwrap())
+}
+
+#[tokio::test]
+async fn operator_commands_and_real_http_reject_revoked_credentials() {
+    let database = Postgres::new().await;
+    let files = tempfile::tempdir().unwrap();
+    let database_file = files.path().join("database-url");
+    let token_file = files.path().join("credential");
+    fs::write(&database_file, database.connection_url()).unwrap();
+    fs::set_permissions(&database_file, fs::Permissions::from_mode(0o600)).unwrap();
+    assert!(command(&["migrate"], &database_file).status.success());
+    let issue = [
+        "credential-issue",
+        "--organization",
+        "acme",
+        "--principal",
+        "worker",
+        "--kind",
+        "agent",
+        "--scopes",
+        "definitions.validate",
+        "--ttl-seconds",
+        "3600",
+        "--output",
+        token_file.to_str().unwrap(),
+    ];
+    let issued = command(&issue, &database_file);
+    assert!(
+        issued.status.success(),
+        "{}",
+        String::from_utf8_lossy(&issued.stderr)
+    );
+    let metadata: Value = serde_json::from_slice(&issued.stdout).unwrap();
+    let token = fs::read_to_string(&token_file).unwrap();
+    let token = token.trim();
+    assert_eq!(
+        fs::metadata(&token_file).unwrap().permissions().mode() & 0o777,
+        0o600
+    );
+    assert!(!String::from_utf8_lossy(&issued.stdout).contains(token));
+    assert!(!String::from_utf8_lossy(&issued.stderr).contains(token));
+    assert!(!command(&issue, &database_file).status.success()); // Cannot overwrite an existing secret.
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM service_credentials")
+        .fetch_one(&database.pool)
+        .await
+        .unwrap();
+    assert_eq!(count, 1);
+    let mut server = Server(
+        Command::new(binary())
+            .args(["serve", "--database-url-file"])
+            .arg(&database_file)
+            .args(["--listen", "127.0.0.1:0"])
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap(),
+    );
+    let stderr = server.0.stderr.take().unwrap();
+    let (sender, receiver) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut line = String::new();
+        BufReader::new(stderr).read_line(&mut line).unwrap();
+        let _ = sender.send(line);
+    });
+    let line = receiver
+        .recv_timeout(Duration::from_secs(10))
+        .expect("server startup");
+    let address: SocketAddr = line
+        .trim()
+        .strip_prefix("agent-computer-server listening on ")
+        .expect("startup address")
+        .parse()
+        .unwrap();
+    assert_eq!(http(address, "GET", "/ready", None, "").0, 200);
+    assert_eq!(
+        http(
+            address,
+            "POST",
+            "/v1alpha1/definitions/validate",
+            None,
+            "invalid"
+        )
+        .0,
+        401
+    );
+    assert_eq!(
+        http(
+            address,
+            "POST",
+            "/v1alpha1/definitions/validate",
+            Some(token),
+            &document().to_string()
+        )
+        .0,
+        200
+    );
+    let revoke = command(
+        &[
+            "credential-revoke",
+            "--organization",
+            "acme",
+            "--credential",
+            metadata["credential_id"].as_str().unwrap(),
+        ],
+        &database_file,
+    );
+    assert!(revoke.status.success());
+    assert_eq!(
+        http(
+            address,
+            "POST",
+            "/v1alpha1/definitions/validate",
+            Some(token),
+            &document().to_string()
+        )
+        .0,
+        401
+    );
+    assert!(
+        Command::new("kill")
+            .args(["-TERM", &server.0.id().to_string()])
+            .status()
+            .unwrap()
+            .success()
+    );
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        if let Some(status) = server.0.try_wait().unwrap() {
+            assert!(status.success());
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "graceful shutdown did not finish"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+#[test]
+fn private_database_files_and_cli_arguments_fail_closed() {
+    let files = tempfile::tempdir().unwrap();
+    let secret = files.path().join("database-url");
+    fs::write(
+        &secret,
+        "postgresql://do-not-print:this-secret@localhost/missing",
+    )
+    .unwrap();
+    fs::set_permissions(&secret, fs::Permissions::from_mode(0o644)).unwrap();
+    let result = command(&["migrate"], &secret);
+    assert!(!result.status.success());
+    assert!(!String::from_utf8_lossy(&result.stderr).contains("this-secret"));
+    assert!(result.stdout.is_empty());
+    let link = files.path().join("symlink");
+    std::os::unix::fs::symlink(&secret, &link).unwrap();
+    assert!(!command(&["migrate"], &link).status.success());
+    let output = Command::new(binary())
+        .args(["serve", "--database-url", "do-not-print-this"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(!String::from_utf8_lossy(&output.stderr).contains("do-not-print-this"));
+}

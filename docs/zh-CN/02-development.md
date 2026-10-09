@@ -13,6 +13,7 @@ Bazel 是项目构建与测试入口，直接使用 `rust_library`、`rust_binar
 ```bash
 bazel build //...
 bazel test //...
+bazel run //:agent-computer-server -- --help
 bazel run //:agent-computer -- version --json
 bazel run //:agent-computer -- capabilities --json
 bazel run //:agent-computer -- validate examples/research.computer.yaml --json
@@ -24,6 +25,8 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 安装 Bazelisk 的环境会读取 `.bazelversion`。Rustup 会读取 `rust-toolchain.toml`。工具下载受限时使用组织提供的 HTTPS 代理或经过校验的镜像；不要修改固定版本来掩盖下载失败。
 
 CLI JSON 输出位于 stdout，诊断位于 stderr；不支持的命令/参数返回退出码 2。运行能力尚未交付，不应将版本命令成功当作运行服务健康。
+
+服务启动、凭据管理、HTTP 路由与 OpenAPI 见 [09 控制服务](09-control-service.md)。
 
 PostgreSQL 集成测试要求本机安装服务端/客户端二进制并以非 root 用户运行；安装与 Bazel 环境参数见 [08 持久化](08-persistence.md)。缺少 PostgreSQL 时测试失败。
 

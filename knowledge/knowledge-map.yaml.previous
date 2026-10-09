@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 26
-updated_at: unix:1791538985
+map_version: 28
+updated_at: unix:1791541273
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -92,9 +92,11 @@ topics:
   title: development
   description: Added by CLI source registration.
   source_ids:
+  - control-service-guide
+  - declaration-persistence-guide
   - numbered-bilingual-docs
-  ref: topics/topic-875b9380866e9d56-e56527cd0c1f7a830289b438d09df67745522e3e336ccec790992f104ea0daca.yaml
-  digest: e56527cd0c1f7a830289b438d09df67745522e3e336ccec790992f104ea0daca
+  ref: topics/topic-875b9380866e9d56-f56d133dd2a287c1d93aaaec431dee60ae95bfe1e13ea9f7676509cb63a060a8.yaml
+  digest: f56d133dd2a287c1d93aaaec431dee60ae95bfe1e13ea9f7676509cb63a060a8
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -118,16 +120,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 10
+  omitted_through: 12
   recent:
-  - version: 11
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-product'.
-  - version: 12
-    action: source.update
-    actor: cli
-    summary: Updated source 'agent-computer-design'.
   - version: 13
     action: source.update
     actor: cli
@@ -184,3 +178,11 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'computer-set-declaration-schema' to topic 'api'.
+  - version: 27
+    action: source.add
+    actor: cli
+    summary: Added source 'declaration-persistence-guide' to topic 'development'.
+  - version: 28
+    action: source.add
+    actor: cli
+    summary: Added source 'control-service-guide' to topic 'development'.

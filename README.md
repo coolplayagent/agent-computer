@@ -10,7 +10,7 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 
 ## 当前阶段
 
-渐进式实现阶段，完整目标保留设计基线 0.5。已建立 Rust + Bazel 工作区、`version/capabilities/validate/schema` CLI 及 Computer/Lease/Execution/幂等领域规则（28 项领域测试）；ComputerSet YAML/JSON 静态验证、固定摘要与 JSON Schema 已交付，另已交付 PostgreSQL 声明库、原子幂等/CAS 与事件/Outbox，共 71 项测试（含 8 项真实数据库集成测试）。尚无产品服务或已验证的 Computer 运行时。构建方法与各阶段进度见 [编号中英文文档](docs/README.md)。下列能力仍是首版设计目标，CodeSpec 中的 API、业务命令和声明示例是待实现契约。
+渐进式实现阶段，完整目标保留设计基线 0.5。已建立 Rust + Bazel 工作区、`version/capabilities/validate/schema` CLI 及 Computer/Lease/Execution/幂等领域规则（28 项领域测试）；ComputerSet YAML/JSON 静态验证、固定摘要与 JSON Schema 已交付，另已交付 PostgreSQL 声明库、原子幂等/CAS 与事件/Outbox，新增 Axum 控制服务、可撤销服务凭据和受保护的静态验证 API，共 80 项测试（11 数据库、6 服务、63 原有测试）。Computer 运行时尚待实现。构建方法与各阶段进度见 [编号中英文文档](docs/README.md)。下列能力仍是首版设计目标，CodeSpec 中的 API、业务命令和声明示例是待实现契约。
 
 - 开发者与平台团队负责集成部署；人和 Agent 都是直接使用者。私有多机 Linux，本地采用同构单节点环境。
 - 认证后的稳定连接链接与嵌入视图提供同等能力；日常 ComputerView 与运维管理界面分开。
