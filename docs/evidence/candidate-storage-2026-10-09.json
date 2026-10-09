@@ -1,0 +1,224 @@
+{
+  "test_id": "candidate-storage-component-2026-10-09",
+  "status": "passed",
+  "scope": "Trusted Rust preparation command on real JuiceFS/PostgreSQL/S3; not runtime acceptance",
+  "source_commit": "98e183197cc711751779694559ec7f562fd3d330",
+  "source_files": {
+    "Cargo.toml": "sha256:b5542b7765357891d9737b3d6e86f42d3ab1dbcf17f0dfcfeff244086db9f869",
+    "Cargo.lock": "sha256:a38300e09cab42c3566c19d67bf40d152e8c799f969199d0774c443ba2d9d849",
+    "MODULE.bazel": "sha256:77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "sha256:bf546f71888bb54dfe7630efdd584706b1dd7a7eea38a7bff6324df8f539ef80",
+    "crates/storage/Cargo.toml": "sha256:45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/BUILD.bazel": "sha256:e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/src/tests.rs": "sha256:5329305dc2a8ca3bcefd84cfcaf7224fb8bcd8213cb4c17ae8971b4320e36d0e",
+    "crates/storage/src/lib.rs": "sha256:848c2b3402311f09891d7dc2a28fbc5325284af388cf7f8448fb20221dbade7f",
+    "crates/storage/src/main.rs": "sha256:1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/directory.rs": "sha256:56f91bfa1a5a05efee93737205d6c0ac1ca3b06a61f772dfd3515ff2f0400569",
+    "crates/storage/src/model.rs": "sha256:af474658d4b5c2991e61fa412c4faef2226da0e9680907be7a11caa27cacffaa",
+    "crates/storage/src/materialize.rs": "sha256:9429e5201ef2edef361a5501ab97b7604a31f0dcf7f597955ca64074d07273af",
+    "crates/storage/src/quota.rs": "sha256:143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960"
+  },
+  "environment": {
+    "kernel": "6.8.0-142-generic",
+    "os": "Ubuntu 24.04.5 LTS",
+    "juicefs": "juicefs version 1.4.1+2026-07-30.0b90c7d",
+    "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+    "s3": "SeaweedFS 4.48; single VM HTTP with random private credentials",
+    "isolation": "Disposable KVM guest; 4 vCPU, 6144 MiB RAM, 24 GiB writable overlay; no Kubernetes in this probe",
+    "writer": "Linux UID/GID 1000 through a bind mount containing only the prepared data leaf",
+    "s3_version": "version 30GB 4.48 530be3e37337488ecc34d58441e0bc476e121c93 linux amd64"
+  },
+  "component_digests": {
+    "bazel_binary": "sha256:8f262156329a497a9dc915865c79201fa6e89c40f53ede317c57b35d1b0dd7df",
+    "juicefs_binary": "sha256:1e111b642668992e04d62377e218a24e263f76af12370facb9097353e5b8d208",
+    "juicefs_release_archive": "sha256:01ee09a21a9351a465e09906f113845e1c6a19bea70f530e5e2b2125b2dd3b82",
+    "seaweedfs_release_archive": "sha256:4a7d108384d044d95212d1342cdda9533fa55842c1c9b41f606ca3c8a9561124",
+    "guest_image": "sha256:6a81c37564db9b1ee84e141922625e1d7c5b389b99bb3c572e0243607d5bb4d2"
+  },
+  "input_refs": {
+    "request": {
+      "candidate": "candidate-one",
+      "computer": "computer-one",
+      "generation": 2,
+      "manifest": {
+        "entries": {
+          "empty": {
+            "kind": "directory"
+          },
+          "src/input.bin": {
+            "executable": false,
+            "kind": "file",
+            "sha256": "sha256:3e51a351de9d7cc37048e72733fd8fd16d2d358589f63b907e74d0675b9660e6",
+            "size": 1048576
+          }
+        }
+      },
+      "manifest_digest": "sha256:72fa3651b19e39c122b4b792a7253385d7e17d6f890ee7826c573b5039c282cd",
+      "organization": "org-final",
+      "quota_bytes": 1073741824,
+      "volume_uid": "volume-component",
+      "workspace": "workspace-component"
+    },
+    "note": "The retained request is generation 2; the probe first prepared generation 1 from the same manifest. Random input bytes were private to the disposable environment; digest and size are retained."
+  },
+  "expected": [
+    "Synchronous quota setup and file/directory sync precede non-replacing generation publication",
+    "Prepared bytes hash correctly and occupy independent regular-file inodes",
+    "Exact retry preserves acknowledged non-root edits and does not overwrite data",
+    "Changed Computer identity conflicts; new generation has independent base bytes",
+    "Published directory quota rejects an over-quota write with EDQUOT",
+    "A fresh read-only memory-cache client reads prepared generation 2 bytes from S3"
+  ],
+  "observed": {
+    "binary_sha256": "8f262156329a497a9dc915865c79201fa6e89c40f53ede317c57b35d1b0dd7df",
+    "checks": [
+      "initial materialization and hash",
+      "independent file inode",
+      "exact retry",
+      "UID 1000 mutation via prepared leaf bind mount",
+      "retry preserves mutation",
+      "computer identity conflict",
+      "new generation independent",
+      "quota at published path",
+      "UID 1000 EDQUOT"
+    ],
+    "filesystem_uuid": "73180459-2fb4-4671-aacf-033156f87293",
+    "input_bytes": 1048576,
+    "input_sha256": "3e51a351de9d7cc37048e72733fd8fd16d2d358589f63b907e74d0675b9660e6",
+    "juicefs_binary_sha256": "sha256:1e111b642668992e04d62377e218a24e263f76af12370facb9097353e5b8d208",
+    "limits": [
+      "single VM; no product runtime grants, lease, fencing or Kubernetes mount admission",
+      "no power loss or S3 failure injection",
+      "private input staging cache; Artifact authorization and object-store fetch pending"
+    ],
+    "next_generation_receipt": {
+      "data_inode": 36,
+      "filesystem_uuid": "73180459-2fb4-4671-aacf-033156f87293",
+      "manifest_digest": "sha256:72fa3651b19e39c122b4b792a7253385d7e17d6f890ee7826c573b5039c282cd",
+      "path_ref": "organization/org-final/workspace/workspace-component/candidates/candidate-one/generation/2/data",
+      "quota_bytes": 1073741824,
+      "request_digest": "sha256:f92bee94cecdbec65967ab393a78991285fa01eaae1a9f84c1e05b504beaa620",
+      "version": 1,
+      "volume_uid": "volume-component"
+    },
+    "quota_refused_file_bytes": 1073741824,
+    "receipt": {
+      "data_inode": 30,
+      "filesystem_uuid": "73180459-2fb4-4671-aacf-033156f87293",
+      "manifest_digest": "sha256:72fa3651b19e39c122b4b792a7253385d7e17d6f890ee7826c573b5039c282cd",
+      "path_ref": "organization/org-final/workspace/workspace-component/candidates/candidate-one/generation/1/data",
+      "quota_bytes": 1073741824,
+      "request_digest": "sha256:93e4a27cd68deb819d4f34606a7574c095edba09a57c8f2a195908d3777342bc",
+      "version": 1,
+      "volume_uid": "volume-component"
+    },
+    "fresh_client_read": {
+      "actual_sha256": "3e51a351de9d7cc37048e72733fd8fd16d2d358589f63b907e74d0675b9660e6",
+      "bytes": 1048576,
+      "cache": "new read-only client; cache-dir memory; cache-size 0",
+      "object_get_metrics": [
+        "juicefs_object_request_data_bytes_GET 1048576",
+        "juicefs_object_request_durations_histogram_seconds_GET_total 2",
+        "juicefs_object_request_durations_histogram_seconds_GET_sum 0.007796055"
+      ]
+    }
+  },
+  "probe_inputs": {
+    "prepare_probe": {
+      "script": "import pathlib,json,subprocess,hashlib,os,copy,time\np=pathlib.Path('/root/storage-probe');mount=pathlib.Path('/mnt/ac-juicefs');binary='/home/ac-test/agent-computer-storage-bazel';uuid=json.loads((mount/'.config').read_text())['Format']['UUID'];url='postgres://jfsmeta@10.0.2.15:5432/jfsmeta?sslmode=disable'\ndef save(path,obj):\n path.write_text(json.dumps(obj,sort_keys=True));path.chmod(0o600)\ndef run(args):\n r=subprocess.run(args,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True);return r\nconfig={'mount_root':str(mount),'volume_path':'volume-preparation','filesystem_uuid':uuid,'volume_uid':'volume-component','object_cache':str(p/'objects'),'writer_uid':1000,'writer_gid':1000,'quota':{'executable':'/usr/local/bin/juicefs','executable_sha256':'sha256:'+hashlib.file_digest(open('/usr/local/bin/juicefs','rb'),'sha256').hexdigest(),'metadata_url':url,'password_file':str(p/'metadata-password'),'timeout_seconds':30}}\nsave(p/'config.json',config)\nblob=os.urandom(1048576);sha=hashlib.sha256(blob).hexdigest();obj=p/'objects'/sha;obj.write_bytes(blob);obj.chmod(0o600)\nmanifest={'entries':{'src/input.bin':{'kind':'file','sha256':'sha256:'+sha,'size':len(blob),'executable':False},'empty':{'kind':'directory'}}};save(p/'manifest.json',manifest)\ndigest=run([binary,'manifest-digest','--file',str(p/'manifest.json')]);assert digest.returncode==0,digest.stdout\nrequest={'organization':'org-final','volume_uid':'volume-component','workspace':'workspace-component','candidate':'candidate-one','computer':'computer-one','generation':1,'quota_bytes':1073741824,'manifest_digest':digest.stdout.strip(),'manifest':manifest}\ndef prepare(req):\n save(p/'request.json',req);return run([binary,'prepare','--config-file',str(p/'config.json'),'--request-file',str(p/'request.json')])\nr=prepare(request);print('initial_prepare_exit',r.returncode,flush=True);print(r.stdout,flush=True);assert r.returncode==0\nreceipt=json.loads(r.stdout);data=mount/config['volume_path']/receipt['path_ref'];inputfile=data/'src/input.bin';assert hashlib.file_digest(inputfile.open('rb'),'sha256').hexdigest()==sha\nassert obj.stat().st_ino!=inputfile.stat().st_ino and inputfile.stat().st_nlink==1\nprint('independent_file_sha256',sha,'inode',inputfile.stat().st_ino,'data_inode',data.stat().st_ino,flush=True)\n# Normal acknowledged preparation is replayable with the same inode and receipt.\nr=prepare(request);assert r.returncode==0 and json.loads(r.stdout)==receipt\n# Bind only the prepared leaf for the non-root operator probe. No control parent is exposed.\nwriter=pathlib.Path('/mnt/ac-candidate-writer');writer.mkdir(exist_ok=True);subprocess.run(['mount','--bind',str(data),str(writer)],check=True)\nnonroot=['setpriv','--reuid','1000','--regid','1000','--clear-groups']\nr=run(nonroot+['sh','-c','printf changed-by-writer > /mnt/ac-candidate-writer/src/input.bin && sync /mnt/ac-candidate-writer/src/input.bin']);assert r.returncode==0,r.stdout\nr=prepare(request);assert r.returncode==0 and json.loads(r.stdout)==receipt and inputfile.read_bytes()==b'changed-by-writer'\nprint('retry_preserved_nonroot_edit',True,'cache_unchanged',hashlib.file_digest(obj.open('rb'),'sha256').hexdigest()==sha,flush=True)\nchanged=copy.deepcopy(request);changed['computer']='other-computer';r=prepare(changed);assert r.returncode!=0;print('conflicting_computer_exit',r.returncode,r.stdout.strip(),flush=True)\nnextgen=copy.deepcopy(request);nextgen['generation']=2;r=prepare(nextgen);assert r.returncode==0,r.stdout;nextreceipt=json.loads(r.stdout);nextdata=mount/config['volume_path']/nextreceipt['path_ref'];assert hashlib.file_digest((nextdata/'src/input.bin').open('rb'),'sha256').hexdigest()==sha\nprint('new_generation_independent',nextdata.stat().st_ino!=data.stat().st_ino,flush=True)\n# Read the real directory quota at its published path, then force EDQUOT as UID 1000.\nenv=os.environ.copy();env['META_PASSWORD_FILE']=str(p/'metadata-password');qr=subprocess.run(['/usr/local/bin/juicefs','quota','get','--path','/'+config['volume_path']+'/'+receipt['path_ref'],url],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True);assert qr.returncode==0;print('published_quota',qr.stdout.strip(),flush=True)\nr=run(nonroot+['dd','if=/dev/zero','of=/mnt/ac-candidate-writer/over-quota.bin','bs=1048576','count=1152','conv=fsync']);print('quota_write_exit',r.returncode,r.stdout.strip(),flush=True);assert r.returncode!=0 and 'Disk quota exceeded' in r.stdout\nsubprocess.run(['umount',str(writer)],check=True)\nevidence={'filesystem_uuid':uuid,'receipt':receipt,'next_generation_receipt':nextreceipt,'input_sha256':sha,'input_bytes':len(blob),'binary_sha256':hashlib.file_digest(open(binary,'rb'),'sha256').hexdigest(),'juicefs_binary_sha256':config['quota']['executable_sha256'],'quota_refused_file_bytes':(data/'over-quota.bin').stat().st_size,'checks':['initial materialization and hash','independent file inode','exact retry','UID 1000 mutation via prepared leaf bind mount','retry preserves mutation','computer identity conflict','new generation independent','quota at published path','UID 1000 EDQUOT'],'limits':['single VM; no product runtime grants, lease, fencing or Kubernetes mount admission','no power loss or S3 failure injection','private input staging cache; Artifact authorization and object-store fetch pending']}\nsave(p/'result.json',evidence)\nprint('storage_probe_passed',True,flush=True)\n",
+      "sha256": "sha256:d4f2913d1eb1fc8a59158db4ac8ab9fe7fab58c8e2277fe490b160146d84340b"
+    },
+    "fresh_read_probe": {
+      "script": "import pathlib,subprocess,json,os,hashlib\np=pathlib.Path('/root/storage-probe');result=json.loads((p/'result.json').read_text());cold=pathlib.Path('/mnt/ac-candidate-cold');cold.mkdir(exist_ok=True)\nenv=os.environ.copy();env['META_PASSWORD_FILE']=str(p/'metadata-password')\ncommand=['/usr/local/bin/juicefs','mount','-d','--read-only','--no-usage-report','--cache-dir','memory','--cache-size','0','--buffer-size','64','postgres://jfsmeta@10.0.2.15:5432/jfsmeta?sslmode=disable',str(cold)]\nr=subprocess.run(command,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)\n(p/'cold-mount.log').write_text(r.stdout);(p/'cold-mount.log').chmod(0o600)\nassert r.returncode==0,'cold mount failed; private log retained'\nfile=cold/'volume-preparation'/result['next_generation_receipt']['path_ref']/'src/input.bin'\nactual=hashlib.file_digest(file.open('rb'),'sha256').hexdigest();assert actual==result['input_sha256']\nstats=(cold/'.stats').read_text();metrics=[line for line in stats.splitlines() if not line.startswith('#') and 'object' in line and ('get' in line.lower() or 'GET' in line)]\nobservation={'actual_sha256':actual,'bytes':file.stat().st_size,'cache':'new read-only client; cache-dir memory; cache-size 0','object_get_metrics':metrics}\nresult['fresh_client_read']=observation\nresult['environment']={'kernel':subprocess.check_output(['uname','-r'],text=True).strip(),'os':'Ubuntu 24.04.5 LTS','juicefs':subprocess.check_output(['/usr/local/bin/juicefs','version'],text=True).strip(),'postgresql':subprocess.check_output(['/usr/lib/postgresql/16/bin/postgres','--version'],text=True).strip(),'s3':'SeaweedFS 4.48; single VM HTTP with random private credentials'}\n(p/'result.json').write_text(json.dumps(result,indent=2)+'\\n');(p/'result.json').chmod(0o600)\nprint(json.dumps(observation,indent=2))\nsubprocess.run(['umount',str(cold)],check=True)\nprint('fresh_client_read_passed',True)\n",
+      "sha256": "sha256:59b6653cb2491ea2028348415c356d6bc5caa4b9a92d5b4b7578922bf7bd4c8a"
+    },
+    "mount_options": [
+      "--no-usage-report",
+      "--cache-dir=memory",
+      "--cache-size=0",
+      "--buffer-size=64"
+    ],
+    "verified_mount_properties": {
+      "juicefs_writeback": false,
+      "fuse_writeback": false,
+      "fuse_options": [
+        "default_permissions"
+      ],
+      "storage": "s3",
+      "subdir": "",
+      "read_only": false
+    }
+  },
+  "prior_attempts": [
+    {
+      "operation": "Read full mount .config as unprivileged ac-test user",
+      "outcome": "Permission denied after successful root-owned mount",
+      "resolution": "Inspect only required fields with sudo; keep mount and all metadata credentials in trusted operator scope"
+    },
+    {
+      "operation": "Earlier Cargo-built preparation probe before final canonical-digest/timeout hardening",
+      "outcome": "Passed separately in org-component",
+      "resolution": "Final recorded run used the Bazel binary and fresh org-final identity; the code-byte hashes match source_commit"
+    }
+  ],
+  "verification": {
+    "bazel": "146 default cases across 7 targets passed; cached unchanged targets and freshly executed storage target as shown in log",
+    "cargo": "Workspace tests passed before final storage-only hardening; final 22 storage cases and Clippy passed after hardening",
+    "qualitygate": {
+      "snapshot": {
+        "verification_digest": "sha256:e53eeb6f2674a2017cb50d007618a752ef6fc3e60dbf4457ef579c23cabc3465",
+        "mode": "worktree",
+        "base": "23aa2de7f4e69d821f7cb945a681c77f612613c6",
+        "head": "23aa2de7f4e69d821f7cb945a681c77f612613c6",
+        "content_digest": "sha256:1772916fe6db57bf7c92b124df9bd40f8e536701b3340379ec854d031f223be7"
+      },
+      "policy": {
+        "source": "qualitygate.yaml",
+        "config_digest": "sha256:e41d8bec8d00e40c13e91e92a62f053dce1b53f383f72bc30c1128233f919b10",
+        "rules_digest": "sha256:06d35ddf072f838422f9a4e2dbc6ac7f842c12163cc4a2dda18a15db4602cd13",
+        "task_contract_digest": null,
+        "trust": "local_candidate",
+        "changes": []
+      },
+      "gate": {
+        "complete": true,
+        "decision": "pass",
+        "blockers": []
+      },
+      "coverage": "Existing line-ending policy only; functional evidence is separate"
+    }
+  },
+  "evidence_refs": [
+    "docs/evidence/candidate-storage-2026-10-09.log",
+    "docs/en/14-candidate-storage.md",
+    "docs/zh-CN/14-candidate-storage.md"
+  ],
+  "limits": [
+    "Single VM, one metadata database and one S3 service; no HA, power loss, disk loss, backup/restore or production TLS qualification",
+    "No runtime grant, database generation allocation, modification lease, physical fencing, application Pod admission, Computer Ready or product startup",
+    "No Artifact authorization/object-store input fetch; a private verified staging cache supplied input objects",
+    "JuiceFS quota accounting is cached; table usage and buffered stream bytes are not exact durable-byte acknowledgements. The final over-quota file stat was 1 GiB and fsync/close returned EDQUOT",
+    "Actual backend-outage file sync failures and multi-node recovery were not injected",
+    "Failed and losing staging directories are retained; no orphan budget reservation or GC",
+    "T01–T43 remain not_run"
+  ],
+  "cleanup": {
+    "status": "completed",
+    "qemu_stopped": true,
+    "forwarded_ports_closed": true,
+    "removed": [
+      "disk.qcow2",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "seed.iso",
+      "user-data",
+      "meta-data",
+      "vm.json",
+      "serial.log",
+      "qemu.log",
+      "known_hosts"
+    ],
+    "private_credentials": "Only inside the destroyed guest overlay; no credential values retained in repository or evidence",
+    "preserved": "Public release archives and read-only base guest image"
+  }
+}

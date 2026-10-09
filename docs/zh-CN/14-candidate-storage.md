@@ -96,3 +96,9 @@ agent-computer-storage prepare \
 22 项默认存储测试覆盖独立文件、重试保留修改、generation 隔离、绑定冲突、输入完整性与大小限额、复制前及发布后的配额失败、并发发布、符号链接/硬链接/FIFO 拒绝、inode 替换、私有控制路径、挂载资格和配额命令失败/超时。执行 `bazel test //crates/storage:storage_contracts_test` 或 `cargo test -p agent-computer-storage --locked`。
 
 一次性虚拟机探针还对真实 JuiceFS/PostgreSQL/S3 运行 Rust 命令，覆盖目录发布、仅叶目录 bind mount 下的非 root 修改、重试、generation 隔离以及发布路径的 `EDQUOT`。组件结果不证明运行授权、fencing、断电恢复、分布式配额准入或完整 T01–T43 验收；真实后端故障导致的文件同步失败与多节点恢复仍须故障注入证据。
+
+## 14.5 已记录组件实测
+
+2026-10-09，`98e1831` 的 Bazel 二进制在隔离 Ubuntu 虚拟机中通过 JuiceFS 1.4.1、PostgreSQL 16.15、SeaweedFS 4.48 实测。1 MiB 输入复制为独立 Candidate generation；UID 1000 写入者通过 data 叶目录 bind mount 修改 generation 1，精确准备重试保留修改，改变 Computer 则冲突。发布目录的 1 GiB 配额拒绝超额写入，并在 `fsync` 与关闭时返回 `EDQUOT`。
+
+另一个使用全新内存缓存的只读 JuiceFS 客户端核验了 generation 2 输入的 SHA-256，指标记录 1 MiB 对象 GET 数据。[固定源码证据](../evidence/candidate-storage-2026-10-09.json)保存二进制/源码摘要、探针脚本、请求、观测及限制；[日志](../evidence/candidate-storage-2026-10-09.log)保存命令与测试输出。采集后已销毁虚拟机及其私有数据。这些是受信任运维组件探针，应用运行准入和验收仍待实现。

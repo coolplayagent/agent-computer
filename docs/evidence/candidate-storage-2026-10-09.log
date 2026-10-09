@@ -1,0 +1,50 @@
+initial_prepare_exit 0
+{"version":1,"request_digest":"sha256:93e4a27cd68deb819d4f34606a7574c095edba09a57c8f2a195908d3777342bc","filesystem_uuid":"73180459-2fb4-4671-aacf-033156f87293","volume_uid":"volume-component","path_ref":"organization/org-final/workspace/workspace-component/candidates/candidate-one/generation/1/data","data_inode":30,"manifest_digest":"sha256:72fa3651b19e39c122b4b792a7253385d7e17d6f890ee7826c573b5039c282cd","quota_bytes":1073741824}
+
+independent_file_sha256 3e51a351de9d7cc37048e72733fd8fd16d2d358589f63b907e74d0675b9660e6 inode 33 data_inode 30
+retry_preserved_nonroot_edit True cache_unchanged True
+conflicting_computer_exit 1 candidate identity conflicts with retained storage
+new_generation_independent True
+published_quota +---------------------------------------------------------------------------------------------------------------------+---------+------+------+-----------+-------+-------+
+|                                                         Path                                                        |   Size  | Used | Use% |   Inodes  | IUsed | IUse% |
++---------------------------------------------------------------------------------------------------------------------+---------+------+------+-----------+-------+-------+
+| /volume-preparation/organization/org-final/workspace/workspace-component/candidates/candidate-one/generation/1/data | 1.0 GiB |  0 B |   0% | unchanged |     0 |       |
++---------------------------------------------------------------------------------------------------------------------+---------+------+------+-----------+-------+-------+
+quota_write_exit 1 dd: fsync failed for '/mnt/ac-candidate-writer/over-quota.bin': Disk quota exceeded
+dd: closing output file '/mnt/ac-candidate-writer/over-quota.bin': Disk quota exceeded
+storage_probe_passed True
+{
+  "actual_sha256": "3e51a351de9d7cc37048e72733fd8fd16d2d358589f63b907e74d0675b9660e6",
+  "bytes": 1048576,
+  "cache": "new read-only client; cache-dir memory; cache-size 0",
+  "object_get_metrics": [
+    "juicefs_object_request_data_bytes_GET 1048576",
+    "juicefs_object_request_durations_histogram_seconds_GET_total 2",
+    "juicefs_object_request_durations_histogram_seconds_GET_sum 0.007796055"
+  ]
+}
+fresh_client_read_passed True
+
+Bazel validation:
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 20 targets (0 packages loaded, 0 targets configured)
+Analyzing: 20 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 20 targets (0 packages loaded, 0 targets configured).
+[12 / 13] 6 / 7 tests; Testing //crates/storage:storage_contracts_test; 1s processwrapper-sandbox
+INFO: Found 13 targets and 7 test targets...
+INFO: Elapsed time: 2.867s, Critical Path: 2.67s
+INFO: 7 processes: 6 action cache hit, 3 internal, 5 processwrapper-sandbox.
+INFO: Build completed successfully, 7 total actions
+//crates/cli:cli_contracts_test                                 (cached) PASSED in 0.2s
+//crates/core:core_contracts_test                               (cached) PASSED in 0.0s
+//crates/definitions:definitions_contracts_test                 (cached) PASSED in 0.2s
+//crates/kubernetes:kubernetes_contracts_test                   (cached) PASSED in 0.2s
+//crates/server:server_contracts_test                           (cached) PASSED in 0.7s
+//crates/store:postgres_contracts_test                          (cached) PASSED in 3.5s
+//crates/storage:storage_contracts_test                                  PASSED in 2.1s
+
+Executed 1 out of 7 tests: 7 tests pass.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
