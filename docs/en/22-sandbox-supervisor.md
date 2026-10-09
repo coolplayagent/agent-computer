@@ -59,3 +59,5 @@ python3 component.py --runsc /usr/local/bin/runsc \
 ```
 
 The script uses fresh private runtime state, runs each container as nonroot with no capabilities, forces cleanup, and records binary/library hashes. Thirteen cases cover argv boundaries, environment clearing, confined cwd, symlink rejection, exit/spawn failures, init descriptor protection, suspended-init uncertainty, timeout, lease expiry, cancellation, escaped descendants and both-stream flooding. It uses an ordinary temporary directory and `--ignore-cgroups=true`; actual Candidate/CSI binding, cgroup enforcement, Kubernetes lifecycle, database/network partitions, authenticated execution results and T01–T43 acceptance remain unverified.
+
+All thirteen component assertions passed on source `f7a8a2a`, using the Bazel-built binary. [Pinned evidence](../evidence/sandbox-supervisor-2026-10-10.json) retains each OCI/request input, runtime/library hashes and the suspended-init limitation. The disposable VM, overlay and private SSH artifacts were removed.

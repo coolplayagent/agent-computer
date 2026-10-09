@@ -59,3 +59,5 @@ python3 component.py --runsc /usr/local/bin/runsc \
 ```
 
 脚本使用全新私有运行时状态，容器内非 root、无 capabilities，强制清理，并记录二进制/动态库摘要。13 项场景覆盖 argv 边界、环境清理、受限 cwd、符号链接拒绝、退出/派生失败、init 描述符保护、监督器暂停后的未知状态、超时、租约到期、取消、脱离进程组的后代及双流洪泛。测试使用普通临时目录和 `--ignore-cgroups=true`；实际 Candidate/CSI 绑定、cgroup 限额、Kubernetes 生命周期、数据库/网络分区、带认证执行结果及 T01–T43 运行验收仍未验证。
+
+源码 `f7a8a2a` 的 Bazel 二进制通过全部 13 项组件断言；[固定证据](../evidence/sandbox-supervisor-2026-10-10.json)保留逐项 OCI/请求输入、运行时/动态库摘要及监督器暂停限制。临时 VM、可写盘和私有 SSH 文件均已删除。

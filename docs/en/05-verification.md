@@ -31,3 +31,5 @@ Seven local storage cases and two PostgreSQL cases additionally verify bounded f
 Two storage cases, five PostgreSQL cases and four server cases add bounded file reads, independent read authorization and the optional HTTP file gateway. The real TCP/PostgreSQL/JuiceFS/S3 component test passed on `e7500e7`, including HTTP timeout followed by durable completion and exact retry. [Pinned evidence](../evidence/candidate-file-http-2026-10-10.json) records that scope; see [21 File HTTP gateway](21-file-http-gateway.md).
 
 Five supervisor cases verify bounded input/output and host-execution refusal. Real gVisor component scenarios are documented in [22 Sandbox supervisor](22-sandbox-supervisor.md); they do not authorize Candidate writes or establish product fencing.
+
+Thirteen actual runsc/Systrap component scenarios passed on `f7a8a2a`; [fixed evidence](../evidence/sandbox-supervisor-2026-10-10.json) preserves the exact inputs and binary hashes. A suspended-init fault deliberately has no local report and remains unresolved until future trusted reconciliation; it is not reported as successful execution or fencing.

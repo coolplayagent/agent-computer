@@ -33,3 +33,5 @@
 新增两项存储、五项 PostgreSQL 与四项服务场景，覆盖有界文件读取、独立读取授权和可选 HTTP 文件网关。真实 TCP/PostgreSQL/JuiceFS/S3 组件测试在 `e7500e7` 上通过，包含 HTTP 超时后持久化完成及准确重试；[固定证据](../evidence/candidate-file-http-2026-10-10.json)记录该范围，见 [21 文件 HTTP 网关](21-file-http-gateway.md)。
 
 新增五项监督器测试验证有界输入/输出和宿主执行拒绝。真实 gVisor 组件场景见 [22 Sandbox 监督器](22-sandbox-supervisor.md)，不授权 Candidate 写入，也不建立产品 fencing 证明。
+
+`f7a8a2a` 上通过 13 项真实 runsc/Systrap 组件场景；[固定证据](../evidence/sandbox-supervisor-2026-10-10.json)保留精确输入与二进制摘要。监督器暂停故障明确没有本地报告，在未来可信对账前仍为未知，不计为执行成功或 fencing。

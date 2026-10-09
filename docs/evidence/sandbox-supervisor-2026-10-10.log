@@ -1,0 +1,21 @@
+source_commit=f7a8a2afa4c9be3b3c101a369e3c3313b8be3ccb
+build_target=//crates/sandbox:agent-computer-sandbox
+runsc version release-20261005.0
+spec: 1.2.1
+{"case": "literal", "elapsed_ms": 13, "exit_code": 0, "kill_sent": false, "outcome": "succeeded", "reaped_processes": 1}
+{"case": "environment", "elapsed_ms": 26, "exit_code": 0, "kill_sent": false, "outcome": "succeeded", "reaped_processes": 1}
+{"case": "cwd", "elapsed_ms": 15, "exit_code": 0, "kill_sent": false, "outcome": "succeeded", "reaped_processes": 1}
+{"case": "symlink-cwd", "elapsed_ms": null, "exit_code": 125, "kill_sent": null, "outcome": "setup_rejected", "reaped_processes": null}
+{"case": "nonzero", "elapsed_ms": 12, "exit_code": 0, "kill_sent": false, "outcome": "failed", "reaped_processes": 1}
+{"case": "missing-executable", "elapsed_ms": 1, "exit_code": 0, "kill_sent": false, "outcome": "spawn_failed", "reaped_processes": 0}
+{"case": "init-protected", "elapsed_ms": 13, "exit_code": 0, "kill_sent": false, "outcome": "succeeded", "reaped_processes": 1}
+{"case": "suspended-supervisor", "elapsed_ms": null, "exit_code": 137, "kill_sent": null, "outcome": "unresolved", "reaped_processes": null}
+{"case": "timeout", "elapsed_ms": 1118, "exit_code": 0, "kill_sent": true, "outcome": "timed_out", "reaped_processes": 2}
+{"case": "lease-expiry", "elapsed_ms": 321, "exit_code": 0, "kill_sent": true, "outcome": "lease_expired", "reaped_processes": 2}
+{"case": "cancel", "elapsed_ms": 134, "exit_code": 0, "kill_sent": true, "outcome": "cancelled", "reaped_processes": 2}
+{"case": "escaped-descendant", "elapsed_ms": 129, "exit_code": 0, "kill_sent": true, "outcome": "descendants_terminated", "reaped_processes": 3}
+{"case": "output-flood", "elapsed_ms": 1210, "exit_code": 0, "kill_sent": true, "outcome": "timed_out", "reaped_processes": 3}
+13 component assertions passed; paused init remains unresolved.
+229 default Rust tests passed; 8 Bazel test targets passed (7 cached).
+Temporary VM stopped; private overlay and SSH artifacts removed.
+T01-T43: not_run; report does not release a Candidate writer lease.

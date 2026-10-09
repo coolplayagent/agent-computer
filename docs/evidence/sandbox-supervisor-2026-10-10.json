@@ -1,0 +1,2726 @@
+{
+  "test_id": "sandbox-supervisor-component-2026-10-10",
+  "status": "passed",
+  "scope": "Thirteen actual gVisor component scenarios; suspended init deliberately yields no local report and remains unresolved. Not product execution acceptance.",
+  "source_commit": "f7a8a2afa4c9be3b3c101a369e3c3313b8be3ccb",
+  "source_worktree_dirty_at_execution": false,
+  "source_files": {
+    ".bazelrc": "sha256:9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
+    ".bazelversion": "sha256:14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "BUILD.bazel": "sha256:384125baec4fe4d63c7b9e512f8ccfd58b31e7bdde6aff733471364cad47b858",
+    "Cargo.lock": "sha256:1984e602f2180947126e3ec986105642382a343d3deec8ab19a44c1900eb45e2",
+    "Cargo.toml": "sha256:f1809a00d8476141a7550114f726b9c74b6c5f80328ca0be5783409767b83775",
+    "MODULE.bazel": "sha256:77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "sha256:765355707dde30a3f0fe9b6d9f02911c76540c5b9a1ea4a683e131a76eb7c479",
+    "crates/cli/BUILD.bazel": "sha256:be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "sha256:f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "sha256:82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "sha256:a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "sha256:0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "sha256:1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "sha256:203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "sha256:6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "sha256:cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "sha256:a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "sha256:3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "sha256:afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "sha256:2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "sha256:aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "sha256:437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "sha256:186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "sha256:3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "sha256:fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "sha256:4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/definitions/BUILD.bazel": "sha256:68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "sha256:25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "sha256:5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "sha256:5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "sha256:8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "sha256:af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "sha256:9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "sha256:49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "sha256:04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "sha256:e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "sha256:790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "sha256:023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/kubernetes/BUILD.bazel": "sha256:776718f6898ccfec54baea2310a895d99047afc284b3c5faceaf3ddc8130eaff",
+    "crates/kubernetes/Cargo.toml": "sha256:293ae865c955164a7b025c3e9d62d3d82be02352a30f4a5e0c253fe6547cab7b",
+    "crates/kubernetes/src/client.rs": "sha256:828d1b842fa252cf09c19ea7984b9659f71a8f4f7bc4d14c42373dabec9ae006",
+    "crates/kubernetes/src/lib.rs": "sha256:1d85803e81141f033e4e41a6ea3f7ac73a83efae2f0e507ff61670406e99bcf9",
+    "crates/kubernetes/src/plan.rs": "sha256:74141f9e9a13567c0b41d7cefd8bd495d361435d0bccf5e369ca0cc915c9b397",
+    "crates/kubernetes/src/tests.rs": "sha256:1b7bbd3435a0ccc65db2cbeb52212f3f38156ef97404ed9ab65fdf9cabc5d11f",
+    "crates/kubernetes/src/verify.rs": "sha256:c805ccf12144890519ba2cf422ee8caf77d31866c262d3e0cfe6beabede01bde",
+    "crates/kubernetes/src/volume.rs": "sha256:c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/live.rs": "sha256:48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/sandbox/BUILD.bazel": "sha256:79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "sha256:6bb11c9a557b4e8b23de5015ba2df3541c2052dae796459fe6b54f093264895f",
+    "crates/sandbox/src/lib.rs": "sha256:064eb5b9fd3eb54b0cfc98966116c7dfca2054e16698a41b979ceec2502a2bc2",
+    "crates/sandbox/src/main.rs": "sha256:31e756c6028a2ff853fdbfe6b74d13fc3c0e8b578d00a42a92df9973a9cb49af",
+    "crates/sandbox/src/output.rs": "sha256:0805b0b15d1dd67c8f926a8e93c8b5066978759ea55d7a7d5c177a29c345d4be",
+    "crates/sandbox/src/request.rs": "sha256:17372c71cfd625cb7475e7d5e5a132d1e92da295ec4a5fb473b2251210e34139",
+    "crates/sandbox/src/supervisor.rs": "sha256:b461c1030e6f31013dc73bc0a9018176703c002567f1a7748fad634f57585970",
+    "crates/sandbox/tests/component.py": "sha256:df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "crates/sandbox/tests/rootfs.py": "sha256:a29da902447c58b166f1a0b9706c589b031d420ef8693df6ded4b133c63b05b0",
+    "crates/server/BUILD.bazel": "sha256:0e3104de0afa95677037fd26ade7b6092f5ef234f246492436a9c48288870b8b",
+    "crates/server/Cargo.toml": "sha256:432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/candidate_worker.rs": "sha256:2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "sha256:df3c1e9eb873ff063310dfcd48259050eb9e8d683de0d84370d331096efc449f",
+    "crates/server/src/connections.rs": "sha256:f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "sha256:2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "sha256:ce07608eb1944309e1719af5ea4576a31f82e1a263461eb23a9d0fd46ac7a698",
+    "crates/server/src/files.rs": "sha256:8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "sha256:e5f6452d1b404c958ea5406fcfd4ea02286d8244d7733507ed84d25813dd9ce1",
+    "crates/server/src/lib.rs": "sha256:3c1f270cd3deae2392217605014ce08ef5a2e0ba908cba61e0e29cdc5413b4d0",
+    "crates/server/src/main.rs": "sha256:abdc3333b484b74091aef03af97ceb8d6d713da32d3d67a2ae5f2dc12e897e45",
+    "crates/server/src/operator.rs": "sha256:63cf49a2aa98e9cadd850b9d864e8a68c693b73312518779ff6d8727911972bc",
+    "crates/server/src/plans.rs": "sha256:5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "sha256:e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "sha256:0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "sha256:d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "sha256:aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "sha256:11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "sha256:2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/authentication.rs": "sha256:3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "sha256:46b814d494bab789c564cb6c0e8660673f06837c004bbd8186f4d6dabb3a804b",
+    "crates/server/tests/cases/files.rs": "sha256:5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/plans.rs": "sha256:836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "sha256:a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "sha256:aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "sha256:57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "sha256:d9332b8cbfc244f60ac9132523a6d9e602b0a8b2a06916d1f25fecfa6ec6d8b6",
+    "crates/server/tests/cases/writers.rs": "sha256:1a145ebeb122260e606fa6c4ec83e7b7644e346c959f6a138d0c3bbd8ed1840e",
+    "crates/server/tests/server_contracts.rs": "sha256:55e03686a899e2bbc9f91fc5d7638ee638bbac0abe26b73f6743ab39570eaaa5",
+    "crates/server/tests/support/mod.rs": "sha256:872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "sha256:e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "sha256:45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/directory.rs": "sha256:d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "sha256:27069a9b5339b74966cd272a7072c4941abf8b3d9ebba8a5c572615ec2735273",
+    "crates/storage/src/files/tests.rs": "sha256:3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "sha256:1d7cd717cd002481a504b0aa8fbaef733ca282be966bc43e5a0f66243417cf14",
+    "crates/storage/src/main.rs": "sha256:1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "sha256:aeb8cb0f27e00590958188f10b3ab743a0b51cfb2c2d04e61a59535b4142156a",
+    "crates/storage/src/model.rs": "sha256:d688269a013be354bf9ca7c385e4e0c2d3cc63f7060eae20f7b28ba7d46ca293",
+    "crates/storage/src/quota.rs": "sha256:143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "sha256:d4dbf90c48affe28deee800b55634935771b7cff7282d364110dcdb5f0fcd58b",
+    "crates/store/BUILD.bazel": "sha256:9dc43e25d04ca43aaac3d30ab0aa6a725d480438d717c6ce998481569c9d5f0d",
+    "crates/store/Cargo.toml": "sha256:708a36606e1631d892c2f8ff6d603ebdc4d3de2f4e9b94a6577c60c99b15e24c",
+    "crates/store/migrations/0001_declaration_registry.sql": "sha256:222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "sha256:f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "sha256:b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "sha256:77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "sha256:590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "sha256:7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "sha256:0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "sha256:903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "sha256:d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "sha256:4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "sha256:560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/src/auth.rs": "sha256:91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "sha256:09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "sha256:2d25777284c18be7f504b314ce4681a5b14d9aeacc92b723d8fb1496f7a807c1",
+    "crates/store/src/plans/access.rs": "sha256:3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "sha256:89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "sha256:a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "sha256:d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "sha256:54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "sha256:35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "sha256:7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "sha256:e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "sha256:129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "sha256:0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "sha256:d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "sha256:a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "sha256:b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "sha256:a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "sha256:ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/connections/mod.rs": "sha256:b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "sha256:4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "sha256:c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "sha256:c8d34e89733792ae58155e65a29c63d9089fb2832326f16144368b9b8b5d8a37",
+    "crates/store/src/runtime/mod.rs": "sha256:53c86cbd08cb5c26385d08576dafd1c3fbf0499ff173678c0385f0301a6dd226",
+    "crates/store/src/runtime/preparation.rs": "sha256:ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "sha256:a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "sha256:2c7f78f85c4dad955490bb496a51ea8e3b02fb36a36b76cfba0c0e39d7df961f",
+    "crates/store/src/runtime/start/types.rs": "sha256:8de756f8fdd65557fa95766a351d5d6755b9e4d9b0f670dcfbe309e762281b61",
+    "crates/store/src/runtime/types.rs": "sha256:7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "sha256:54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/files.rs": "sha256:59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "sha256:363d62fa4baa73a519d420eca8963587ffc19b4d8f56755cac1b7ec1a00b49aa",
+    "crates/store/src/runtime/writers/types.rs": "sha256:bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "sha256:3cc4d6a624a43cbc7403f288579141cf947cc3b22f113a40f436870b5df65b2a",
+    "crates/store/src/writes.rs": "sha256:6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "sha256:57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "sha256:d499f8152fa6a52624dadb7291d37ad8454559e53ea35a102b3a537b5254b47e",
+    "crates/store/tests/contracts/concurrency.rs": "sha256:4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "sha256:27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/connections.rs": "sha256:4c39be0e806c469ba79a2bb549b43057b2a348014648431829033147a32629f2",
+    "crates/store/tests/contracts/plans/mod.rs": "sha256:429d9d5e6064e738cfd6048db10b35dd7544498e19d9439b1864648ef2df0862",
+    "crates/store/tests/contracts/plans/preparation.rs": "sha256:63698718ac4ea2b24f7dd6cb4e8fdca8b24d7f9cc18ad4eb18be7d7f8d832968",
+    "crates/store/tests/contracts/plans/publication.rs": "sha256:fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "sha256:ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "sha256:90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "sha256:451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "sha256:3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "sha256:987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "sha256:722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "sha256:0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "sha256:8534d0db05f080c6a6f23d8aa123f094bc8ee36b4adfa008669248aa6dac2f23",
+    "crates/store/tests/contracts/plans/starts.rs": "sha256:1ae17e197bd03859ab5c077ffc66c869629d9cc646d24844178c60b2842eec7f",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "sha256:6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "sha256:c1965c9b4c564d502f74fb84dba906609effa633472f2ec54f759e6476c62d48",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "sha256:034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "sha256:7bfa131a922aca98b5f78140a94eb4f25a06f24347153a789dd7f3e6910ea2f6",
+    "crates/store/tests/contracts/registry.rs": "sha256:99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "sha256:abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "sha256:03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "sha256:a75b0aad41cda6ebf6726764dfb207c4a9f206cd1c391ef1d6dcb645172b945a",
+    "crates/test-support/BUILD.bazel": "sha256:92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "sha256:c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "sha256:128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/worker/BUILD.bazel": "sha256:a141adcdaea4eb4aa4f0ee50200368e4bab642566606f20c4da4044e31dd2c0f",
+    "crates/worker/Cargo.toml": "sha256:d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
+    "crates/worker/src/candidate.rs": "sha256:b7bf6055c255a6196bc919ffe15b9a79704db022a0840851502f85e528fe854f",
+    "crates/worker/src/files.rs": "sha256:1c6008373f4afead3afc5ac76c122a44f1f2b4227837f8c058ae4a268f10df64",
+    "crates/worker/src/files/gateway.rs": "sha256:7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "sha256:dc52ef3ae9cdfeaddadbd29288fc21cf2eeb5f7852d6add2e02a0781ae92b4f1",
+    "crates/worker/tests/candidate_live.rs": "sha256:e703fb14e88a33a0637820891b3f751ed53dba6626b1c18f4b2844071eca176c",
+    "crates/worker/tests/live.rs": "sha256:131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/file_http.rs": "sha256:c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "sha256:4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6",
+    "rust-toolchain.toml": "sha256:559f488c181e0e9e77cf17c29de663977f036ec7ff2e2060585714bf53c52d62"
+  },
+  "component_digests": {
+    "supervisor_bazel_binary": "sha256:82322d3c3aff60e25e8420877e8efca9f9e4ecafe923e169b90fcf2b1c2d9055",
+    "fixture_files": {
+      "/bin/agent-computer-sandbox": "82322d3c3aff60e25e8420877e8efca9f9e4ecafe923e169b90fcf2b1c2d9055",
+      "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "9d339ecb409578d6a5d587e6c537a8f9589b8a13fefba30d167433a4b5758bee",
+      "/usr/lib/x86_64-linux-gnu/libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+      "/usr/lib/x86_64-linux-gnu/libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+      "/lib64/ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+      "/bin/sh": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+      "/bin/sleep": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/usr/lib/x86_64-linux-gnu/libsystemd.so.0": "9405c27411b652140806ab7576f7d76610f67bde662ba730efc7aa7171785011",
+      "/usr/lib/x86_64-linux-gnu/libselinux.so.1": "7538ee77765a27966563c0d22437a3080dcdb346ff76cc16d71a3ce3379a716a",
+      "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0": "4a6b6b2078685b074869d75cb068664d7da6b3036df7bca0442b1bbbd4ac7e65",
+      "/bin/setsid": "e0247c69b5966f336155291c00153ee75e980fe526a1371ddf7445788671dc66",
+      "/bin/env": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/head": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/yes": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/cat": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02"
+    },
+    "runtime_files": {
+      "/usr/local/bin/runsc": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a",
+      "/usr/local/bin/gvisor-bin/runsc-fd-parking": "03af90d07ea466c10ecc3e3ba839b2a59540959dd3286aea3886917cba850c11",
+      "/usr/local/bin/gvisor-bin/gvisor-sentry-prewarmer": "3315d7ad7c2d3751d349e4976fa02da1da6fd7e41746c35622304e5fabe4fce0",
+      "/usr/local/bin/gvisor-bin/runsc-metric-server": "7bcbe5846a0f6d34c7d2bd312033bb92ab6305b9ac93e09b753b3474f91f27b2",
+      "/usr/local/bin/gvisor-bin/gvisor_sentry": "0050e7c6063e17de1729500cd73b18322d85c758eb0ffcab18e539df7110bd12",
+      "/usr/local/bin/gvisor-bin/checkpointgofer": "c454d0b5fab4627d8915194f901a70c66bb4792f680e3f75d2a47516382b449a"
+    }
+  },
+  "environment": {
+    "kernel": "6.8.0-142-generic",
+    "architecture": "x86_64",
+    "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "isolation": "Disposable KVM guest; 4 vCPU, 6144 MiB RAM, 24 GiB overlay"
+  },
+  "input_refs": {
+    "build_target": "//crates/sandbox:agent-computer-sandbox",
+    "fixture_script": "crates/sandbox/tests/rootfs.py",
+    "test_script": "crates/sandbox/tests/component.py",
+    "cases": {
+      "nonzero": {
+        "request": {
+          "execution_id": "nonzero",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "exit 23"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/nonzero/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/nonzero/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "lease-expiry": {
+        "request": {
+          "execution_id": "lease-expiry",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "trap '' TERM; echo started > /workspace/started; while :; do /bin/sleep 10; done"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 200,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/lease-expiry/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/lease-expiry/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "missing-executable": {
+        "request": {
+          "execution_id": "missing-executable",
+          "generation": 7,
+          "argv": [
+            "/missing-executable"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/missing-executable/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/missing-executable/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "cwd": {
+        "request": {
+          "execution_id": "cwd",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "pwd; printf saved > result"
+          ],
+          "cwd": "nested",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/cwd/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/cwd/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "symlink-cwd": {
+        "request": {
+          "execution_id": "symlink-cwd",
+          "generation": 7,
+          "argv": [
+            "/bin/true"
+          ],
+          "cwd": "escape",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/symlink-cwd/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/symlink-cwd/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": "sandbox supervisor: Setup\n"
+      },
+      "suspended-supervisor": {
+        "request": {
+          "execution_id": "suspended-supervisor",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "echo started > /workspace/started; kill -STOP 1; /bin/sleep 10"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 200,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/suspended-supervisor/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/suspended-supervisor/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "timeout": {
+        "request": {
+          "execution_id": "timeout",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "trap '' TERM; echo started > /workspace/started; while :; do /bin/sleep 10; done"
+          ],
+          "cwd": "",
+          "timeout_seconds": 1,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/timeout/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/timeout/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "output-flood": {
+        "request": {
+          "execution_id": "output-flood",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "/bin/yes x & /bin/yes y >&2 & wait"
+          ],
+          "cwd": "",
+          "timeout_seconds": 1,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 17
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/output-flood/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/output-flood/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "escaped-descendant": {
+        "request": {
+          "execution_id": "escaped-descendant",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "/bin/setsid /bin/sh -c \"trap '' TERM; echo started > /workspace/started; while :; do /bin/sleep 10; done\" & while test ! -e /workspace/started; do :; done; exit 0"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/escaped-descendant/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/escaped-descendant/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "literal": {
+        "request": {
+          "execution_id": "literal",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "printf \"%s\" \"$1\"",
+            "fixture",
+            "a;$(id)"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/literal/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/literal/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "init-protected": {
+        "request": {
+          "execution_id": "init-protected",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "if echo forged > /proc/1/fd/1; then exit 1; fi; printf protected"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/init-protected/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/init-protected/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "cancel": {
+        "request": {
+          "execution_id": "cancel",
+          "generation": 7,
+          "argv": [
+            "/bin/sh",
+            "-c",
+            "trap '' TERM; echo started > /workspace/started; while :; do /bin/sleep 10; done"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/cancel/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/cancel/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      },
+      "environment": {
+        "request": {
+          "execution_id": "environment",
+          "generation": 7,
+          "argv": [
+            "/bin/env"
+          ],
+          "cwd": "",
+          "timeout_seconds": 10,
+          "lease_budget_ms": 15000,
+          "term_grace_ms": 100,
+          "output_limit_bytes": 4096
+        },
+        "oci_config": {
+          "ociVersion": "1.0.2",
+          "hostname": "sandbox-component",
+          "root": {
+            "path": "/root/supervisor-final-rootfs",
+            "readonly": true
+          },
+          "process": {
+            "terminal": false,
+            "user": {
+              "uid": 1000,
+              "gid": 1000
+            },
+            "args": [
+              "/bin/agent-computer-sandbox",
+              "--request",
+              "/request.json"
+            ],
+            "env": [
+              "AC_HOST_SECRET=must-not-leak"
+            ],
+            "cwd": "/",
+            "noNewPrivileges": true,
+            "capabilities": {
+              "bounding": [],
+              "effective": [],
+              "inheritable": [],
+              "permitted": [],
+              "ambient": []
+            },
+            "rlimits": [
+              {
+                "type": "RLIMIT_NOFILE",
+                "hard": 128,
+                "soft": 128
+              },
+              {
+                "type": "RLIMIT_NPROC",
+                "hard": 64,
+                "soft": 64
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "type": "proc",
+              "source": "proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/dev",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "mode=755",
+                "size=1m"
+              ]
+            },
+            {
+              "destination": "/tmp",
+              "type": "tmpfs",
+              "source": "tmpfs",
+              "options": [
+                "nosuid",
+                "nodev",
+                "mode=1777",
+                "size=64m"
+              ]
+            },
+            {
+              "destination": "/workspace",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/environment/workspace",
+              "options": [
+                "rbind",
+                "rw",
+                "nosuid",
+                "nodev"
+              ]
+            },
+            {
+              "destination": "/request.json",
+              "type": "bind",
+              "source": "/root/supervisor-test-final/environment/request.json",
+              "options": [
+                "bind",
+                "ro",
+                "nosuid",
+                "nodev"
+              ]
+            }
+          ],
+          "linux": {
+            "namespaces": [
+              {
+                "type": "pid"
+              },
+              {
+                "type": "network"
+              },
+              {
+                "type": "ipc"
+              },
+              {
+                "type": "uts"
+              },
+              {
+                "type": "mount"
+              }
+            ],
+            "maskedPaths": [
+              "/proc/kcore",
+              "/proc/keys",
+              "/proc/timer_list",
+              "/sys/firmware"
+            ],
+            "readonlyPaths": [
+              "/proc/sys",
+              "/proc/sysrq-trigger"
+            ]
+          }
+        },
+        "runtime_stderr": ""
+      }
+    }
+  },
+  "expected": [
+    "Structured argv preserves literal shell characters; no inherited environment beyond the fixed allowlist",
+    "Descriptor-bound cwd writes inside the test workspace; a symlink cwd is rejected before spawn",
+    "Exit 23 and missing executable produce separate failed/spawn_failed local reports",
+    "Same-UID command cannot write through /proc/1/fd/1 to forge supervisor stdout",
+    "A same-UID SIGSTOP suspends init in this runtime; external KILL yields exit 137 and no local report, leaving the authoritative outcome unresolved",
+    "TERM-resistant timeout, local lease expiry and cancellation escalate to KILL and reap two processes",
+    "Main exit 0 with a setsid descendant triggers descendants_terminated and reaps three processes",
+    "Concurrent stdout/stderr flood retains 17 bytes per stream, counts and truncates excess, and cannot starve termination",
+    "All owned runsc containers are deleted; the disposable VM and private overlay/SSH artifacts are removed"
+  ],
+  "observed": {
+    "component": "sandbox-supervisor",
+    "runtime": "runsc version release-20261005.0\nspec: 1.2.1",
+    "platform": "systrap",
+    "network": "none",
+    "cgroup_limits_verified": false,
+    "product_execution_admission": false,
+    "candidate_mount_verified": false,
+    "physical_fencing": false,
+    "accepted_runtime_tests": [],
+    "tests": [
+      {
+        "name": "literal",
+        "exit_code": 0,
+        "wall_ms": 119,
+        "report": {
+          "version": 1,
+          "execution_id": "literal",
+          "generation": 7,
+          "request_digest": "sha256:35adb9a1a8e97e422caaaa982c88376ca90a6c5cebb7fae93ea328b9e111dac7",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 13,
+          "stdout": {
+            "bytes": [
+              97,
+              59,
+              36,
+              40,
+              105,
+              100,
+              41
+            ],
+            "observed_bytes": 7,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "environment",
+        "exit_code": 0,
+        "wall_ms": 122,
+        "report": {
+          "version": 1,
+          "execution_id": "environment",
+          "generation": 7,
+          "request_digest": "sha256:32e225ff57cb3d7931966bf24e42f87b09bf67d4394d89aeab044d4c866b1172",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 26,
+          "stdout": {
+            "bytes": [
+              72,
+              79,
+              77,
+              69,
+              61,
+              47,
+              116,
+              109,
+              112,
+              10,
+              76,
+              65,
+              78,
+              71,
+              61,
+              67,
+              10,
+              80,
+              65,
+              84,
+              72,
+              61,
+              47,
+              117,
+              115,
+              114,
+              47,
+              98,
+              105,
+              110,
+              58,
+              47,
+              98,
+              105,
+              110,
+              10
+            ],
+            "observed_bytes": 36,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "cwd",
+        "exit_code": 0,
+        "wall_ms": 120,
+        "report": {
+          "version": 1,
+          "execution_id": "cwd",
+          "generation": 7,
+          "request_digest": "sha256:d962f5773af5d238bcb153cdf0b72dbd00175ccba69b94db3fe2b4260e85ab81",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 15,
+          "stdout": {
+            "bytes": [
+              47,
+              119,
+              111,
+              114,
+              107,
+              115,
+              112,
+              97,
+              99,
+              101,
+              47,
+              110,
+              101,
+              115,
+              116,
+              101,
+              100,
+              10
+            ],
+            "observed_bytes": 18,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "symlink-cwd",
+        "exit_code": 125,
+        "wall_ms": 119,
+        "rejected": true
+      },
+      {
+        "name": "nonzero",
+        "exit_code": 0,
+        "wall_ms": 71,
+        "report": {
+          "version": 1,
+          "execution_id": "nonzero",
+          "generation": 7,
+          "request_digest": "sha256:e2904fe5be664c7e66a4a4165622841e94c133e05c336a8a28c9bec1d55ad1a9",
+          "outcome": "failed",
+          "main_exit_code": 23,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 12,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "missing-executable",
+        "exit_code": 0,
+        "wall_ms": 71,
+        "report": {
+          "version": 1,
+          "execution_id": "missing-executable",
+          "generation": 7,
+          "request_digest": "sha256:42a43da5c29a41a40f2b31860de9680173ad099ff371a46df52bba8eb9116c6f",
+          "outcome": "spawn_failed",
+          "main_exit_code": null,
+          "main_signal": null,
+          "reaped_processes": 0,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 1,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": false
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": false
+          }
+        }
+      },
+      {
+        "name": "init-protected",
+        "exit_code": 0,
+        "wall_ms": 70,
+        "report": {
+          "version": 1,
+          "execution_id": "init-protected",
+          "generation": 7,
+          "request_digest": "sha256:0125e2fe26bcb518bb1efb66e50915c3858e91c1d61d270dc5c5c291026e7635",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 13,
+          "stdout": {
+            "bytes": [
+              112,
+              114,
+              111,
+              116,
+              101,
+              99,
+              116,
+              101,
+              100
+            ],
+            "observed_bytes": 9,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [
+              47,
+              98,
+              105,
+              110,
+              47,
+              115,
+              104,
+              58,
+              32,
+              49,
+              58,
+              32,
+              99,
+              97,
+              110,
+              110,
+              111,
+              116,
+              32,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              32,
+              47,
+              112,
+              114,
+              111,
+              99,
+              47,
+              49,
+              47,
+              102,
+              100,
+              47,
+              49,
+              58,
+              32,
+              80,
+              101,
+              114,
+              109,
+              105,
+              115,
+              115,
+              105,
+              111,
+              110,
+              32,
+              100,
+              101,
+              110,
+              105,
+              101,
+              100,
+              10
+            ],
+            "observed_bytes": 58,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "suspended-supervisor",
+        "exit_code": 137,
+        "wall_ms": 1073,
+        "external_kill": true,
+        "local_report_absent": true,
+        "authoritative_outcome": "unresolved"
+      },
+      {
+        "name": "timeout",
+        "exit_code": 0,
+        "wall_ms": 1224,
+        "report": {
+          "version": 1,
+          "execution_id": "timeout",
+          "generation": 7,
+          "request_digest": "sha256:fa0552666e7c6dd351e0c06306482fb76455206d0bdfac7d848ed2e20076ca68",
+          "outcome": "timed_out",
+          "main_exit_code": null,
+          "main_signal": 9,
+          "reaped_processes": 2,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 1118,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "lease-expiry",
+        "exit_code": 0,
+        "wall_ms": 370,
+        "report": {
+          "version": 1,
+          "execution_id": "lease-expiry",
+          "generation": 7,
+          "request_digest": "sha256:f39225515b630ef1b455d7ff4c7eb042e11830b4160b61b5af357ee9e08c791c",
+          "outcome": "lease_expired",
+          "main_exit_code": null,
+          "main_signal": 9,
+          "reaped_processes": 2,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 321,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "cancel",
+        "exit_code": 0,
+        "wall_ms": 226,
+        "report": {
+          "version": 1,
+          "execution_id": "cancel",
+          "generation": 7,
+          "request_digest": "sha256:cbdcc93cbaa16cde0c7ad66de4281fdcfc792bc523fea2e625c58282b596bbe0",
+          "outcome": "cancelled",
+          "main_exit_code": null,
+          "main_signal": 9,
+          "reaped_processes": 2,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 134,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "escaped-descendant",
+        "exit_code": 0,
+        "wall_ms": 221,
+        "report": {
+          "version": 1,
+          "execution_id": "escaped-descendant",
+          "generation": 7,
+          "request_digest": "sha256:5b602b30a1cbf876e850e58cd9fc6ad2b58689c847b902736aaa5fc8618904b3",
+          "outcome": "descendants_terminated",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 3,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 129,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "output-flood",
+        "exit_code": 0,
+        "wall_ms": 1325,
+        "report": {
+          "version": 1,
+          "execution_id": "output-flood",
+          "generation": 7,
+          "request_digest": "sha256:257ec99b600f473f01e7dba859cbb7e07e1d4419741b22dbee50238cea4e1d30",
+          "outcome": "timed_out",
+          "main_exit_code": null,
+          "main_signal": 15,
+          "reaped_processes": 3,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 1210,
+          "stdout": {
+            "bytes": [
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120
+            ],
+            "observed_bytes": 6291456,
+            "truncated": true,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121
+            ],
+            "observed_bytes": 6291456,
+            "truncated": true,
+            "eof": true
+          }
+        }
+      }
+    ],
+    "test_script_sha256": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "runtime_state_after_tests": "null\n"
+  },
+  "verification": {
+    "cargo_workspace_tests": 229,
+    "bazel_test_targets": 8,
+    "bazel_cached_targets": 7,
+    "cargo_fmt": "passed",
+    "cargo_clippy_all_targets_all_features": "passed",
+    "bazel_build_lockfile_error": "passed",
+    "qualitygate": {
+      "profile": "full",
+      "scope": "delivery",
+      "gate": {
+        "complete": true,
+        "decision": "pass",
+        "blockers": []
+      },
+      "snapshot": {
+        "verification_digest": "sha256:000bab8668dc5911a7929d437066070a6f7d41ed8490d0f4870576362e618618",
+        "mode": "worktree",
+        "base": "dc929236af513963c0d437bb7116e04b381c6c02",
+        "head": "dc929236af513963c0d437bb7116e04b381c6c02",
+        "content_digest": "sha256:2fbfb1294ad0d7541ff12b6c382d326234e14a7c545189c90c651b724d470ab0"
+      },
+      "policy": {
+        "source": "qualitygate.yaml",
+        "config_digest": "sha256:e41d8bec8d00e40c13e91e92a62f053dce1b53f383f72bc30c1128233f919b10",
+        "rules_digest": "sha256:06d35ddf072f838422f9a4e2dbc6ac7f842c12163cc4a2dda18a15db4602cd13",
+        "task_contract_digest": null,
+        "trust": "local_candidate",
+        "changes": []
+      }
+    },
+    "limits": "Qualitygate existing policy only checks line endings; independent test results carry functional coverage."
+  },
+  "probe_inputs": {
+    "vm_boot_script": "import os,pathlib,subprocess,socket,json\np=pathlib.Path('/home/tdp/.cache/agent-computer-kube-vm');q=pathlib.Path('/tmp/agent-computer-kube-vm/qemu')\nenv=os.environ.copy();env['LD_LIBRARY_PATH']=str(q/'usr/lib/x86_64-linux-gnu')\nif not (p/'id_ed25519').exists():subprocess.run(['ssh-keygen','-q','-t','ed25519','-N','','-f',str(p/'id_ed25519')],check=True)\n(p/'meta-data').write_text('instance-id: ac-kube-validation-001\\nlocal-hostname: ac-kube-validation\\n')\n(p/'user-data').write_text('#cloud-config\\nusers:\\n  - name: ac-test\\n    groups: [sudo]\\n    shell: /bin/bash\\n    sudo: ALL=(ALL) NOPASSWD:ALL\\n    lock_passwd: true\\n    ssh_authorized_keys:\\n      - '+(p/'id_ed25519.pub').read_text().strip()+'\\nssh_pwauth: false\\ndisable_root: true\\n')\nsubprocess.run([str(q/'usr/bin/genisoimage'),'-quiet','-output',str(p/'seed.iso'),'-volid','cidata','-joliet','-rock',str(p/'user-data'),str(p/'meta-data')],check=True,env=env)\nif not (p/'disk.qcow2').exists():subprocess.run([str(q/'usr/bin/qemu-img'),'create','-f','qcow2','-F','qcow2','-b',str(p/'noble-server-cloudimg-amd64.img'),str(p/'disk.qcow2'),'24G'],check=True,env=env)\nports=[]\nfor _ in range(2):\n with socket.socket() as s:s.bind(('127.0.0.1',0));ports.append(s.getsockname()[1])\nssh_port,api_port=ports\nargs=[str(q/'usr/bin/qemu-system-x86_64'),'-enable-kvm','-cpu','host','-smp','4','-m','6144','-machine','q35','-display','none','-vga','none','-monitor','none','-serial','file:'+str(p/'serial.log'),'-L',str(q/'usr/share/qemu'),'-bios',str(q/'usr/share/seabios/bios-256k.bin'),'-drive','file='+str(p/'disk.qcow2')+',if=virtio,format=qcow2','-drive','file='+str(p/'seed.iso')+',media=cdrom,readonly=on','-netdev',f'user,id=n0,hostfwd=tcp:127.0.0.1:{ssh_port}-:22,hostfwd=tcp:127.0.0.1:{api_port}-:6443','-device','virtio-net-pci,netdev=n0,romfile=']\nprocess=subprocess.Popen(args,env=env,stdin=subprocess.DEVNULL,stdout=(p/'qemu.log').open('ab'),stderr=subprocess.STDOUT,start_new_session=True)\n(p/'vm.json').write_text(json.dumps({'pid':process.pid,'ssh_port':ssh_port,'api_port':api_port}));print('VM',process.pid,ssh_port,api_port)\n",
+    "collection_script": "import hashlib,json,pathlib,platform,subprocess\nroot=pathlib.Path('/root/supervisor-test-final')\nr=json.loads((root/'result.json').read_text())\nr['environment']={'kernel':platform.release(),'architecture':platform.machine(),'os_release':pathlib.Path('/etc/os-release').read_text(),'isolation':'Disposable KVM guest; 4 vCPU, 6144 MiB RAM, 24 GiB overlay'}\nr['runtime_files']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [pathlib.Path('/usr/local/bin/runsc'),*pathlib.Path('/usr/local/bin/gvisor-bin').glob('*')] if p.is_file()}\nr['inputs']={p.name:{'request':json.loads((p/'request.json').read_text()),'oci_config':json.loads((p/'config.json').read_text()),'runtime_stderr':(p/'stderr.log').read_text()} for p in root.iterdir() if (p/'config.json').is_file()}\nr['runtime_state_after_tests']=subprocess.run(['/usr/local/bin/runsc','--root='+str(root/'state'),'list','--format=json'],check=True,capture_output=True,text=True).stdout\nassert json.loads(r['runtime_state_after_tests']) in ([], None)\nprint(json.dumps(r,indent=2))\n"
+  },
+  "setup_observations": [
+    "Initial protection probe timed out because child SIGSTOP suspended init; the final fault scenario explicitly verifies external kill and unresolved outcome. No product fencing or safe takeover is inferred."
+  ],
+  "evidence_refs": [
+    "docs/evidence/sandbox-supervisor-2026-10-10.log",
+    "crates/sandbox/tests/component.py",
+    "docs/en/22-sandbox-supervisor.md",
+    "docs/zh-CN/22-sandbox-supervisor.md"
+  ],
+  "limits": [
+    "No durable execution admission, API route, Computer Ready, Candidate/CSI mount or writer-lease completion is implemented by this component.",
+    "No S3 output publication or authenticated result acceptance; the bounded stdout report is local observation only.",
+    "The fixture uses ordinary VM directories, standalone runsc and ignore-cgroups=true; resource-limit enforcement and Kubernetes lifecycle are not certified.",
+    "A paused supervisor, blocking filesystem/exec call or node partition requires a trusted independent runtime watchdog and physical fencing before handoff.",
+    "One VM and one pinned gVisor release; T01-T43 remain not_run. Teardown is test cleanup, not product fence evidence."
+  ],
+  "cleanup": {
+    "owned_qemu_pid": 2254868,
+    "command_identity_verified": true,
+    "stopped": true,
+    "removed": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "user-data",
+      "meta-data",
+      "known_hosts",
+      "serial.log",
+      "qemu.log",
+      "vm.json"
+    ],
+    "upstream_caches_preserved": true,
+    "product_fencing_evidence": false
+  },
+  "record_date_timezone": "2026-10-10 Asia/Singapore"
+}
