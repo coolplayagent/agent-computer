@@ -1,0 +1,35 @@
+Source inputs verified against d25fdd5449f5f5c95f05b9250b216518f6936b48
+
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //crates/kubernetes:startup_live_test (0 packages loaded, 0 targets configured)
+Analyzing: target //crates/kubernetes:startup_live_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //crates/kubernetes:startup_live_test (0 packages loaded, 12 targets configured).
+[751 / 752] [Prepa] runfiles for //crates/kubernetes:startup_live_test
+[752 / 753] Testing //crates/kubernetes:startup_live_test; 1s processwrapper-sandbox
+[752 / 753] Testing //crates/kubernetes:startup_live_test; 10s processwrapper-sandbox
+[752 / 753] Testing //crates/kubernetes:startup_live_test; 13s processwrapper-sandbox
+INFO: From Testing //crates/kubernetes:startup_live_test:
+==================== Test output for //crates/kubernetes:startup_live_test:
+
+running 1 test
+test real_kubernetes_v5_startup_attach ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.35s
+
+================================================================================
+INFO: Found 1 test target...
+Target //crates/kubernetes:startup_live_test up-to-date:
+  bazel-bin/crates/kubernetes/startup_live_test
+INFO: Elapsed time: 14.658s, Critical Path: 14.39s
+INFO: 4 processes: 3 action cache hit, 2 internal, 3 processwrapper-sandbox.
+INFO: Build completed successfully, 4 total actions
+//crates/kubernetes:startup_live_test                                    PASSED in 13.4s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+{"passed": 12, "result": "/var/tmp/ac-attach-startup-regression/result.json"}
+{"passed": 13, "result": "/var/tmp/ac-attach-supervisor-regression/result.json"}

@@ -57,3 +57,5 @@ bazel test //crates/kubernetes:startup_live_test --lockfile_mode=error --test_en
 ```
 
 夹具不能作为产品监督器镜像发布。可信镜像来源、Candidate 挂载、数据库派发 worker、独立 watchdog/fencing、输出对象和权威完成接纳仍待实现；运行验收 T01–T43 继续为 `not_run`。
+
+[固定源码证据](../evidence/kubernetes-startup-attach-2026-10-10.json)与[原始输出](../evidence/kubernetes-startup-attach-2026-10-10.log)绑定提交 `d25fdd5`、200 项已核验输入及精确测试镜像/监督器二进制。同一二进制的 12 项启动回归和 13 项监督器回归也全部通过；VM、私有磁盘、SSH 密钥与 Kubernetes 凭据已清理。

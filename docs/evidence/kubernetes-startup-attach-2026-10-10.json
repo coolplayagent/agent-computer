@@ -1,0 +1,1863 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "Kubernetes v5 startup attach component plus supervisor regression; not product acceptance",
+  "source_commit": "d25fdd5449f5f5c95f05b9250b216518f6936b48",
+  "source_worktree_dirty_at_execution": true,
+  "execution_head_before_commit": "d8053763abb4393d2c523a93adf0353416b6c4b6",
+  "source_inputs_verified_against_commit": true,
+  "source_inputs_sha256": {
+    ".bazelrc": "9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
+    ".bazelversion": "14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "Cargo.lock": "24afc9439875f40f494b7253f1c2ebf49577a7096826bfc7da9c2186bc580a17",
+    "Cargo.toml": "9e182797cc6a0c6f708e8e0978edc7e574fc31886a902ef0d91a0cc2c4e96751",
+    "MODULE.bazel": "77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "edc06f6e5df1d9200328c8f4605c34c5f092ae8367240a0271d19ac60c1d7a34",
+    "crates/cli/BUILD.bazel": "be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/definitions/BUILD.bazel": "68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/kubernetes/BUILD.bazel": "4dc5f9f4e54ed4a27390e048a4a66770b5a8fded411ee15ad3480fd3c8ec6d3a",
+    "crates/kubernetes/Cargo.toml": "02e4a2490ddb22ad41054e8473901d553b17c6f9fe46f448536f7971947013c3",
+    "crates/kubernetes/src/attach.rs": "02352fe0af55065374b3a4770e4079bf2b1c02e2977652e32067306fc021961f",
+    "crates/kubernetes/src/client.rs": "5fc2cffdd11df90664a3183f2b873d6eec17b5b110237581e6a91f1822f9572a",
+    "crates/kubernetes/src/lib.rs": "25a091a66f0929c80db42a12ca3f1bab57f16c9ecbc261176af864cb810cbecb",
+    "crates/kubernetes/src/plan.rs": "74141f9e9a13567c0b41d7cefd8bd495d361435d0bccf5e369ca0cc915c9b397",
+    "crates/kubernetes/src/startup_plan.rs": "d914141da585c69d69bca5923b696e36a758bd57accf8f4c81e328cf9b264010",
+    "crates/kubernetes/src/tests.rs": "87e626ab20146d805dcabdb7e755462ada244b1a1b4751f5c57c165f915003e5",
+    "crates/kubernetes/src/tests/attach.rs": "8fdc1f81d307cb790238b154378c35a3f1f2f38b3cfd7a9977dab20e42d7bd9f",
+    "crates/kubernetes/src/verify.rs": "d7e5e3d7f0b2334704c077d1ec2ef0fd8f61e1a37840f15c9fbe11d85cbb84b9",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_image.py": "e71f5f1f42063121e9debd3a45338a901fb9ba8358c55bebd41165254a27a3ca",
+    "crates/kubernetes/tests/startup_live.rs": "0e570020fcd89f18b158ae92076743f389e2b1feb32fdf330133a6e087bfc476",
+    "crates/sandbox/BUILD.bazel": "79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "f9af73e96f4335bc488c77f42ebb5eafe0b10a2a6f21bd399bca7470450ccc31",
+    "crates/sandbox/src/lib.rs": "78a8c1b617eeb5a0b1fac02c35662d06e3396ac56ec18cde82cf4f14635ed8eb",
+    "crates/sandbox/src/main.rs": "71b39de404e0d4d10102ddad34ec82ef78e41c3c1dd580908293a4d6c60ffd90",
+    "crates/sandbox/src/output.rs": "0805b0b15d1dd67c8f926a8e93c8b5066978759ea55d7a7d5c177a29c345d4be",
+    "crates/sandbox/src/request.rs": "17372c71cfd625cb7475e7d5e5a132d1e92da295ec4a5fb473b2251210e34139",
+    "crates/sandbox/src/startup.rs": "c08e576aeb1408c37f9260766a9b4261acba0c48b88975f8addc18761b92d2d0",
+    "crates/sandbox/src/supervisor.rs": "a31cca7230f8e15b47effd6bf01f7f91b3710c215ebb818d716e87b949eba2df",
+    "crates/sandbox/tests/component.py": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "crates/sandbox/tests/rootfs.py": "a29da902447c58b166f1a0b9706c589b031d420ef8693df6ded4b133c63b05b0",
+    "crates/sandbox/tests/startup_component.py": "d1671c99de3dce9bbd2e96f2d14a863d7b68c590e71a71339a62abac6f99924e",
+    "crates/server/BUILD.bazel": "202c67eaffa2167aae23968c6ddc4ad7e2f023c56e8cf58092c05a8eacc26d2c",
+    "crates/server/Cargo.toml": "432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/candidate_worker.rs": "2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "df3c1e9eb873ff063310dfcd48259050eb9e8d683de0d84370d331096efc449f",
+    "crates/server/src/connections.rs": "f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "ce07608eb1944309e1719af5ea4576a31f82e1a263461eb23a9d0fd46ac7a698",
+    "crates/server/src/executions.rs": "36c762c78c7ef28832df164b8ab578d2ec66a4a117a11f42426daaf3213239af",
+    "crates/server/src/files.rs": "8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "9a5730616504a767678bd0ca06d51affaca2db5e1027758cb4b0103166fcf64f",
+    "crates/server/src/lib.rs": "f9251475cd79205c7ac3b5913918e2ece5d44033ca9a08413c12df74beaf0101",
+    "crates/server/src/main.rs": "abdc3333b484b74091aef03af97ceb8d6d713da32d3d67a2ae5f2dc12e897e45",
+    "crates/server/src/operator.rs": "63cf49a2aa98e9cadd850b9d864e8a68c693b73312518779ff6d8727911972bc",
+    "crates/server/src/plans.rs": "5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/authentication.rs": "3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "06081eb9037a213d52cd47fda2c1219f07903c8e2024c06f793456fc2cbf7a2d",
+    "crates/server/tests/cases/executions.rs": "29cc4850e0ae92bf020482c7ea8f415f4c55b424c097284da772a1522d23e3ba",
+    "crates/server/tests/cases/files.rs": "5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/plans.rs": "836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "d9332b8cbfc244f60ac9132523a6d9e602b0a8b2a06916d1f25fecfa6ec6d8b6",
+    "crates/server/tests/cases/writers.rs": "1a145ebeb122260e606fa6c4ec83e7b7644e346c959f6a138d0c3bbd8ed1840e",
+    "crates/server/tests/server_contracts.rs": "afe01e567f3619a39758a5929aa8b2d8792805c02687cd6ee179376a8bd0d306",
+    "crates/server/tests/support/mod.rs": "872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/directory.rs": "d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "27069a9b5339b74966cd272a7072c4941abf8b3d9ebba8a5c572615ec2735273",
+    "crates/storage/src/files/tests.rs": "3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "1d7cd717cd002481a504b0aa8fbaef733ca282be966bc43e5a0f66243417cf14",
+    "crates/storage/src/main.rs": "1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "aeb8cb0f27e00590958188f10b3ab743a0b51cfb2c2d04e61a59535b4142156a",
+    "crates/storage/src/model.rs": "d688269a013be354bf9ca7c385e4e0c2d3cc63f7060eae20f7b28ba7d46ca293",
+    "crates/storage/src/quota.rs": "143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "d4dbf90c48affe28deee800b55634935771b7cff7282d364110dcdb5f0fcd58b",
+    "crates/store/BUILD.bazel": "400a3835ee1e9038b12524d7fbcfceb5cd52a67393d51e67ab8ed77657a9a61f",
+    "crates/store/Cargo.toml": "f63c2bea26d70602e04aefc8a66712d3465b87fc1eac34edac3a6a6cd186dadb",
+    "crates/store/migrations/0001_declaration_registry.sql": "222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/migrations/0012_execution_admission.sql": "381d01c13cba7e165b08e06abbdd623a1464b4f1cc7da065b1cb913dd42c7b5d",
+    "crates/store/migrations/0013_execution_dispatch.sql": "48e374c04d996a56173f8f53ae2f275af862e4ca8aea4ae4884373135273ebbb",
+    "crates/store/migrations/0014_execution_startup.sql": "86cd2ca00cdb925053c9c33a6afc8b4490a82783ba7d48f421bb53b1b7b4eacc",
+    "crates/store/src/auth.rs": "91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "72e4d6e7ffe328b46c65df08337b4e095c907a1b6e8d022321013a8d3713784c",
+    "crates/store/src/plans/access.rs": "3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/connections/mod.rs": "b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "c8d34e89733792ae58155e65a29c63d9089fb2832326f16144368b9b8b5d8a37",
+    "crates/store/src/runtime/mod.rs": "53c86cbd08cb5c26385d08576dafd1c3fbf0499ff173678c0385f0301a6dd226",
+    "crates/store/src/runtime/preparation.rs": "ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "2c7f78f85c4dad955490bb496a51ea8e3b02fb36a36b76cfba0c0e39d7df961f",
+    "crates/store/src/runtime/start/types.rs": "8de756f8fdd65557fa95766a351d5d6755b9e4d9b0f670dcfbe309e762281b61",
+    "crates/store/src/runtime/types.rs": "7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/executions.rs": "c1925c5c1e6f40bcdada9dfeea129eaa33c0cc7305bc358d10f588be9027d319",
+    "crates/store/src/runtime/writers/executions/dispatch.rs": "6f812cde0bf169227fa3f328d8a4da360bf1411c7e81597eb5cf1e7f1f7ebe40",
+    "crates/store/src/runtime/writers/executions/dispatch/startup.rs": "5c980faca3c50904af2cc33d562da751ab93c4ec66888e91d2a9772b734a6255",
+    "crates/store/src/runtime/writers/files.rs": "59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "4ca729b660c7484d1f642d8b4094946ea9f05309f2b4578bbaee04eb3395fc64",
+    "crates/store/src/runtime/writers/types.rs": "bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "3cc4d6a624a43cbc7403f288579141cf947cc3b22f113a40f436870b5df65b2a",
+    "crates/store/src/writes.rs": "6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "cd7101a8a982c22573d161e6fc288ecd2f8b5952c4e71b8d5684675fec0ecdd9",
+    "crates/store/tests/contracts/concurrency.rs": "4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/connections.rs": "b45628b23cc546e97903ff0cf4fa436920261cfd9cb13de9b657b29be6c22882",
+    "crates/store/tests/contracts/plans/mod.rs": "429d9d5e6064e738cfd6048db10b35dd7544498e19d9439b1864648ef2df0862",
+    "crates/store/tests/contracts/plans/preparation.rs": "b8d754fd07d2fa6f420ddd938392fec2056a35a8e60d71b0a838c7226b5429a2",
+    "crates/store/tests/contracts/plans/publication.rs": "fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "8534d0db05f080c6a6f23d8aa123f094bc8ee36b4adfa008669248aa6dac2f23",
+    "crates/store/tests/contracts/plans/starts.rs": "d2dc26b89e06c96c0e122026a23fb73d002a82173a8ec77b30267a614f152a6e",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/executions.rs": "7eb8892ce253731c41d3507a59263b0e8a11944ddcb57e46cd35c4c63bcc83f4",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch.rs": "4a14732887c34f41f3efa65a9e7b81fb741814bacc076bfbb868af96567ed110",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/startup.rs": "0e569c246d2148b69830abf69436ee5e068b82e33d3333203946671d58d982b6",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "c28cfc94650be073c01ba9b31553af68edaa2c18542f52ec86a3809a1211df7d",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "004f0c88be7fc6a871e468796d63e2d00249c25aa20cb0183c4eb839c452aaef",
+    "crates/store/tests/contracts/registry.rs": "99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "d3a095925421fb39535330675242eb9b643a0689d1a42fda7e5dd689b199f50a",
+    "crates/test-support/BUILD.bazel": "92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/worker/BUILD.bazel": "a141adcdaea4eb4aa4f0ee50200368e4bab642566606f20c4da4044e31dd2c0f",
+    "crates/worker/Cargo.toml": "d1a1feb50a2a6a3ae5631df7590f177027da4f7f4cc7f965ecfbda29568d2146",
+    "crates/worker/src/candidate.rs": "b7bf6055c255a6196bc919ffe15b9a79704db022a0840851502f85e528fe854f",
+    "crates/worker/src/files.rs": "1c6008373f4afead3afc5ac76c122a44f1f2b4227837f8c058ae4a268f10df64",
+    "crates/worker/src/files/gateway.rs": "7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "dc52ef3ae9cdfeaddadbd29288fc21cf2eeb5f7852d6add2e02a0781ae92b4f1",
+    "crates/worker/tests/candidate_live.rs": "e703fb14e88a33a0637820891b3f751ed53dba6626b1c18f4b2844071eca176c",
+    "crates/worker/tests/live.rs": "131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/file_http.rs": "c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6",
+    "rust-toolchain.toml": "559f488c181e0e9e77cf17c29de663977f036ec7ff2e2060585714bf53c52d62"
+  },
+  "image": {
+    "image": "registry.invalid/agent-computer/startup-component@sha256:8a7cf145c10fe721083c7755c71cdcc2625f8c7ab0e1814080b77d12eb5ac1bc",
+    "supervisor_sha256": "fd11ef0c8cd401240e607138b32fb2d834afc6c237b3e422731b75358382d278",
+    "archive_sha256": "635469a6d4b1d968d5b31881f8d27d8c81c5430a3f934e83b3775a09069b087a"
+  },
+  "live_test_binary_sha256": "9be4be18fbba25840ac5f7928fafdbacdff48fc6cfe73d556cacf2abc7de9a60",
+  "node_inspection": {
+    "pod": {
+      "name": "ac-b1c55c41751b1c81fde25359fbe78447d38d213d24a6240a91dc",
+      "namespace": "ac-kube-component",
+      "uid": "292d4157-7f92-4ea6-a43b-ff912681fcbf"
+    },
+    "container_id": "55aa49c35d90fa0c3c67e0e27709aebb4ac88a702775df09140259c1472d16b6",
+    "runtime": {
+      "Name": "io.containerd.runsc.v1",
+      "Options": {
+        "type_url": "runtimeoptions.v1.Options",
+        "value": "Ch5pby5jb250YWluZXJkLnJ1bnNjLnYxLm9wdGlvbnMSGi9ldGMvY29udGFpbmVyZC9ydW5zYy50b21s"
+      }
+    },
+    "runsc_processes": "   8488     0 runsc-gofer --platform=systrap --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053/log.json --log-format=json --panic-log=/var/log/pods/ac-kube-component_ac-b1c55c41751b1c81fde25359fbe78447d38d213d24a6240a91dc_292d4157-7f92-4ea6-a43b-ff912681fcbf/gvisor_panic.log --log-fd=3 gofer --bundle /run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053 --gofer-mount-confs=lisafs:none,lisafs:none --spec-fd=4 --mounts-fd=5 --rpc-fd=6 --io-fds=7 --io-fds=8 --sync-chroot-fd=9 38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053\n   8493     0 runsc-sandbox --panic-log=/var/log/pods/ac-kube-component_ac-b1c55c41751b1c81fde25359fbe78447d38d213d24a6240a91dc_292d4157-7f92-4ea6-a43b-ff912681fcbf/gvisor_panic.log --platform=systrap --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053/log.json --log-format=json --log-fd=3 --panic-log-fd=4 boot --bundle=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053 --gofer-mount-confs=lisafs:none,lisafs:none --apply-caps=true --setup-root --total-host-memory 6213025792 --cpu-num 2 --cpu-quota 50000 --cpu-period 100000 --total-memory 268435456 --io-fds=5 --io-fds=6 --dev-io-fd=-1 --mounts-fd=7 --start-sync-fd=8 --pin-ring-fd=9 --user-log-fd=10 --controller-fd=11 --spec-fd=12 --stdio-fds=13 --stdio-fds=14 --stdio-fds=15 38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053\n   8507     0 [gvisor_sentry]\n   8523     0 [gvisor_sentry]\n   8524     0 [gvisor_sentry]\n   8527     0 runsc --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053/log.json --log-format=json --panic-log=/var/log/pods/ac-kube-component_ac-b1c55c41751b1c81fde25359fbe78447d38d213d24a6240a91dc_292d4157-7f92-4ea6-a43b-ff912681fcbf/gvisor_panic.log --platform=systrap wait 38256836a9275c792fc702116c8f841ca32edff9744e927d37e89573058f7053\n   8573     0 runsc-gofer --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/55aa49c35d90fa0c3c67e0e27709aebb4ac88a702775df09140259c1472d16b6/log.json --log-format=json --platform=systrap --log-fd=3 gofer --bundle /run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/55aa49c35d90fa0c3c67e0e27709aebb4ac88a702775df09140259c1472d16b6 --gofer-mount-confs=lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none,lisafs:none --spec-fd=4 --mounts-fd=5 --rpc-fd=6 --io-fds=7 --io-fds=8 --io-fds=9 --io-fds=10 --io-fds=11 --io-fds=12 --io-fds=13 --sync-chroot-fd=14 55aa49c35d90fa0c3c67e0e27709aebb4ac88a702775df09140259c1472d16b6\n   8591     0 [gvisor_sentry]\n   8592     0 [gvisor_sentry]\n   8593     0 runsc --root=/run/containerd/runsc/k8s.io --log=/run/k3s/containerd/io.containerd.runtime.v2.task/k8s.io/55aa49c35d90fa0c3c67e0e27709aebb4ac88a702775df09140259c1472d16b6/log.json --log-format=json --platform=systrap wait 55aa49c35d90fa0c3c67e0e27709aebb4ac88a702775df09140259c1472d16b6\n",
+    "oci_root_readonly": true,
+    "process": {
+      "user": {
+        "additionalGids": [
+          1000
+        ],
+        "gid": 1000,
+        "uid": 1000
+      },
+      "args": [
+        "/bin/agent-computer-sandbox",
+        "--attach-startup-json",
+        "{\"version\":1,\"intent_digest\":\"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"request\":{\"execution_id\":\"attach_success_1791569363653094831\",\"generation\":1,\"argv\":[\"/bin/sh\",\"-c\",\"printf 'attach-output'; printf 'attach-error' >&2; test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token && test -z \\\"${KUBERNETES_SERVICE_HOST+x}\\\" && test -z \\\"${HOSTNAME+x}\\\"\"],\"cwd\":\"\",\"timeout_seconds\":10,\"lease_budget_ms\":30000,\"term_grace_ms\":100,\"output_limit_bytes\":64}}"
+      ],
+      "env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "HOSTNAME=ac-b1c55c41751b1c81fde25359fbe78447d38d213d24a6240a91dc",
+        "KUBERNETES_PORT=tcp://10.43.0.1:443",
+        "KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443",
+        "KUBERNETES_PORT_443_TCP_PROTO=tcp",
+        "KUBERNETES_PORT_443_TCP_PORT=443",
+        "KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1",
+        "KUBERNETES_SERVICE_HOST=10.43.0.1",
+        "KUBERNETES_SERVICE_PORT=443",
+        "KUBERNETES_SERVICE_PORT_HTTPS=443"
+      ],
+      "noNewPrivileges": true,
+      "capabilities": {}
+    },
+    "node": {
+      "architecture": "amd64",
+      "bootID": "5f3b6c57-235d-4bdf-a83c-d61074693472",
+      "containerRuntimeVersion": "containerd://2.3.4-k3s1",
+      "kernelVersion": "6.8.0-142-generic",
+      "kubeProxyVersion": "",
+      "kubeletVersion": "v1.37.1+k3s1",
+      "machineID": "e11a6892aa9448c5a45b64da9a27fb94",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.5 LTS",
+      "runningInUserNamespace": false,
+      "systemUUID": "e11a6892aa9448c5a45b64da9a27fb94"
+    }
+  },
+  "kubernetes_attach": {
+    "cases": [
+      {
+        "bootstrap": {
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf 'attach-output'; printf 'attach-error' >&2; test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token && test -z \"${KUBERNETES_SERVICE_HOST+x}\" && test -z \"${HOSTNAME+x}\""
+            ],
+            "cwd": "",
+            "execution_id": "attach_success_1791569363653094831",
+            "generation": 1,
+            "lease_budget_ms": 30000,
+            "output_limit_bytes": 64,
+            "term_grace_ms": 100,
+            "timeout_seconds": 10
+          },
+          "version": 1
+        },
+        "case": "success",
+        "grant": {
+          "challenge_digest": "sha256:a18997be7b78c2e5782c03ca916623fce3f5e24b9e5cdced49a8ab2f424fa9ec",
+          "lease_budget_ms": 15000,
+          "version": 1
+        },
+        "observation": {
+          "challenge_digest": "sha256:a18997be7b78c2e5782c03ca916623fce3f5e24b9e5cdced49a8ab2f424fa9ec",
+          "grant_digest": "sha256:6e4081cceecf0ba57b2faa3ace09f77ba51b76206b14bb2028ff0c169341ef7e",
+          "report": {
+            "children_reaped": true,
+            "elapsed_ms": 34,
+            "execution_id": "attach_success_1791569363653094831",
+            "generation": 1,
+            "kill_sent": false,
+            "main_exit_code": 0,
+            "main_signal": null,
+            "outcome": "succeeded",
+            "reaped_processes": 1,
+            "request_digest": "sha256:6da5d64fa06ee883aec9ed8f5831f73467608185a3ba2c6edbe3cf15fb62816e",
+            "stderr": {
+              "bytes": [
+                97,
+                116,
+                116,
+                97,
+                99,
+                104,
+                45,
+                101,
+                114,
+                114,
+                111,
+                114
+              ],
+              "eof": true,
+              "observed_bytes": 12,
+              "truncated": false
+            },
+            "stdout": {
+              "bytes": [
+                97,
+                116,
+                116,
+                97,
+                99,
+                104,
+                45,
+                111,
+                117,
+                116,
+                112,
+                117,
+                116
+              ],
+              "eof": true,
+              "observed_bytes": 13,
+              "truncated": false
+            },
+            "version": 1
+          },
+          "version": 1
+        },
+        "pod_name": "ac-b1c55c41751b1c81fde25359fbe78447d38d213d24a6240a91dc",
+        "pod_uid": "292d4157-7f92-4ea6-a43b-ff912681fcbf",
+        "supervisor_stderr": []
+      },
+      {
+        "bootstrap": {
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "sleep 10"
+            ],
+            "cwd": "",
+            "execution_id": "attach_timeout_1791569366784224960",
+            "generation": 1,
+            "lease_budget_ms": 30000,
+            "output_limit_bytes": 64,
+            "term_grace_ms": 100,
+            "timeout_seconds": 1
+          },
+          "version": 1
+        },
+        "case": "timeout",
+        "grant": {
+          "challenge_digest": "sha256:4aed023e01245be0d863f7ceaf654180924fde38cd74f13091ad669b40184b7c",
+          "lease_budget_ms": 15000,
+          "version": 1
+        },
+        "observation": {
+          "challenge_digest": "sha256:4aed023e01245be0d863f7ceaf654180924fde38cd74f13091ad669b40184b7c",
+          "grant_digest": "sha256:6226995fb9b6ec4a24fd33c92923454b6db808c0ce438fb5e1b8e02701dac5e5",
+          "report": {
+            "children_reaped": true,
+            "elapsed_ms": 1032,
+            "execution_id": "attach_timeout_1791569366784224960",
+            "generation": 1,
+            "kill_sent": false,
+            "main_exit_code": null,
+            "main_signal": 15,
+            "outcome": "timed_out",
+            "reaped_processes": 2,
+            "request_digest": "sha256:024984516a0d3a436f9d931f94c2952767dd613289cd2d82e2cb17bfea071013",
+            "stderr": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "stdout": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "version": 1
+          },
+          "version": 1
+        },
+        "pod_name": "ac-d765e8b35256eab64d7324a0a8a44e8ca385af6e36c0778edb6a",
+        "pod_uid": "41411ede-4fa2-4c26-a54c-8fad38358ffe",
+        "supervisor_stderr": []
+      },
+      {
+        "bootstrap": {
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "sleep 10"
+            ],
+            "cwd": "",
+            "execution_id": "attach_lease_1791569369724448384",
+            "generation": 1,
+            "lease_budget_ms": 30000,
+            "output_limit_bytes": 64,
+            "term_grace_ms": 100,
+            "timeout_seconds": 10
+          },
+          "version": 1
+        },
+        "case": "lease",
+        "grant": {
+          "challenge_digest": "sha256:f57c89cf9ae4b31a817babe85669db3f7ffb4314cc108d05a0f597015975f997",
+          "lease_budget_ms": 2000,
+          "version": 1
+        },
+        "observation": {
+          "challenge_digest": "sha256:f57c89cf9ae4b31a817babe85669db3f7ffb4314cc108d05a0f597015975f997",
+          "grant_digest": "sha256:26edd29be4c44aa9253db39fdbfb92b0e7d8a4749806736208547248521b9b77",
+          "report": {
+            "children_reaped": true,
+            "elapsed_ms": 2015,
+            "execution_id": "attach_lease_1791569369724448384",
+            "generation": 1,
+            "kill_sent": false,
+            "main_exit_code": null,
+            "main_signal": 15,
+            "outcome": "lease_expired",
+            "reaped_processes": 2,
+            "request_digest": "sha256:362052a784bbe2b689dc78fe912840bf5058e0fade0d2d460658198f629a5781",
+            "stderr": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "stdout": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "version": 1
+          },
+          "version": 1
+        },
+        "pod_name": "ac-80b3abe2896cb979fb209612e37b77c14a9722e6fcec1fed5009",
+        "pod_uid": "22ae9131-c8f6-462f-8378-621b53113328",
+        "supervisor_stderr": []
+      },
+      {
+        "bootstrap": {
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "head -c 100000 /dev/zero"
+            ],
+            "cwd": "",
+            "execution_id": "attach_bounded_output_1791569373145590307",
+            "generation": 1,
+            "lease_budget_ms": 30000,
+            "output_limit_bytes": 64,
+            "term_grace_ms": 100,
+            "timeout_seconds": 10
+          },
+          "version": 1
+        },
+        "case": "bounded_output",
+        "grant": {
+          "challenge_digest": "sha256:611691bdaa8507c1aa5b164248d99ead07abccd75fc8ba8534bbce4431db5f74",
+          "lease_budget_ms": 15000,
+          "version": 1
+        },
+        "observation": {
+          "challenge_digest": "sha256:611691bdaa8507c1aa5b164248d99ead07abccd75fc8ba8534bbce4431db5f74",
+          "grant_digest": "sha256:7938fec8e2f8541baba7af7fb8208b31f89c69a760129e0db75af403974cb960",
+          "report": {
+            "children_reaped": true,
+            "elapsed_ms": 47,
+            "execution_id": "attach_bounded_output_1791569373145590307",
+            "generation": 1,
+            "kill_sent": false,
+            "main_exit_code": 0,
+            "main_signal": null,
+            "outcome": "succeeded",
+            "reaped_processes": 1,
+            "request_digest": "sha256:fa375d9ab03fcf3b94fc7835c2bab8d5cd1eacdf2bde420dd462350121918318",
+            "stderr": {
+              "bytes": [],
+              "eof": true,
+              "observed_bytes": 0,
+              "truncated": false
+            },
+            "stdout": {
+              "bytes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "eof": true,
+              "observed_bytes": 100000,
+              "truncated": true
+            },
+            "version": 1
+          },
+          "version": 1
+        },
+        "pod_name": "ac-8035ff87fafcaa594ab1853aea5808a2306a221d6a38da5f1013",
+        "pod_uid": "78910b17-5ec9-42dd-b114-aeb478b7b5a8",
+        "supervisor_stderr": []
+      }
+    ],
+    "scope": "ephemeral startup attach component, fixture grants only"
+  },
+  "startup_regression": {
+    "component": "sandbox-startup-handshake",
+    "runtime": "runsc version release-20261005.0\nspec: 1.2.1",
+    "platform": "systrap",
+    "network": "none",
+    "tests": [
+      {
+        "name": "valid",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "valid",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "valid",
+          "generation": 7,
+          "bootstrap_digest": "sha256:004f513a265bb8b8a74eacd430a1b1b3e896d2657d5ff2461ca95e74179e6d5f",
+          "nonce": "8a3b9ba955a4462c619f9093a574498875a2db685c34b6b7cc43f693e5d20f66"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:9d8928d8697cdbd709be2b4e0d582b210fd81eb5890716d4b173174d8fc148d7",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 0,
+        "wall_ms": 95,
+        "report": {
+          "version": 1,
+          "challenge_digest": "sha256:9d8928d8697cdbd709be2b4e0d582b210fd81eb5890716d4b173174d8fc148d7",
+          "grant_digest": "sha256:97f625c6b787d5fe5d1c621a4192c5f7e00da4c5d00f57b417f51257115347ab",
+          "report": {
+            "version": 1,
+            "execution_id": "valid",
+            "generation": 7,
+            "request_digest": "sha256:536c5125d1a0370677b730076c5e3feaf11ad953a20d7b0d803ad139959db40a",
+            "outcome": "succeeded",
+            "main_exit_code": 0,
+            "main_signal": null,
+            "reaped_processes": 1,
+            "children_reaped": true,
+            "kill_sent": false,
+            "elapsed_ms": 22,
+            "stdout": {
+              "bytes": [
+                108,
+                105,
+                116,
+                101,
+                114,
+                97,
+                108
+              ],
+              "observed_bytes": 7,
+              "truncated": false,
+              "eof": true
+            },
+            "stderr": {
+              "bytes": [],
+              "observed_bytes": 0,
+              "truncated": false,
+              "eof": true
+            }
+          }
+        }
+      },
+      {
+        "name": "delayed-valid",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "delayed-valid",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "delayed-valid",
+          "generation": 7,
+          "bootstrap_digest": "sha256:ed01093e588f4c7d349da7f3d2e5b5ceb89ec8a4d567cc5bfea40514a4073249",
+          "nonce": "2db73de6ab56acb4f78437da932279b20ab5309633a52f41d1b80c96dbea7b40"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:189d844d4da43398363cda82099c34034e74f039281d608771955c1a864947df",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 0,
+        "wall_ms": 361,
+        "report": {
+          "version": 1,
+          "challenge_digest": "sha256:189d844d4da43398363cda82099c34034e74f039281d608771955c1a864947df",
+          "grant_digest": "sha256:6a2ae6bf766e093581c914ad81dcb31b6c51594de38f50ec040ccc5a017e7786",
+          "report": {
+            "version": 1,
+            "execution_id": "delayed-valid",
+            "generation": 7,
+            "request_digest": "sha256:c43aa1e6a1dd716d11b15a7e7d1b01580bda8e972373e95e255e68ae4076170b",
+            "outcome": "succeeded",
+            "main_exit_code": 0,
+            "main_signal": null,
+            "reaped_processes": 1,
+            "children_reaped": true,
+            "kill_sent": false,
+            "elapsed_ms": 287,
+            "stdout": {
+              "bytes": [
+                108,
+                105,
+                116,
+                101,
+                114,
+                97,
+                108
+              ],
+              "observed_bytes": 7,
+              "truncated": false,
+              "eof": true
+            },
+            "stderr": {
+              "bytes": [],
+              "observed_bytes": 0,
+              "truncated": false,
+              "eof": true
+            }
+          }
+        }
+      },
+      {
+        "name": "late-grant",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "late-grant",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "late-grant",
+          "generation": 7,
+          "bootstrap_digest": "sha256:9ce88a12c2ef4d6032ef7d98151bdd94af370dc438eac73ef0593244ee819403",
+          "nonce": "feca4901909062ce5417cbe3adf784ab9bad9f3da59376b652af86b663a5a123"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:246e9851b9421c53db08222431ec28b798c9e23d47c48ea2b185eca24137d557",
+          "lease_budget_ms": 100
+        },
+        "exit_code": 125,
+        "wall_ms": 330,
+        "rejected": true,
+        "error": "StartupExpired",
+        "command_started": false
+      },
+      {
+        "name": "wrong-challenge",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "wrong-challenge",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "wrong-challenge",
+          "generation": 7,
+          "bootstrap_digest": "sha256:d4563f0a268c5e4737cf81486601e38a04b9a1327a4dccfb509642c3194db3bd",
+          "nonce": "ef7bd422cff06884b4488d36339d007264d2022f915bb77256cfb4903138e004"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 125,
+        "wall_ms": 66,
+        "rejected": true,
+        "error": "InvalidRequest",
+        "command_started": false
+      },
+      {
+        "name": "budget-increase",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "budget-increase",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 500,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "budget-increase",
+          "generation": 7,
+          "bootstrap_digest": "sha256:d9934cc4718012516f90551af6dcb29000c3ecb7f0e5b07acc3e6698c2ed0218",
+          "nonce": "8e64ef308dd9284bf88e7258f30b3295d0f7d84f8b3eebc1e168311f5ddaae65"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:572aed2e2aacecbd0b52d1a40290b2bf6e14232fda6027a77cd1d1b4155edef5",
+          "lease_budget_ms": 1000
+        },
+        "exit_code": 125,
+        "wall_ms": 60,
+        "rejected": true,
+        "error": "InvalidRequest",
+        "command_started": false
+      },
+      {
+        "name": "closed-channel",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "closed-channel",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "closed-channel",
+          "generation": 7,
+          "bootstrap_digest": "sha256:f2c598263481f5e0bff102cb95446f824f16a4896ad1f07423c1b4d9d3294a8a",
+          "nonce": "d5fea1182183148bf39a9854cbe9bfe9748ac415e33985245d59648f4201a229"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:80f8588849235926b494e7d1511dbf9d17fd0936e86c4fdb2d1a9fafb5c2099b",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 125,
+        "wall_ms": 72,
+        "rejected": true,
+        "error": "InvalidRequest",
+        "command_started": false
+      },
+      {
+        "name": "cancel-before-grant",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "cancel-before-grant",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "cancel-before-grant",
+          "generation": 7,
+          "bootstrap_digest": "sha256:354a114828786951fb1b5fc01752f9d52a6152782c070414c7033aa6d2b6ab46",
+          "nonce": "dc4527d4fd65298c0dbd4d33e9e83d5ff43acfabc166af0405e02bf0c433c814"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:57a90302eb76082fb387e91ac80c7f85c1dfee2f7d6e295211ebd0348d4229d5",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 125,
+        "wall_ms": 51,
+        "rejected": true,
+        "error": "StartupCancelled",
+        "command_started": false
+      },
+      {
+        "name": "duplicate-frame",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "duplicate-frame",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "duplicate-frame",
+          "generation": 7,
+          "bootstrap_digest": "sha256:417fd008839010c95b96d93965fbe6f19d0d10514d06f42fe3c5a7b5c9622def",
+          "nonce": "68bfeb1c073c0048c25383bfa04d6b386fb4420c05133846958c3643a1310836"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:91aca94e2cdced3e2906ac1f6e379ced322074e80c364a2fb535a4f9b43f84f7",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 125,
+        "wall_ms": 52,
+        "rejected": true,
+        "error": "InvalidRequest",
+        "command_started": false
+      },
+      {
+        "name": "oversized-frame",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "oversized-frame",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "oversized-frame",
+          "generation": 7,
+          "bootstrap_digest": "sha256:3e485ea0f11454235620f1919f0f59533987a34f2554d39da0dc5101c7215e2e",
+          "nonce": "0f194716f361d94e44cee84ce7b42b224e0181b54e419a610f1d6aed7f33b3ab"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:1f48db7fcf429bc671c753f55d8ca731ad34fcffe60cfdb4a5161f5c33f57b51",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 125,
+        "wall_ms": 227,
+        "rejected": true,
+        "error": "InvalidRequest",
+        "command_started": false
+      },
+      {
+        "name": "anchored-deadline",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "anchored-deadline",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "trap '' TERM; printf started > result; while :; do /bin/sleep 10; done"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "anchored-deadline",
+          "generation": 7,
+          "bootstrap_digest": "sha256:089407f84515fea3b36003ef00f70507c2e22c49347161d774031f97a974a211",
+          "nonce": "5056685ce47104e785217aa7c5fd17cf05a19779fec7dd03255e375614da81c4"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:3a4aa042e03df8b746771446af8a99732cdb4faf291923f2f81bf299ef86ba95",
+          "lease_budget_ms": 500
+        },
+        "exit_code": 0,
+        "wall_ms": 724,
+        "report": {
+          "version": 1,
+          "challenge_digest": "sha256:3a4aa042e03df8b746771446af8a99732cdb4faf291923f2f81bf299ef86ba95",
+          "grant_digest": "sha256:5580f37ce2b9b31ef1ad1a0aa2602e9838b8056fd2b080becc8a41e52a8d4fe5",
+          "report": {
+            "version": 1,
+            "execution_id": "anchored-deadline",
+            "generation": 7,
+            "request_digest": "sha256:209fcfa46230650b6b039111162780b798ff10c9548073c586ab1e3c59d799e4",
+            "outcome": "lease_expired",
+            "main_exit_code": null,
+            "main_signal": 9,
+            "reaped_processes": 2,
+            "children_reaped": true,
+            "kill_sent": true,
+            "elapsed_ms": 626,
+            "stdout": {
+              "bytes": [],
+              "observed_bytes": 0,
+              "truncated": false,
+              "eof": true
+            },
+            "stderr": {
+              "bytes": [],
+              "observed_bytes": 0,
+              "truncated": false,
+              "eof": true
+            }
+          }
+        }
+      },
+      {
+        "name": "stdin-and-environment",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "stdin-and-environment",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "/bin/cat; /bin/env"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "stdin-and-environment",
+          "generation": 7,
+          "bootstrap_digest": "sha256:39c88c9b12a1433dbc5c778560c95486601bf45cfc67d8b59e65d62cf3d63c01",
+          "nonce": "e349b6f1dab6d112de07f694ab8aeaf93b50fb2e6979fc4973b006114ac00212"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:a55d7e35f5d268b45da172259acc444cc39c24c63bdbeb7d43a3ae4fecf84efa",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 0,
+        "wall_ms": 112,
+        "report": {
+          "version": 1,
+          "challenge_digest": "sha256:a55d7e35f5d268b45da172259acc444cc39c24c63bdbeb7d43a3ae4fecf84efa",
+          "grant_digest": "sha256:3bb80d55ec8c89a76c1e44bce93c4ae06e59297d70fb39502694521bf0724f90",
+          "report": {
+            "version": 1,
+            "execution_id": "stdin-and-environment",
+            "generation": 7,
+            "request_digest": "sha256:b8efd56965043e7e1253cf9fa417d07fd90fb950d36f522565b211da8615b9f5",
+            "outcome": "succeeded",
+            "main_exit_code": 0,
+            "main_signal": null,
+            "reaped_processes": 1,
+            "children_reaped": true,
+            "kill_sent": false,
+            "elapsed_ms": 32,
+            "stdout": {
+              "bytes": [
+                72,
+                79,
+                77,
+                69,
+                61,
+                47,
+                116,
+                109,
+                112,
+                10,
+                80,
+                65,
+                84,
+                72,
+                61,
+                47,
+                117,
+                115,
+                114,
+                47,
+                98,
+                105,
+                110,
+                58,
+                47,
+                98,
+                105,
+                110,
+                10,
+                76,
+                65,
+                78,
+                71,
+                61,
+                67,
+                10,
+                80,
+                87,
+                68,
+                61,
+                47,
+                119,
+                111,
+                114,
+                107,
+                115,
+                112,
+                97,
+                99,
+                101,
+                10
+              ],
+              "observed_bytes": 51,
+              "truncated": false,
+              "eof": true
+            },
+            "stderr": {
+              "bytes": [],
+              "observed_bytes": 0,
+              "truncated": false,
+              "eof": true
+            }
+          }
+        }
+      },
+      {
+        "name": "withheld-grant",
+        "bootstrap": {
+          "version": 1,
+          "intent_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "request": {
+            "execution_id": "withheld-grant",
+            "generation": 7,
+            "argv": [
+              "/bin/sh",
+              "-c",
+              "printf started > result; printf literal"
+            ],
+            "cwd": "",
+            "timeout_seconds": 10,
+            "lease_budget_ms": 10000,
+            "term_grace_ms": 100,
+            "output_limit_bytes": 4096
+          }
+        },
+        "challenge": {
+          "version": 1,
+          "execution_id": "withheld-grant",
+          "generation": 7,
+          "bootstrap_digest": "sha256:6f1567c490713b32b233dfccb96968fbe7028f8f78cf4fa931746dba6dd03844",
+          "nonce": "c7ab6ad9d4f013d5b5c45220dfbdd9c099186e8bab6b88ae68d123a82fa19836"
+        },
+        "fixture_grant": {
+          "version": 1,
+          "challenge_digest": "sha256:6d011af2190b953ac77b66a8f96fcc0fea44595907d86317d01574f74015a9be",
+          "lease_budget_ms": 5000
+        },
+        "exit_code": 125,
+        "wall_ms": 30076,
+        "rejected": true,
+        "error": "StartupExpired",
+        "command_started": false
+      }
+    ],
+    "grants_are_protocol_fixtures": true,
+    "product_execution_admission": false,
+    "kubernetes_attach_verified": false,
+    "candidate_mount_verified": false,
+    "physical_fencing": false,
+    "cgroup_limits_verified": false,
+    "accepted_runtime_tests": [],
+    "fixture_files": {
+      "/bin/agent-computer-sandbox": "fd11ef0c8cd401240e607138b32fb2d834afc6c237b3e422731b75358382d278",
+      "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "9d339ecb409578d6a5d587e6c537a8f9589b8a13fefba30d167433a4b5758bee",
+      "/usr/lib/x86_64-linux-gnu/libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+      "/usr/lib/x86_64-linux-gnu/libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+      "/lib64/ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+      "/bin/sh": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+      "/bin/sleep": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/usr/lib/x86_64-linux-gnu/libsystemd.so.0": "9405c27411b652140806ab7576f7d76610f67bde662ba730efc7aa7171785011",
+      "/usr/lib/x86_64-linux-gnu/libselinux.so.1": "7538ee77765a27966563c0d22437a3080dcdb346ff76cc16d71a3ce3379a716a",
+      "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0": "4a6b6b2078685b074869d75cb068664d7da6b3036df7bca0442b1bbbd4ac7e65",
+      "/bin/setsid": "e0247c69b5966f336155291c00153ee75e980fe526a1371ddf7445788671dc66",
+      "/bin/env": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/head": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/yes": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/cat": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02"
+    },
+    "test_script_sha256": "d1671c99de3dce9bbd2e96f2d14a863d7b68c590e71a71339a62abac6f99924e"
+  },
+  "supervisor_regression": {
+    "component": "sandbox-supervisor",
+    "runtime": "runsc version release-20261005.0\nspec: 1.2.1",
+    "platform": "systrap",
+    "network": "none",
+    "cgroup_limits_verified": false,
+    "product_execution_admission": false,
+    "candidate_mount_verified": false,
+    "physical_fencing": false,
+    "accepted_runtime_tests": [],
+    "tests": [
+      {
+        "name": "literal",
+        "exit_code": 0,
+        "wall_ms": 125,
+        "report": {
+          "version": 1,
+          "execution_id": "literal",
+          "generation": 7,
+          "request_digest": "sha256:35adb9a1a8e97e422caaaa982c88376ca90a6c5cebb7fae93ea328b9e111dac7",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 13,
+          "stdout": {
+            "bytes": [
+              97,
+              59,
+              36,
+              40,
+              105,
+              100,
+              41
+            ],
+            "observed_bytes": 7,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "environment",
+        "exit_code": 0,
+        "wall_ms": 123,
+        "report": {
+          "version": 1,
+          "execution_id": "environment",
+          "generation": 7,
+          "request_digest": "sha256:32e225ff57cb3d7931966bf24e42f87b09bf67d4394d89aeab044d4c866b1172",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 14,
+          "stdout": {
+            "bytes": [
+              72,
+              79,
+              77,
+              69,
+              61,
+              47,
+              116,
+              109,
+              112,
+              10,
+              76,
+              65,
+              78,
+              71,
+              61,
+              67,
+              10,
+              80,
+              65,
+              84,
+              72,
+              61,
+              47,
+              117,
+              115,
+              114,
+              47,
+              98,
+              105,
+              110,
+              58,
+              47,
+              98,
+              105,
+              110,
+              10
+            ],
+            "observed_bytes": 36,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "cwd",
+        "exit_code": 0,
+        "wall_ms": 69,
+        "report": {
+          "version": 1,
+          "execution_id": "cwd",
+          "generation": 7,
+          "request_digest": "sha256:d962f5773af5d238bcb153cdf0b72dbd00175ccba69b94db3fe2b4260e85ab81",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 14,
+          "stdout": {
+            "bytes": [
+              47,
+              119,
+              111,
+              114,
+              107,
+              115,
+              112,
+              97,
+              99,
+              101,
+              47,
+              110,
+              101,
+              115,
+              116,
+              101,
+              100,
+              10
+            ],
+            "observed_bytes": 18,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "symlink-cwd",
+        "exit_code": 125,
+        "wall_ms": 69,
+        "rejected": true
+      },
+      {
+        "name": "nonzero",
+        "exit_code": 0,
+        "wall_ms": 69,
+        "report": {
+          "version": 1,
+          "execution_id": "nonzero",
+          "generation": 7,
+          "request_digest": "sha256:e2904fe5be664c7e66a4a4165622841e94c133e05c336a8a28c9bec1d55ad1a9",
+          "outcome": "failed",
+          "main_exit_code": 23,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 13,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "missing-executable",
+        "exit_code": 0,
+        "wall_ms": 70,
+        "report": {
+          "version": 1,
+          "execution_id": "missing-executable",
+          "generation": 7,
+          "request_digest": "sha256:42a43da5c29a41a40f2b31860de9680173ad099ff371a46df52bba8eb9116c6f",
+          "outcome": "spawn_failed",
+          "main_exit_code": null,
+          "main_signal": null,
+          "reaped_processes": 0,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 1,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": false
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": false
+          }
+        }
+      },
+      {
+        "name": "init-protected",
+        "exit_code": 0,
+        "wall_ms": 69,
+        "report": {
+          "version": 1,
+          "execution_id": "init-protected",
+          "generation": 7,
+          "request_digest": "sha256:0125e2fe26bcb518bb1efb66e50915c3858e91c1d61d270dc5c5c291026e7635",
+          "outcome": "succeeded",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 1,
+          "children_reaped": true,
+          "kill_sent": false,
+          "elapsed_ms": 12,
+          "stdout": {
+            "bytes": [
+              112,
+              114,
+              111,
+              116,
+              101,
+              99,
+              116,
+              101,
+              100
+            ],
+            "observed_bytes": 9,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [
+              47,
+              98,
+              105,
+              110,
+              47,
+              115,
+              104,
+              58,
+              32,
+              49,
+              58,
+              32,
+              99,
+              97,
+              110,
+              110,
+              111,
+              116,
+              32,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              32,
+              47,
+              112,
+              114,
+              111,
+              99,
+              47,
+              49,
+              47,
+              102,
+              100,
+              47,
+              49,
+              58,
+              32,
+              80,
+              101,
+              114,
+              109,
+              105,
+              115,
+              115,
+              105,
+              111,
+              110,
+              32,
+              100,
+              101,
+              110,
+              105,
+              101,
+              100,
+              10
+            ],
+            "observed_bytes": 58,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "suspended-supervisor",
+        "exit_code": 137,
+        "wall_ms": 1119,
+        "external_kill": true,
+        "local_report_absent": true,
+        "authoritative_outcome": "unresolved"
+      },
+      {
+        "name": "timeout",
+        "exit_code": 0,
+        "wall_ms": 1173,
+        "report": {
+          "version": 1,
+          "execution_id": "timeout",
+          "generation": 7,
+          "request_digest": "sha256:fa0552666e7c6dd351e0c06306482fb76455206d0bdfac7d848ed2e20076ca68",
+          "outcome": "timed_out",
+          "main_exit_code": null,
+          "main_signal": 9,
+          "reaped_processes": 2,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 1119,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "lease-expiry",
+        "exit_code": 0,
+        "wall_ms": 422,
+        "report": {
+          "version": 1,
+          "execution_id": "lease-expiry",
+          "generation": 7,
+          "request_digest": "sha256:f39225515b630ef1b455d7ff4c7eb042e11830b4160b61b5af357ee9e08c791c",
+          "outcome": "lease_expired",
+          "main_exit_code": null,
+          "main_signal": 9,
+          "reaped_processes": 2,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 326,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "cancel",
+        "exit_code": 0,
+        "wall_ms": 276,
+        "report": {
+          "version": 1,
+          "execution_id": "cancel",
+          "generation": 7,
+          "request_digest": "sha256:cbdcc93cbaa16cde0c7ad66de4281fdcfc792bc523fea2e625c58282b596bbe0",
+          "outcome": "cancelled",
+          "main_exit_code": null,
+          "main_signal": 9,
+          "reaped_processes": 2,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 167,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "escaped-descendant",
+        "exit_code": 0,
+        "wall_ms": 221,
+        "report": {
+          "version": 1,
+          "execution_id": "escaped-descendant",
+          "generation": 7,
+          "request_digest": "sha256:5b602b30a1cbf876e850e58cd9fc6ad2b58689c847b902736aaa5fc8618904b3",
+          "outcome": "descendants_terminated",
+          "main_exit_code": 0,
+          "main_signal": null,
+          "reaped_processes": 3,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 132,
+          "stdout": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [],
+            "observed_bytes": 0,
+            "truncated": false,
+            "eof": true
+          }
+        }
+      },
+      {
+        "name": "output-flood",
+        "exit_code": 0,
+        "wall_ms": 1327,
+        "report": {
+          "version": 1,
+          "execution_id": "output-flood",
+          "generation": 7,
+          "request_digest": "sha256:257ec99b600f473f01e7dba859cbb7e07e1d4419741b22dbee50238cea4e1d30",
+          "outcome": "timed_out",
+          "main_exit_code": null,
+          "main_signal": 15,
+          "reaped_processes": 3,
+          "children_reaped": true,
+          "kill_sent": true,
+          "elapsed_ms": 1220,
+          "stdout": {
+            "bytes": [
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120,
+              10,
+              120
+            ],
+            "observed_bytes": 6291456,
+            "truncated": true,
+            "eof": true
+          },
+          "stderr": {
+            "bytes": [
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121,
+              10,
+              121
+            ],
+            "observed_bytes": 6291456,
+            "truncated": true,
+            "eof": true
+          }
+        }
+      }
+    ],
+    "fixture_files": {
+      "/bin/agent-computer-sandbox": "fd11ef0c8cd401240e607138b32fb2d834afc6c237b3e422731b75358382d278",
+      "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "9d339ecb409578d6a5d587e6c537a8f9589b8a13fefba30d167433a4b5758bee",
+      "/usr/lib/x86_64-linux-gnu/libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+      "/usr/lib/x86_64-linux-gnu/libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+      "/lib64/ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+      "/bin/sh": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+      "/bin/sleep": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/usr/lib/x86_64-linux-gnu/libsystemd.so.0": "9405c27411b652140806ab7576f7d76610f67bde662ba730efc7aa7171785011",
+      "/usr/lib/x86_64-linux-gnu/libselinux.so.1": "7538ee77765a27966563c0d22437a3080dcdb346ff76cc16d71a3ce3379a716a",
+      "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0": "4a6b6b2078685b074869d75cb068664d7da6b3036df7bca0442b1bbbd4ac7e65",
+      "/bin/setsid": "e0247c69b5966f336155291c00153ee75e980fe526a1371ddf7445788671dc66",
+      "/bin/env": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/head": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/yes": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/cat": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02"
+    },
+    "test_script_sha256": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e"
+  },
+  "test_commands": [
+    "bazel test //crates/kubernetes:startup_live_test --lockfile_mode=error --test_env=AGENT_COMPUTER_KUBE_STARTUP_CONFIG=<private-config>",
+    "sudo python3 startup_component.py --runsc /usr/local/bin/runsc --rootfs /home/ac-test/attach-rootfs --work-dir /var/tmp/ac-attach-startup-regression",
+    "sudo python3 component.py --runsc /usr/local/bin/runsc --rootfs /home/ac-test/attach-rootfs --work-dir /var/tmp/ac-attach-supervisor-regression"
+  ],
+  "all_commands_exit_code": 0,
+  "passed_scenarios": {
+    "kubernetes_attach": 4,
+    "startup_regression": 12,
+    "supervisor_regression": 13
+  },
+  "cleanup": {
+    "vm_pid": 2505606,
+    "owned_command_verified": true,
+    "process_terminal": true,
+    "namespace_pods_remaining": 0,
+    "removed_private_files": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "user-data",
+      "meta-data",
+      "known_hosts",
+      "serial.log",
+      "qemu.log",
+      "vm.json",
+      "ca.pem",
+      "token",
+      "config.json",
+      "startup-config.json"
+    ],
+    "public_input_cache_retained": true,
+    "not_product_fencing": true
+  },
+  "limits": [
+    "Single disposable KVM VM, K3s v1.37.1+k3s1, containerd 2.3.4-k3s1, gVisor release-20261005.0 Systrap.",
+    "Fixture grants only; no database authorization, Candidate mount, JuiceFS, S3, runtime dispatch worker or durable accepted completion in this run.",
+    "Operator-imported test image made from trusted local supervisor and host libraries; not distributable product image provenance.",
+    "Kubernetes attach has no atomic Pod UID precondition; exclusive trusted namespace/controller RBAC is required.",
+    "Local correlated reports and remote-command success are observations, not physical fencing or writer drainage.",
+    "Supervisor PID 1 pause regression needs external runsc kill and produces no completion report; no independent product watchdog was tested.",
+    "Direct-runsc regressions use ignore-cgroups=true; no production cgroup/resource or packet-level NetworkPolicy certification.",
+    "Kubernetes supplies service variables to PID 1 despite enableServiceLinks=false; success command checks KUBERNETES_SERVICE_HOST and HOSTNAME absent from child environment and no service-account token.",
+    "VM teardown is test cleanup, not a product fencing certificate; T01-T43 remain not_run."
+  ]
+}
