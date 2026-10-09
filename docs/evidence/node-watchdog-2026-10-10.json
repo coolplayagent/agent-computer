@@ -1,0 +1,900 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "Single-VM Linux cgroup and gVisor watchdog component; not product acceptance",
+  "source_commit": "2bde24033aa120af867810b43a4cc03147a2a016",
+  "source_worktree_dirty_at_execution": true,
+  "source_binding_method": "Tests ran before the feature commit; exact source/build input hashes and binaries were subsequently verified against that commit. No runtime source changed after successful probes.",
+  "source_inputs_verified_against_commit": 206,
+  "source_inputs_sha256": {
+    ".bazelrc": "9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
+    ".bazelversion": "14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "BUILD.bazel": "384125baec4fe4d63c7b9e512f8ccfd58b31e7bdde6aff733471364cad47b858",
+    "Cargo.lock": "ed51fce4ab980bf47ab2a7a74c29e5dcf912341aa2c436fcb3b118c9a869f0ed",
+    "Cargo.toml": "6bbd54082f894e068fab722f665f62ae07cbf45b29610ea78d0f1531c9e0e5c2",
+    "MODULE.bazel": "77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "08fbcb014b5cd3cba65539584df065a06f3fd2e3755dee3e03632a0db2039942",
+    "REPO.bazel": "0d7b24d9b55db95e252ebe1cd79217db5c84d95d620ad46e6475395f5a51f41b",
+    "crates/cli/BUILD.bazel": "be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/definitions/BUILD.bazel": "68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/kubernetes/BUILD.bazel": "7fdf09618a04e0a7d2e5a70e9552e66bba470d622fa616ac8ae398da82c204c1",
+    "crates/kubernetes/Cargo.toml": "2ee0b950d6b367cf344e58bf70ff2dd230d7318ea80cda2f0173c64364db55db",
+    "crates/kubernetes/src/attach.rs": "b565d5a7328a98b67c3a22e969a3937e7ee7b86192432bb6b4d10adbe38962f0",
+    "crates/kubernetes/src/candidate.rs": "86166ec030f27ed0e6c065c4819b2a0daa3694d97fc270a8cbd6ec3e5226fecb",
+    "crates/kubernetes/src/client.rs": "e82218558dccd0a8f5954323203ae4112557a7dd9e5b545106625106b6c6d006",
+    "crates/kubernetes/src/lib.rs": "531a70b11382e230ce59a2c964415ec96e002f0391a5fec7b07db3457e27700d",
+    "crates/kubernetes/src/plan.rs": "33ad87e18a933e582be1c1cdf720cda6a1c4af96e2a01dea43ec2d4aac164898",
+    "crates/kubernetes/src/startup_plan.rs": "eec5fc4f4378132b142aaaa2b9dada28e66854e77ac4698ffdc527eb9b572c29",
+    "crates/kubernetes/src/tests.rs": "87e626ab20146d805dcabdb7e755462ada244b1a1b4751f5c57c165f915003e5",
+    "crates/kubernetes/src/tests/attach.rs": "ddf356c7a3138ed3ef64d21c9f88fcd25a37f2d09d6698ccb7fae2f9783a9d80",
+    "crates/kubernetes/src/tests/attach/candidate.rs": "e8c4aac7b5578b473230d98d9e209396f4c48dcad5c11e1f6bfc4dacebc49ff4",
+    "crates/kubernetes/src/verify.rs": "fdebabd72c4f598d7fceaea5e6c853fe983636955089951d5c28655f6f3ca48c",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/candidate_live.rs": "f60ddcbe6b2ef5528afa464d92cef53a1fbc09b7b3d0511e0633649cc86b10b9",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_live.rs": "0e570020fcd89f18b158ae92076743f389e2b1feb32fdf330133a6e087bfc476",
+    "crates/sandbox/BUILD.bazel": "79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "f9af73e96f4335bc488c77f42ebb5eafe0b10a2a6f21bd399bca7470450ccc31",
+    "crates/sandbox/src/lib.rs": "78a8c1b617eeb5a0b1fac02c35662d06e3396ac56ec18cde82cf4f14635ed8eb",
+    "crates/sandbox/src/main.rs": "71b39de404e0d4d10102ddad34ec82ef78e41c3c1dd580908293a4d6c60ffd90",
+    "crates/sandbox/src/output.rs": "0805b0b15d1dd67c8f926a8e93c8b5066978759ea55d7a7d5c177a29c345d4be",
+    "crates/sandbox/src/request.rs": "17372c71cfd625cb7475e7d5e5a132d1e92da295ec4a5fb473b2251210e34139",
+    "crates/sandbox/src/startup.rs": "c08e576aeb1408c37f9260766a9b4261acba0c48b88975f8addc18761b92d2d0",
+    "crates/sandbox/src/supervisor.rs": "a31cca7230f8e15b47effd6bf01f7f91b3710c215ebb818d716e87b949eba2df",
+    "crates/sandbox/tests/rootfs.py": "b148a45feb59c88cfa828b633eec1f0d57e980076ab835012c666744bb228f8f",
+    "crates/server/BUILD.bazel": "12ce9a04fcd6d9d02600be009f1d68e6aa5bc50938d2e2fd7c27100c485e104d",
+    "crates/server/Cargo.toml": "432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/candidate_worker.rs": "2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "df3c1e9eb873ff063310dfcd48259050eb9e8d683de0d84370d331096efc449f",
+    "crates/server/src/connections.rs": "f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "ce07608eb1944309e1719af5ea4576a31f82e1a263461eb23a9d0fd46ac7a698",
+    "crates/server/src/execution_worker.rs": "0e4c9d5861d4c42318ec0d16cb795e36cbba310f3bee051bfc718b7246612341",
+    "crates/server/src/executions.rs": "36c762c78c7ef28832df164b8ab578d2ec66a4a117a11f42426daaf3213239af",
+    "crates/server/src/files.rs": "8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "9a5730616504a767678bd0ca06d51affaca2db5e1027758cb4b0103166fcf64f",
+    "crates/server/src/lib.rs": "f9251475cd79205c7ac3b5913918e2ece5d44033ca9a08413c12df74beaf0101",
+    "crates/server/src/main.rs": "2a6e895eb3030910433d7e150a34039dc38290e04d4d44952e2b9b1b395ccd79",
+    "crates/server/src/operator.rs": "15864ed28b2b154c3cd3abf83769fd8c71c1697316035b6b252d2a54806218c2",
+    "crates/server/src/plans.rs": "5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/authentication.rs": "3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "06081eb9037a213d52cd47fda2c1219f07903c8e2024c06f793456fc2cbf7a2d",
+    "crates/server/tests/cases/executions.rs": "29cc4850e0ae92bf020482c7ea8f415f4c55b424c097284da772a1522d23e3ba",
+    "crates/server/tests/cases/files.rs": "5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/plans.rs": "836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "d9332b8cbfc244f60ac9132523a6d9e602b0a8b2a06916d1f25fecfa6ec6d8b6",
+    "crates/server/tests/cases/writers.rs": "1a145ebeb122260e606fa6c4ec83e7b7644e346c959f6a138d0c3bbd8ed1840e",
+    "crates/server/tests/server_contracts.rs": "afe01e567f3619a39758a5929aa8b2d8792805c02687cd6ee179376a8bd0d306",
+    "crates/server/tests/support/mod.rs": "872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/directory.rs": "d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "27069a9b5339b74966cd272a7072c4941abf8b3d9ebba8a5c572615ec2735273",
+    "crates/storage/src/files/tests.rs": "3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "1d7cd717cd002481a504b0aa8fbaef733ca282be966bc43e5a0f66243417cf14",
+    "crates/storage/src/main.rs": "1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "aeb8cb0f27e00590958188f10b3ab743a0b51cfb2c2d04e61a59535b4142156a",
+    "crates/storage/src/model.rs": "d688269a013be354bf9ca7c385e4e0c2d3cc63f7060eae20f7b28ba7d46ca293",
+    "crates/storage/src/quota.rs": "143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "d4dbf90c48affe28deee800b55634935771b7cff7282d364110dcdb5f0fcd58b",
+    "crates/store/BUILD.bazel": "400a3835ee1e9038b12524d7fbcfceb5cd52a67393d51e67ab8ed77657a9a61f",
+    "crates/store/Cargo.toml": "f63c2bea26d70602e04aefc8a66712d3465b87fc1eac34edac3a6a6cd186dadb",
+    "crates/store/src/auth.rs": "91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "2a69fe1a7d558e857561e7f49d42a1d6e7c8be9cff7980639eb7b3fd79bd23db",
+    "crates/store/src/plans/access.rs": "3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/connections/mod.rs": "b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "c8d34e89733792ae58155e65a29c63d9089fb2832326f16144368b9b8b5d8a37",
+    "crates/store/src/runtime/mod.rs": "53c86cbd08cb5c26385d08576dafd1c3fbf0499ff173678c0385f0301a6dd226",
+    "crates/store/src/runtime/preparation.rs": "ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "2c7f78f85c4dad955490bb496a51ea8e3b02fb36a36b76cfba0c0e39d7df961f",
+    "crates/store/src/runtime/start/types.rs": "8de756f8fdd65557fa95766a351d5d6755b9e4d9b0f670dcfbe309e762281b61",
+    "crates/store/src/runtime/types.rs": "7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/executions.rs": "61f419642e9dd2ee00d2d8c670b8a41415fcd570eefe3236935505622124e823",
+    "crates/store/src/runtime/writers/executions/dispatch.rs": "f9c54da5ebac4bf4454dc6e515554993e2f43a970ac678e280578991089f6ef9",
+    "crates/store/src/runtime/writers/executions/dispatch/inputs.rs": "0107de3175cfc993c629a65b151d0664285c64f92f65d419577e7dce041097ab",
+    "crates/store/src/runtime/writers/executions/dispatch/pods.rs": "556c0050335f496d7b0da40ce61cc2f5a90a350c243ec6e1846e9ed05126ec29",
+    "crates/store/src/runtime/writers/executions/dispatch/pods/validation.rs": "47ab37bca8ff5276583f6917dd1b9a071f29eb91eea57a9d98e413c9bf7deeae",
+    "crates/store/src/runtime/writers/executions/dispatch/startup.rs": "d98fe43e2b551dd24610aeba9bc2e86d8fe807b518a748fd9187ed327460e209",
+    "crates/store/src/runtime/writers/files.rs": "59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "890cfd30953d125b0e3efc342891f87172d7000af2659e92d9154beb21577531",
+    "crates/store/src/runtime/writers/types.rs": "bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "3cc4d6a624a43cbc7403f288579141cf947cc3b22f113a40f436870b5df65b2a",
+    "crates/store/src/writes.rs": "6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "cd7101a8a982c22573d161e6fc288ecd2f8b5952c4e71b8d5684675fec0ecdd9",
+    "crates/store/tests/contracts/concurrency.rs": "4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/connections.rs": "b45628b23cc546e97903ff0cf4fa436920261cfd9cb13de9b657b29be6c22882",
+    "crates/store/tests/contracts/plans/mod.rs": "429d9d5e6064e738cfd6048db10b35dd7544498e19d9439b1864648ef2df0862",
+    "crates/store/tests/contracts/plans/preparation.rs": "b8d754fd07d2fa6f420ddd938392fec2056a35a8e60d71b0a838c7226b5429a2",
+    "crates/store/tests/contracts/plans/publication.rs": "fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "8534d0db05f080c6a6f23d8aa123f094bc8ee36b4adfa008669248aa6dac2f23",
+    "crates/store/tests/contracts/plans/starts.rs": "d2dc26b89e06c96c0e122026a23fb73d002a82173a8ec77b30267a614f152a6e",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/executions.rs": "7eb8892ce253731c41d3507a59263b0e8a11944ddcb57e46cd35c4c63bcc83f4",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch.rs": "7874f855a16749c80bf2268e2efa995b3391376bfda92cf72ae180c375e76129",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/inputs.rs": "cbd10111ed7bfb26549e868ffea12d11fe095e5f28e8f39f499a52e8c793f791",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/pods.rs": "3ab922c34dfb8bc355b8ad3c574718499eca9bc67fb50d02562c2e46172cf04c",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/startup.rs": "0e569c246d2148b69830abf69436ee5e068b82e33d3333203946671d58d982b6",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "c28cfc94650be073c01ba9b31553af68edaa2c18542f52ec86a3809a1211df7d",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "004f0c88be7fc6a871e468796d63e2d00249c25aa20cb0183c4eb839c452aaef",
+    "crates/store/tests/contracts/registry.rs": "99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "018252a0abbd567fb7c61a4526c22a77351188b8ef66128a32baf4535216afdb",
+    "crates/test-support/BUILD.bazel": "92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/watchdog/BUILD.bazel": "489dfa780acdf2d487d4cd2461ba0d005e59349cdca390bae6b596dea452e2ec",
+    "crates/watchdog/Cargo.toml": "780f27a7d28a57e3d3350a5ac6a5c7074151e0dd39ccaa696ee5e7ab5f0dfcde",
+    "crates/watchdog/src/cgroup.rs": "5e716bceed0061141a43a54528bb2da8cf862f14c1f7f0d8699c4751647bf94d",
+    "crates/watchdog/src/lib.rs": "69387bb02229c1d1de813fac4704f46bcf8471e1f298f544b0863f86269b8bbb",
+    "crates/watchdog/src/main.rs": "861673b7c2a4c6670f2e2ba7de52e0add3b37d6d1487d3e2bb692a453f74e773",
+    "crates/watchdog/src/request.rs": "b8840bc4de21cbe7a4799f32fe7e312431d7af1d97e9d1a4dd58da64782f6c68",
+    "crates/watchdog/tests/component.py": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef",
+    "crates/watchdog/tests/runsc_component.py": "94d7c6963920c1bde984a0383dd8ed6bfdb948bf07f526b011752bd13ec2f219",
+    "crates/worker/BUILD.bazel": "9d944b0f1b16ee015d19d85bfbbae025cfd7581b5511bebd231707ed4fd8bc9e",
+    "crates/worker/Cargo.toml": "98a8cfcc4b9e22ed3c9e16ac816f29ba3d9c40123f595cb780e279940282a5b3",
+    "crates/worker/src/candidate.rs": "b7bf6055c255a6196bc919ffe15b9a79704db022a0840851502f85e528fe854f",
+    "crates/worker/src/execution.rs": "5b4d486b9325b79513a35267826e56da6744efa01017d059ba8c8768a2d34474",
+    "crates/worker/src/execution/plan.rs": "b7adc18c6cbad1471e5067a07351d162ec61e3de2b6aa6192b8ec2d90b9ca4b3",
+    "crates/worker/src/execution/storage.rs": "1b6b88446d86aee0ea5d8c0ed5c33350087a66d90f24220330fc611488da9e02",
+    "crates/worker/src/files.rs": "1c6008373f4afead3afc5ac76c122a44f1f2b4227837f8c058ae4a268f10df64",
+    "crates/worker/src/files/gateway.rs": "7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "9d1aff1ed95c9b931950d6d5972e425a8e7b8a5200577c520575b22e62d217b6",
+    "crates/worker/tests/candidate_live.rs": "e703fb14e88a33a0637820891b3f751ed53dba6626b1c18f4b2844071eca176c",
+    "crates/worker/tests/execution_live.rs": "8cd546cf8b33b495a7e57f027ba2f639143a1f13b6025b1ef16fb99d32923487",
+    "crates/worker/tests/live.rs": "131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/file_http.rs": "c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6",
+    "rust-toolchain.toml": "559f488c181e0e9e77cf17c29de663977f036ec7ff2e2060585714bf53c52d62"
+  },
+  "artifacts": {
+    "watchdog_bazel_binary_sha256": "0dbbb066e9b0968dd8c1981e874cd080dd238d120a7bcac1c0a1facdb71b5aa5",
+    "supervisor_bazel_binary_sha256": "1935be3816fba02b9cae5db124405e6e803dfb4add253fe39e6374802a5e9304",
+    "rootfs_tar_sha256": "8502c0e095ddaf8cd92a8315e2348999ff49ac9b1986ce1b307c0d47fb70a65d",
+    "gvisor_distribution_sha256": "bd4eb2ca0ee74f0fbbb5f5273ba011e79c56a29fbb047393b88b981cd3230ede",
+    "raw_log": "node-watchdog-2026-10-10.log",
+    "raw_log_sha256": "d5cfdc75311ad78375a3ea6b9fa23b0a1f856924793e8b6f2e1f2954f768f3ad"
+  },
+  "environment": {
+    "kernel": "6.8.0-142-generic",
+    "architecture": "x86_64",
+    "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "runtime_files": {
+      "runsc": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a",
+      "gvisor-bin/runsc-fd-parking": "03af90d07ea466c10ecc3e3ba839b2a59540959dd3286aea3886917cba850c11",
+      "gvisor-bin/gvisor-sentry-prewarmer": "3315d7ad7c2d3751d349e4976fa02da1da6fd7e41746c35622304e5fabe4fce0",
+      "gvisor-bin/runsc-metric-server": "7bcbe5846a0f6d34c7d2bd312033bb92ab6305b9ac93e09b753b3474f91f27b2",
+      "gvisor-bin/gvisor_sentry": "0050e7c6063e17de1729500cd73b18322d85c758eb0ffcab18e539df7110bd12",
+      "gvisor-bin/checkpointgofer": "c454d0b5fab4627d8915194f901a70c66bb4792f680e3f75d2a47516382b449a"
+    },
+    "owned_cgroup_leftovers": []
+  },
+  "kernel_probe": {
+    "schema_version": 1,
+    "scope": "Linux cgroup component, not product acceptance",
+    "kernel": "6.8.0-142-generic",
+    "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+    "binary_sha256": "0dbbb066e9b0968dd8c1981e874cd080dd238d120a7bcac1c0a1facdb71b5aa5",
+    "test_sha256": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef",
+    "cases": [
+      {
+        "case": "stopped-supervisor",
+        "status": "pass",
+        "pids": {
+          "parent": 1594,
+          "child": 1595
+        },
+        "report": {
+          "version": 1,
+          "request": {
+            "version": 1,
+            "execution_id": "stopped-supervisor",
+            "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+            "cgroup_path": "ac-watchdog-eac74d91a3e94f5699fc58220e37dad9/stopped-supervisor",
+            "cgroup_inode": 6401,
+            "deadline_boottime_ms": 260729
+          },
+          "cgroup_device": 28,
+          "armed_boottime_ms": 259530,
+          "kill_boottime_ms": 260729,
+          "observed_boottime_ms": 260739,
+          "trigger": "Deadline",
+          "observation": "EmptyObserved",
+          "error": null
+        }
+      },
+      {
+        "case": "frozen-tree",
+        "status": "pass",
+        "pids": {
+          "parent": 1597,
+          "child": 1598
+        },
+        "report": {
+          "version": 1,
+          "request": {
+            "version": 1,
+            "execution_id": "frozen-tree",
+            "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+            "cgroup_path": "ac-watchdog-eac74d91a3e94f5699fc58220e37dad9/frozen-tree",
+            "cgroup_inode": 6437,
+            "deadline_boottime_ms": 261991
+          },
+          "cgroup_device": 28,
+          "armed_boottime_ms": 260793,
+          "kill_boottime_ms": 261991,
+          "observed_boottime_ms": 262001,
+          "trigger": "Deadline",
+          "observation": "EmptyObserved",
+          "error": null
+        }
+      },
+      {
+        "case": "expired-deadline",
+        "status": "pass",
+        "pids": {
+          "parent": 1600,
+          "child": 1601
+        },
+        "report": {
+          "version": 1,
+          "request": {
+            "version": 1,
+            "execution_id": "expired-deadline",
+            "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+            "cgroup_path": "ac-watchdog-eac74d91a3e94f5699fc58220e37dad9/expired-deadline",
+            "cgroup_inode": 6473,
+            "deadline_boottime_ms": 261053
+          },
+          "cgroup_device": 28,
+          "armed_boottime_ms": 262055,
+          "kill_boottime_ms": 262055,
+          "observed_boottime_ms": 262065,
+          "trigger": "Deadline",
+          "observation": "EmptyObserved",
+          "error": null
+        }
+      },
+      {
+        "case": "closed-receipt",
+        "status": "pass",
+        "pids": {
+          "parent": 1603,
+          "child": 1604
+        },
+        "elapsed_ms": 16,
+        "deadline": 287116
+      },
+      {
+        "case": "full-receipt",
+        "status": "pass",
+        "pids": {
+          "parent": 1606,
+          "child": 1607
+        },
+        "elapsed_ms": 16,
+        "deadline": 287183
+      },
+      {
+        "case": "controller-exit",
+        "status": "pass",
+        "pids": {
+          "parent": 1609,
+          "child": 1610
+        },
+        "report": {
+          "version": 1,
+          "request": {
+            "version": 1,
+            "execution_id": "controller-exit",
+            "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+            "cgroup_path": "ac-watchdog-eac74d91a3e94f5699fc58220e37dad9/controller-exit",
+            "cgroup_inode": 6581,
+            "deadline_boottime_ms": 263450
+          },
+          "cgroup_device": 28,
+          "armed_boottime_ms": 262285,
+          "kill_boottime_ms": 263450,
+          "observed_boottime_ms": 263460,
+          "trigger": "Deadline",
+          "observation": "EmptyObserved",
+          "error": null
+        }
+      },
+      {
+        "case": "path-reuse",
+        "status": "pass",
+        "original": {
+          "parent": 1613,
+          "child": 1614
+        },
+        "replacement": {
+          "parent": 1616,
+          "child": 1617
+        },
+        "report": {
+          "version": 1,
+          "request": {
+            "version": 1,
+            "execution_id": "path-reuse",
+            "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+            "cgroup_path": "ac-watchdog-eac74d91a3e94f5699fc58220e37dad9/path-reuse",
+            "cgroup_inode": 6617,
+            "deadline_boottime_ms": 265342
+          },
+          "cgroup_device": 28,
+          "armed_boottime_ms": 263544,
+          "kill_boottime_ms": 265342,
+          "observed_boottime_ms": 265342,
+          "trigger": "Deadline",
+          "observation": "Unknown",
+          "error": "KillFailed"
+        }
+      },
+      {
+        "case": "wrong-inode",
+        "status": "pass",
+        "pids": {
+          "parent": 1618,
+          "child": 1619
+        }
+      },
+      {
+        "case": "wrong-boot",
+        "status": "pass",
+        "pids": {
+          "parent": 1621,
+          "child": 1622
+        }
+      },
+      {
+        "case": "own-ancestor",
+        "status": "pass",
+        "pids": {
+          "parent": 1624,
+          "child": 1625
+        }
+      },
+      {
+        "case": "delegated-group",
+        "status": "pass",
+        "pids": {
+          "parent": 1627,
+          "child": 1628
+        }
+      },
+      {
+        "case": "threaded-group",
+        "status": "pass"
+      }
+    ]
+  },
+  "gvisor_probe": {
+    "case": "gvisor-pid1-stop",
+    "status": "pass",
+    "report": {
+      "version": 1,
+      "request": {
+        "version": 1,
+        "execution_id": "pid1-stop",
+        "boot_id": "a64d9b4c-3dfb-40b0-82ce-2a6a33ef15b9",
+        "cgroup_path": "ac-watchdog-runsc-9b6b9412fd614ad8affb70e292816983",
+        "cgroup_inode": 7940,
+        "deadline_boottime_ms": 393639
+      },
+      "cgroup_device": 28,
+      "armed_boottime_ms": 392640,
+      "kill_boottime_ms": 393639,
+      "observed_boottime_ms": 393649,
+      "trigger": "Deadline",
+      "observation": "EmptyObserved",
+      "error": null
+    },
+    "kernel": "6.8.0-142-generic",
+    "runtime_members_before_kill": [
+      {
+        "pid": 1855,
+        "argv": [
+          "/usr/local/bin/runsc",
+          "--root=/home/ac-test/watchdog-runsc/state",
+          "--platform=systrap",
+          "--network=none",
+          "--ignore-cgroups=true",
+          "--directfs=false",
+          "run",
+          "--bundle=/home/ac-test/watchdog-runsc",
+          "ac-watchdog-2b99589b7d7141588be26e4680021ada"
+        ]
+      },
+      {
+        "pid": 1862,
+        "argv": [
+          "runsc-gofer",
+          "--ignore-cgroups=true",
+          "--directfs=false",
+          "--root=/home/ac-test/watchdog-runsc/state",
+          "--network=none",
+          "--platform=systrap",
+          "gofer",
+          "--bundle",
+          "/home/ac-test/watchdog-runsc",
+          "--gofer-mount-confs=lisafs:none,lisafs:none,lisafs:none",
+          "--spec-fd=3",
+          "--mounts-fd=4",
+          "--rpc-fd=5",
+          "--io-fds=6",
+          "--io-fds=7",
+          "--io-fds=8",
+          "--sync-chroot-fd=9",
+          "ac-watchdog-2b99589b7d7141588be26e4680021ada"
+        ]
+      },
+      {
+        "pid": 1863,
+        "argv": [
+          "runsc-sandbox",
+          "--network=none",
+          "--platform=systrap",
+          "--ignore-cgroups=true",
+          "--directfs=false",
+          "--root=/home/ac-test/watchdog-runsc/state",
+          "boot",
+          "--attached=true",
+          "--bundle=/home/ac-test/watchdog-runsc",
+          "--controller-fd=9",
+          "--dev-io-fd=-1",
+          "--gofer-mount-confs=lisafs:none,lisafs:none,lisafs:none",
+          "--io-fds=3,4,5",
+          "--mounts-fd=6",
+          "--pin-ring-fd=8",
+          "--setup-root=false",
+          "--spec-fd=10",
+          "--start-sync-fd=7",
+          "--stdio-fds=11,12,13",
+          "--total-host-memory=6213017600",
+          "--total-memory=6213017600",
+          "--product-name=Standard PC (Q35 + ICH9, 2009)",
+          "--host-thp-shmem-enabled=never",
+          "--host-thp-defrag=madvise",
+          "--proc-mount-sync-fd=22",
+          "ac-watchdog-2b99589b7d7141588be26e4680021ada"
+        ]
+      },
+      {
+        "pid": 1868,
+        "argv": [
+          "/usr/local/bin/gvisor-bin/runsc-fd-parking"
+        ]
+      },
+      {
+        "pid": 1886,
+        "argv": []
+      },
+      {
+        "pid": 1906,
+        "argv": []
+      },
+      {
+        "pid": 1907,
+        "argv": []
+      },
+      {
+        "pid": 1910,
+        "argv": []
+      },
+      {
+        "pid": 1911,
+        "argv": []
+      },
+      {
+        "pid": 1912,
+        "argv": []
+      },
+      {
+        "pid": 1913,
+        "argv": []
+      }
+    ],
+    "local_lease_budget_ms": 200,
+    "work_after_local_deadline_observed": true,
+    "supervisor_report_absent": true,
+    "runtime_host_exit_code": -9,
+    "watchdog_sha256": "0dbbb066e9b0968dd8c1981e874cd080dd238d120a7bcac1c0a1facdb71b5aa5",
+    "runsc_sha256": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a",
+    "runsc_version": "runsc version release-20261005.0\nspec: 1.2.1",
+    "test_sha256": "94d7c6963920c1bde984a0383dd8ed6bfdb948bf07f526b011752bd13ec2f219",
+    "rootfs_files": {
+      "/bin/agent-computer-sandbox": "1935be3816fba02b9cae5db124405e6e803dfb4add253fe39e6374802a5e9304",
+      "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "9d339ecb409578d6a5d587e6c537a8f9589b8a13fefba30d167433a4b5758bee",
+      "/usr/lib/x86_64-linux-gnu/libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+      "/usr/lib/x86_64-linux-gnu/libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+      "/lib64/ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+      "/bin/sh": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+      "/bin/sleep": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/usr/lib/x86_64-linux-gnu/libsystemd.so.0": "9405c27411b652140806ab7576f7d76610f67bde662ba730efc7aa7171785011",
+      "/usr/lib/x86_64-linux-gnu/libselinux.so.1": "7538ee77765a27966563c0d22437a3080dcdb346ff76cc16d71a3ce3379a716a",
+      "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0": "4a6b6b2078685b074869d75cb068664d7da6b3036df7bca0442b1bbbd4ac7e65",
+      "/bin/setsid": "e0247c69b5966f336155291c00153ee75e980fe526a1371ddf7445788671dc66",
+      "/bin/env": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/head": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/yes": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/cat": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02",
+      "/bin/sync": "f84e76ea4da1e0c4e92254bd0d7dccdabe2c8b3098e734f27997dae3ee5d8e02"
+    },
+    "candidate_mount": false,
+    "kubernetes_binding": false,
+    "durable_fence": false
+  },
+  "earlier_attempt": {
+    "status": "fixture_setup_failed",
+    "kernel_cases_passed_before_failure": 11,
+    "reason": "Threaded topology transition was attempted after populating the subtree; the kernel rejected it with EOPNOTSUPP. The fixture now establishes an empty threaded topology first.",
+    "source": "Pre-fix uncommitted fixture; raw live section retained. Not claimed as a full pass."
+  },
+  "verification": {
+    "cargo_workspace_tests": 293,
+    "bazel_test_targets": 9,
+    "cargo_exit_code": 0,
+    "bazel_exit_code": 0,
+    "clippy_all_targets_all_features_exit_code": 0,
+    "cargo_fmt_exit_code": 0,
+    "documentation": {
+      "checks": {
+        "markdown_files": 82,
+        "local_links": 539,
+        "structured_examples": 38,
+        "yaml_files": 15,
+        "requirement_rows": 35,
+        "test_rows": 43
+      },
+      "glossary_terms": 51,
+      "errors": [],
+      "limits": "Documentation syntax, links, schema and traceability only; no runtime validation."
+    },
+    "feature_qualitygate": {
+      "schema_version": 1,
+      "selection": {
+        "mode": "delivery",
+        "exclude": [],
+        "excluded_paths": [],
+        "changed_files": [
+          "Cargo.lock",
+          "Cargo.toml",
+          "MODULE.bazel.lock",
+          "crates/watchdog/BUILD.bazel",
+          "crates/watchdog/Cargo.toml",
+          "crates/watchdog/src/cgroup.rs",
+          "crates/watchdog/src/lib.rs",
+          "crates/watchdog/src/main.rs",
+          "crates/watchdog/src/request.rs",
+          "crates/watchdog/tests/component.py",
+          "crates/watchdog/tests/runsc_component.py",
+          "docs/README.md",
+          "docs/en/03-architecture.md",
+          "docs/en/04-implementation-plan.md",
+          "docs/en/05-verification.md",
+          "docs/en/29-execution-worker.md",
+          "docs/en/30-node-watchdog.md",
+          "docs/zh-CN/03-architecture.md",
+          "docs/zh-CN/04-implementation-plan.md",
+          "docs/zh-CN/05-verification.md",
+          "docs/zh-CN/29-execution-worker.md",
+          "docs/zh-CN/30-node-watchdog.md",
+          "knowledge/glossary/business-glossary.yaml",
+          "knowledge/knowledge-map.yaml",
+          "knowledge/knowledge-map.yaml.previous",
+          "knowledge/topics/topic-875b9380866e9d56-5f932753a110b61ceb5737fd81245ad639a0ac7ec2f10de14eaf82fa49bf8cb5.yaml",
+          "knowledge/topics/topic-875b9380866e9d56-ef67bdcb393eca5ed25e1826bd07f2de3b832d14048c36743dd8ed35bd790645.yaml"
+        ],
+        "changed_lines": 1350,
+        "execution_context_digest": "sha256:4b56dab39383af6ffa58293a9b9a774fbc54141a59fb11784e9fe061d91d4d90",
+        "empty_delivery": false
+      },
+      "run_id": "run-79p5y7",
+      "scope": "delivery",
+      "profile": "full",
+      "evaluator_digest": "sha256:5dfafb2cac49f134c39953613f350b003982180ea9e51d54a907753e5c5083c1",
+      "environment_digest": "sha256:50e27d2941f39e1655f1e9f78f9b1997f7415681d658ebbfe30bb7fd16e3dc05",
+      "snapshot": {
+        "verification_digest": "sha256:32cd1de48b901287bd43035e29ecd6b886b82c8549cf97cfebb95c5ca493146b",
+        "mode": "worktree",
+        "base": "3861d5f6f4d5e54002debf68e3a7702ab97f959b",
+        "head": "3861d5f6f4d5e54002debf68e3a7702ab97f959b",
+        "content_digest": "sha256:4b56dab39383af6ffa58293a9b9a774fbc54141a59fb11784e9fe061d91d4d90"
+      },
+      "policy": {
+        "source": "qualitygate.yaml",
+        "config_digest": "sha256:e41d8bec8d00e40c13e91e92a62f053dce1b53f383f72bc30c1128233f919b10",
+        "rules_digest": "sha256:06d35ddf072f838422f9a4e2dbc6ac7f842c12163cc4a2dda18a15db4602cd13",
+        "task_contract_digest": null,
+        "trust": "local_candidate",
+        "changes": []
+      },
+      "plan": {
+        "execution_order": [
+          "line-ending"
+        ],
+        "required_checks": [
+          "line-ending"
+        ],
+        "pending_delivery_checks": [],
+        "acceptance": {}
+      },
+      "gate": {
+        "complete": true,
+        "decision": "pass",
+        "blockers": []
+      },
+      "checks": [
+        {
+          "id": "line-ending",
+          "rule_version": 1,
+          "required": true,
+          "severity": "error",
+          "applicability": "applicable",
+          "execution": {
+            "status": "completed",
+            "reason": null,
+            "argv": [],
+            "cwd": null,
+            "started_at_ms": null,
+            "ended_at_ms": null,
+            "duration_ms": null,
+            "exit_code": null,
+            "artifacts": []
+          },
+          "verdict": "pass",
+          "matched_entities": 26,
+          "diagnostics": [],
+          "metadata": {
+            "adapter_version": "0.5.7",
+            "delivery_filtered": 0,
+            "depends_on": [],
+            "rule_definition": {
+              "builtin": {
+                "defaults": {
+                  "depends_on": [],
+                  "enabled": true,
+                  "parameters": {},
+                  "required": true,
+                  "severity": "error",
+                  "source": null
+                },
+                "description": "Preserve line endings; new text files use LF",
+                "id": "line-ending",
+                "implementation": "line-ending",
+                "language": [],
+                "lifecycle_inputs": [
+                  "source-format-hygiene"
+                ],
+                "requires_capabilities": [
+                  "files"
+                ],
+                "standard_refs": [
+                  {
+                    "controls": [
+                      "formatting",
+                      "file-integrity"
+                    ],
+                    "source_id": "google-cpp"
+                  },
+                  {
+                    "controls": [
+                      "formatting",
+                      "source-file"
+                    ],
+                    "source_id": "google-java"
+                  },
+                  {
+                    "controls": [
+                      "coding-style",
+                      "static-gate"
+                    ],
+                    "source_id": "huawei-codearts"
+                  },
+                  {
+                    "controls": [
+                      "formatting",
+                      "reviewability"
+                    ],
+                    "source_id": "meta-velox"
+                  }
+                ],
+                "version": 1
+              },
+              "custom": null,
+              "origin": "skill:references/rules/core/line-ending.yaml",
+              "package": "core"
+            }
+          }
+        }
+      ],
+      "summary": {
+        "checks_total": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "incomplete": 0,
+        "diagnostics_total": 0,
+        "diagnostics_filtered": 0
+      },
+      "verification": {
+        "conclusion": "在已验证形态下未发现问题 / No problems found in the verified shapes",
+        "verified_shapes": [
+          "line-ending: 26 matched entities; verdict Some(Pass)"
+        ],
+        "known_limits": [
+          "Results cover only the selected snapshot, policy, configured tools and observed inputs.",
+          "Warning findings remain review signals even when the blocking gate is satisfied.",
+          "Fixture regression can falsify known behavior; it cannot prove correctness on a real deployment.",
+          "Delivery scope selects changed lines and changed-file findings; unlocated command failures and incomplete evidence remain blocking. This is not repository-wide approval."
+        ],
+        "unverified_assumptions": [
+          "Unrepresented frameworks, runtime configuration delivery, reflection and production environments are not verified.",
+          "Custom rules and external tool versions require their own representative regression evidence."
+        ]
+      },
+      "context": {
+        "report_path": "/opt/workspace/agent-computer/.qualitygate/evidence/node-watchdog/run-79p5y7/report.json",
+        "recheck": {
+          "argv": [
+            "qualitygate",
+            "--root",
+            "/opt/workspace/agent-computer",
+            "check",
+            "--worktree",
+            "--base",
+            "3861d5f6f4d5e54002debf68e3a7702ab97f959b",
+            "--expect-base",
+            "3861d5f6f4d5e54002debf68e3a7702ab97f959b",
+            "--snapshot-max-mib",
+            "256",
+            "--snapshot-max-file-mib",
+            "2",
+            "--snapshot-jobs",
+            "4",
+            "--snapshot-timeout-secs",
+            "120",
+            "--config",
+            "qualitygate.yaml",
+            "--profile",
+            "full",
+            "--format",
+            "json"
+          ]
+        },
+        "delivery_recheck": {
+          "argv": [
+            "qualitygate",
+            "--root",
+            "/opt/workspace/agent-computer",
+            "check",
+            "--worktree",
+            "--base",
+            "3861d5f6f4d5e54002debf68e3a7702ab97f959b",
+            "--expect-base",
+            "3861d5f6f4d5e54002debf68e3a7702ab97f959b",
+            "--snapshot-max-mib",
+            "256",
+            "--snapshot-max-file-mib",
+            "2",
+            "--snapshot-jobs",
+            "4",
+            "--snapshot-timeout-secs",
+            "120",
+            "--config",
+            "qualitygate.yaml",
+            "--profile",
+            "full",
+            "--format",
+            "json"
+          ]
+        }
+      }
+    },
+    "qualitygate_limit": "Existing policy checks line endings; Rust, database, documentation and live component checks were run separately."
+  },
+  "knowledge_index": {
+    "update": "qos_rejected",
+    "unfinished_tasks": 32,
+    "capacity": 32,
+    "last_indexed_commit": "abcde858628989b946fef6c35c26675a60e5bd7a",
+    "current_source_indexed": false,
+    "map_validation_passed": true
+  },
+  "cleanup": {
+    "owned_vm_pid": 2765501,
+    "ownership_verified": true,
+    "terminated": true,
+    "private_files_removed": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "user-data",
+      "meta-data",
+      "known_hosts",
+      "serial.log",
+      "qemu.log",
+      "vm.json"
+    ],
+    "public_cache_preserved": true,
+    "product_fencing_evidence": false
+  },
+  "limits": [
+    "No Kubernetes/Pod/container/Candidate identity binding or database startup-grant integration.",
+    "No accepted execution completion, writer release or storage fencing.",
+    "EmptyObserved only describes live processes at observation; it does not prevent future admission or prove in-flight storage completion.",
+    "No watchdog daemon supervision, durable registration or crash/restart recovery.",
+    "No node reboot, real system suspend, wall-clock jump, kernel failure or multi-node fault injection.",
+    "gVisor fixture uses --ignore-cgroups=true with a dedicated host cgroup inherited by the runtime processes; no containerd/Kubernetes cgroup policy or resource limits are certified.",
+    "T01-T43 remain not_run."
+  ]
+}

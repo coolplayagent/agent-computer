@@ -35,3 +35,5 @@ python3 crates/watchdog/tests/runsc_component.py --watchdog /absolute/path/agent
 ```
 
 内核 fixture 覆盖监督进程停止与嵌套逃逸会话后代、冻结子树、过期截止时间、管道关闭/已满、控制器退出、cgroup 删除/复用、inode/boot 不匹配、自身祖先定位、已委派控制文件和线程化拓扑。gVisor fixture 先证明子进程在停止 PID 1、超过本地租约后仍继续工作，再验证外部 watchdog 终止真实 runsc/gofer 子树。这些组件探针使用本地 fixture 目录，没有真实 Candidate 或 Kubernetes 身份绑定。固定源码证据与默认测试分开记录。
+
+显式探针在随后提交为 `2bde240` 的精确代码上通过 12 个内核场景和 1 个 gVisor PID 1 STOP 场景。[固定源码记录](../evidence/node-watchdog-2026-10-10.json)核对了 206 个源码/构建输入及精确二进制；[原始输出](../evidence/node-watchdog-2026-10-10.log)也保留先前线程化拓扑 fixture 的失败。gVisor 子进程确实越过 200 ms 本地租约继续运行，随后节点 watchdog 在固定截止时间终止运行时子树，内核在 10 ms 后报告无存活进程。自有 VM、磁盘和私有凭据已删除。这只构成组件证据，没有完成接纳、写锁释放或产品验收。

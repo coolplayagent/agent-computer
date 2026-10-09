@@ -55,3 +55,5 @@
 数据库/CSI/gVisor 执行工作器在 `bacaef9` 上通过五个真实场景，包含启动授权、运营派发命令、取消和仅观察恢复。[固定证据](../evidence/candidate-execution-worker-2026-10-10.json)包含节点 inode 检查及两次独立 S3 回读。执行仍保留 Unknown/Draining，完成接纳/排空记录为零，运行验收仍未执行。
 
 新增五项节点 watchdog 契约测试覆盖有界绝对截止时间和可信身份检查，见 [30 节点 watchdog](30-node-watchdog.md)。显式 root 内核与 gVisor 探针属于单独的组件证据，不释放持久写锁。
+
+独立节点 watchdog 通过 12 个内核场景及真实 gVisor PID 1 STOP 故障；[固定证据](../evidence/node-watchdog-2026-10-10.json)记录精确源码/二进制及组件边界。生产启动授权接入和持久 fencing 仍待实现。

@@ -53,3 +53,5 @@ Three PostgreSQL cases verify fixed execution runtime inputs and recovery withou
 The explicit database/CSI/gVisor execution worker fixture passed five cases on `bacaef9`, including real startup authorization, an operator dispatch command, cancellation and observation-only recovery. [Pinned evidence](../evidence/candidate-execution-worker-2026-10-10.json) includes actual node inode inspection and two independent S3 reads. It retains Unknown/Draining states and zero accepted completion/drain records; runtime acceptance remains unexecuted.
 
 Five node watchdog contracts cover bounded absolute deadlines and trusted identity checks; see [30 Node watchdog](30-node-watchdog.md). Root-only kernel and gVisor probes are separate component evidence, without durable writer release.
+
+The standalone node watchdog passed 12 kernel cases and the real gVisor PID 1 STOP fault; [pinned evidence](../evidence/node-watchdog-2026-10-10.json) records exact source/binaries and the component boundary. Production startup-grant integration and durable fencing remain pending.
