@@ -1,0 +1,26 @@
+[Unit]
+Description=Agent Computer continuous Candidate preparation worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+UMask=0077
+# Pin one organization and qualified mounted Volume. Update binding after changes.
+# The root-owned file supplies DATABASE_URL_FILE, ORGANIZATION, WORKER_ID, CONFIG_FILE.
+EnvironmentFile=/etc/agent-computer/candidate-worker.env
+ExecStart=/usr/local/bin/agent-computer-server candidate-worker --database-url-file ${DATABASE_URL_FILE} --organization ${ORGANIZATION} --worker-id ${WORKER_ID} --config-file ${CONFIG_FILE} --concurrency 2 --poll-ms 1000
+Restart=on-failure
+RestartSec=5s
+# SIGTERM joins storage operations. Forced termination retains original identities;
+# after lease expiry a replacement observes dispatched preparation without replay.
+KillMode=mixed
+TimeoutStopSec=240s
+NoNewPrivileges=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

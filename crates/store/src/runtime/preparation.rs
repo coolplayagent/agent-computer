@@ -1,5 +1,6 @@
 //! Trusted Candidate preparation protocol. Lease expiry permits observation only
 //! after dispatch; it never proves a filesystem writer stopped.
+mod queue;
 use super::{start::graph, *};
 use crate::{
     plans::DefinitionKind,
