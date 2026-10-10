@@ -1,5 +1,7 @@
 //! Trusted worker journal API. No Kubernetes mutation or process launch here.
 mod completion;
+mod queue;
+pub use queue::QueuedDispatch;
 mod inputs;
 pub use completion::ExecutionCompletion;
 mod outputs;
@@ -202,60 +204,10 @@ impl Store {
         if record.try_get::<i64, _>("revision")? != expected_revision {
             return Err(Error::RuntimeConflict);
         }
-        match bound_authority(&mut tx, org.as_str(), &record).await {
-            Ok(()) => {}
-            Err(Error::Unauthenticated | Error::Forbidden) => {
-                cancel_reserved(
-                    &mut tx,
-                    org.as_str(),
-                    &record.try_get::<String, _>("lease_id")?,
-                    record.try_get("epoch")?,
-                    "writer_unavailable",
-                    seq,
-                )
-                .await?;
-                tx.commit().await?;
-                return Err(Error::WriterLeaseInactive);
-            }
-            Err(e) => return Err(e),
+        match begin_queued(tx, org, id, record, seq, local_start).await? {
+            QueuedDispatch::Claimed(attempt) => Ok(*attempt),
+            QueuedDispatch::Cancelled(_) | QueuedDispatch::Idle => Err(Error::WriterLeaseInactive),
         }
-        reconcile(&mut tx, org.as_str(), &record, seq).await?;
-        let record = row(&mut tx, org.as_str(), id).await?;
-        if record.try_get::<String, _>("state")? != "Queued" {
-            tx.commit().await?;
-            return Err(Error::WriterLeaseInactive);
-        }
-        let started = transactions::now(&mut tx).await?;
-        let deadline: i64 = record.try_get("queue_deadline_at_ms")?;
-        let lease: String = record.try_get("lease_id")?;
-        let epoch: i64 = record.try_get("epoch")?;
-        let hash = hash(org.as_str(), &record, started, deadline)?;
-        sqlx::query("INSERT INTO execution_dispatch_intents (organization,execution_id,lease_id,epoch,intent_digest,started_at_ms,deadline_at_ms) VALUES ($1,$2,$3,$4,$5,$6,$7)")
-            .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).bind(started).bind(deadline).execute(&mut *tx).await?;
-        sqlx::query("INSERT INTO candidate_writer_dispatches (organization,dispatch_id,lease_id,epoch,input_digest) VALUES ($1,$2,$3,$4,$5)")
-            .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).execute(&mut *tx).await?;
-        sqlx::query("UPDATE execution_requests SET state='Dispatching',reason='dispatch_committed',revision=revision+1 WHERE organization=$1 AND execution_id=$2")
-            .bind(org.as_str()).bind(id).execute(&mut *tx).await?;
-        sqlx::query("UPDATE candidate_writer_leases SET revision=revision+1 WHERE organization=$1 AND lease_id=$2")
-            .bind(org.as_str()).bind(&lease).execute(&mut *tx).await?;
-        transactions::emit(&mut tx,org.as_str(),seq,"execution.status_changed",serde_json::json!({"execution_id":id,"state":"Dispatching","reason":"dispatch_committed","dispatch_started":true,"intent_digest":hash,"deadline_at_ms":deadline})).await?;
-        // Recheck expiry after potentially slow journal/outbox writes. Credential
-        // and principal share locks also serialize concurrent revocation.
-        bound_authority(&mut tx, org.as_str(), &record).await?;
-        let owner = authority::row(&mut tx, org.as_str(), &lease).await?;
-        if transactions::now(&mut tx).await? >= deadline
-            || !authority::active(&mut tx, org.as_str(), &owner).await?
-        {
-            return Err(Error::WriterLeaseInactive);
-        }
-        let current = row(&mut tx, org.as_str(), id).await?;
-        let result = ExecutionDispatchAttempt {
-            intent: intent(&mut tx, org.as_str(), &current).await?,
-            deadline: local_start + Duration::from_millis((deadline - started) as u64),
-        };
-        result.remaining_budget_ms()?;
-        tx.commit().await?;
-        Ok(result)
     }
 
     /// Read-only recovery snapshot; never creates another dispatch attempt.
@@ -299,4 +251,72 @@ impl Store {
         tx.commit().await?;
         Ok(result)
     }
+}
+
+// Both explicit dispatch and queue claiming share the same atomic authorization
+// and one-use journal. Selecting a queue row never grants a replay capability.
+async fn begin_queued(
+    mut tx: Transaction<'_, Postgres>,
+    org: &OrganizationId,
+    id: &str,
+    record: PgRow,
+    seq: i64,
+    local_start: Instant,
+) -> Result<QueuedDispatch> {
+    match bound_authority(&mut tx, org.as_str(), &record).await {
+        Ok(()) => {}
+        Err(Error::Unauthenticated | Error::Forbidden) => {
+            cancel_reserved(
+                &mut tx,
+                org.as_str(),
+                &record.try_get::<String, _>("lease_id")?,
+                record.try_get("epoch")?,
+                "writer_unavailable",
+                seq,
+            )
+            .await?;
+            let cancelled = view(&row(&mut tx, org.as_str(), id).await?)?;
+            tx.commit().await?;
+            return Ok(QueuedDispatch::Cancelled(Box::new(cancelled)));
+        }
+        Err(e) => return Err(e),
+    }
+    reconcile(&mut tx, org.as_str(), &record, seq).await?;
+    let record = row(&mut tx, org.as_str(), id).await?;
+    if record.try_get::<String, _>("state")? != "Queued" {
+        let cancelled = view(&record)?;
+        tx.commit().await?;
+        return Ok(QueuedDispatch::Cancelled(Box::new(cancelled)));
+    }
+    let started = transactions::now(&mut tx).await?;
+    let deadline: i64 = record.try_get("queue_deadline_at_ms")?;
+    let lease: String = record.try_get("lease_id")?;
+    let epoch: i64 = record.try_get("epoch")?;
+    let hash = hash(org.as_str(), &record, started, deadline)?;
+    sqlx::query("INSERT INTO execution_dispatch_intents (organization,execution_id,lease_id,epoch,intent_digest,started_at_ms,deadline_at_ms) VALUES ($1,$2,$3,$4,$5,$6,$7)")
+            .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).bind(started).bind(deadline).execute(&mut *tx).await?;
+    sqlx::query("INSERT INTO candidate_writer_dispatches (organization,dispatch_id,lease_id,epoch,input_digest) VALUES ($1,$2,$3,$4,$5)")
+            .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).execute(&mut *tx).await?;
+    sqlx::query("UPDATE execution_requests SET state='Dispatching',reason='dispatch_committed',revision=revision+1 WHERE organization=$1 AND execution_id=$2")
+            .bind(org.as_str()).bind(id).execute(&mut *tx).await?;
+    sqlx::query("UPDATE candidate_writer_leases SET revision=revision+1 WHERE organization=$1 AND lease_id=$2")
+            .bind(org.as_str()).bind(&lease).execute(&mut *tx).await?;
+    transactions::emit(&mut tx,org.as_str(),seq,"execution.status_changed",serde_json::json!({"execution_id":id,"state":"Dispatching","reason":"dispatch_committed","dispatch_started":true,"intent_digest":hash,"deadline_at_ms":deadline})).await?;
+    // Recheck expiry after potentially slow journal/outbox writes. Credential
+    // and principal share locks also serialize concurrent revocation.
+    bound_authority(&mut tx, org.as_str(), &record).await?;
+    let owner = authority::row(&mut tx, org.as_str(), &lease).await?;
+    if transactions::now(&mut tx).await? >= deadline
+        || !authority::active(&mut tx, org.as_str(), &owner).await?
+    {
+        return Err(Error::WriterLeaseInactive);
+    }
+    let current = row(&mut tx, org.as_str(), id).await?;
+    let result = ExecutionDispatchAttempt {
+        intent: intent(&mut tx, org.as_str(), &current).await?,
+        deadline: local_start + Duration::from_millis((deadline - started) as u64),
+    };
+    result.remaining_budget_ms()?;
+    tx.commit().await?;
+    Ok(QueuedDispatch::Claimed(Box::new(result)))
 }

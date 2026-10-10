@@ -1,5 +1,7 @@
 //! Trusted single-execution controller. Completion requires live kernel and IO seals.
 mod plan;
+mod queue;
+pub use queue::{QueueEvent, QueueOptions, QueueSummary, run_queue};
 mod storage;
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_kubernetes::{
@@ -8,9 +10,9 @@ use agent_computer_kubernetes::{
 use agent_computer_store::{Error, Result, Store, runtime::writers::*};
 pub use plan::compile_plan;
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Configuration {
     pub outputs: agent_computer_objects::Configuration,
@@ -106,13 +108,36 @@ pub async fn execute_once(
     expected_revision: i64,
     config: Configuration,
 ) -> Result<WorkResult> {
-    let output_client = agent_computer_objects::Client::new(&config.outputs)
-        .map_err(|_| Error::ReferenceUnavailable)?;
-    let output_spool = agent_computer_objects::Spool::open(&config.output_spool)
-        .map_err(|_| Error::ReferenceUnavailable)?;
+    let (output_client, output_spool) = output_resources(&config)?;
     let attempt = store
         .begin_candidate_execution_dispatch(org, id, expected_revision)
         .await?;
+    execute_admitted(store, client, attempt, config, output_client, output_spool).await
+}
+fn output_resources(
+    config: &Configuration,
+) -> Result<(
+    Arc<agent_computer_objects::Client>,
+    agent_computer_objects::Spool,
+)> {
+    let client = agent_computer_objects::Client::new(&config.outputs)
+        .map_err(|_| Error::ReferenceUnavailable)?;
+    let spool = agent_computer_objects::Spool::open(&config.output_spool)
+        .map_err(|_| Error::ReferenceUnavailable)?;
+    Ok((Arc::new(client), spool))
+}
+async fn execute_admitted(
+    store: &Store,
+    client: &Client,
+    attempt: ExecutionDispatchAttempt,
+    config: Configuration,
+    output_client: Arc<agent_computer_objects::Client>,
+    output_spool: agent_computer_objects::Spool,
+) -> Result<WorkResult> {
+    let organization = OrganizationId::new(&attempt.intent().organization)
+        .map_err(|_| Error::InvalidStoredData)?;
+    let execution_id = attempt.intent().execution.execution_id.clone();
+    let (org, id) = (&organization, execution_id.as_str());
     // Commitment itself can consume the last millisecond. Still pass through
     // authority lowering if the returned in-process budget has already expired.
     let budget = Duration::from_millis(attempt.remaining_budget_ms().unwrap_or_default().into());

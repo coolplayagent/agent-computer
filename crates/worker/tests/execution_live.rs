@@ -26,6 +26,8 @@ mod faults;
 mod output_http;
 #[path = "support/execution_outputs.rs"]
 mod outputs;
+#[path = "support/execution_queue.rs"]
+mod queue;
 
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
@@ -314,6 +316,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
     }
     let worker = json!({"approved_supervisor_image":image,"storage":storage,"candidate":local,"node":config["node"],"outputs":config["outputs"],"output_spool":config["output_spool"]});
     let mut results = vec![];
+    let mut queue_evidence = Value::Null;
     for name in names {
         let token = if name.starts_with("output-") {
             output_credential.expose_token()
@@ -396,7 +399,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             )
             .await
             .unwrap();
-        let script = if name == "output-failed" {
+        let script = if name == "command" {
+            "printf active > queue-started.txt; /bin/sync queue-started.txt; /bin/sleep 5; printf persisted > output.txt; /bin/sync output.txt; printf done"
+        } else if name == "output-failed" {
             "printf persisted > output.txt; /bin/sync output.txt; exit 7"
         } else if name == "output-timeout" {
             "printf persisted > output.txt; /bin/sync output.txt; /bin/sleep 20"
@@ -669,35 +674,23 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 serde_json::to_value(result).unwrap()
             }
             "command" => {
-                let path = PathBuf::from(field(&config, "result_file"))
-                    .with_file_name("execution-command.json");
                 let private = json!({"api_url":kube["api_url"],"ca_file":kube["ca_file"],"token_file":kube["token_file"],"deployment":deployment,"execution":worker});
-                fs::write(&path, serde_json::to_vec(&private).unwrap()).unwrap();
-                fs::set_permissions(&path, fs::Permissions::from_mode(0o600)).unwrap();
-                let output = std::process::Command::new(field(&config, "server_binary"))
-                    .args([
-                        "execution-dispatch-once",
-                        "--database-url-file",
-                        field(&config, "database_url_file"),
-                        "--organization",
-                        org.as_str(),
-                        "--execution-id",
-                        &queued.execution_id,
-                        "--expected-revision",
-                        "1",
-                        "--config-file",
-                    ])
-                    .arg(path)
-                    .output()
-                    .unwrap();
-                assert!(
-                    output.status.success(),
-                    "{}",
-                    String::from_utf8_lossy(&output.stderr)
+                let fixture = queue::Fixture {
+                    config: &config,
+                    private: &private,
+                    store: &store,
+                    org: &org,
+                    token,
+                };
+                let (result, extra, evidence) = fixture.run(&results[0], &queued).await;
+                let normal_data = root.join(field(&results[0]["prepared"], "path_ref"));
+                assert_eq!(
+                    fs::read(normal_data.join("queue-concurrent.txt")).unwrap(),
+                    b"concurrent"
                 );
-                let result: Value = serde_json::from_slice(&output.stdout).unwrap();
-                assert!(result["interrupted_at"].is_null(), "{result}");
                 assert_eq!(fs::read(data.join("output.txt")).unwrap(), b"persisted");
+                results.push(extra);
+                queue_evidence = evidence;
                 result
             }
             "rejected" => {
@@ -984,8 +977,8 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .fetch_one(&pool)
             .await
             .unwrap();
-    assert_eq!(drains, 12);
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
+    assert_eq!(drains, 13);
+    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

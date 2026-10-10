@@ -36,4 +36,4 @@ agent-computer-server serve --database-url-file /private/control-url --listen 12
 
 [绑定源码的组件记录](../evidence/execution-output-downloads-2026-10-10.json) · [验证日志](../evidence/execution-output-downloads-2026-10-10.log)
 
-本次交付是有界输出读取能力。自动执行派发、浏览器/ComputerView、跨节点 fencing 和完整产品验收仍待完成。公开 `execution` 仍为 unsupported，Computer `ready=false`，T01–T43 保持 `not_run`。
+本次交付是有界输出读取能力。节点本地自动派发见 [44](44-queued-execution-worker.md)。浏览器/ComputerView、跨节点 fencing 和完整产品验收仍待完成。公开 `execution` 仍为 unsupported，Computer `ready=false`，T01–T43 保持 `not_run`。

@@ -12,7 +12,7 @@ use agent_computer_store::{
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Configuration {
     pub target: PreparationTarget,

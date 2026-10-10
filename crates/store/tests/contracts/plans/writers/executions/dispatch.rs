@@ -1,5 +1,6 @@
 mod inputs;
 mod pods;
+mod queue;
 mod startup;
 mod watchdogs;
 use super::*;

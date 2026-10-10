@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 65
-updated_at: unix:1791620641
+map_version: 66
+updated_at: unix:1791622745
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -133,11 +133,12 @@ topics:
   - execution-output-downloads
   - fenced-execution-csi
   - node-expiry-reaper
+  - queued-execution-worker
   - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-359f9c3426d8242e2de9c977805802fc77ad6791a686de8f653771a496d44fe7.yaml
-  digest: 359f9c3426d8242e2de9c977805802fc77ad6791a686de8f653771a496d44fe7
+  ref: topics/topic-a402c4336ebfd782-8262c11ad9e7ddaa73f60f702ab030fc4e665bb7a4dacddb54a23220c1b59265.yaml
+  digest: 8262c11ad9e7ddaa73f60f702ab030fc4e665bb7a4dacddb54a23220c1b59265
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -161,12 +162,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 49
+  omitted_through: 50
   recent:
-  - version: 50
-    action: source.add
-    actor: cli
-    summary: Added source 'execution-pod-journal' to topic 'development'.
   - version: 51
     action: source.add
     actor: cli
@@ -227,3 +224,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'execution-output-downloads' to topic 'execution'.
+  - version: 66
+    action: source.add
+    actor: cli
+    summary: Added source 'queued-execution-worker' to topic 'execution'.

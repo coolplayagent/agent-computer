@@ -22,7 +22,7 @@ pub struct PreparationTarget {
     pub writer_gid: u32,
 }
 impl PreparationTarget {
-    fn validate(&self) -> Result<()> {
+    pub(super) fn validate(&self) -> Result<()> {
         if [
             &self.volume_id,
             &self.namespace_uid,

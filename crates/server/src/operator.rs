@@ -31,7 +31,7 @@ pub(crate) fn failed(message: &'static str) -> Failure {
 pub async fn run(args: Vec<String>) -> Result<(), Failure> {
     if args.is_empty() || args == ["--help"] || args == ["help"] {
         println!(
-            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080] [--file-config PATH] [--output-config PATH]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes SCOPE[,SCOPE...] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  runtime-grant|runtime-revoke --database-url-file PATH --organization ID --principal ID --kind computer|workspace|app|browser_profile --resource-id ID --permission PERMISSION [--max-runtime-seconds SECONDS]\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n  reconciliation-volumes-once --database-url-file PATH --organization ID --worker-id ID --config-file PATH\n  artifact-publish-once --database-url-file PATH --organization ID --worker-id ID --commit-id ID --config-file PATH\n  candidate-prepare-once --database-url-file PATH --organization ID --worker-id ID --request-id ID --config-file PATH\n  execution-dispatch-once --database-url-file PATH --organization ID --execution-id ID --expected-revision REVISION --config-file PATH\n  execution-recover-once|execution-output-recover|execution-output-read --database-url-file PATH --organization ID --execution-id ID --config-file PATH\n  workspace-initialize-empty --database-url-file PATH --organization ID --workspace-id ID\n  writer-lease-reconcile --database-url-file PATH --organization ID --lease-id ID\n  candidate-file-save-once --database-url-file PATH --credential-file PATH --lease-id ID --request-file PATH --config-file PATH\n\nScopes: definitions.validate, definitions.manage, runtime.connect, runtime.read, runtime.observe, runtime.app.use, runtime.activate, runtime.execute, runtime.modify, runtime.control, runtime.publish, runtime.manage, runtime.delete.\nRuntime activate grants require a 1..86400 second limit; revoke omits the limit.\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
+            "agent-computer-server\n\nCommands:\n  migrate --database-url-file PATH\n  serve --database-url-file PATH [--listen 127.0.0.1:8080] [--file-config PATH] [--output-config PATH]\n  credential-issue --database-url-file PATH --organization ID --principal ID --kind human|agent --scopes SCOPE[,SCOPE...] --ttl-seconds 3600 --output PATH\n  credential-revoke --database-url-file PATH --organization ID --credential ID\n  principal-disable --database-url-file PATH --organization ID --principal ID\n  definition-grant|definition-revoke --database-url-file PATH --organization ID --principal ID --kind KIND --name NAME --permission create|manage|reference\n  runtime-grant|runtime-revoke --database-url-file PATH --organization ID --principal ID --kind computer|workspace|app|browser_profile --resource-id ID --permission PERMISSION [--max-runtime-seconds SECONDS]\n  catalog-register --database-url-file PATH --organization ID --kind KIND --name NAME\n  catalog-disable --database-url-file PATH --organization ID --resource-id ID\n  reconciliation-inspect|reconciliation-resume|reconciliation-abandon --database-url-file PATH --organization ID --operation ID\n  reconciliation-volumes-once --database-url-file PATH --organization ID --worker-id ID --config-file PATH\n  artifact-publish-once --database-url-file PATH --organization ID --worker-id ID --commit-id ID --config-file PATH\n  candidate-prepare-once --database-url-file PATH --organization ID --worker-id ID --request-id ID --config-file PATH\n  execution-worker --database-url-file PATH --organization ID --config-file PATH [--concurrency 1] [--poll-ms 250]\n  execution-dispatch-once --database-url-file PATH --organization ID --execution-id ID --expected-revision REVISION --config-file PATH\n  execution-recover-once|execution-output-recover|execution-output-read --database-url-file PATH --organization ID --execution-id ID --config-file PATH\n  workspace-initialize-empty --database-url-file PATH --organization ID --workspace-id ID\n  writer-lease-reconcile --database-url-file PATH --organization ID --lease-id ID\n  candidate-file-save-once --database-url-file PATH --credential-file PATH --lease-id ID --request-file PATH --config-file PATH\n\nScopes: definitions.validate, definitions.manage, runtime.connect, runtime.read, runtime.observe, runtime.app.use, runtime.activate, runtime.execute, runtime.modify, runtime.control, runtime.publish, runtime.manage, runtime.delete.\nRuntime activate grants require a 1..86400 second limit; revoke omits the limit.\n\nCredential administration requires trusted database access. Secret files must be private. Remote access requires a TLS reverse proxy; OIDC and Computer runtime are not implemented."
         );
         return Ok(());
     }
@@ -97,6 +97,13 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             "request-id",
             "config-file",
         ],
+        "execution-worker" => &[
+            "database-url-file",
+            "organization",
+            "config-file",
+            "concurrency",
+            "poll-ms",
+        ],
         "execution-dispatch-once" => &[
             "database-url-file",
             "organization",
@@ -152,7 +159,8 @@ pub async fn run(args: Vec<String>) -> Result<(), Failure> {
             .await
             .map_err(|_| failed("Database schema is not ready. Run migrate first."))?;
         match command {
-            "execution-dispatch-once"
+            "execution-worker"
+            | "execution-dispatch-once"
             | "execution-recover-once"
             | "execution-output-recover"
             | "execution-output-read" => {

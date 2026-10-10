@@ -10,7 +10,16 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_execution_queue_poll(&self) {
+        sqlx::raw_sql(
+            "DROP INDEX execution_queue_poll; DELETE FROM _sqlx_migrations WHERE version=24;",
+        )
+        .execute(&self.pool)
+        .await
+        .unwrap();
+    }
     pub async fn remove_execution_completions(&self) {
+        self.remove_execution_queue_poll().await;
         sqlx::raw_sql("DROP TABLE execution_completions; DROP FUNCTION guard_execution_completion(); DROP FUNCTION complete_execution_completion(); DELETE FROM _sqlx_migrations WHERE version=23; ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_state_check; ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_reason_check; ALTER TABLE execution_requests ADD CHECK (state IN ('Queued','Cancelled','Dispatching','CancelRequested','Unknown')); ALTER TABLE execution_requests ADD CHECK (reason IN ('awaiting_runtime_dispatch','user_requested','writer_unavailable','dispatch_committed','dispatch_unconfirmed')); ALTER TABLE candidate_writer_drains DROP CONSTRAINT candidate_writer_drains_proof_check; ALTER TABLE candidate_writer_drains ADD CHECK (proof IN ('no_dispatch','bounded_file_drained'));").execute(&self.pool).await.unwrap();
         for (source, name) in [
             (
