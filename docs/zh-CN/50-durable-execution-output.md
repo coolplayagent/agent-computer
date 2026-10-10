@@ -34,4 +34,6 @@ worker 使用单个顺序发布器，最多排队八块、发布一块。各发�
 
 最新[持久化输出流增量](50-durable-execution-output.md)通过 471 项 Cargo 测试、15 个 Bazel 目标、fmt/Clippy、32 个真实执行场景、7 个聚焦流式场景、8 类节点续租故障以及 Candidate/CSI 回归。独立读取核对了 271 个输出块对象、60 个最终输出对象和 13 个冷读取 Candidate 输出文件。[源码绑定记录](../evidence/durable-execution-output-stream-2026-10-10.json)保留洪泛失败尝试、EOF/续租回归、进程退出后的报告接收诊断、准确二进制和 VM 清理证明。T01–T43 仍为 `not_run`。
 
+详细证据保存在由摘要绑定的[流式轨迹](../evidence/durable-execution-output-stream-2026-10-10.cases.json)、[聚焦轨迹](../evidence/durable-execution-output-stream-2026-10-10.focused.json)、[输出块日志](../evidence/durable-execution-output-stream-2026-10-10.chunks.json)和[执行日志](../evidence/durable-execution-output-stream-2026-10-10.journal.json)中。主记录给出无损重组方法及规范化 SHA-256。
+
 自动排空恢复、多节点 fencing、完整 Computer 生命周期调度、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。

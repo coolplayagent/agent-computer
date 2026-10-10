@@ -12,3 +12,4 @@ Owned environment cleanup:
 {"owned_vm_pid": 3468539, "private_vm_state_removed": true, "public_download_cache_retained": true, "removed_owned_files": ["disk.qcow2", "seed.iso", "id_ed25519", "id_ed25519.pub", "known_hosts", "user-data", "meta-data", "qemu.log", "serial.log", "vm.json"], "stopped": true}
 Earlier attempts are retained with exact log digests in the JSON record.
 Public Computer execution remains unsupported; T01–T43 not_run.
+Detailed JSON evidence was split without data loss for bounded GraphRAG file ingestion. Canonical reconstructed SHA-256: 3b364cb29c1c82ab153502c9721b33ec6260cca60030e7df307ce3c088676bbd
