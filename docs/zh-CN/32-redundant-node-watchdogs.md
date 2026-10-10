@@ -38,3 +38,5 @@ AGENT_COMPUTER_WATCHDOG_BIN=/absolute/path/agent-computer-watchdog \
 本能力容忍一个 watchdog 进程失效，不提供持久节点服务、自动重启、多节点路由、存储排空或持久 fencing。两个进程共享主机及故障域：主机故障、共同父 cgroup 被冻结、管理员同时终止两者，或相同二进制/内核故障仍可能使两者失效。独立会话不隔离服务 cgroup 的清理；部署必须将两个 watchdog 放在 workload 和控制器清理组之外。暂停的 watchdog 需要可信清理，分离的回收线程不会恢复或替换它。
 
 `EmptyObserved` 仍只是某一时刻的观察，不能阻止后续进程准入，也不能证明异步存储已完成。执行仍为 Unknown，writer 仍为 Draining；公开执行能力和 T01–T43 验收状态不变。
+
+[33](33-watchdog-journals.md) 已交付节点本地意图/报告日志及只读恢复观察，持久 fencing 与 writer 释放仍待实现。

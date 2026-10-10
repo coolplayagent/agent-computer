@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 54
-updated_at: unix:1791595694
+map_version: 55
+updated_at: unix:1791596787
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -125,8 +125,9 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - redundant-node-watchdogs
-  ref: topics/topic-a402c4336ebfd782-52577676d97eaa06b9f062fd93b5c269dceb21c8037545445cd043e8347a539e.yaml
-  digest: 52577676d97eaa06b9f062fd93b5c269dceb21c8037545445cd043e8347a539e
+  - watchdog-journals
+  ref: topics/topic-a402c4336ebfd782-5b9f3b20ba2473e295c9634102d026d66d2e3d64a8eab8536b194262b59326e3.yaml
+  digest: 5b9f3b20ba2473e295c9634102d026d66d2e3d64a8eab8536b194262b59326e3
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -150,12 +151,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 38
+  omitted_through: 39
   recent:
-  - version: 39
-    action: source.update
-    actor: cli
-    summary: Updated source 'candidate-preparation-worker'.
   - version: 40
     action: source.add
     actor: cli
@@ -216,3 +213,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'redundant-node-watchdogs' to topic 'execution'.
+  - version: 55
+    action: source.add
+    actor: cli
+    summary: Added source 'watchdog-journals' to topic 'execution'.

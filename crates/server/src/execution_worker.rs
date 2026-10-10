@@ -40,7 +40,7 @@ pub async fn run(
         let revision=options.get("expected-revision").ok_or_else(usage)?.parse().map_err(|_|usage())?;
         execution::execute_once(store,&client,&org,id,revision,config.execution).await
     } else {
-        execution::recover_once(store,&client,&org,id,&config.execution.storage,&config.execution.approved_supervisor_image).await
+        execution::recover_once(store,&client,&org,id,&config.execution.storage,&config.execution.approved_supervisor_image,&config.execution.node.spool).await
     }.map_err(|_|failed("Execution worker did not acknowledge a result. Inspect the original execution and Pod journal; recovery never reissues creation or startup authorization."))?;
     println!(
         "{}",

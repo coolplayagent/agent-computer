@@ -26,4 +26,5 @@ rust_test(
     name = "watchdog_contracts_test",
     size = "small",
     crate = ":watchdog",
+    deps = all_crate_deps(normal_dev = True),
 )

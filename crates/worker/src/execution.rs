@@ -51,6 +51,7 @@ pub struct WorkResult {
     pub interrupted_at: Option<Phase>,
     pub cleanup: Cleanup,
     pub node_error: Option<agent_computer_node::Error>,
+    pub watchdog_journals: Option<agent_computer_node::JournalObservations>,
     #[serde(skip)]
     pub observation: Option<StartupObservation>,
 }
@@ -199,6 +200,7 @@ pub async fn execute_once(
         interrupted_at,
         cleanup,
         node_error,
+        watchdog_journals: None,
         observation,
     })
 }
@@ -261,6 +263,7 @@ pub async fn recover_once(
     id: &str,
     storage: &agent_computer_kubernetes::volume::StorageClassBinding,
     approved_image: &str,
+    spool: &std::path::Path,
 ) -> Result<WorkResult> {
     let state = unknown(store, org, id).await?;
     let journal = store.candidate_execution_pod(org, id).await?;
@@ -276,11 +279,32 @@ pub async fn recover_once(
     } else {
         Cleanup::NoPlan
     };
+    // Complete authority lowering/conditional cleanup before local IO. A stuck
+    // spool must not prevent those operations, nor manufacture a drain receipt.
+    let (watchdog_journals, node_error) =
+        if let Some(arm) = store.candidate_execution_watchdog(org, id).await? {
+            let spool = spool.to_owned();
+            match tokio::time::timeout(
+                Duration::from_secs(5),
+                tokio::task::spawn_blocking(move || {
+                    agent_computer_node::observe_journals(&spool, &arm.evidence)
+                }),
+            )
+            .await
+            {
+                Ok(Ok(Ok(value))) => (Some(value), None),
+                Ok(Ok(Err(error))) => (None, Some(error)),
+                _ => (None, Some(agent_computer_node::Error::Deadline)),
+            }
+        } else {
+            (None, None)
+        };
     Ok(WorkResult {
         execution: state,
         interrupted_at: Some(Phase::Recovery),
         cleanup,
-        node_error: None,
+        node_error,
+        watchdog_journals,
         observation: None,
     })
 }

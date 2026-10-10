@@ -71,7 +71,11 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
     assert!(rustix::process::geteuid().is_root());
     let binary = std::env::var("AGENT_COMPUTER_WATCHDOG_BIN").unwrap();
     let executable = File::open(binary).unwrap();
-    let spool = tempfile::tempdir().unwrap();
+    let spool = tempfile::Builder::new()
+        .prefix("journal-test-")
+        .permissions(std::fs::Permissions::from_mode(0o700))
+        .tempdir_in("/root")
+        .unwrap();
     for (index, signal) in [
         (0, Signal::KILL),
         (1, Signal::KILL),
@@ -119,6 +123,7 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
                 .map(|(_, child, _)| child.0.take().unwrap())
                 .collect(),
         );
+        let expected = serde_json::json!({"version":2,"armed":guards[0].0,"backup_armed":guards[1].0,"watchdog_pids":[cleanup.0[0].id(),cleanup.0[1].id()]});
         let failed = Pid::from_child(&cleanup.0[index]);
         kill_process(failed, signal).unwrap();
         let limit = Instant::now() + Duration::from_secs(1);
@@ -161,6 +166,18 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
         if signal == Signal::STOP {
             kill_process(failed, Signal::KILL).unwrap();
         }
+        // The survivor persists its report before the closed output returns 2.
+        assert_eq!(cleanup.0[1 - index].wait().unwrap().code(), Some(2));
+        let observations = crate::observe_journals(spool.path(), &expected).unwrap();
+        assert!(matches!(
+            observations.guards[index],
+            crate::JournalStatus::Unconfirmed { .. }
+        ));
+        assert!(
+            matches!(&observations.guards[1-index],crate::JournalStatus::Recorded{report,..} if report.observation==agent_computer_watchdog::Observation::EmptyObserved)
+        );
+        println!("{}", serde_json::to_string(&observations).unwrap());
+        rejects_tampered_journals(spool.path(), &expected, 1 - index);
         drop(cleanup);
         std::fs::remove_dir(&path).unwrap();
         println!(
@@ -168,4 +185,74 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
             serde_json::json!({"case":"redundant_guard_fault", "failed_index":index, "signal":format!("{signal:?}"), "deadline_boottime_ms":request.deadline_boottime_ms,"empty_observed_boottime_ms":observed,"writer_released":false})
         );
     }
+}
+
+fn rejects_tampered_journals(spool: &std::path::Path, evidence: &serde_json::Value, index: usize) {
+    use crate::{JournalStatus, observe_journals};
+    use std::os::unix::fs::{PermissionsExt, symlink};
+    let arm = if index == 0 { "armed" } else { "backup_armed" };
+    let dir = spool.join(evidence[arm]["journal"]["id"].as_str().unwrap());
+    let mut wrong = evidence.clone();
+    wrong["watchdog_pids"][index] = serde_json::json!(1);
+    assert!(matches!(
+        observe_journals(spool, &wrong).unwrap().guards[index],
+        JournalStatus::Unavailable { .. }
+    ));
+    let mut legacy = evidence.clone();
+    legacy[arm].as_object_mut().unwrap().remove("journal");
+    assert!(matches!(
+        observe_journals(spool, &legacy).unwrap().guards[index],
+        JournalStatus::LegacyUnjournaled
+    ));
+    let intent = dir.join("intent.json");
+    let report = dir.join("report.json");
+    let original = std::fs::read(&report).unwrap();
+    let expected_unavailable = || {
+        assert!(matches!(
+            observe_journals(spool, evidence).unwrap().guards[index],
+            JournalStatus::Unavailable { .. }
+        ))
+    };
+    let mut bad: serde_json::Value = serde_json::from_slice(&original).unwrap();
+    bad["request"]["execution_id"] = "foreign".into();
+    std::fs::write(&report, serde_json::to_vec(&bad).unwrap()).unwrap();
+    expected_unavailable();
+    std::fs::write(&report, &original).unwrap();
+    let bytes = std::fs::read(&intent).unwrap();
+    let mut changed = bytes.clone();
+    changed.push(b' ');
+    std::fs::write(&intent, &changed).unwrap();
+    expected_unavailable();
+    std::fs::write(&intent, &bytes).unwrap();
+    std::fs::set_permissions(&report, std::fs::Permissions::from_mode(0o644)).unwrap();
+    expected_unavailable();
+    std::fs::set_permissions(&report, std::fs::Permissions::from_mode(0o600)).unwrap();
+    let second = dir.join("copy");
+    std::fs::hard_link(&report, &second).unwrap();
+    expected_unavailable();
+    std::fs::remove_file(second).unwrap();
+    std::fs::remove_file(&report).unwrap();
+    symlink(&intent, &report).unwrap();
+    expected_unavailable();
+    std::fs::remove_file(&report).unwrap();
+    // A partially written temporary file cannot become a completed observation.
+    std::fs::write(dir.join("report.pending"), b"{").unwrap();
+    assert!(matches!(
+        observe_journals(spool, evidence).unwrap().guards[index],
+        JournalStatus::Unconfirmed { .. }
+    ));
+    std::fs::remove_file(dir.join("report.pending")).unwrap();
+    // Restore only this owned fixture's original result for final readback.
+    use std::os::unix::fs::OpenOptionsExt;
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&report)
+        .unwrap();
+    file.write_all(&original).unwrap();
+    assert!(matches!(
+        observe_journals(spool, evidence).unwrap().guards[index],
+        JournalStatus::Recorded { .. }
+    ));
 }

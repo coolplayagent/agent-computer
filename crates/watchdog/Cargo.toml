@@ -8,7 +8,11 @@ license.workspace = true
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
 rustix = { workspace = true, features = ["time"] }
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

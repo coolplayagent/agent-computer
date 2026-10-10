@@ -1,8 +1,9 @@
 //! Trusted Linux node component. Local kernel observations are not durable fences.
-//! No Kubernetes identity, database authority, journal or restart recovery is implied.
+//! Journals retain observations, never Kubernetes authority or a restart permit.
 #![forbid(unsafe_code)]
 
 mod cgroup;
+pub mod journal;
 mod request;
 
 pub use request::{MAX_BUDGET_MS, MAX_REQUEST_BYTES, Request};
@@ -10,9 +11,9 @@ use rustix::{
     fd::{AsFd, OwnedFd},
     time,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub enum Error {
     InvalidRequest,
     IdentityMismatch,
@@ -25,6 +26,9 @@ pub enum Error {
     ObservationFailed,
     DrainTimeout,
     OutputUnavailable,
+    JournalUnavailable,
+    UntrustedJournal,
+    InvalidJournal,
 }
 
 impl std::fmt::Display for Error {
@@ -40,20 +44,21 @@ impl From<rustix::io::Errno> for Error {
 }
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub enum Trigger {
     Deadline,
     ReceiptUnavailable,
     TimerFailure,
 }
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub enum Observation {
     EmptyObserved,
     Unknown,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct Report {
     pub version: u8,
     pub request: Request,
@@ -64,6 +69,8 @@ pub struct Report {
     pub trigger: Trigger,
     pub observation: Observation,
     pub error: Option<Error>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub journal: Option<journal::Reference>,
 }
 
 #[derive(Serialize)]
@@ -73,12 +80,37 @@ struct Armed<'a> {
     request: &'a Request,
     cgroup_device: u64,
     armed_boottime_ms: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    journal: Option<&'a journal::Reference>,
 }
 
 /// Runs outside the target cgroup. The trusted caller must prevent migration into
 /// or out of that tree and launch this process independently from its controller.
 /// Output must be a pipe; neither closed readers nor backpressure may delay kill.
 pub fn run(request: Request, output: &impl AsFd) -> Result<Report> {
+    run_inner(request, output, None)
+}
+
+/// Journal setup precedes arming. Completion IO only occurs after termination
+/// and bounded observation, so journal backpressure cannot delay the kill.
+pub fn run_journaled(
+    request: Request,
+    output: &impl AsFd,
+    journal: journal::Journal,
+) -> Result<Report> {
+    if &request != journal.request() {
+        return Err(Error::InvalidJournal);
+    }
+    let report = run_inner(request, output, Some(journal.reference()))?;
+    journal.complete(&report)?;
+    Ok(report)
+}
+
+fn run_inner(
+    request: Request,
+    output: &impl AsFd,
+    journal: Option<&journal::Reference>,
+) -> Result<Report> {
     if !rustix::process::geteuid().is_root() {
         return Err(Error::RootRequired);
     }
@@ -99,6 +131,7 @@ pub fn run(request: Request, output: &impl AsFd) -> Result<Report> {
         request: &request,
         cgroup_device: group.device,
         armed_boottime_ms,
+        journal,
     };
     let trigger = if write_frame(output, &armed).is_err() {
         Trigger::ReceiptUnavailable
@@ -123,6 +156,7 @@ pub fn run(request: Request, output: &impl AsFd) -> Result<Report> {
             Observation::Unknown
         },
         error: result.err(),
+        journal: journal.cloned(),
     })
 }
 
