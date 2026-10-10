@@ -54,3 +54,5 @@ python3 crates/watchdog/tests/component.py \
 ```
 
 The journal probe covers normal persistence, closed/full output pipes, report publication failure, duplicate intent and nonprivate directory rejection. These component tests do not rerun the full Kubernetes/CSI/Candidate worker path, certify storage drainage, or establish durable fencing. Execution remains Unknown, writer remains Draining, and T01–T43 remain `not_run`.
+
+The 2026-10-10 [source-bound record](../evidence/watchdog-journals-2026-10-10.json) and [raw logs](../evidence/watchdog-journals-2026-10-10.log) record 310 passing default tests (including 136 PostgreSQL cases) and 22 root VM component scenarios: four redundant guard faults, six journal IO cases and twelve kernel regressions. The initial directory-permission failure and its explicit `0700` fix are retained. Final VM binaries matched local Bazel hashes, and the owned VM, private key and writable disk were removed.

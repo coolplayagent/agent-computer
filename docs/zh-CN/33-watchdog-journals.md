@@ -54,3 +54,5 @@ python3 crates/watchdog/tests/component.py \
 ```
 
 日志探针覆盖正常持久化、关闭/写满的回执管道、报告发布失败、重复意图及非私有目录拒绝。这些组件测试不等于重跑完整 Kubernetes/CSI/Candidate worker 链路，不证明存储排空或持久 fencing。执行继续为 Unknown，writer 继续为 Draining，T01–T43 保持 `not_run`。
+
+2026-10-10 的[源码绑定记录](../evidence/watchdog-journals-2026-10-10.json)和[原始日志](../evidence/watchdog-journals-2026-10-10.log)记录了 310 项默认测试通过（含 136 项 PostgreSQL 测试），以及 22 个 root VM 组件场景：4 个双守卫故障、6 个日志 IO 场景和 12 个内核回归。初次目录权限失败及显式 `0700` 修复均已保留。最终 VM 二进制与本地 Bazel 哈希一致，测试 VM、私钥和可写磁盘已清理。

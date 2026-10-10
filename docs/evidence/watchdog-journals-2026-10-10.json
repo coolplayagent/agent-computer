@@ -1,0 +1,922 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "Durable watchdog journal and Linux node/cgroup components; not Computer acceptance",
+  "status": "passed_component_verification",
+  "source_commit": "fb8281721efe715dd37accbe536ca000e6465c71",
+  "source_worktree_dirty_at_execution": true,
+  "source_binding_method": "All 241 source/build inputs captured at final execution match the feature commit; remote final Bazel binaries and Python fixtures match local SHA-256. Later documentation changes do not change these inputs.",
+  "source_inputs_sha256": {
+    ".bazelrc": "9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
+    ".bazelversion": "14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "BUILD.bazel": "384125baec4fe4d63c7b9e512f8ccfd58b31e7bdde6aff733471364cad47b858",
+    "Cargo.lock": "d01d43506c36c2efc6ef29ed23612fd407a040e6cc9ed31a0ba5e5a459276a93",
+    "Cargo.toml": "a68c22559fd01cae048224986a50ce1a984803bf128205b8ac6678b5a88cbc0e",
+    "MODULE.bazel": "77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "1cf53572cdc81da9f76ba88bfe15ebd44c3b46a015f71384ae06bc90da2e540d",
+    "REPO.bazel": "0d7b24d9b55db95e252ebe1cd79217db5c84d95d620ad46e6475395f5a51f41b",
+    "crates/cli/BUILD.bazel": "be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/definitions/BUILD.bazel": "68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/kubernetes/BUILD.bazel": "7fdf09618a04e0a7d2e5a70e9552e66bba470d622fa616ac8ae398da82c204c1",
+    "crates/kubernetes/Cargo.toml": "2ee0b950d6b367cf344e58bf70ff2dd230d7318ea80cda2f0173c64364db55db",
+    "crates/kubernetes/src/attach.rs": "b565d5a7328a98b67c3a22e969a3937e7ee7b86192432bb6b4d10adbe38962f0",
+    "crates/kubernetes/src/candidate.rs": "86166ec030f27ed0e6c065c4819b2a0daa3694d97fc270a8cbd6ec3e5226fecb",
+    "crates/kubernetes/src/client.rs": "e82218558dccd0a8f5954323203ae4112557a7dd9e5b545106625106b6c6d006",
+    "crates/kubernetes/src/lib.rs": "f7c277c42db1fc8483038c09f994204736f4a027a18c17a571d344235cb820f3",
+    "crates/kubernetes/src/node.rs": "31a1a2154771cc253d2a9717f1fab555e9c15c51f4c865e52e1b502f79bde601",
+    "crates/kubernetes/src/plan.rs": "33ad87e18a933e582be1c1cdf720cda6a1c4af96e2a01dea43ec2d4aac164898",
+    "crates/kubernetes/src/startup_plan.rs": "eec5fc4f4378132b142aaaa2b9dada28e66854e77ac4698ffdc527eb9b572c29",
+    "crates/kubernetes/src/tests.rs": "7348bf0b8e34e4594427a531885b4198ad41e82adce3649f152d5c608447fa82",
+    "crates/kubernetes/src/tests/attach.rs": "ddf356c7a3138ed3ef64d21c9f88fcd25a37f2d09d6698ccb7fae2f9783a9d80",
+    "crates/kubernetes/src/tests/attach/candidate.rs": "e8c4aac7b5578b473230d98d9e209396f4c48dcad5c11e1f6bfc4dacebc49ff4",
+    "crates/kubernetes/src/verify.rs": "fdebabd72c4f598d7fceaea5e6c853fe983636955089951d5c28655f6f3ca48c",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/candidate_live.rs": "f60ddcbe6b2ef5528afa464d92cef53a1fbc09b7b3d0511e0633649cc86b10b9",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_image.py": "e71f5f1f42063121e9debd3a45338a901fb9ba8358c55bebd41165254a27a3ca",
+    "crates/kubernetes/tests/startup_live.rs": "0e570020fcd89f18b158ae92076743f389e2b1feb32fdf330133a6e087bfc476",
+    "crates/node/BUILD.bazel": "a3906fea0e173d75850200eebdcf1b7172f0ca2382f905bdcd6fe52da46da7b0",
+    "crates/node/Cargo.toml": "4a99becf39054ce31b98451767862436ebfdc26e8eee1ab3221d9da3dc860d4d",
+    "crates/node/src/command.rs": "6124ed2da0df6b3ad5c83041c22cc4ec1ed1966ce7ed9b8dbb9a40414bb02287",
+    "crates/node/src/guard.rs": "0d470e90ae7ca69f5e2a2740d6257d4d27125250ef5239a799701f6992432558",
+    "crates/node/src/guard/tests.rs": "95d7083efd762d78ab00e8d794210e35c85f464823757edfb54b73fc06d005d7",
+    "crates/node/src/journals.rs": "8c5a35a1c34a05b3b4e54ac90c25f5e7b2373f8f26289221b3963e250e36f3dc",
+    "crates/node/src/lib.rs": "5e5b7409a898ae444e20961cb8fcef3379fbf8f62189f4bd0654b195ff37d4b8",
+    "crates/node/src/observation.rs": "69fbc169d2b79526bea7dd2bacecbbd8e05d032d4b031fff031abc19cb001031",
+    "crates/sandbox/BUILD.bazel": "79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "f9af73e96f4335bc488c77f42ebb5eafe0b10a2a6f21bd399bca7470450ccc31",
+    "crates/sandbox/src/lib.rs": "78a8c1b617eeb5a0b1fac02c35662d06e3396ac56ec18cde82cf4f14635ed8eb",
+    "crates/sandbox/src/main.rs": "71b39de404e0d4d10102ddad34ec82ef78e41c3c1dd580908293a4d6c60ffd90",
+    "crates/sandbox/src/output.rs": "0805b0b15d1dd67c8f926a8e93c8b5066978759ea55d7a7d5c177a29c345d4be",
+    "crates/sandbox/src/request.rs": "17372c71cfd625cb7475e7d5e5a132d1e92da295ec4a5fb473b2251210e34139",
+    "crates/sandbox/src/startup.rs": "c08e576aeb1408c37f9260766a9b4261acba0c48b88975f8addc18761b92d2d0",
+    "crates/sandbox/src/supervisor.rs": "a31cca7230f8e15b47effd6bf01f7f91b3710c215ebb818d716e87b949eba2df",
+    "crates/sandbox/tests/component.py": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "crates/sandbox/tests/rootfs.py": "b148a45feb59c88cfa828b633eec1f0d57e980076ab835012c666744bb228f8f",
+    "crates/sandbox/tests/startup_component.py": "d1671c99de3dce9bbd2e96f2d14a863d7b68c590e71a71339a62abac6f99924e",
+    "crates/server/BUILD.bazel": "12ce9a04fcd6d9d02600be009f1d68e6aa5bc50938d2e2fd7c27100c485e104d",
+    "crates/server/Cargo.toml": "432333f5065fe5f3529ca3c6de3014ffd50027bb4d7bec07e8ce7de8a0f40c89",
+    "crates/server/src/candidate_worker.rs": "2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "df3c1e9eb873ff063310dfcd48259050eb9e8d683de0d84370d331096efc449f",
+    "crates/server/src/connections.rs": "f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "ce07608eb1944309e1719af5ea4576a31f82e1a263461eb23a9d0fd46ac7a698",
+    "crates/server/src/execution_worker.rs": "ba951f7ece5da3929c93390e26f0eeecd6b8ee9d5cce7a114eeb84bf06422139",
+    "crates/server/src/executions.rs": "36c762c78c7ef28832df164b8ab578d2ec66a4a117a11f42426daaf3213239af",
+    "crates/server/src/files.rs": "8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "9a5730616504a767678bd0ca06d51affaca2db5e1027758cb4b0103166fcf64f",
+    "crates/server/src/lib.rs": "f9251475cd79205c7ac3b5913918e2ece5d44033ca9a08413c12df74beaf0101",
+    "crates/server/src/main.rs": "2a6e895eb3030910433d7e150a34039dc38290e04d4d44952e2b9b1b395ccd79",
+    "crates/server/src/operator.rs": "15864ed28b2b154c3cd3abf83769fd8c71c1697316035b6b252d2a54806218c2",
+    "crates/server/src/plans.rs": "5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/authentication.rs": "3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "06081eb9037a213d52cd47fda2c1219f07903c8e2024c06f793456fc2cbf7a2d",
+    "crates/server/tests/cases/executions.rs": "29cc4850e0ae92bf020482c7ea8f415f4c55b424c097284da772a1522d23e3ba",
+    "crates/server/tests/cases/files.rs": "5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/plans.rs": "836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "d9332b8cbfc244f60ac9132523a6d9e602b0a8b2a06916d1f25fecfa6ec6d8b6",
+    "crates/server/tests/cases/writers.rs": "1a145ebeb122260e606fa6c4ec83e7b7644e346c959f6a138d0c3bbd8ed1840e",
+    "crates/server/tests/server_contracts.rs": "afe01e567f3619a39758a5929aa8b2d8792805c02687cd6ee179376a8bd0d306",
+    "crates/server/tests/support/mod.rs": "872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/directory.rs": "d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "27069a9b5339b74966cd272a7072c4941abf8b3d9ebba8a5c572615ec2735273",
+    "crates/storage/src/files/tests.rs": "3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "1d7cd717cd002481a504b0aa8fbaef733ca282be966bc43e5a0f66243417cf14",
+    "crates/storage/src/main.rs": "1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "aeb8cb0f27e00590958188f10b3ab743a0b51cfb2c2d04e61a59535b4142156a",
+    "crates/storage/src/model.rs": "d688269a013be354bf9ca7c385e4e0c2d3cc63f7060eae20f7b28ba7d46ca293",
+    "crates/storage/src/quota.rs": "143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "d4dbf90c48affe28deee800b55634935771b7cff7282d364110dcdb5f0fcd58b",
+    "crates/store/BUILD.bazel": "c64c45d4918860b1ad1c6e69a068f7875af9e1f9beede0e83ad528cbd126eed1",
+    "crates/store/Cargo.toml": "2081109ddc3b1780d6ac6dff146813f5f15f38b5568b54823512f8af18b59adf",
+    "crates/store/migrations/0001_declaration_registry.sql": "222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/migrations/0012_execution_admission.sql": "381d01c13cba7e165b08e06abbdd623a1464b4f1cc7da065b1cb913dd42c7b5d",
+    "crates/store/migrations/0013_execution_dispatch.sql": "48e374c04d996a56173f8f53ae2f275af862e4ca8aea4ae4884373135273ebbb",
+    "crates/store/migrations/0014_execution_startup.sql": "86cd2ca00cdb925053c9c33a6afc8b4490a82783ba7d48f421bb53b1b7b4eacc",
+    "crates/store/migrations/0015_execution_pods.sql": "c25255885da207c5002c6525f2607282874ed37975e2cb6258184dde878e6f45",
+    "crates/store/migrations/0016_execution_watchdogs.sql": "7e81722f0464dfd4479f0e0b6b5dbb92f7dadc1cd998192fe910aa3322eebf95",
+    "crates/store/migrations/0017_redundant_watchdogs.sql": "b44ba78c21c79662f75ab3b2bd4bb8fd5e07ba6448c8fa9ad1e103c5f6e2fa44",
+    "crates/store/src/auth.rs": "91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "1619acea3ee3ddf2a65cfb9f4bf08ac10c53132a6b3d3d42f86505bb7bbd51f7",
+    "crates/store/src/plans/access.rs": "3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/connections/mod.rs": "b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "c8d34e89733792ae58155e65a29c63d9089fb2832326f16144368b9b8b5d8a37",
+    "crates/store/src/runtime/mod.rs": "53c86cbd08cb5c26385d08576dafd1c3fbf0499ff173678c0385f0301a6dd226",
+    "crates/store/src/runtime/preparation.rs": "ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "2c7f78f85c4dad955490bb496a51ea8e3b02fb36a36b76cfba0c0e39d7df961f",
+    "crates/store/src/runtime/start/types.rs": "8de756f8fdd65557fa95766a351d5d6755b9e4d9b0f670dcfbe309e762281b61",
+    "crates/store/src/runtime/types.rs": "7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/executions.rs": "a190173c28d752a1277489c18ac283a7d424e2eba98a42f90f4323bf3f683f53",
+    "crates/store/src/runtime/writers/executions/dispatch.rs": "cf948234a31f88b3904b1e1b26f87ad0d54fa575c4c6d25f8037d894939dcbdb",
+    "crates/store/src/runtime/writers/executions/dispatch/inputs.rs": "0107de3175cfc993c629a65b151d0664285c64f92f65d419577e7dce041097ab",
+    "crates/store/src/runtime/writers/executions/dispatch/pods.rs": "cf0a4782a4d2cb6f89147c0c226fa6265bafd13367df928ba1daa5e9b0c8b56d",
+    "crates/store/src/runtime/writers/executions/dispatch/pods/validation.rs": "47ab37bca8ff5276583f6917dd1b9a071f29eb91eea57a9d98e413c9bf7deeae",
+    "crates/store/src/runtime/writers/executions/dispatch/startup.rs": "5a9833f7eb2534144a960797a00e2c1df735c9d532aa9ba9b7dc3c6dffef8273",
+    "crates/store/src/runtime/writers/executions/dispatch/watchdogs.rs": "c731c2a41c55d9265492a6d2d166cd922995eb906731b20c588475367de38e10",
+    "crates/store/src/runtime/writers/files.rs": "59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "e634f0543ce91dfcbbe83998b2d9ba4b88a97ac3a63a5d495c03760c2957810d",
+    "crates/store/src/runtime/writers/types.rs": "bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "3cc4d6a624a43cbc7403f288579141cf947cc3b22f113a40f436870b5df65b2a",
+    "crates/store/src/writes.rs": "6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "cd7101a8a982c22573d161e6fc288ecd2f8b5952c4e71b8d5684675fec0ecdd9",
+    "crates/store/tests/contracts/concurrency.rs": "4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/connections.rs": "b45628b23cc546e97903ff0cf4fa436920261cfd9cb13de9b657b29be6c22882",
+    "crates/store/tests/contracts/plans/mod.rs": "429d9d5e6064e738cfd6048db10b35dd7544498e19d9439b1864648ef2df0862",
+    "crates/store/tests/contracts/plans/preparation.rs": "b8d754fd07d2fa6f420ddd938392fec2056a35a8e60d71b0a838c7226b5429a2",
+    "crates/store/tests/contracts/plans/publication.rs": "fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "8534d0db05f080c6a6f23d8aa123f094bc8ee36b4adfa008669248aa6dac2f23",
+    "crates/store/tests/contracts/plans/starts.rs": "d2dc26b89e06c96c0e122026a23fb73d002a82173a8ec77b30267a614f152a6e",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/executions.rs": "7eb8892ce253731c41d3507a59263b0e8a11944ddcb57e46cd35c4c63bcc83f4",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch.rs": "a039a219b5de1e25c284c0b6bc41dec71bb29ffe1cff23f7199145443844b1ff",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/inputs.rs": "cbd10111ed7bfb26549e868ffea12d11fe095e5f28e8f39f499a52e8c793f791",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/pods.rs": "2ed2953d67f57df568b7fe3b984669805ab1a223fc2fdecc36ce9cdaec174b3f",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/startup.rs": "0e569c246d2148b69830abf69436ee5e068b82e33d3333203946671d58d982b6",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs.rs": "b41c3a39c91204e50b5061e1b9c1641f7798597dcc200a5d14153c6104092821",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "c28cfc94650be073c01ba9b31553af68edaa2c18542f52ec86a3809a1211df7d",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "004f0c88be7fc6a871e468796d63e2d00249c25aa20cb0183c4eb839c452aaef",
+    "crates/store/tests/contracts/registry.rs": "99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "c273c56dcaf0af8f13bacf79eb483352f8e6fd30c530cfe88d4ce4e12f7af9e3",
+    "crates/test-support/BUILD.bazel": "92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/watchdog/BUILD.bazel": "b705098c304921fc46ddf6be655abd5ffbfb4190701a8c6e306ab0bd8d92a412",
+    "crates/watchdog/Cargo.toml": "ade61d1d3e47b7e512390b1f8a4f7f3b96b9b234f4aa7b24cf5847c6171fca1b",
+    "crates/watchdog/src/cgroup.rs": "5e716bceed0061141a43a54528bb2da8cf862f14c1f7f0d8699c4751647bf94d",
+    "crates/watchdog/src/journal.rs": "1f7a4c434bef5e89f3c03293627a9ef886fa84561e1280e775a10a52b655ae39",
+    "crates/watchdog/src/journal/tests.rs": "936193158c71b096f0eed1243799fbdcdf33ceaff83f68b09da3eb3b59ce8778",
+    "crates/watchdog/src/lib.rs": "c3d8cf1680da40fe8fdfe772ebdbf433ddd4fd4a6b59a5518eb3e0be91498840",
+    "crates/watchdog/src/main.rs": "117b2797d0ab22250f4e3907c89adc9e44eea1cedfa885de7dad27c5085ec85a",
+    "crates/watchdog/src/request.rs": "cb98e5d7b392695a82f80d6c0fe39b140baad48562627f80b0655646b164472f",
+    "crates/watchdog/tests/component.py": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef",
+    "crates/watchdog/tests/journal_component.py": "a11dd0c38f69792f26b937ff79903fbc04fb7e7aecbea5641b595de59039af3e",
+    "crates/watchdog/tests/runsc_component.py": "94d7c6963920c1bde984a0383dd8ed6bfdb948bf07f526b011752bd13ec2f219",
+    "crates/worker/BUILD.bazel": "c5b9f8aec308a60b95a06a1d81688efd190201fd2a1923553afdf7965165c139",
+    "crates/worker/Cargo.toml": "8d9e69831d2f1845ea447612f3edc72c44e1515df90ba3b12ca642c3403f6e84",
+    "crates/worker/src/candidate.rs": "b7bf6055c255a6196bc919ffe15b9a79704db022a0840851502f85e528fe854f",
+    "crates/worker/src/execution.rs": "eb276ce9fb1804ad8107523208e7867c87497f4b6f1e7ad4e820e102a1134473",
+    "crates/worker/src/execution/plan.rs": "b7adc18c6cbad1471e5067a07351d162ec61e3de2b6aa6192b8ec2d90b9ca4b3",
+    "crates/worker/src/execution/storage.rs": "1b6b88446d86aee0ea5d8c0ed5c33350087a66d90f24220330fc611488da9e02",
+    "crates/worker/src/files.rs": "1c6008373f4afead3afc5ac76c122a44f1f2b4227837f8c058ae4a268f10df64",
+    "crates/worker/src/files/gateway.rs": "7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "9d1aff1ed95c9b931950d6d5972e425a8e7b8a5200577c520575b22e62d217b6",
+    "crates/worker/tests/candidate_live.rs": "e703fb14e88a33a0637820891b3f751ed53dba6626b1c18f4b2844071eca176c",
+    "crates/worker/tests/execution_live.rs": "67588e53de6c891b94f24d2d5a0a244d591c487505d3d11ce3a6706c67ac3645",
+    "crates/worker/tests/execution_node.py": "ecbb38ad691ccfaf529ac77d3f17e6b84de95123ddd9d47c67fccd160d439fa1",
+    "crates/worker/tests/live.rs": "131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/execution_faults.rs": "90710a45ba151f79c217e5686b885fb1cf94fb7e7806acebb1f55a0d4ca64f3f",
+    "crates/worker/tests/support/file_http.rs": "c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6"
+  },
+  "environment": {
+    "kernel": "6.8.0-142-generic",
+    "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+    "binary_and_fixture_sha256": {
+      "/home/ac-test/agent-computer-watchdog": "ea7b7e7fec6db5f6acbd4a1e2f451978be1af3b41becf8cf9fbfbd343f920eb5",
+      "/home/ac-test/node_contracts_test": "59f4a51bd8c0be01e3e56007dce47f7a547f2d8aa95fee1282d7e1fdf58721fb",
+      "/home/ac-test/journal_component.py": "a11dd0c38f69792f26b937ff79903fbc04fb7e7aecbea5641b595de59039af3e",
+      "/home/ac-test/component.py": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef"
+    },
+    "remaining_watchdogs": [],
+    "owned_cgroups": []
+  },
+  "default_tests": {
+    "status": "pass",
+    "targets": 10,
+    "passed": 310,
+    "postgresql_tests_included": 136,
+    "details": {
+      "bazel-testlogs/crates/sandbox/sandbox_contracts_test/test.log": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/kubernetes/kubernetes_contracts_test/test.log": {
+        "passed": 35,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/store/postgres_contracts_test/test.log": {
+        "passed": 136,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/cli/cli_contracts_test/test.log": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/server/server_contracts_test/test.log": {
+        "passed": 20,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/storage/storage_contracts_test/test.log": {
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/watchdog/watchdog_contracts_test/test.log": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/node/node_contracts_test/test.log": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 1
+      },
+      "bazel-testlogs/crates/definitions/definitions_contracts_test/test.log": {
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0
+      },
+      "bazel-testlogs/crates/core/core_contracts_test/test.log": {
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0
+      }
+    }
+  },
+  "checks": {
+    "cargo_test_workspace": "pass",
+    "cargo_clippy_workspace_all_targets_D_warnings": "pass",
+    "cargo_fmt_check": "pass",
+    "bazel_build_lockfile_error": "pass",
+    "bazel_test_lockfile_error": "pass",
+    "maps": "valid",
+    "qualitygate_feature": {
+      "run_id": "run-odmEHp",
+      "profile": "full",
+      "scope": "delivery",
+      "gate": {
+        "complete": true,
+        "decision": "pass",
+        "blockers": []
+      },
+      "pending_delivery_checks": [],
+      "snapshot": {
+        "verification_digest": "sha256:3e36278422fefa3ba51cedf4009b9e1a6988260dfcabeba4e9ac2374a1d3d350",
+        "mode": "worktree",
+        "base": "9e8658d3d2e485c7675a1291f8e41855a2b34f8b",
+        "head": "9e8658d3d2e485c7675a1291f8e41855a2b34f8b",
+        "content_digest": "sha256:441f3c82d99a5d53c80594f95810a98fd787a8e81b957093addbcac48ed7748e"
+      },
+      "configured_policy": "line-ending only; runtime/tests are separate evidence"
+    }
+  },
+  "root_component_cases": {
+    "count": 22,
+    "redundant_pair": [
+      {
+        "case": "redundant_guard_fault",
+        "deadline_boottime_ms": 492947,
+        "empty_observed_boottime_ms": 492950,
+        "failed_index": 0,
+        "signal": "\"Signal::KILL\"",
+        "writer_released": false
+      },
+      {
+        "case": "redundant_guard_fault",
+        "deadline_boottime_ms": 494513,
+        "empty_observed_boottime_ms": 494522,
+        "failed_index": 1,
+        "signal": "\"Signal::KILL\"",
+        "writer_released": false
+      },
+      {
+        "case": "redundant_guard_fault",
+        "deadline_boottime_ms": 496071,
+        "empty_observed_boottime_ms": 496080,
+        "failed_index": 0,
+        "signal": "\"Signal::STOP\"",
+        "writer_released": false
+      },
+      {
+        "case": "redundant_guard_fault",
+        "deadline_boottime_ms": 497642,
+        "empty_observed_boottime_ms": 497642,
+        "failed_index": 1,
+        "signal": "\"Signal::STOP\"",
+        "writer_released": false
+      }
+    ],
+    "recovery_observations": [
+      {
+        "guards": [
+          {
+            "state": "unconfirmed",
+            "journal": {
+              "id": "journal-B0477x",
+              "device": 64769,
+              "inode": 262206,
+              "intent_digest": "sha256:ec9efcdcbad0cbf7edf62216773b21f8afe079d24923ff70c842fe9b96c935c9"
+            }
+          },
+          {
+            "state": "recorded",
+            "journal": {
+              "id": "journal-O1vaht",
+              "device": 64769,
+              "inode": 262208,
+              "intent_digest": "sha256:ba4e196e5b5ecd25bdd930f403d84374a5a4ebabd1a838bc5c6c8a19f0a77ddc"
+            },
+            "report": {
+              "version": 1,
+              "request": {
+                "version": 1,
+                "execution_id": "ac-guard-pair-1888-491432",
+                "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+                "cgroup_path": "ac-guard-pair-1888-491432",
+                "cgroup_inode": 7766,
+                "deadline_boottime_ms": 492947
+              },
+              "cgroup_device": 28,
+              "armed_boottime_ms": 491475,
+              "kill_boottime_ms": 492947,
+              "observed_boottime_ms": 492957,
+              "trigger": "Deadline",
+              "observation": "EmptyObserved",
+              "error": null,
+              "journal": {
+                "id": "journal-O1vaht",
+                "device": 64769,
+                "inode": 262208,
+                "intent_digest": "sha256:ba4e196e5b5ecd25bdd930f403d84374a5a4ebabd1a838bc5c6c8a19f0a77ddc"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "guards": [
+          {
+            "state": "recorded",
+            "journal": {
+              "id": "journal-RV6TMY",
+              "device": 64769,
+              "inode": 262211,
+              "intent_digest": "sha256:37e7d3e7716db2e8afc7c09e7318726482a9894bbce8abc1692f849cc3e328e7"
+            },
+            "report": {
+              "version": 1,
+              "request": {
+                "version": 1,
+                "execution_id": "ac-guard-pair-1888-493002",
+                "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+                "cgroup_path": "ac-guard-pair-1888-493002",
+                "cgroup_inode": 7815,
+                "deadline_boottime_ms": 494513
+              },
+              "cgroup_device": 28,
+              "armed_boottime_ms": 493021,
+              "kill_boottime_ms": 494513,
+              "observed_boottime_ms": 494523,
+              "trigger": "Deadline",
+              "observation": "EmptyObserved",
+              "error": null,
+              "journal": {
+                "id": "journal-RV6TMY",
+                "device": 64769,
+                "inode": 262211,
+                "intent_digest": "sha256:37e7d3e7716db2e8afc7c09e7318726482a9894bbce8abc1692f849cc3e328e7"
+              }
+            }
+          },
+          {
+            "state": "unconfirmed",
+            "journal": {
+              "id": "journal-BV3Kwj",
+              "device": 64769,
+              "inode": 262213,
+              "intent_digest": "sha256:7062f558c96156aec85e39a2199dd30e7d31aa79d4c5dad81d829626e33aa344"
+            }
+          }
+        ]
+      },
+      {
+        "guards": [
+          {
+            "state": "unconfirmed",
+            "journal": {
+              "id": "journal-ysJGRK",
+              "device": 64769,
+              "inode": 262216,
+              "intent_digest": "sha256:41736e0071a12c54d41bf1fedef3ad2e88d85b1b20586f63a39477b2878bc750"
+            }
+          },
+          {
+            "state": "recorded",
+            "journal": {
+              "id": "journal-KW4Ooo",
+              "device": 64769,
+              "inode": 262218,
+              "intent_digest": "sha256:7c94d69eaa97ac445615130a433713bd8798cdb372c06ed5a342303d4ecc1c98"
+            },
+            "report": {
+              "version": 1,
+              "request": {
+                "version": 1,
+                "execution_id": "ac-guard-pair-1888-494562",
+                "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+                "cgroup_path": "ac-guard-pair-1888-494562",
+                "cgroup_inode": 7864,
+                "deadline_boottime_ms": 496071
+              },
+              "cgroup_device": 28,
+              "armed_boottime_ms": 494594,
+              "kill_boottime_ms": 496071,
+              "observed_boottime_ms": 496081,
+              "trigger": "Deadline",
+              "observation": "EmptyObserved",
+              "error": null,
+              "journal": {
+                "id": "journal-KW4Ooo",
+                "device": 64769,
+                "inode": 262218,
+                "intent_digest": "sha256:7c94d69eaa97ac445615130a433713bd8798cdb372c06ed5a342303d4ecc1c98"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "guards": [
+          {
+            "state": "recorded",
+            "journal": {
+              "id": "journal-z1Ntuf",
+              "device": 64769,
+              "inode": 262221,
+              "intent_digest": "sha256:166c61941ba643113c470b47653e234b1cdaa4cbe77f80263be1655d0cf1aec5"
+            },
+            "report": {
+              "version": 1,
+              "request": {
+                "version": 1,
+                "execution_id": "ac-guard-pair-1888-496130",
+                "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+                "cgroup_path": "ac-guard-pair-1888-496130",
+                "cgroup_inode": 7913,
+                "deadline_boottime_ms": 497642
+              },
+              "cgroup_device": 28,
+              "armed_boottime_ms": 496152,
+              "kill_boottime_ms": 497642,
+              "observed_boottime_ms": 497652,
+              "trigger": "Deadline",
+              "observation": "EmptyObserved",
+              "error": null,
+              "journal": {
+                "id": "journal-z1Ntuf",
+                "device": 64769,
+                "inode": 262221,
+                "intent_digest": "sha256:166c61941ba643113c470b47653e234b1cdaa4cbe77f80263be1655d0cf1aec5"
+              }
+            }
+          },
+          {
+            "state": "unconfirmed",
+            "journal": {
+              "id": "journal-Y0SRvc",
+              "device": 64769,
+              "inode": 262223,
+              "intent_digest": "sha256:53af8f49aafd538101d5bd80f43926c9b3cdb89a1aebac971ae44f93e83a87bc"
+            }
+          }
+        ]
+      }
+    ],
+    "journal_io": {
+      "scope": "Linux journal IO component, not Computer acceptance",
+      "kernel": "6.8.0-142-generic",
+      "binary_sha256": "ea7b7e7fec6db5f6acbd4a1e2f451978be1af3b41becf8cf9fbfbd343f920eb5",
+      "fixture_sha256": "a11dd0c38f69792f26b937ff79903fbc04fb7e7aecbea5641b595de59039af3e",
+      "cases": [
+        {
+          "case": "normal",
+          "status": "pass",
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "normal",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-journal-75eb5451370e4659b44d58f2ac064f33",
+              "cgroup_inode": 7962,
+              "deadline_boottime_ms": 498933
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 497742,
+            "kill_boottime_ms": 498933,
+            "observed_boottime_ms": 498943,
+            "trigger": "Deadline",
+            "observation": "EmptyObserved",
+            "error": null,
+            "journal": {
+              "id": "normal",
+              "device": 64769,
+              "inode": 262205,
+              "intent_digest": "sha256:af164134785ff53c2c7aa5445f303c56cb98d099c4217e65638e2c8daeffa5ae"
+            }
+          }
+        },
+        {
+          "case": "closed-output",
+          "status": "pass",
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "closed-output",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-journal-3ca709f85fec4cb580eab6258445145a",
+              "cgroup_inode": 8011,
+              "deadline_boottime_ms": 500174
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 498982,
+            "kill_boottime_ms": 500174,
+            "observed_boottime_ms": 500184,
+            "trigger": "Deadline",
+            "observation": "EmptyObserved",
+            "error": null,
+            "journal": {
+              "id": "closed-output",
+              "device": 64769,
+              "inode": 262209,
+              "intent_digest": "sha256:4d97c44fb3e4a11577305c9458aa57469a3165e50151cd6268e4c0efe414ca09"
+            }
+          }
+        },
+        {
+          "case": "report-write-error",
+          "status": "pass",
+          "target_empty": true,
+          "report_missing": true
+        },
+        {
+          "case": "full-output",
+          "status": "pass",
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "full-output",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-journal-f72bdf7876704b449297d0fcd3b1eb7c",
+              "cgroup_inode": 8109,
+              "deadline_boottime_ms": 526501
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 501525,
+            "kill_boottime_ms": 501525,
+            "observed_boottime_ms": 501535,
+            "trigger": "ReceiptUnavailable",
+            "observation": "EmptyObserved",
+            "error": null,
+            "journal": {
+              "id": "full-output",
+              "device": 64769,
+              "inode": 262217,
+              "intent_digest": "sha256:2926874322d040a10de8f5a2c33e09a051b1ba67aa6eb5ecfd601efae02bb9fd"
+            }
+          }
+        },
+        {
+          "case": "duplicate-journal",
+          "status": "pass",
+          "armed": false,
+          "target_untouched": true
+        },
+        {
+          "case": "nonprivate-journal",
+          "status": "pass",
+          "armed": false,
+          "target_untouched": true
+        }
+      ]
+    },
+    "kernel_regression": {
+      "schema_version": 1,
+      "scope": "Linux cgroup component, not product acceptance",
+      "kernel": "6.8.0-142-generic",
+      "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+      "binary_sha256": "ea7b7e7fec6db5f6acbd4a1e2f451978be1af3b41becf8cf9fbfbd343f920eb5",
+      "test_sha256": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef",
+      "cases": [
+        {
+          "case": "stopped-supervisor",
+          "status": "pass",
+          "pids": {
+            "parent": 1925,
+            "child": 1926
+          },
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "stopped-supervisor",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/stopped-supervisor",
+              "cgroup_inode": 8305,
+              "deadline_boottime_ms": 502933
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 501735,
+            "kill_boottime_ms": 502933,
+            "observed_boottime_ms": 502943,
+            "trigger": "Deadline",
+            "observation": "EmptyObserved",
+            "error": null
+          }
+        },
+        {
+          "case": "frozen-tree",
+          "status": "pass",
+          "pids": {
+            "parent": 1928,
+            "child": 1929
+          },
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "frozen-tree",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/frozen-tree",
+              "cgroup_inode": 8341,
+              "deadline_boottime_ms": 504298
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 503099,
+            "kill_boottime_ms": 504298,
+            "observed_boottime_ms": 504308,
+            "trigger": "Deadline",
+            "observation": "EmptyObserved",
+            "error": null
+          }
+        },
+        {
+          "case": "expired-deadline",
+          "status": "pass",
+          "pids": {
+            "parent": 1931,
+            "child": 1932
+          },
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "expired-deadline",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/expired-deadline",
+              "cgroup_inode": 8377,
+              "deadline_boottime_ms": 503371
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 504372,
+            "kill_boottime_ms": 504372,
+            "observed_boottime_ms": 504382,
+            "trigger": "Deadline",
+            "observation": "EmptyObserved",
+            "error": null
+          }
+        },
+        {
+          "case": "closed-receipt",
+          "status": "pass",
+          "pids": {
+            "parent": 1934,
+            "child": 1935
+          },
+          "elapsed_ms": 16,
+          "deadline": 529434
+        },
+        {
+          "case": "full-receipt",
+          "status": "pass",
+          "pids": {
+            "parent": 1937,
+            "child": 1938
+          },
+          "elapsed_ms": 16,
+          "deadline": 529512
+        },
+        {
+          "case": "controller-exit",
+          "status": "pass",
+          "pids": {
+            "parent": 1940,
+            "child": 1941
+          },
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "controller-exit",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/controller-exit",
+              "cgroup_inode": 8485,
+              "deadline_boottime_ms": 505780
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 504616,
+            "kill_boottime_ms": 505780,
+            "observed_boottime_ms": 505790,
+            "trigger": "Deadline",
+            "observation": "EmptyObserved",
+            "error": null
+          }
+        },
+        {
+          "case": "path-reuse",
+          "status": "pass",
+          "original": {
+            "parent": 1944,
+            "child": 1945
+          },
+          "replacement": {
+            "parent": 1947,
+            "child": 1948
+          },
+          "report": {
+            "version": 1,
+            "request": {
+              "version": 1,
+              "execution_id": "path-reuse",
+              "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a",
+              "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/path-reuse",
+              "cgroup_inode": 8521,
+              "deadline_boottime_ms": 507662
+            },
+            "cgroup_device": 28,
+            "armed_boottime_ms": 505863,
+            "kill_boottime_ms": 507662,
+            "observed_boottime_ms": 507662,
+            "trigger": "Deadline",
+            "observation": "Unknown",
+            "error": "KillFailed"
+          }
+        },
+        {
+          "case": "wrong-inode",
+          "status": "pass",
+          "pids": {
+            "parent": 1949,
+            "child": 1950
+          }
+        },
+        {
+          "case": "wrong-boot",
+          "status": "pass",
+          "pids": {
+            "parent": 1952,
+            "child": 1953
+          }
+        },
+        {
+          "case": "own-ancestor",
+          "status": "pass",
+          "pids": {
+            "parent": 1955,
+            "child": 1956
+          }
+        },
+        {
+          "case": "delegated-group",
+          "status": "pass",
+          "pids": {
+            "parent": 1958,
+            "child": 1959
+          }
+        },
+        {
+          "case": "threaded-group",
+          "status": "pass"
+        }
+      ]
+    }
+  },
+  "repair_during_verification": {
+    "initial_run": "The new node launcher failed WatchdogUnavailable in the root pair fixture. The temporary-directory library used umask-derived permissions, and the journal rejected the nonprivate directory.",
+    "fix": "Explicit 0700 on production and fixture journal directories. Final Bazel rerun passed all cases.",
+    "initial_log_retained_in": "watchdog-journals-2026-10-10.log"
+  },
+  "cleanup": {
+    "status": "complete",
+    "vm_pid": 3906787,
+    "identity_verified": true,
+    "stopped": true,
+    "private_files_removed": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "user-data",
+      "meta-data",
+      "known_hosts",
+      "serial.log",
+      "qemu.log",
+      "vm.json"
+    ],
+    "remaining_watchdogs": [],
+    "owned_cgroups": [],
+    "completed_at_utc": "2026-10-10T01:50:02.810939+00:00"
+  },
+  "code_index": {
+    "status": "stale",
+    "update_error": "qos_rejected: 32 unfinished tasks, queue capacity 32; used direct sources, map validation passed"
+  },
+  "limits": [
+    "No full Kubernetes/CSI/Candidate worker live test was rerun in this increment. Worker/server wiring compiled with all targets; local journal recovery was exercised by the root node fixture.",
+    "No node reboot or power-loss test, and no durability SLA across faulty disks/filesystems. Configure root-owned node-local durable storage.",
+    "No persistent node supervisor, journal garbage collection/quota, off-node replication, or durable storage fence.",
+    "Recovery observations do not accept outputs, grant replacement execution, signal old PIDs, or release a writer. Execution remains Unknown and writer remains Draining.",
+    "Filesystem reads run after authority lowering/conditional cleanup with a five-second wait budget; a blocked syscall is not cancellable and runtime shutdown may wait.",
+    "Product acceptance T01–T43 remains not_run."
+  ],
+  "log_format": "Concatenated raw command output with section labels; trailing line whitespace removed for repository hygiene."
+}
