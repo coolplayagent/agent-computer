@@ -1,4 +1,6 @@
 use crate::{Error, Result, command, observation::RuntimeObservation};
+#[cfg(test)]
+mod tests;
 use agent_computer_watchdog::{Request, boottime_ms};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -20,8 +22,11 @@ pub struct ArmedReceipt {
 
 #[derive(Debug, Serialize)]
 pub struct Evidence {
+    pub version: u8,
     pub runtime: RuntimeObservation,
     pub armed: ArmedReceipt,
+    pub backup_armed: ArmedReceipt,
+    pub watchdog_pids: [u32; 2],
     pub observed_boottime_ms: u64,
 }
 
@@ -30,8 +35,8 @@ pub struct Evidence {
 #[derive(Debug)]
 pub struct ArmedGuard {
     evidence: Evidence,
-    child: DetachedChild,
-    _stdout: ChildStdout,
+    children: [DetachedChild; 2],
+    _stdout: [ChildStdout; 2],
 }
 impl ArmedGuard {
     pub fn evidence(&self) -> &Evidence {
@@ -44,15 +49,11 @@ impl ArmedGuard {
             .request
             .deadline_boottime_ms
             .saturating_sub(boottime_ms());
-        if remaining == 0
-            || self
-                .child
-                .process()
-                .try_wait()
-                .map_err(|_| Error::WatchdogUnavailable)?
-                .is_some()
-        {
+        if remaining == 0 {
             return Err(Error::Deadline);
+        }
+        for child in &mut self.children {
+            child.require_running()?;
         }
         u32::try_from(remaining).map_err(|_| Error::Deadline)
     }
@@ -62,6 +63,23 @@ impl ArmedGuard {
 #[derive(Debug)]
 struct DetachedChild(Option<Child>);
 impl DetachedChild {
+    fn require_running(&mut self) -> Result<()> {
+        use rustix::process::{WaitId, WaitIdOptions, waitid};
+        let pid = rustix::process::Pid::from_child(self.process());
+        loop {
+            match waitid(
+                WaitId::Pid(pid),
+                WaitIdOptions::EXITED
+                    | WaitIdOptions::STOPPED
+                    | WaitIdOptions::NOHANG
+                    | WaitIdOptions::NOWAIT,
+            ) {
+                Ok(None) => return Ok(()),
+                Err(rustix::io::Errno::INTR) => continue,
+                _ => return Err(Error::WatchdogUnavailable),
+            }
+        }
+    }
     fn process(&mut self) -> &mut Child {
         self.0.as_mut().expect("child is present until drop")
     }
@@ -85,9 +103,61 @@ pub(crate) fn launch(
     runtime: RuntimeObservation,
     deadline: Instant,
 ) -> Result<ArmedGuard> {
+    let [
+        (armed, primary, primary_stdout),
+        (backup_armed, backup, backup_stdout),
+    ] = launch_pair(executable, spool, &request, deadline)?;
+    let watchdog_pids = [
+        primary.0.as_ref().unwrap().id(),
+        backup.0.as_ref().unwrap().id(),
+    ];
+    let mut guard = ArmedGuard {
+        evidence: Evidence {
+            version: 2,
+            runtime,
+            armed,
+            backup_armed,
+            watchdog_pids,
+            observed_boottime_ms: boottime_ms(),
+        },
+        children: [primary, backup],
+        _stdout: [primary_stdout, backup_stdout],
+    };
+    guard.remaining_budget_ms()?;
+    Ok(guard)
+}
+
+type ArmedProcess = (ArmedReceipt, DetachedChild, ChildStdout);
+
+fn launch_pair(
+    executable: &File,
+    spool: &std::path::Path,
+    request: &Request,
+    deadline: Instant,
+) -> Result<[ArmedProcess; 2]> {
+    let mut primary = launch_one(executable, spool, request, deadline)?;
+    // Partial setup failure detaches an already armed timer; never disarm it.
+    let mut backup = launch_one(executable, spool, request, deadline)?;
+    if primary.0.cgroup_device != backup.0.cgroup_device {
+        return Err(Error::IdentityMismatch);
+    }
+    primary.1.require_running()?;
+    backup.1.require_running()?;
+    Ok([primary, backup])
+}
+
+fn launch_one(
+    executable: &File,
+    spool: &std::path::Path,
+    request: &Request,
+    deadline: Instant,
+) -> Result<ArmedProcess> {
+    if Instant::now() >= deadline {
+        return Err(Error::Deadline);
+    }
     let mut input = tempfile::NamedTempFile::new_in(spool).map_err(|_| Error::Configuration)?;
-    let expected = serde_json::to_value(&request).map_err(|_| Error::Configuration)?;
-    let bytes = serde_json::to_vec(&request).map_err(|_| Error::Configuration)?;
+    let expected = serde_json::to_value(request).map_err(|_| Error::Configuration)?;
+    let bytes = serde_json::to_vec(request).map_err(|_| Error::Configuration)?;
     // Also applies the watchdog's canonical path, ID and budget input bounds.
     Request::parse(&bytes).map_err(|_| Error::Configuration)?;
     input.write_all(&bytes).map_err(|_| Error::Configuration)?;
@@ -125,17 +195,8 @@ pub(crate) fn launch(
     {
         return Err(Error::IdentityMismatch);
     }
-    let mut guard = ArmedGuard {
-        evidence: Evidence {
-            runtime,
-            armed,
-            observed_boottime_ms: now,
-        },
-        child,
-        _stdout: stdout,
-    };
-    guard.remaining_budget_ms()?;
-    Ok(guard)
+    child.require_running()?;
+    Ok((armed, child, stdout))
 }
 
 fn read_receipt(

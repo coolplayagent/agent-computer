@@ -33,6 +33,7 @@
 29. [数据库授权的 Candidate 执行工作器](zh-CN/29-execution-worker.md)
 30. [节点 cgroup watchdog](zh-CN/30-node-watchdog.md)
 31. [节点布防后的执行启动](zh-CN/31-node-guarded-startup.md)
+32. [冗余节点 watchdog](zh-CN/32-redundant-node-watchdogs.md)
 
 ## 02. English
 
@@ -67,6 +68,7 @@
 29. [Database-backed Candidate execution worker](en/29-execution-worker.md)
 30. [Node cgroup watchdog](en/30-node-watchdog.md)
 31. [Node-guarded execution startup](en/31-node-guarded-startup.md)
+32. [Redundant node watchdogs](en/32-redundant-node-watchdogs.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

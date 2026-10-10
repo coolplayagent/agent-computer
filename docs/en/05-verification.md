@@ -59,3 +59,5 @@ The standalone node watchdog passed 12 kernel cases and the real gVisor PID 1 ST
 Nine additional default contracts cover exact node/process identity, bounded local commands, durable arm metadata, WAL recovery without restored live handles, and migration 16. Actual controller/PID 1 fault tests are separate component evidence; they do not release writer leases or change T01–T43.
 
 The final worktree passed all 303 default Cargo/Bazel tests and seven guarded-startup VM cases after the child-reaping fix. The [component evidence](../evidence/node-guarded-startup-2026-10-10.json) retains exact source and binary hashes, full VM readback, twelve kernel probes of the unchanged watchdog binary, and earlier failures. The owned VM and ten private files were removed after collection. This remains component evidence; T01–T43 stay `not_run`.
+
+Four additional default tests cover watchdog exit/stop detection, detached lifetime, redundant SQL evidence and migration 17 compatibility. The root-only pair fault fixture remains separate; see [32 Redundant node watchdogs](32-redundant-node-watchdogs.md).

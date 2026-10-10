@@ -36,6 +36,8 @@ Replace every placeholder with observed deployment values. Executables and their
 
 Build with `bazel build //crates/node //crates/watchdog:agent-computer-watchdog //crates/server:agent-computer-server`. Recovery only observes and conditionally deletes the original Pod; it never rearms from stored JSON.
 
+The current adapter requires a pair of independently armed processes with the same deadline; see [32 Redundant node watchdogs](32-redundant-node-watchdogs.md). The single-guard runtime evidence below describes its original source revision.
+
 ## 31.4 Verification and remaining work
 
 Ten new default cases cover Kubernetes node/boot/container identity, structured CRI rejection, pinned command execution, bounded subprocess I/O, child identity during error cleanup, SQL identity/deadline constraints, immutable WAL recovery and migration 16. SQL fixtures explicitly use synthetic metadata; they do not construct live node handles. The final source passed all 303 default Cargo/Bazel tests, including 134 PostgreSQL cases, across ten Bazel test targets.

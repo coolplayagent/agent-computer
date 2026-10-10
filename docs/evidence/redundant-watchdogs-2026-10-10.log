@@ -1,0 +1,33 @@
+=== agent-computer-redundant-live-final.log ===
+
+running 1 test
+{"case":"redundant_guard_fault","deadline_boottime_ms":195295,"empty_observed_boottime_ms":195304,"failed_index":0,"signal":"\"Signal::KILL\"","writer_released":false}
+{"case":"redundant_guard_fault","deadline_boottime_ms":196824,"empty_observed_boottime_ms":196825,"failed_index":1,"signal":"\"Signal::KILL\"","writer_released":false}
+{"case":"redundant_guard_fault","deadline_boottime_ms":198334,"empty_observed_boottime_ms":198339,"failed_index":0,"signal":"\"Signal::STOP\"","writer_released":false}
+{"case":"redundant_guard_fault","deadline_boottime_ms":199857,"empty_observed_boottime_ms":199858,"failed_index":1,"signal":"\"Signal::STOP\"","writer_released":false}
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 6.08s
+
+
+=== agent-computer-redundant-environment.log ===
+Linux ac-kube-validation 6.8.0-142-generic #142-Ubuntu SMP PREEMPT_DYNAMIC Wed Sep  2 14:24:27 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.5 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+0cd01d9d-8245-4d6e-a263-df6dc7cc7764
+ee54c1bdb471f468e1cc925c6074bfd90353c0c4ac1db29806ed9483a2594215  /home/ac-test/node_contracts_test
+735c4f44546c19ff1c01b423d33c79d4bb3377244f31933240393a64394f4833  /home/ac-test/agent-computer-watchdog
+
+=== agent-computer-redundant-owned-clean.json ===
+{"remaining_watchdogs": [], "owned_cgroups": []}

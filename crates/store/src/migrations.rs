@@ -131,6 +131,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0016_execution_watchdogs.sql")),
                     false,
                 ),
+                Migration::new(
+                    17,
+                    Cow::Borrowed("redundant execution watchdogs"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0017_redundant_watchdogs.sql")),
+                    false,
+                ),
             ])
         })
     }
