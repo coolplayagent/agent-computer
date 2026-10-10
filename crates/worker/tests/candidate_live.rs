@@ -30,6 +30,8 @@ use std::{
 mod artifacts;
 #[path = "support/continuation.rs"]
 mod continuation;
+#[path = "support/fence.rs"]
+mod fence;
 #[path = "support/file_http.rs"]
 mod file_http;
 #[path = "support/file_writer.rs"]
@@ -474,7 +476,8 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         owner: &owner,
     })
     .await;
-    let evidence = json!({"continuation":continuation,"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
+    let fence = fence::verify(&worker_config, &config, &observations[0]["receipt"]);
+    let evidence = json!({"fence":fence,"continuation":continuation,"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
     fs::write(
         config["observation_file"].as_str().unwrap(),
         serde_json::to_vec_pretty(&evidence).unwrap(),

@@ -36,10 +36,10 @@ rust_test(
 rust_test(
     name = "candidate_worker_live_test",
     size = "large",
-    srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs", "tests/support/file_http.rs", "tests/support/artifacts.rs", "tests/support/continuation.rs"],
+    srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs", "tests/support/file_http.rs", "tests/support/artifacts.rs", "tests/support/continuation.rs", "tests/support/fence.rs"],
     crate_root = "tests/candidate_live.rs",
     tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
-    deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/storage", "//crates/store"] + all_crate_deps(normal = True, normal_dev = True),
+    deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/storage", "//crates/store", "//crates/fence"] + all_crate_deps(normal = True, normal_dev = True),
 )

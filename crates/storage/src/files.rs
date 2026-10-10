@@ -10,6 +10,21 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{io::Write, os::unix::fs::MetadataExt, time::Instant};
 
+/// An open, identity-checked Candidate directory for a trusted filesystem adapter.
+/// No path or serialized receipt can construct this handle. The caller must still
+/// enforce writer admission and must never expose the backing descriptor to a tenant.
+pub struct CandidateDirectory {
+    file: std::fs::File,
+    prepared: Prepared,
+    uid: u32,
+    gid: u32,
+}
+impl CandidateDirectory {
+    pub fn into_parts(self) -> (std::fs::File, Prepared, u32, u32) {
+        (self.file, self.prepared, self.uid, self.gid)
+    }
+}
+
 pub const MAX_FILE_BYTES: usize = 1 << 20;
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -119,6 +134,15 @@ fn snapshot(dir: &Dir, path: &str) -> Result<Option<FileVersion>> {
 }
 
 impl MountedVolume {
+    pub fn candidate_directory(&self, prepared: &Prepared) -> Result<CandidateDirectory> {
+        let dir = self.prepared_data(prepared)?;
+        Ok(CandidateDirectory {
+            file: dir.0.into(),
+            prepared: prepared.clone(),
+            uid: self.uid,
+            gid: self.gid,
+        })
+    }
     /// A bounded read from a pinned regular inode. Atomic gateway replacements
     /// yield either version; arbitrary unmanaged in-place writers are excluded.
     pub fn read_file(&self, prepared: &Prepared, path: &str) -> Result<Option<FileRead>> {
