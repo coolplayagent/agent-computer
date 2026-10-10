@@ -1,6 +1,6 @@
 # 53. Internal Browser Driver
 
-`packages/browser-driver` implements the TypeScript/Playwright component from D09: one private Chromium profile per admitted Browser App instance, multiple pages, bounded observations and explicit actions. It is an internal worker library. Public Browser API/CLI commands, App instance persistence, GUI control leases and ComputerView are still pending; the service continues to advertise Browser as unsupported.
+`packages/browser-driver` implements the TypeScript/Playwright component from D09: one private Chromium profile per admitted Browser App instance, multiple pages, bounded observations and explicit actions. It is an internal worker library. Public Browser API/CLI commands, App launch integration, GUI control leases and ComputerView are still pending; the service continues to advertise Browser as unsupported.
 
 ## Worker contract
 
@@ -39,3 +39,5 @@ Set the same browser path when installing and testing. Browser installation and 
 Tests exercise real pages and HTTP effects, PNG/DOM observations, structured and coordinate input, tabs, revocation, navigation/frame/handoff invalidation, bounds, lost acknowledgements and late journal admission. Their in-memory authorization/journal fixtures establish driver behavior only. Full App lifecycle, persistent GUI authority/journal adapters, encrypted profile checkpoints, cross-node fencing, ComputerView and T04/T05/T10/T24 acceptance remain incomplete.
 
 [Source-bound component evidence](../evidence/browser-driver-2026-10-11.json) and [actual browser test output](../evidence/browser-driver-2026-10-11.log) record 11 passing cases in a disposable VM with gVisor and Chromium sandbox enabled. This is not App lifecycle or product acceptance.
+
+[Durable App admission](54-app-admission.md) now supplies a separate reservation API. It does not yet implement the driver authority/journal callbacks.

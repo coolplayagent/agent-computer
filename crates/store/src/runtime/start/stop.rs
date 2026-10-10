@@ -74,6 +74,10 @@ pub(crate) async fn commit_stop(
     if !clean && checkpoint.is_none() {
         return Err(Error::RuntimeStopBlocked);
     }
+    if sqlx::query_scalar::<_,bool>("SELECT EXISTS (SELECT 1 FROM app_instances WHERE organization=$1 AND request_id=$2 AND state<>'Cancelled')")
+        .bind(org).bind(&request.request_id).fetch_one(&mut **tx).await? {
+        return Err(Error::RuntimeStopBlocked);
+    }
     let source = sqlx::query("SELECT r.candidate_id,r.storage_bytes,i.revision,v.digest FROM runtime_start_requests r JOIN runtime_start_inputs i USING(organization,request_id) JOIN workspace_input_versions v ON v.organization=i.organization AND v.workspace_id=i.workspace_id AND v.revision=i.revision WHERE r.organization=$1 AND r.request_id=$2")
             .bind(org).bind(&request.request_id).fetch_one(&mut **tx).await?;
     let receipt = ComputerStopReceipt {

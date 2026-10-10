@@ -48,6 +48,12 @@ pub fn router_with_gateways(
             get(|| async { Json(json!({"version":VERSION,"api_version":API_VERSION})) }),
         )
         .route("/v1alpha1/capabilities", get(capabilities))
+        .route("/v1alpha1/computers/{id}/apps", post(crate::apps::admit))
+        .route("/v1alpha1/app-instances/{id}", get(crate::apps::get))
+        .route(
+            "/v1alpha1/app-instances/{id}/cancel",
+            post(crate::apps::cancel),
+        )
         .route(
             "/v1alpha1/workspaces/{id}/artifacts",
             post(crate::artifacts::commit),
@@ -203,7 +209,7 @@ async fn capabilities(State(state): State<ServiceState>) -> Json<serde_json::Val
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane", "computer.stop_before_user_dispatch":"control-plane",
-            "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"sealed-file-candidates",
+            "app.admission":"bounded-queued", "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"sealed-file-candidates",
             "execution.admission":"bounded-queued", "execution.outputs":"bounded-durable-observations", "execution.output_chunks":if state.outputs.is_some(){"bounded-verified-prefixes"}else{"metadata-only"}, "execution.output_downloads":if state.outputs.is_some(){"bounded-verified-streams"}else{"unsupported"}, "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
     )

@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: revocable service credentials, independent runtime grants, authorized definition plans, queued Computer start admission, durable connection and writer coordination, authenticated bounded file reads/saves, trusted guarded execution workers with durable outputs, and sealed Workspace artifacts with file-only checkpoint restart. Trusted operators provision storage and publish artifacts. Computer Ready, browser/OIDC, arbitrary-process storage fencing, App/profile checkpoint capture, Presentation, GC and full product acceptance remain pending."
+    "description": "Development control API: revocable service credentials, independent runtime grants, authorized definition plans, queued Computer start admission, queued App reservations with explicit profile ownership, durable connection and writer coordination, authenticated bounded file reads/saves, trusted guarded execution workers with durable outputs, and sealed Workspace artifacts with file-only checkpoint restart. Trusted operators provision storage and publish artifacts. Computer Ready, browser/OIDC, arbitrary-process storage fencing, App/profile checkpoint capture, Presentation, GC and full product acceptance remain pending."
   },
   "servers": [
     {
@@ -4444,6 +4444,484 @@
           }
         }
       }
+    },
+    "/v1alpha1/computers/{id}/apps": {
+      "post": {
+        "operationId": "admitApp",
+        "description": "Reserve a Chromium App in the current Prepared Computer generation. Requires live bound connection, Computer connect/read/app.use/activate, App read/app.use/activate, corresponding credential scopes, and profile AppUse plus separately registered subject ownership. Fixed lifetime includes queue delay and is bounded by the connection and original Computer admission budget. Unique App, Sandbox and Profile slots remain held when Blocked. No launch, GUI control or readiness is granted.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid path, input or idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credential inactive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing service scope, activation budget or unsupported Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or owner inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request deadline exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale generation, occupied slot, revision or idempotency conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection expired or closed, or idempotency key retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Pinned App revision mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds 4 KiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Pinned catalog or driver unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "App ceiling reached (64 per organization, 8 per principal); Blocked reservations still count.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Reconcile unknown writes using the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Current App reservation metadata; ready remains false.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppInstance"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdmitApp"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/app-instances/{id}": {
+      "get": {
+        "operationId": "getAppInstance",
+        "description": "Read own App admission with current Computer and App read permission. Rechecks original credential, connection, grants, budget and pinned catalogs; expired or invalid Queued reservations become irreversibly Blocked. A new credential for the same principal may inspect the record but cannot inherit its bound connection.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Credential inactive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing service scope, activation budget or unsupported Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or owner inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request deadline exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale generation, occupied slot, revision or idempotency conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection expired or closed, or idempotency key retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Pinned App revision mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Pinned catalog or driver unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Reconcile unknown writes using the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current App reservation metadata; ready remains false.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppInstance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/app-instances/{id}/cancel": {
+      "post": {
+        "operationId": "cancelApp",
+        "description": "Cancel an owned undispatched Queued or Blocked reservation using exact App generation and revision; requires current Computer/App manage permission and runtime.manage. Exact retries return current original metadata. This cancellation proves only absence of launch through this admission API. It is not process termination or profile checkpoint evidence.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid path, input or idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credential inactive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing service scope, activation budget or unsupported Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or owner inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request deadline exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale generation, occupied slot, revision or idempotency conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection expired or closed, or idempotency key retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Pinned App revision mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds 4 KiB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Use uncompressed application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Pinned catalog or driver unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "App ceiling reached (64 per organization, 8 per principal); Blocked reservations still count.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Reconcile unknown writes using the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current App reservation metadata; ready remains false.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppInstance"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelApp"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -7002,6 +7480,154 @@
           }
         },
         "description": "Contiguous verified prefix, available during execution and after interruption. Resume after next_sequence without rerunning a command. Final report verification and EOF do not assert accepted execution completion. Empty pages are not proof of terminal state. Missing final report remains explicit."
+      },
+      "AdmitApp": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "connection_session_id",
+          "computer_generation",
+          "app_id",
+          "expected_app_revision",
+          "runtime_seconds"
+        ],
+        "properties": {
+          "connection_session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "app_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "expected_app_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "runtime_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 300
+          }
+        }
+      },
+      "CancelApp": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "app_generation",
+          "expected_revision"
+        ],
+        "properties": {
+          "app_generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "AppInstance": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instance_id",
+          "computer_id",
+          "app_id",
+          "sandbox_id",
+          "profile_owner_id",
+          "connection_session_id",
+          "computer_generation",
+          "app_generation",
+          "app_revision",
+          "revision",
+          "created_at_ms",
+          "expires_at_ms",
+          "checked_at_ms",
+          "profile_id",
+          "binding_digest",
+          "state",
+          "ready"
+        ],
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "app_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "sandbox_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "profile_owner_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "connection_session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "app_generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "app_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expires_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "checked_at_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "profile_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "binding_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Queued",
+              "Blocked",
+              "Cancelled"
+            ]
+          },
+          "ready": {
+            "const": false
+          }
+        }
       }
     },
     "responses": {

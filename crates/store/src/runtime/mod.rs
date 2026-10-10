@@ -1,6 +1,7 @@
 //! Exact resource runtime grants, separate from declaration management.
 //! No permission implies another, and successful checks do not establish a lease,
 //! a generation, physical fencing, stopped processes, or actual runtime readiness.
+pub mod apps;
 pub mod artifacts;
 pub mod connections;
 pub mod files;
@@ -163,6 +164,7 @@ impl Store {
         } else {
             0
         };
+        apps::invalidate_grant(&mut tx, &grant, enabled).await?;
         let draining_writers = if !enabled {
             writers::invalidate_grant(&mut tx, &grant).await?
         } else {

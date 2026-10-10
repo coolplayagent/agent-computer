@@ -556,3 +556,101 @@ fn private_database_files_and_cli_arguments_fail_closed() {
     assert_eq!(output.status.code(), Some(2));
     assert!(!String::from_utf8_lossy(&output.stderr).contains("do-not-print-this"));
 }
+
+#[tokio::test]
+async fn operator_registers_profile_subject_explicitly_without_transfer_or_launch() {
+    use agent_computer_core::identity::OrganizationId;
+    use agent_computer_store::{Store, plans::DefinitionKind};
+    let database = Postgres::new().await;
+    let files = tempfile::tempdir().unwrap();
+    let database_file = files.path().join("database-url");
+    fs::write(&database_file, database.connection_url()).unwrap();
+    fs::set_permissions(&database_file, fs::Permissions::from_mode(0o600)).unwrap();
+    assert!(command(&["migrate"], &database_file).status.success());
+    for principal in ["alice", "bob"] {
+        let output = files.path().join(principal);
+        assert!(
+            command(
+                &[
+                    "credential-issue",
+                    "--organization",
+                    "acme",
+                    "--principal",
+                    principal,
+                    "--kind",
+                    "human",
+                    "--scopes",
+                    "runtime.read",
+                    "--ttl-seconds",
+                    "60",
+                    "--output",
+                    output.to_str().unwrap()
+                ],
+                &database_file
+            )
+            .status
+            .success()
+        );
+    }
+    let store = Store::new(database.pool.clone());
+    let profile = store
+        .register_catalog_reference(
+            &OrganizationId::new("acme").unwrap(),
+            DefinitionKind::BrowserProfile,
+            "private-browser",
+        )
+        .await
+        .unwrap();
+    let args = [
+        "browser-profile-owner-register",
+        "--organization",
+        "acme",
+        "--resource-id",
+        profile.as_str(),
+        "--principal",
+        "alice",
+    ];
+    for _ in 0..2 {
+        let result = command(&args, &database_file);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let receipt: Value = serde_json::from_slice(&result.stdout).unwrap();
+        assert_eq!(
+            receipt,
+            serde_json::json!({"registered":true,"runtime_started":false})
+        );
+    }
+    assert!(
+        !command(
+            &[
+                "browser-profile-owner-register",
+                "--organization",
+                "acme",
+                "--resource-id",
+                profile.as_str(),
+                "--principal",
+                "bob"
+            ],
+            &database_file
+        )
+        .status
+        .success()
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, String>("SELECT principal FROM browser_profile_owners")
+            .fetch_one(&database.pool)
+            .await
+            .unwrap(),
+        "alice"
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM app_instances")
+            .fetch_one(&database.pool)
+            .await
+            .unwrap(),
+        0
+    );
+}

@@ -75,3 +75,5 @@
 最新[持久化输出流增量](50-durable-execution-output.md)通过 471 项 Cargo 测试、15 个 Bazel 目标、fmt/Clippy、32 个真实执行场景、7 个聚焦流式场景、8 类节点续租故障以及 Candidate/CSI 回归。独立读取核对了 271 个输出块对象、60 个最终输出对象和 13 个冷读取 Candidate 输出文件。[源码绑定记录](../evidence/durable-execution-output-stream-2026-10-10.json)保留洪泛失败尝试、EOF/续租回归、进程退出后的报告接收诊断、准确二进制和 VM 清理证明。T01–T43 仍为 `not_run`。
 
 [认证执行 CLI](52-authenticated-execution-cli.md)新增八项线路契约测试和一项真实 CLI/TCP/Axum/PostgreSQL 测试。最终 Bazel 快照的 17 个目标共通过 487 项 Rust 测试，四项已有特权运行测试按默认配置忽略。准备回执为合成数据且派发意图为零，仅证明客户端与控制面行为，见[源码绑定记录](../evidence/authenticated-execution-cli-2026-10-11.json)。
+
+[App 持久化准入](54-app-admission.md)新增九项 PostgreSQL 契约、三项 HTTP 契约和一项实际运维进程测试。最终快照通过 18 个 Bazel 目标：500 项 Rust 测试及五项 TypeScript 单元测试，四项已有特权测试忽略。存储准备为合成证据，本次不新增 Chromium 运行时认证，详见[源码绑定记录](../evidence/app-admission-2026-10-11.json)。App 启动/GUI 适配器和完整产品验收仍待完成。

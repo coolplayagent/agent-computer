@@ -1,6 +1,6 @@
 # 53. 内部 Browser Driver
 
-`packages/browser-driver` 实现 D09 中的 TypeScript/Playwright 驱动组件：每个获准启动的 Browser App 实例使用独立 Chromium profile，支持多页、有界观察和显式动作。这是内部 worker 库。公开 Browser API/CLI、App 实例持久化、GUI 控制租约和 ComputerView 尚未接入，服务仍声明 Browser 不受支持。
+`packages/browser-driver` 实现 D09 中的 TypeScript/Playwright 驱动组件：每个获准启动的 Browser App 实例使用独立 Chromium profile，支持多页、有界观察和显式动作。这是内部 worker 库。公开 Browser API/CLI、App 启动接入、GUI 控制租约和 ComputerView 尚未接入，服务仍声明 Browser 不受支持。
 
 ## Worker 契约
 
@@ -39,3 +39,5 @@ PLAYWRIGHT_BROWSERS_PATH=/private/test-browsers bazel test //packages/browser-dr
 测试使用真实页面和 HTTP 效果，覆盖 PNG/DOM、结构化及坐标输入、多页、撤权、导航/框架/控制切换失效、边界、回执丢失和迟到的 journal 准入。内存授权/journal fixture 仅验证驱动行为。完整 App 生命周期、持久 GUI 授权/journal、加密 profile checkpoint、跨节点 fencing、ComputerView 和 T04/T05/T10/T24 验收仍未完成。
 
 [绑定源码的组件证据](../evidence/browser-driver-2026-10-11.json)与[真实浏览器测试输出](../evidence/browser-driver-2026-10-11.log)记录一次性 VM 中同时启用 gVisor 和 Chromium 沙箱的 11 项通过结果，不构成 App 生命周期或产品验收。
+
+[App 持久化准入](54-app-admission.md)现已提供独立预留接口，尚未实现本驱动所需的 Authority/journal 回调接入。

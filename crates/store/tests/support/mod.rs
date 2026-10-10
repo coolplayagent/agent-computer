@@ -137,9 +137,9 @@ impl Database {
         let postgres = Postgres::new().await;
         let pool = postgres.pool.clone();
         let store = Store::new(pool.clone());
-        let (one, two) = tokio::join!(store.migrate(), store.migrate());
-        one.unwrap();
-        two.unwrap();
+        // Return the first migration error promptly; a failed migration may leave
+        // its pooled connection holding the session advisory lock.
+        tokio::try_join!(store.migrate(), store.migrate()).unwrap();
         Self {
             store,
             pool,

@@ -8,6 +8,7 @@ use serde_json::Value;
 use std::time::Duration;
 
 mod admission;
+mod apps;
 mod artifacts;
 mod connections;
 mod preparation;

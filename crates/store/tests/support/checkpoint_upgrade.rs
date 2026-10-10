@@ -1,7 +1,14 @@
 use super::Database;
 
 impl Database {
+    pub async fn remove_app_admission(&self) {
+        // Disposable test database only; production exposes forward migrations.
+        sqlx::raw_sql("DROP TRIGGER revoke_app_credential ON service_credentials; DROP TRIGGER revoke_app_principal ON principals; DROP TRIGGER close_app_connection ON connection_sessions; DROP TRIGGER check_computer_app_reservations ON runtime_start_requests; DROP FUNCTION invalidate_app_authority(); DROP FUNCTION guard_computer_app_reservations(); DROP TABLE app_instances,browser_profile_owners; DROP FUNCTION guard_app_admission(); DELETE FROM _sqlx_migrations WHERE version=31;")
+            .execute(&self.pool).await.unwrap();
+    }
+
     pub async fn remove_execution_output_chunks(&self) {
+        self.remove_app_admission().await;
         sqlx::raw_sql("DROP TRIGGER check_execution_output_stream_final ON execution_output_intents; DROP FUNCTION guard_execution_output_stream_final(); DROP TABLE execution_output_chunks,execution_output_chunk_intents; DROP FUNCTION guard_execution_output_chunk(); DROP FUNCTION execution_output_stream_progress(TEXT,TEXT); ALTER TABLE execution_requests DROP CONSTRAINT execution_stream_policy; DELETE FROM _sqlx_migrations WHERE version=30;")
             .execute(&self.pool).await.unwrap();
         let source = include_str!("../../migrations/0029_execution_renewal.sql");
