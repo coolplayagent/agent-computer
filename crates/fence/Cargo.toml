@@ -1,0 +1,20 @@
+[package]
+name = "agent-computer-fence"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+agent-computer-storage = { path = "../storage" }
+fuser.workspace = true
+rustix.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+getrandom.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

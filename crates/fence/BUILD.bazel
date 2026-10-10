@@ -1,0 +1,20 @@
+load("@crates//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+rust_library(
+    name = "fence",
+    srcs = glob(["src/**/*.rs"]),
+    crate_name = "agent_computer_fence",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    visibility = ["//visibility:public"],
+    deps = ["//crates/storage"] + all_crate_deps(normal = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+)
+
+rust_test(
+    name = "fence_contracts_test",
+    size = "small",
+    crate = ":fence",
+    deps = all_crate_deps(normal_dev = True),
+)

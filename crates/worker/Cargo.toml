@@ -19,6 +19,8 @@ serde.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]
+agent-computer-fence = { path = "../fence" }
+rustix.workspace = true
 agent-computer-test-support = { path = "../test-support" }
 tokio.workspace = true
 sqlx.workspace = true
