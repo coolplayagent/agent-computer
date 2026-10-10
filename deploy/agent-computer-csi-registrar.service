@@ -1,0 +1,21 @@
+[Unit]
+Description=Agent Computer CSI registration using upstream node-driver-registrar
+After=agent-computer-csi.service
+Requires=agent-computer-csi.service
+PartOf=agent-computer-csi.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+# Install an operator-verified upstream registrar; the component evidence pins
+# the tested image digest and extracted executable checksum.
+ExecStart=/usr/local/bin/csi-node-driver-registrar --csi-address=/var/lib/kubelet/plugins/csi.agent-computer.io/csi.sock --kubelet-registration-path=/var/lib/kubelet/plugins/csi.agent-computer.io/csi.sock --plugin-registration-path=/var/lib/kubelet/plugins_registry
+Restart=on-failure
+RestartSec=2
+UMask=0077
+NoNewPrivileges=true
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

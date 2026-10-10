@@ -55,3 +55,27 @@ pub(super) async fn verify(local: Arc<LocalStorage>) -> Result<()> {
     .await
     .map_err(|_| Error::ReferenceUnavailable)?
 }
+pub(super) async fn fence(
+    local: Arc<LocalStorage>,
+    execution: String,
+) -> Result<Arc<agent_computer_fence::MountedFence>> {
+    tokio::task::spawn_blocking(move || {
+        let registry = agent_computer_csi::Registry::open(std::path::Path::new(
+            agent_computer_csi::server::REGISTRY,
+        ))
+        .map_err(|_| Error::ReferenceUnavailable)?;
+        let path = registry
+            .prepare_mountpoint(&execution)
+            .map_err(|_| Error::ReferenceUnavailable)?;
+        let candidate = local
+            .mount
+            .candidate_directory(&local.prepared)
+            .map_err(|_| Error::ReferenceUnavailable)?;
+        Ok(Arc::new(
+            agent_computer_fence::mount(candidate, &path)
+                .map_err(|_| Error::ReferenceUnavailable)?,
+        ))
+    })
+    .await
+    .map_err(|_| Error::ReferenceUnavailable)?
+}

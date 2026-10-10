@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+agent-computer-fence = { path = "../fence" }
 agent-computer-definitions = { path = "../definitions" }
 agent-computer-sandbox = { path = "../sandbox" }
 agent-computer-storage = { path = "../storage" }

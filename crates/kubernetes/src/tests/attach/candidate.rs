@@ -203,6 +203,91 @@ fn candidate_admission_cannot_change_subpath_or_reintroduce_volume_ownership() {
         .remove("readOnly");
     verify::pod(plan.pod_plan(), &p, None).unwrap();
 }
+#[test]
+fn fenced_candidate_pins_node_and_rejects_direct_mount_substitution() {
+    let (request, prepared) = prepared();
+    let node = crate::NodeIdentity {
+        name: "node-a".into(),
+        uid: "node-uid".into(),
+        boot_id: "00000000-0000-0000-0000-000000000001".into(),
+    };
+    let reference = agent_computer_fence::MountReference {
+        version: 1,
+        instance: "a".repeat(64),
+        path: "/var/lib/agent-computer-csi/mounts/execution-a".into(),
+        device: 42,
+        inode: 1,
+        boot_id: node.boot_id.clone(),
+        mount_namespace: 12,
+        prepared: prepared.clone(),
+    };
+    let plan = StartupSandboxPlan::with_candidate(
+        &definition(true),
+        "sandbox",
+        identity(),
+        "ac-test",
+        &format!("docker.io/library/busybox@sha256:{}", "a".repeat(64)),
+        startup_plan().bootstrap().clone(),
+        mount(&request, &prepared)
+            .unwrap()
+            .with_fence(reference.clone(), node.clone())
+            .unwrap(),
+    )
+    .unwrap();
+    let pod = running(&plan);
+    assert_eq!(
+        pod["spec"]["volumes"][2]["csi"]["driver"],
+        "csi.agent-computer.io"
+    );
+    assert!(
+        pod["spec"]["containers"][0]["volumeMounts"][2]
+            .get("subPath")
+            .is_none()
+    );
+    verify::pod(plan.pod_plan(), &pod, None).unwrap();
+    for (pointer, value) in [
+        ("/spec/nodeName", json!("node-b")),
+        (
+            "/spec/volumes/2",
+            json!({"name":"workspace","hostPath":{"path":"/mnt/backing"}}),
+        ),
+        (
+            "/spec/volumes/2",
+            json!({"name":"workspace","persistentVolumeClaim":{"claimName":"pvc-volume"}}),
+        ),
+        (
+            "/spec/volumes/2/csi/volumeAttributes/agent-computer.io~1mount-instance",
+            json!("b".repeat(64)),
+        ),
+        (
+            "/spec/containers/0/volumeMounts/2",
+            json!({"name":"workspace","mountPath":"/workspace","subPath":"other","readOnly":false}),
+        ),
+    ] {
+        let mut changed = pod.clone();
+        *changed.pointer_mut(pointer).unwrap() = value;
+        assert!(
+            verify::pod(plan.pod_plan(), &changed, None).is_err(),
+            "{pointer}"
+        );
+    }
+    let mut wrong = reference.clone();
+    wrong.prepared.data_inode += 1;
+    assert!(
+        mount(&request, &prepared)
+            .unwrap()
+            .with_fence(wrong, node.clone())
+            .is_err()
+    );
+    let mut wrong = reference;
+    wrong.boot_id = "00000000-0000-0000-0000-000000000002".into();
+    assert!(
+        mount(&request, &prepared)
+            .unwrap()
+            .with_fence(wrong, node)
+            .is_err()
+    );
+}
 #[tokio::test]
 async fn candidate_create_rechecks_claim_and_pv_before_one_post() {
     for changed in [false, true] {

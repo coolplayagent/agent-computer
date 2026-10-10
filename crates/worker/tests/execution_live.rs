@@ -398,7 +398,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         } else if name == "cancel" {
             "printf started > started.txt; /bin/sync started.txt; /bin/sleep 20; printf unexpected > late.txt"
         } else {
-            "printf persisted > output.txt; /bin/sync output.txt; printf done"
+            "/bin/mkdir nested && printf nested > nested/file && /bin/sync nested/file && /bin/mv nested/file nested/renamed && /bin/rm nested/renamed || exit 98; if [ -e .control ] || [ -e nested/.control ]; then exit 99; fi; /bin/rmdir nested || exit 98; printf persisted > output.txt; /bin/sync output.txt; printf done"
         };
         let queued = store
             .submit_candidate_execution(
@@ -547,6 +547,29 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                         );
                         tokio::time::sleep(Duration::from_millis(50)).await;
                     }
+                    let csi_test = field(&config, "csi_test_binary").to_owned();
+                    let csi_execution = queued.execution_id.clone();
+                    let proof = tokio::task::spawn_blocking(move || {
+                        std::process::Command::new(csi_test)
+                            .env("AGENT_COMPUTER_CSI_DISPOSABLE_TEST", "1")
+                            .env("AGENT_COMPUTER_CSI_TEST_EXECUTION", csi_execution)
+                            .args([
+                                "--exact",
+                                "real_csi_active_retry_and_restart",
+                                "--nocapture",
+                            ])
+                            .output()
+                            .unwrap()
+                    })
+                    .await
+                    .unwrap();
+                    assert!(
+                        proof.status.success(),
+                        "{} {}",
+                        String::from_utf8_lossy(&proof.stdout),
+                        String::from_utf8_lossy(&proof.stderr)
+                    );
+                    println!("{}", String::from_utf8_lossy(&proof.stdout));
                     // Optional independent node inspection before cancellation;
                     // the original execution budget continues to run throughout.
                     if let Some(path) = config["node_observation_file"].as_str() {
@@ -672,6 +695,45 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         };
         if name == "output-db-failure" {
             sqlx::raw_sql("DROP TRIGGER reject_output_publication ON events; DROP FUNCTION reject_output_publication();").execute(&pool).await.unwrap();
+        }
+        if !matches!(name, "lost" | "rejected" | "controller-kill" | "pid1-stop") {
+            assert_eq!(outcome["publication_revoked"], true, "{outcome}");
+            assert_eq!(outcome["io_fence"]["prepared"], prepared, "{outcome}");
+            let pod = store
+                .candidate_execution_pod(&org, &queued.execution_id)
+                .await
+                .unwrap()
+                .unwrap();
+            let binding: Value = serde_json::from_str(
+                pod.manifest["metadata"]["annotations"]["agent-computer.io/binding"]
+                    .as_str()
+                    .unwrap(),
+            )
+            .unwrap();
+            assert_eq!(
+                pod.manifest["spec"]["volumes"][2]["csi"]["driver"],
+                "csi.agent-computer.io"
+            );
+            assert!(
+                pod.manifest["spec"]["containers"][0]["volumeMounts"][2]
+                    .get("subPath")
+                    .is_none()
+            );
+            assert_eq!(
+                binding["workspace"]["fence"]["mount"]["instance"],
+                outcome["io_fence"]["instance"]
+            );
+            if let Some(arm) = store
+                .candidate_execution_watchdog(&org, &queued.execution_id)
+                .await
+                .unwrap()
+            {
+                assert_eq!(
+                    arm.evidence["runtime"]["workspace_mount"],
+                    binding["workspace"]["fence"]["mount"]
+                );
+                assert_eq!(arm.evidence["runtime"]["workspace_mount"]["inode"], 1);
+            }
         }
         let private = json!({"api_url":"https://127.0.0.1:1","ca_file":"/unavailable-kubernetes-ca","token_file":"/unavailable-kubernetes-token","deployment":deployment,"execution":worker});
         let output_evidence = outputs::verify(

@@ -3,9 +3,11 @@
 #![forbid(unsafe_code)]
 mod backend;
 mod filesystem;
+mod reference;
 use agent_computer_storage::{Prepared, files::CandidateDirectory};
 use backend::{Result as FsResult, State};
 use fuser::{BackgroundSession, Config, Errno, MountOption, SessionACL};
+pub use reference::MountReference;
 use serde::Serialize;
 use std::{
     fs::File,
@@ -110,10 +112,22 @@ impl SealedFence {
 }
 pub struct MountedFence {
     gate: Arc<Gate>,
-    session: BackgroundSession,
+    session: Option<BackgroundSession>,
     _mountpoint: File,
+    reference: MountReference,
 }
 impl MountedFence {
+    /// Serializable routing metadata, never a reconstructed IO barrier.
+    pub fn reference(&self) -> &MountReference {
+        &self.reference
+    }
+    pub fn verify(&self) -> std::io::Result<File> {
+        self.reference.verify()
+    }
+    /// Immediately reject new mutations, without claiming existing IO is drained.
+    pub fn close(&self) {
+        self.gate.closed.store(true, Ordering::SeqCst);
+    }
     pub fn seal(&self) -> std::io::Result<SealedFence> {
         self.gate.seal()
     }
@@ -127,9 +141,17 @@ impl MountedFence {
             active_mutation: self.gate.active_mutation.load(Ordering::SeqCst),
         }
     }
-    pub fn unmount(self) -> std::io::Result<()> {
+    pub fn unmount(mut self) -> std::io::Result<()> {
         self.gate.closed.store(true, Ordering::SeqCst);
-        self.session.umount_and_join()
+        self.session
+            .take()
+            .expect("mounted session")
+            .umount_and_join()
+    }
+}
+impl Drop for MountedFence {
+    fn drop(&mut self) {
+        self.close();
     }
 }
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -183,10 +205,12 @@ fn mount_inner(
     ];
     config.n_threads = Some(2);
     let session = fuser::spawn_mount(filesystem::Filesystem(gate.clone()), mountpoint, &config)?;
+    let reference = MountReference::observe(mountpoint, &gate.instance, &gate.prepared)?;
     Ok(MountedFence {
         gate,
-        session,
+        session: Some(session),
         _mountpoint: target,
+        reference,
     })
 }
 fn trusted_mountpoint(path: &Path) -> std::io::Result<File> {

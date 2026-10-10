@@ -41,6 +41,44 @@ pub fn arm(
     candidate: &CandidateIdentity,
     deadline_boottime_ms: u64,
 ) -> Result<ArmedGuard> {
+    arm_inner(
+        config,
+        identity,
+        execution,
+        command,
+        candidate,
+        deadline_boottime_ms,
+        None,
+    )
+}
+pub fn arm_fenced(
+    config: &Configuration,
+    identity: PodRuntimeIdentity,
+    execution: &str,
+    command: &serde_json::Value,
+    candidate: &CandidateIdentity,
+    deadline_boottime_ms: u64,
+    fence: &agent_computer_fence::MountedFence,
+) -> Result<ArmedGuard> {
+    arm_inner(
+        config,
+        identity,
+        execution,
+        command,
+        candidate,
+        deadline_boottime_ms,
+        Some(fence),
+    )
+}
+fn arm_inner(
+    config: &Configuration,
+    identity: PodRuntimeIdentity,
+    execution: &str,
+    command: &serde_json::Value,
+    candidate: &CandidateIdentity,
+    deadline_boottime_ms: u64,
+    fence: Option<&agent_computer_fence::MountedFence>,
+) -> Result<ArmedGuard> {
     if !rustix::process::geteuid().is_root() {
         return Err(Error::RootRequired);
     }
@@ -134,6 +172,7 @@ pub fn arm(
         &container,
         &sandbox,
         &metadata,
+        fence.is_some(),
     )
     .map_err(|_| Error::RuntimeBinding)?;
     let start = observation::process(fields.pid, &fields.sandbox, &fields.parent)
@@ -161,7 +200,7 @@ pub fn arm(
     );
     let stat = mount.metadata().map_err(|_| Error::IdentityMismatch)?;
     if candidate.data_inode == 0
-        || stat.ino() != candidate.data_inode
+        || (fence.is_none() && stat.ino() != candidate.data_inode)
         || stat.uid() != 1000
         || stat.gid() != 1000
         || stat.mode() & 0o777 != 0o700
@@ -171,6 +210,18 @@ pub fn arm(
             != 0x6573_5546
     {
         return Err(Error::WorkspaceBinding);
+    }
+    if let Some(fence) = fence {
+        let reference = fence.reference();
+        if reference.boot_id != config.node.boot_id
+            || reference.prepared.data_inode != candidate.data_inode
+        {
+            return Err(Error::WorkspaceBinding);
+        }
+        fence.verify().map_err(|_| Error::WorkspaceBinding)?;
+        reference
+            .verify_file(&mount)
+            .map_err(|_| Error::WorkspaceBinding)?;
     }
     if observation::process(fields.pid, &fields.sandbox, &fields.parent)? != start {
         return Err(Error::IdentityMismatch);
@@ -191,6 +242,7 @@ pub fn arm(
         cgroup_path: fields.parent,
         cgroup_inode: inode,
         workspace_inode: candidate.data_inode,
+        workspace_mount: fence.map(|f| f.reference().clone()),
         volume_path: candidate.volume_path.clone(),
         runtime_processes,
     };

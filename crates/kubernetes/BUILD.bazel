@@ -8,7 +8,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/definitions", "//crates/sandbox", "//crates/storage"] + all_crate_deps(normal = True),
+    deps = ["//crates/fence", "//crates/definitions", "//crates/sandbox", "//crates/storage"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 

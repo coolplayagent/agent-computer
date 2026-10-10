@@ -1,0 +1,27 @@
+[Unit]
+Description=Agent Computer trusted Candidate CSI publisher
+After=k3s.service
+Requires=k3s.service
+Wants=agent-computer-csi-registrar.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+# Set NODE_NAME to the exact Kubernetes node name in this operator-owned file.
+EnvironmentFile=/etc/agent-computer/csi.env
+ExecStartPre=/usr/bin/install -d -m 0700 /var/lib/agent-computer-csi
+ExecStartPre=/usr/bin/install -d -m 0755 /var/lib/kubelet/plugins/csi.agent-computer.io /var/lib/kubelet/plugins_registry
+ExecStart=/usr/local/bin/agent-computer-csi ${NODE_NAME}
+Restart=on-failure
+RestartSec=2
+UMask=0077
+NoNewPrivileges=true
+PrivateMounts=no
+# Do not add filesystem sandbox directives creating a separate mount namespace:
+# publication must be visible to Kubelet and the local execution controller.
+RestrictAddressFamilies=AF_UNIX
+LimitNOFILE=8192
+
+[Install]
+WantedBy=multi-user.target

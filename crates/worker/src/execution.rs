@@ -49,6 +49,8 @@ pub enum Cleanup {
 /// The raw observation is deliberately omitted from JSON/operator command output.
 #[derive(Debug, Serialize)]
 pub struct WorkResult {
+    pub io_fence: Option<agent_computer_fence::Evidence>,
+    pub publication_revoked: bool,
     pub output: Option<ExecutionOutput>,
     pub output_unconfirmed: bool,
     pub execution: ExecutionRequest,
@@ -118,16 +120,23 @@ pub async fn execute_once(
     let mut journal = None;
     let mut observed = None;
     let mut node_error = None;
+    let mut fence = None;
+    let mut registered = false;
     let run=tokio::time::timeout(budget, async {
         let inputs=store.candidate_execution_runtime_inputs(org,id).await?;
-        plan=Some(compile_plan(&inputs,client,&config.storage,&config.approved_supervisor_image)?);
-        let plan=plan.as_ref().ok_or(Error::InvalidStoredData)?;
         let local=storage::open(&inputs,config.candidate).await?;
         storage::verify(local.clone()).await?;
+        fence=Some(storage::fence(local.clone(),id.into()).await?);
+        let fence=fence.as_ref().ok_or(Error::InvalidStoredData)?;
+        plan=Some(plan::compile(&inputs,client,&config.storage,&config.approved_supervisor_image,Some((fence.reference().clone(),config.node.node.clone())))?);
+        let plan=plan.as_ref().ok_or(Error::InvalidStoredData)?;
         phase=Phase::PodPlan;
         backend(client.probe_sandbox_storage(plan.pod_plan()).await)?;
         let permit=store.register_candidate_execution_pod(&attempt,client.namespace_uid(),&plan.pod_plan().manifest()).await?;
         journal=Some(permit.plan().clone());
+        let registry=agent_computer_csi::Registry::open(std::path::Path::new(agent_computer_csi::server::REGISTRY)).map_err(|_|Error::ReferenceUnavailable)?;
+        registry.register(fence,agent_computer_csi::PodBinding {namespace:client.namespace().into(),name:permit.plan().pod_name.clone(),node:config.node.node.name.clone()}).map_err(|_|Error::ReferenceUnavailable)?;
+        registered=true;
         active(store,org,id).await?;
         permit.remaining_budget_ms()?;
         phase=Phase::PodCreate;
@@ -159,7 +168,8 @@ pub async fn execute_once(
         let execution=id.to_owned();
         let candidate=agent_computer_node::CandidateIdentity{data_inode:inputs.prepared.data_inode,volume_path:inputs.target.volume_path.clone()};
         phase=Phase::Watchdog;
-        let mut guard=tokio::task::spawn_blocking(move || agent_computer_node::arm(&config.node,runtime,&execution,&command,&candidate,guard_deadline))
+        let live_fence=fence.clone();
+        let mut guard=tokio::task::spawn_blocking(move || agent_computer_node::arm_fenced(&config.node,runtime,&execution,&command,&candidate,guard_deadline,&live_fence))
             .await.map_err(|_|Error::RuntimeAccessUnavailable)?.map_err(|error|{node_error=Some(error);Error::ReferenceUnavailable})?;
         phase=Phase::WatchdogRegistration;
         store.register_candidate_execution_watchdog(&attempt,&mut guard).await?;
@@ -183,11 +193,19 @@ pub async fn execute_once(
             }
         }
     }).await;
+    if let Some(fence) = &fence {
+        fence.close();
+    }
     let observation = run.ok().and_then(std::result::Result::ok);
     let interrupted_at = observation.is_none().then_some(phase);
     // Try to lower database authority first, but a database outage must not skip
     // best-effort conditional deletion of an already planned/observed instance.
     let state = unknown(store, org, id).await;
+    let publication_revoked = if registered {
+        revoke(fence.as_ref().expect("registered live mount").instance()).await
+    } else {
+        false
+    };
     let cleanup = match (&plan, &journal) {
         (Some(plan), Some(journal)) => {
             cleanup(
@@ -221,7 +239,24 @@ pub async fn execute_once(
     } else {
         (None, false)
     };
+    let io_fence = if let Some(fence) = fence {
+        match tokio::time::timeout(
+            Duration::from_secs(5),
+            tokio::task::spawn_blocking(move || {
+                fence.seal().map(|sealed| sealed.evidence().clone())
+            }),
+        )
+        .await
+        {
+            Ok(Ok(Ok(evidence))) => Some(evidence),
+            _ => None,
+        }
+    } else {
+        None
+    };
     Ok(WorkResult {
+        io_fence,
+        publication_revoked,
         output,
         output_unconfirmed,
         execution: state?,
@@ -295,13 +330,33 @@ pub async fn recover_once(
 ) -> Result<WorkResult> {
     let state = unknown(store, org, id).await?;
     let journal = store.candidate_execution_pod(org, id).await?;
+    let mut publication_revoked = false;
     let cleanup = if let Some(journal) = journal {
         let inputs = store.candidate_execution_runtime_inputs(org, id).await?;
-        let plan = compile_plan(&inputs, client, storage, approved_image)?;
+        let binding: serde_json::Value = serde_json::from_str(
+            journal.manifest["metadata"]["annotations"]["agent-computer.io/binding"]
+                .as_str()
+                .ok_or(Error::InvalidStoredData)?,
+        )
+        .map_err(|_| Error::InvalidStoredData)?;
+        let fence = if binding["workspace"]["fence"].is_null() {
+            None
+        } else {
+            let mount: agent_computer_fence::MountReference =
+                serde_json::from_value(binding["workspace"]["fence"]["mount"].clone())
+                    .map_err(|_| Error::InvalidStoredData)?;
+            let node = serde_json::from_value(binding["workspace"]["fence"]["node"].clone())
+                .map_err(|_| Error::InvalidStoredData)?;
+            Some((mount, node))
+        };
+        let plan = plan::compile(&inputs, client, storage, approved_image, fence.clone())?;
         if journal.namespace_uid != client.namespace_uid()
             || journal.manifest != plan.pod_plan().manifest()
         {
             return Err(Error::RuntimeConflict);
+        }
+        if let Some((mount, _)) = fence {
+            publication_revoked = revoke(&mount.instance).await;
         }
         cleanup(store, client, org, id, &plan, &journal, None).await
     } else {
@@ -328,6 +383,8 @@ pub async fn recover_once(
             (None, None)
         };
     Ok(WorkResult {
+        io_fence: None,
+        publication_revoked,
         output: None,
         output_unconfirmed: false,
         execution: state,
@@ -337,4 +394,20 @@ pub async fn recover_once(
         watchdog_journals,
         observation: None,
     })
+}
+async fn revoke(instance: &str) -> bool {
+    let instance = instance.to_owned();
+    matches!(
+        tokio::time::timeout(
+            Duration::from_secs(5),
+            tokio::task::spawn_blocking(move || {
+                agent_computer_csi::Registry::open(std::path::Path::new(
+                    agent_computer_csi::server::REGISTRY,
+                ))?
+                .revoke(&instance)
+            })
+        )
+        .await,
+        Ok(Ok(Ok(())))
+    )
 }

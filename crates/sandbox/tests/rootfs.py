@@ -30,7 +30,7 @@ def copy(source, destination):
 
 for source, destination in [(a.supervisor, "/bin/agent-computer-sandbox")] + [
     (pathlib.Path(shutil.which(name)), "/bin/" + name)
-    for name in ["sh", "sleep", "setsid", "env", "head", "yes", "cat", "sync"]
+    for name in ["sh", "sleep", "setsid", "env", "head", "yes", "cat", "sync", "mkdir", "mv", "rm", "rmdir"]
 ]:
     copy(source, destination)
     deps = subprocess.run(["ldd", str(source)], check=True, capture_output=True, text=True).stdout
