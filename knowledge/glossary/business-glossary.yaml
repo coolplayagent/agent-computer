@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: browser-driver
+    domain: agent-infrastructure
+    canonical_name: BrowserDriver
+    definition: 内部 TypeScript/Playwright 浏览器组件，以独立私有 profile 和当前授权驱动多页观察及单次动作；持久 intent 和结果应答不确定时禁止重放，context 关闭不构成物理 fencing，生产 App 生命周期、GUI 控制与 profile checkpoint 尚待接入。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: packages/browser-driver/src/driver.ts
+      - relation: represented_by
+        target_kind: file
+        target: packages/browser-driver/src/contracts.ts
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/53-browser-driver.md
   - id: node-guarded-startup
     domain: agent-infrastructure
     canonical_name: NodeGuardedStartup

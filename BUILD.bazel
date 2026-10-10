@@ -1,10 +1,21 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+
+npm_link_all_packages(name = "node_modules")
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    visibility = ["//visibility:public"],
+)
+
 alias(
     name = "agent-computer",
     actual = "//crates/cli:agent-computer",
     visibility = ["//visibility:public"],
 )
 
-exports_files(["rust-toolchain.toml", "Cargo.toml", "Cargo.lock"])
+exports_files(["rust-toolchain.toml", "Cargo.toml", "Cargo.lock", "package.json", "pnpm-lock.yaml", "tsconfig.json"])
 
 alias(
     name = "agent-computer-server",

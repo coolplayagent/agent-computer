@@ -1,0 +1,23 @@
+{
+  "name": "agent-computer-browser-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": "22.22.1"
+  },
+  "scripts": {
+    "build": "tsc -p packages/browser-driver/tsconfig.json",
+    "test:browser": "node --test packages/browser-driver/dist/tests/*.test.js"
+  },
+  "dependencies": {
+    "playwright-core": "1.64.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  }
+}

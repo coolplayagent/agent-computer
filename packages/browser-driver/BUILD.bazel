@@ -1,0 +1,28 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
+
+ts_project(
+    name = "browser_driver",
+    srcs = glob(["src/**/*.ts", "tests/**/*.ts"]),
+    tsconfig = "tsconfig.json",
+    extends = "//:tsconfig",
+    declaration = True,
+    source_map = True,
+    transpiler = "tsc",
+    out_dir = "dist",
+    visibility = ["//visibility:public"],
+    deps = ["//:node_modules/@types/node", "//:node_modules/playwright-core"],
+)
+
+js_test(
+    name = "unit_test",
+    entry_point = "dist/tests/unit.test.js",
+    data = [":browser_driver"],
+)
+
+js_test(
+    name = "browser_test",
+    entry_point = "dist/tests/browser.test.js",
+    data = [":browser_driver"],
+    tags = ["manual", "requires-browser"],
+)

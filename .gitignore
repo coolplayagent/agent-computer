@@ -3,3 +3,5 @@ codespec/*.lock
 knowledge/*.lock
 /target/
 /bazel-*
+node_modules/
+dist/
