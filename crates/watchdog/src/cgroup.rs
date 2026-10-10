@@ -12,6 +12,10 @@ pub(crate) struct Cgroup {
 
 impl Cgroup {
     pub fn open(request: &Request) -> Result<Self> {
+        Self::open_matching(request, None)
+    }
+
+    pub fn open_matching(request: &Request, device: Option<u64>) -> Result<Self> {
         let mut dir = File::from(open(
             "/sys/fs/cgroup",
             OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
@@ -28,7 +32,7 @@ impl Cgroup {
             trusted(&child(&dir, "cgroup.procs", OFlags::RDONLY)?)?;
         }
         let stat = fstat(&dir)?;
-        if stat.st_ino != request.cgroup_inode {
+        if stat.st_ino != request.cgroup_inode || device.is_some_and(|v| v != stat.st_dev) {
             return Err(Error::IdentityMismatch);
         }
         if read_control(&child(&dir, "cgroup.type", OFlags::RDONLY)?)? != "domain\n" {

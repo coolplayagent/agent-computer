@@ -65,3 +65,5 @@
 新增四项默认测试覆盖 watchdog 退出/暂停检测、分离生命周期、双进程 SQL 证据与迁移 17 兼容性。root 专用双进程故障 fixture 单独验证，见 [32 冗余节点 watchdog](32-redundant-node-watchdogs.md)。
 
 [33](33-watchdog-journals.md) 已交付节点本地意图/报告日志及只读恢复观察，持久 fencing 与 writer 释放仍待实现。
+
+常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。

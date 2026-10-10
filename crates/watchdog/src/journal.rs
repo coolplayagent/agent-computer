@@ -33,6 +33,16 @@ pub struct Intent {
 pub struct Snapshot {
     pub intent: Intent,
     pub report: Option<Report>,
+    pub enrollment: Option<Enrollment>,
+    pub recovery: Option<Report>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Enrollment {
+    pub version: u8,
+    pub journal: Reference,
+    pub cgroup_device: u64,
 }
 
 pub struct Journal {
@@ -84,6 +94,19 @@ impl Journal {
 
     /// Opens a fixed reference, including after a reboot, for observation only.
     pub fn read(spool: &Path, reference: &Reference) -> Result<Snapshot> {
+        let journal = Self::open_reference(spool, reference)?;
+        let report = journal.report()?;
+        let enrollment = journal.enrollment()?;
+        let recovery = journal.recovery()?;
+        Ok(Snapshot {
+            intent: journal.intent,
+            report,
+            enrollment,
+            recovery,
+        })
+    }
+
+    fn open_reference(spool: &Path, reference: &Reference) -> Result<Self> {
         root()?;
         valid_id(&reference.id)?;
         let dir = directory(&spool.join(&reference.id), true)?;
@@ -100,16 +123,102 @@ impl Journal {
             return Err(Error::InvalidJournal);
         }
         Request::parse(&serde_json::to_vec(&intent.request).map_err(|_| Error::InvalidJournal)?)?;
-        let journal = Self {
+        Ok(Self {
             directory: dir,
             reference: reference.clone(),
             intent,
-        };
-        let report = journal.report()?;
-        Ok(Snapshot {
-            intent: journal.intent,
-            report,
         })
+    }
+
+    pub(crate) fn enroll(&self, cgroup_device: u64) -> Result<()> {
+        let enrollment = Enrollment {
+            version: 1,
+            journal: self.reference.clone(),
+            cgroup_device,
+        };
+        publish(
+            &self.directory,
+            "enrollment.json",
+            "enrollment.pending",
+            &serde_json::to_vec(&enrollment).map_err(|_| Error::InvalidJournal)?,
+        )
+    }
+
+    pub(crate) fn open_enrolled(spool: &Path, id: &str) -> Result<Option<(Self, Enrollment)>> {
+        root()?;
+        valid_id(id)?;
+        let dir = directory(&spool.join(id), true)?;
+        let Some(bytes) = read(&dir, "enrollment.json")? else {
+            return Ok(None);
+        };
+        let enrollment: Enrollment =
+            serde_json::from_slice(&bytes).map_err(|_| Error::InvalidJournal)?;
+        if enrollment.journal.id != id {
+            return Err(Error::InvalidJournal);
+        }
+        let journal = Self::open_reference(spool, &enrollment.journal)?;
+        journal.validate_enrollment(&enrollment)?;
+        Ok(Some((journal, enrollment)))
+    }
+
+    fn validate_enrollment(&self, value: &Enrollment) -> Result<()> {
+        if value.version != 1 || value.journal != self.reference || value.cgroup_device == 0 {
+            return Err(Error::InvalidJournal);
+        }
+        Ok(())
+    }
+
+    fn enrollment(&self) -> Result<Option<Enrollment>> {
+        read(&self.directory, "enrollment.json")?
+            .map(|bytes| {
+                let value = serde_json::from_slice(&bytes).map_err(|_| Error::InvalidJournal)?;
+                self.validate_enrollment(&value)?;
+                Ok(value)
+            })
+            .transpose()
+    }
+
+    pub(crate) fn recovery(&self) -> Result<Option<Report>> {
+        read(&self.directory, "recovery.json")?
+            .map(|bytes| {
+                let value = serde_json::from_slice(&bytes).map_err(|_| Error::InvalidJournal)?;
+                self.validate_recovery(&value)?;
+                Ok(value)
+            })
+            .transpose()
+    }
+
+    fn validate_recovery(&self, report: &Report) -> Result<()> {
+        self.validate_common(report)?;
+        let enrollment = self.enrollment()?.ok_or(Error::InvalidJournal)?;
+        if report.trigger != Trigger::Recovery
+            || report.kill_boottime_ms < report.request.deadline_boottime_ms
+            || report.cgroup_device != enrollment.cgroup_device
+            || report.observation != Observation::EmptyObserved
+        {
+            return Err(Error::InvalidJournal);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn complete_recovery(&self, report: &Report) -> Result<()> {
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static NEXT: AtomicU64 = AtomicU64::new(0);
+        self.validate_recovery(report)?;
+        // An interrupted recovery must not reserve the only temporary name.
+        // The final record remains immutable; old partial files are retained.
+        let pending = format!(
+            "recovery-{}-{}-{}.pending",
+            std::process::id(),
+            crate::boottime_ms(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        );
+        publish(
+            &self.directory,
+            "recovery.json",
+            &pending,
+            &serde_json::to_vec(report).map_err(|_| Error::InvalidJournal)?,
+        )
     }
 
     pub(crate) fn complete(&self, report: &Report) -> Result<()> {
@@ -130,6 +239,13 @@ impl Journal {
     }
 
     fn validate_report(&self, report: &Report) -> Result<()> {
+        if report.trigger == Trigger::Recovery {
+            return Err(Error::InvalidJournal);
+        }
+        self.validate_common(report)
+    }
+
+    fn validate_common(&self, report: &Report) -> Result<()> {
         if report.version != 1
             || report.request != self.intent.request
             || report.journal.as_ref() != Some(&self.reference)
@@ -169,7 +285,7 @@ fn valid_id(id: &str) -> Result<()> {
     }
 }
 
-fn directory(path: &Path, private: bool) -> Result<File> {
+pub(crate) fn directory(path: &Path, private: bool) -> Result<File> {
     let parts: Vec<_> = path.components().collect();
     if !path.is_absolute()
         || parts

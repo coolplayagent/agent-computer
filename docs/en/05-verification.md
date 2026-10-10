@@ -63,3 +63,5 @@ The final worktree passed all 303 default Cargo/Bazel tests and seven guarded-st
 Four additional default tests cover watchdog exit/stop detection, detached lifetime, redundant SQL evidence and migration 17 compatibility. The root-only pair fault fixture remains separate; see [32 Redundant node watchdogs](32-redundant-node-watchdogs.md).
 
 Node-local intent/report journals and read-only recovery observations are now delivered in [33](33-watchdog-journals.md). They preserve the remaining fencing and writer-release boundaries.
+
+The persistent expiry service and separate recovery reports are described in [34](34-node-expiry-reaper.md).

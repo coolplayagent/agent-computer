@@ -256,3 +256,99 @@ fn rejects_tampered_journals(spool: &std::path::Path, evidence: &serde_json::Val
         JournalStatus::Recorded { .. }
     ));
 }
+
+#[test]
+#[ignore = "requires root, writable host cgroup v2 and AGENT_COMPUTER_WATCHDOG_BIN in a disposable VM"]
+fn reaper_observation_preserves_original_arms_after_both_guards_die() {
+    use std::{os::unix::fs::MetadataExt, path::PathBuf};
+    assert!(rustix::process::geteuid().is_root());
+    let executable = File::open(std::env::var("AGENT_COMPUTER_WATCHDOG_BIN").unwrap()).unwrap();
+    let spool = tempfile::Builder::new()
+        .prefix("reaper-test-")
+        .permissions(std::fs::Permissions::from_mode(0o700))
+        .tempdir_in("/root")
+        .unwrap();
+    let name = format!("ac-reaper-node-{}-{}", std::process::id(), boottime_ms());
+    let path = PathBuf::from("/sys/fs/cgroup").join(&name);
+    std::fs::create_dir(&path).unwrap();
+    let _group = OwnedGroup(path.clone());
+    let mut workload = sleeper();
+    let pid = Pid::from_child(workload.process());
+    std::fs::write(path.join("cgroup.procs"), pid.as_raw_nonzero().to_string()).unwrap();
+    kill_process(pid, Signal::STOP).unwrap();
+    let request = Request {
+        version: 1,
+        execution_id: name.clone(),
+        boot_id: std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
+            .unwrap()
+            .trim()
+            .into(),
+        cgroup_path: name,
+        cgroup_inode: std::fs::metadata(&path).unwrap().ino(),
+        deadline_boottime_ms: boottime_ms() + 1200,
+    };
+    let mut guards = launch_pair(
+        &executable,
+        spool.path(),
+        &request,
+        Instant::now() + Duration::from_secs(1),
+    )
+    .unwrap();
+    let mut children = OwnedProcesses(
+        guards
+            .iter_mut()
+            .map(|(_, child, _)| child.0.take().unwrap())
+            .collect(),
+    );
+    let evidence = serde_json::json!({"version":2,"armed":guards[0].0,"backup_armed":guards[1].0,"watchdog_pids":[children.0[0].id(),children.0[1].id()]});
+    for child in &mut children.0 {
+        child.kill().unwrap();
+        child.wait().unwrap();
+    }
+    drop(guards);
+    let mut reaper = agent_computer_watchdog::reaper::Reaper::open(spool.path()).unwrap();
+    let limit = Instant::now() + Duration::from_secs(5);
+    loop {
+        reaper.step().unwrap();
+        let result = crate::observe_journals(spool.path(), &evidence).unwrap();
+        if result
+            .guards
+            .iter()
+            .all(|v| matches!(v, crate::JournalStatus::Recovered { .. }))
+        {
+            println!("{}", serde_json::to_string(&result).unwrap());
+            break;
+        }
+        assert!(Instant::now() < limit);
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    assert!(boottime_ms() >= request.deadline_boottime_ms);
+    workload.process().wait().unwrap();
+    let mut wrong = evidence.clone();
+    wrong["armed"]["cgroup_device"] = serde_json::json!(999);
+    assert!(matches!(
+        crate::observe_journals(spool.path(), &wrong)
+            .unwrap()
+            .guards[0],
+        crate::JournalStatus::Unavailable { .. }
+    ));
+    let recovered_path = spool
+        .path()
+        .join(evidence["armed"]["journal"]["id"].as_str().unwrap())
+        .join("recovery.json");
+    let bytes = std::fs::read(&recovered_path).unwrap();
+    let mut changed: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    changed["trigger"] = "Deadline".into();
+    std::fs::write(&recovered_path, serde_json::to_vec(&changed).unwrap()).unwrap();
+    assert!(matches!(
+        crate::observe_journals(spool.path(), &evidence)
+            .unwrap()
+            .guards[0],
+        crate::JournalStatus::Unavailable { .. }
+    ));
+    std::fs::write(recovered_path, bytes).unwrap();
+    println!(
+        "{}",
+        serde_json::json!({"case":"node_reaper_recovery","status":"pass","writer_released":false})
+    );
+}

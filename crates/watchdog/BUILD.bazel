@@ -3,7 +3,7 @@ load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "watchdog",
-    srcs = glob(["src/**/*.rs"], exclude = ["src/main.rs"]),
+    srcs = glob(["src/**/*.rs"], exclude = ["src/main.rs", "src/service.rs"]),
     crate_name = "agent_computer_watchdog",
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
@@ -14,7 +14,7 @@ rust_library(
 
 rust_binary(
     name = "agent-computer-watchdog",
-    srcs = ["src/main.rs"],
+    srcs = ["src/main.rs", "src/service.rs"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],

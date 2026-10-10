@@ -42,10 +42,12 @@
 
 显式 `//crates/worker:execution_worker_live_test` 现使用一个 70 GiB 保留卷中的七个 10 GiB Candidate，覆盖库/命令执行、取消、丢失 Pod 确认、镜像拒绝、控制器 SIGKILL，以及控制器 SIGKILL 加沙箱 PID 1 STOP。最后一个场景先证明两项故障后写入者仍继续运行，再在任何 API 清理之前检查原截止时间后的固定 cgroup 递归空状态。普通控制器退出场景也可能由独立 PID 1 预算完成终止；只有暂停 PID 1 的场景隔离验证了外部 watchdog。root 组件实测及精确源码证据与默认测试分开记录。
 
-尚未交付 watchdog 自身崩溃监督、持久节点服务/重启协议、多节点路由、远程节点认证、终止后的进程准入封闭、异步存储排空、输出对象接纳、公开执行授权或完整 Computer Ready。宿主运营方和运行时仍是信任边界。`EmptyObserved` 是某一时刻的观测，不是持久 fencing。自动恢复与生产部署认证仍待实现；T01–T43 保持 `not_run`。
+这份原始运行证据没有认证 watchdog 自身崩溃监督或后续节点到期服务/重启协议。多节点路由、远程节点认证、终止后的进程准入封闭、异步存储排空、输出对象接纳、公开执行授权和完整 Computer Ready 仍待实现。宿主运营方和运行时仍是信任边界。`EmptyObserved` 是某一时刻的观测，不是持久 fencing。自动恢复与生产部署认证仍待实现；T01–T43 保持 `not_run`。
 
 提交 `fd672ef` 中子进程回收修复后的最终源码通过全部七个真实场景，相同未变更的 watchdog 二进制通过十二个内核探针。另一个全新只读 JuiceFS 客户端通过两次 S3 GET 回读两个保存文件，数据库取证保留五份布防/授权及零完成/排空记录。[组件证据记录](../evidence/node-guarded-startup-2026-10-10.json)与[原始日志](../evidence/node-guarded-startup-2026-10-10.log)保留精确源码/二进制摘要、完整 VM 回读及早期失败。取证后已停止本次 QEMU 进程并移除其十个私有 VM 文件。
 
 复核发现宿主 PID 复用窗口：`try_wait` 可能在错误清理向旧进程组 ID 发信号之前回收 CLI 主进程。适配器现使用 `waitid` 的 `NOWAIT` 观测退出，在子进程身份仍被保留时发送清理信号，之后才回收。此修订的真实子进程回归、完整默认测试、工作区 Clippy 及 VM 复验均已通过；记录中仍分别保留早期运行时观测的源码范围。
 
 当前适配器要求两个进程独立布防并共用原始截止时间，见 [32 冗余节点 watchdog](32-redundant-node-watchdogs.md)。上文单 watchdog 运行证据仍绑定其原始源码版本。
+
+常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。

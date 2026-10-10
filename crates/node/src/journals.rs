@@ -12,9 +12,22 @@ use std::path::Path;
 #[serde(tag = "state", rename_all = "snake_case")]
 pub enum JournalStatus {
     LegacyUnjournaled,
-    Unconfirmed { journal: Reference },
-    Recorded { journal: Reference, report: Report },
-    Unavailable { error: Error },
+    Unconfirmed {
+        journal: Reference,
+    },
+    Recorded {
+        journal: Reference,
+        report: Report,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        recovery: Option<Report>,
+    },
+    Recovered {
+        journal: Reference,
+        report: Report,
+    },
+    Unavailable {
+        error: Error,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -55,6 +68,10 @@ pub fn observe_journals(spool: &Path, evidence: &Value) -> Result<JournalObserva
                 || snapshot.intent.request != armed.request
                 || evidence["watchdog_pids"][index].as_u64()
                     != Some(u64::from(snapshot.intent.watchdog_pid))
+                || snapshot
+                    .enrollment
+                    .as_ref()
+                    .is_some_and(|v| v.cgroup_device != armed.cgroup_device)
             {
                 return Err(Error::IdentityMismatch);
             }
@@ -65,6 +82,12 @@ pub fn observe_journals(spool: &Path, evidence: &Value) -> Result<JournalObserva
                     return Err(Error::IdentityMismatch);
                 }
                 Ok(JournalStatus::Recorded {
+                    journal: reference,
+                    report,
+                    recovery: snapshot.recovery,
+                })
+            } else if let Some(report) = snapshot.recovery {
+                Ok(JournalStatus::Recovered {
                     journal: reference,
                     report,
                 })
