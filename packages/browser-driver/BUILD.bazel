@@ -1,5 +1,5 @@
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
-load("@aspect_rules_js//js:defs.bzl", "js_test")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_test")
 
 ts_project(
     name = "browser_driver",
@@ -21,8 +21,28 @@ js_test(
 )
 
 js_test(
+    name = "bridge_test",
+    entry_point = "dist/tests/bridge.test.js",
+    data = [":browser_driver"],
+)
+
+js_test(
     name = "browser_test",
     entry_point = "dist/tests/browser.test.js",
+    data = [":browser_driver"],
+    tags = ["manual", "requires-browser"],
+)
+
+js_binary(
+    name = "worker",
+    entry_point = "dist/src/worker.js",
+    data = [":browser_driver"],
+    visibility = ["//visibility:public"],
+)
+
+js_test(
+    name = "bridge_browser_test",
+    entry_point = "dist/tests/bridge-browser.test.js",
     data = [":browser_driver"],
     tags = ["manual", "requires-browser"],
 )

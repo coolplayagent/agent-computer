@@ -49,3 +49,5 @@ agent-computer-server browser-profile-owner-register --database-url-file /privat
 PostgreSQL 与 HTTP 契约覆盖 WAL 重启、从迁移 30 升级、幂等、并发归属、不可变 Profile 主体、旧代次、独立 scope、凭据/grant/连接失效、固定过期、取消及 Computer 停止/封存阻断。另一个 HTTP 场景使用两个不同 App、两个不同 Profile 和同一个 Sandbox，验证预算槽位独占。夹具中的存储准备回执明确为合成证据，仅证明数据库和服务行为，不启动 Chromium，也不认证部署环境。
 
 下一步仍须接入实际 App 启动 worker 与 Pod 身份、节点 fencing、持久 GUI 控制代次与动作 journal、BrowserDriver 可信桥接、profile checkpoint/restore 和 ComputerView。Queued 记录不等同于生产 `Authority` 或 `ActionJournal` 适配器。完整 D09 与 T04/T05/T10/T24 验收仍未完成。[本增量源码绑定记录](../evidence/app-admission-2026-10-11.json)保留这些限制。
+
+[Browser worker 桥接](55-browser-worker-bridge.md)现提供私有进程通信入口，持久控制器和节点接入仍待完成。

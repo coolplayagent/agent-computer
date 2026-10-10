@@ -41,3 +41,5 @@ PLAYWRIGHT_BROWSERS_PATH=/private/test-browsers bazel test //packages/browser-dr
 [绑定源码的组件证据](../evidence/browser-driver-2026-10-11.json)与[真实浏览器测试输出](../evidence/browser-driver-2026-10-11.log)记录一次性 VM 中同时启用 gVisor 和 Chromium 沙箱的 11 项通过结果，不构成 App 生命周期或产品验收。
 
 [App 持久化准入](54-app-admission.md)现已提供独立预留接口，尚未实现本驱动所需的 Authority/journal 回调接入。
+
+[Browser worker 桥接](55-browser-worker-bridge.md)现提供私有进程通信入口，持久控制器和节点接入仍待完成。

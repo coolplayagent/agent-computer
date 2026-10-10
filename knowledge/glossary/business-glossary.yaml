@@ -33,6 +33,12 @@ terms:
         target: packages/browser-driver/src/contracts.ts
       - relation: represented_by
         target_kind: file
+        target: packages/browser-driver/src/bridge.ts
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/55-browser-worker-bridge.md
+      - relation: represented_by
+        target_kind: file
         target: docs/zh-CN/53-browser-driver.md
   - id: node-guarded-startup
     domain: agent-infrastructure

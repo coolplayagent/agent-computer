@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "component": "browser-worker-bridge",
+  "status": "component_contracts_passed",
+  "recorded_at": "2026-10-10T21:51:15.916516+00:00",
+  "base_commit": "bcb638bbb226834b1267ef10b60411659ef647fe",
+  "source_manifest_sha256": {
+    "package.json": "1ff10396d5b6ef8d2251f806fa71c691d89c92b87f75ffe007e8f9c7aaa39b7e",
+    "packages/browser-driver/BUILD.bazel": "a4fb9797b5c196053d68a222e13bed888791f3b5a0e81a00c19f19778bede0c6",
+    "packages/browser-driver/src/authority.ts": "4ea081865948de1e6974071eadf23c00fcb591d15a178173d9981504e4df5c79",
+    "packages/browser-driver/src/bridge-protocol.ts": "e16cc37e7d3b464f503318c72b6fc297973f52b0099398ff0690aa70e738afbe",
+    "packages/browser-driver/src/bridge.ts": "e24ec4302670ef448d74b5e4dffb7cfb055210ba958b8f423acbb8b17b9f5ddd",
+    "packages/browser-driver/src/contracts.ts": "340a73f1ad95fc3c44971a172a858bf4a4f3277fa692740f2f9379e49e81ca43",
+    "packages/browser-driver/src/driver.ts": "43a4902c8b00f7c91fda28e2170c52872f370257b3564b97ca8d7906e8f8a1fe",
+    "packages/browser-driver/src/index.ts": "c6a43b595516ecf10ca8bab16fd6f018e9fd02aa3a443f7931a10435bd2e2035",
+    "packages/browser-driver/src/observation.ts": "a1d2fe194ba9f38c54bd52c74d94c22de823ef33ce23f5d0288bca3faa54ad61",
+    "packages/browser-driver/src/validation.ts": "a84beb1917e79e57c975ad6d96a501e32795d0c034e333da8f7e20d46261e74b",
+    "packages/browser-driver/src/worker.ts": "bbfc758935c664d75e57cb1c4a03980634fdfde8b9110792879ba2deeebdbae2",
+    "packages/browser-driver/tests/bridge-browser.test.ts": "ba3110e025c9c96432b495041b08928f207833d08d55f0ceb42f831827e963a0",
+    "packages/browser-driver/tests/bridge-peer.ts": "32335b0200d5ab8a31baeff50d7c2703d46c0ade84cbfe2eecd1390555fed3b7",
+    "packages/browser-driver/tests/bridge.test.ts": "42be4acbb56334a7bfb823cefc48a3107917d3d8d9f68de5b22cc7f159f3a865",
+    "packages/browser-driver/tests/browser.test.ts": "9d3144482277df7ab2f17b4056fdd28e75fca0afb094cc65ff4ab40774c925d9",
+    "packages/browser-driver/tests/fixture.ts": "88ca461b702fd7a17ce7a70d51f66a16cf816614bca8569160a0301e4b765980",
+    "packages/browser-driver/tests/unit.test.ts": "77ebadf8111bf803f7b0e52aed3ba705ecc004d0d5b35edabcaa51068c8c3054",
+    "packages/browser-driver/tsconfig.json": "97a33bea762a9d016c309893f52e61bc76e79897f9ddba523d3e25968415ffa5",
+    "pnpm-lock.yaml": "5c0feb4ad548864116fd4df559f05652bfa443892b56688f31ad227b1c0e7f6a",
+    "tsconfig.json": "1a943e78ceca0715810ae1a11fd2e41e4fc0964303e1274ae0fdb3f14816b1a6"
+  },
+  "tests": {
+    "bazel_targets": [
+      {
+        "target": "crates/cli/cli_contracts_test",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ae60feaca684b70ae7abaa905538f67f7b998c4074583fe9645976166d96b89d"
+      },
+      {
+        "target": "crates/cli/remote_contracts_test",
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "e3a871c3fb4b47393ea4ac93eab5edb72fd4067f58aeb40b1e1657560acf4ecc"
+      },
+      {
+        "target": "crates/cli/remote_service_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "b159f5997dbf7a35df594c10cc5e5b18725d18a696eda6862dcf2a1d02d32b20"
+      },
+      {
+        "target": "crates/core/core_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "46ee77c20f534dd5553533dfc8cad2f94fd9ba3e22c506879358c5afbec5dc86"
+      },
+      {
+        "target": "crates/csi/csi_contracts_test",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fba239b1728eee4fc1ca0b0cb86e9e0a2b5bf6b38a6623bf5763b9f63a73f8ea"
+      },
+      {
+        "target": "crates/definitions/definitions_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "6e71674847e5fbdc8aacbbf9d1b26faf03d001d8f8fddbd9c313a43d81e8e215"
+      },
+      {
+        "target": "crates/fence/fence_contracts_test",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "a6b4d92da00a345ec37dfd44eabc1638727222658385bd990427e529bb210895"
+      },
+      {
+        "target": "crates/kubernetes/kubernetes_contracts_test",
+        "passed": 43,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "007bd2e6098d5d4ea1525487cf1c18dae324fa7bb138af9b150ace292399b69c"
+      },
+      {
+        "target": "crates/node/node_contracts_test",
+        "passed": 15,
+        "failed": 0,
+        "ignored": 3,
+        "language": "rust",
+        "log_sha256": "d365c85b7293bda21f20a9f4b48420eaa87a464c5de3aa441b7e6370dc6a7fe5"
+      },
+      {
+        "target": "crates/objects/objects_contracts_test",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "f2b779185c7f6a9bc65bec0eaa8d65d83fe4453e683e9fb06e3bad5f4262af74"
+      },
+      {
+        "target": "crates/sandbox/sandbox_contracts_test",
+        "passed": 27,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ec2028d44371ed1abb468e789dc69bf122a2125052c13634010eec8bceb1a8f3"
+      },
+      {
+        "target": "crates/server/server_contracts_test",
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "2ec4291d6b1e662123adc022d0066b65765599a55ee47fcadc33f94639db14fe"
+      },
+      {
+        "target": "crates/server/server_unit_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "369d97c3404152250321d4e4c777c0cb85966153d0c5559066b8206f592a8812"
+      },
+      {
+        "target": "crates/storage/storage_contracts_test",
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "78b9fd7048353238a07d097ad1e6857b3be7d99dcafa7b8d0ced869469527399"
+      },
+      {
+        "target": "crates/store/postgres_contracts_test",
+        "passed": 239,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "8e01d628ab4226f54938b4f325c2b51fb5985552c6da714e2ac08fe27bdf7102"
+      },
+      {
+        "target": "crates/watchdog/watchdog_contracts_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "151ca4f0244a395e660e9014cc1617a2c475f7a03d4ba056d29715d8e7ce7e02"
+      },
+      {
+        "target": "crates/worker/worker_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "11af2472242161964adac27a0a32c7efe0d06983ef4257639175add04b152b58"
+      },
+      {
+        "target": "packages/browser-driver/bridge_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "32fb07e2e363adabaa3a13ed0aa275eb738d1f781f37efacf0e547508ccfd57d"
+      },
+      {
+        "target": "packages/browser-driver/unit_test",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "99b498a0661211cb88af676568f4a41c8b237b4e083f015d1a4243f2b95ff28b"
+      }
+    ],
+    "rust_passed": 500,
+    "typescript_unit_passed": 19,
+    "privileged_cases_ignored": 4,
+    "new_bridge_unit_cases": 14,
+    "real_chromium_cases": 15,
+    "new_real_worker_process_cases": 4,
+    "full_bazel_log_sha256": "e785400f66d41e63c97c6070597786d91a1ef32bbbd67e5aec7567cc56ef65e2",
+    "fmt": "passed",
+    "clippy_all_workspace_all_targets_all_features_warnings_denied": "passed",
+    "clippy_log_sha256": "ff3ff878f46e55d97a180c3cdc6f2cafb4ed719810eb542080b81c6c8536ba92",
+    "browser_log_sha256": "6ebc44dbcde0276f5fe5ebe9c61fc1f4ecba27ee84a8a068b25afd2a7dc1900b"
+  },
+  "environment": {
+    "os": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+    "node": "v22.22.1",
+    "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+    "node_sha256": "243fd8938011479f41b3de101842150fa990f33fbbb3f7aabd330857f2d79e1d",
+    "runsc_sha256": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a",
+    "chromium_sha256": "377a9fc07b495c3b8d0ab8ec1fdfd153641759f9756fea34d8dfce4de82f5025",
+    "oci_config_sha256": "f11118de90cbb865eec131c9c89822399795b52663e1280cbdbb13b0e049f27f",
+    "compiled_files": [
+      {
+        "path": "packages/browser-driver/dist/src/authority.js",
+        "sha256": "439d5d30ce9b3fdceb340d3b70f4cb7a909f32240a358b0f8df300d4733047a9"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/bridge-protocol.js",
+        "sha256": "961de6c59856182a3d6ba8ce1e6b657821a2b718755990695351409165440a86"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/bridge.js",
+        "sha256": "a153913b2d1eb8ff958c9bda45d1d02ff5c8da6115a068d6d13b9a3430754cee"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/contracts.js",
+        "sha256": "c1d71c8449db4566be6cdd68f6b04d97192aa9ec121c5a5e1598ade26d32fcab"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/driver.js",
+        "sha256": "fc36f46dfdc9f4aea9f22f668fb3a6dfef78cbbd89df5649eae40d2831920584"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/index.js",
+        "sha256": "0bddf1f236217446941c64f23d09383ce7bac94fc014bcb10b1cb8e10a9a4ab7"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/observation.js",
+        "sha256": "50855e895d8b0ca68c9f02fe5bd7b5dd4609cd08a35fd8f90346778aece13b82"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/validation.js",
+        "sha256": "7b77cefde2a19a100b07e2d5426957f6a6e30136a607293ac1fd6179d1d2fc00"
+      },
+      {
+        "path": "packages/browser-driver/dist/src/worker.js",
+        "sha256": "f725c2d819c667467992d87f224ca0616271c04094440279f36637925340b904"
+      },
+      {
+        "path": "packages/browser-driver/dist/tests/bridge-browser.test.js",
+        "sha256": "792e21161499a2064b7250ed248625067a648fa39e065ba336b23245c8fe2959"
+      },
+      {
+        "path": "packages/browser-driver/dist/tests/bridge-peer.js",
+        "sha256": "e4f993fa111d23e0f8dc1a63913b802f49a31ea2ae18920d0370bdbd790b5f8c"
+      },
+      {
+        "path": "packages/browser-driver/dist/tests/bridge.test.js",
+        "sha256": "c501b425f249ed8e8684d0c7bc905e48534cece7b915cca52d04218d4287ccab"
+      },
+      {
+        "path": "packages/browser-driver/dist/tests/browser.test.js",
+        "sha256": "1bcaaca195ed7b640c3b843e658305ddff1c9b4376e90b7814ccb1ea29771281"
+      },
+      {
+        "path": "packages/browser-driver/dist/tests/fixture.js",
+        "sha256": "791d1fe66b56f3b64d2016df894f0896f59f2e037d6e9dca8da412209b66474d"
+      },
+      {
+        "path": "packages/browser-driver/dist/tests/unit.test.js",
+        "sha256": "41be7b44adb54c4344b0dd7a58ce31c5924be53e006e97b754afa575d1fca803"
+      }
+    ],
+    "packages": [
+      "libasound2t64:amd64\t1.2.11-1ubuntu0.3",
+      "libc6:amd64\t2.39-0ubuntu8.9",
+      "libcairo2:amd64\t1.18.0-3build1",
+      "libgbm1:amd64\t25.2.8-0ubuntu0.24.04.4",
+      "libnspr4:amd64\t2:4.35-1.1build1",
+      "libnss3:amd64\t2:3.98-1ubuntu0.2",
+      "libpango-1.0-0:amd64\t1.52.1+ds-1build1"
+    ],
+    "network": "runsc network=none; loopback test fixtures only",
+    "platform": "gvisor systrap",
+    "chromium_sandbox_enabled": true,
+    "read_only_root": true,
+    "uid": 1000,
+    "gid": 1000,
+    "capabilities": [],
+    "no_new_privileges": true,
+    "private_profile_tmpfs": "/browser-state uid=1000,gid=1000,mode=0700,size=512MiB",
+    "live_cgroup": {
+      "membership": "0::/bridge-validation-final\n",
+      "path": "/sys/fs/cgroup/bridge-validation-final",
+      "limits": {
+        "memory.max": "4294967296\n",
+        "pids.max": "512\n",
+        "cpu.max": "300000 100000\n"
+      }
+    },
+    "cleanup": {
+      "pid": 174308,
+      "owned_vm_stopped": true,
+      "removed_private_files": [
+        "disk.qcow2",
+        "seed.iso",
+        "id_ed25519",
+        "id_ed25519.pub",
+        "meta-data",
+        "user-data",
+        "known_hosts",
+        "vm.json",
+        "serial.log",
+        "qemu.log"
+      ],
+      "public_base_and_archives_retained": true
+    }
+  },
+  "scope": "Real worker executable over OS pipes inside gVisor, plus existing real Chromium cases. Controller authority/journal callbacks are test fixtures. No deployed App controller or public Browser route.",
+  "qualitygate": "Final unfiltered full delivery check runs after this record; existing policy selects line-ending only. Separate behavior checks above. Reports archived outside source tree.",
+  "development_corrections": [
+    "Test driver page fixture needed document_generation to match the actual interface.",
+    "Allow one following request during the final result write because a peer can receive bytes before the local write callback completes.",
+    "Install matching gVisor sidecars from the same cached release archive; final runtime uses enforced cgroups."
+  ],
+  "known_limits": [
+    "No production PostgreSQL Authority/ActionJournal callback adapter or GUI control epoch",
+    "No Kubernetes Browser Pod/attach adapter, App launch controller, or independent Browser node guard",
+    "Worker context closure and process exit do not prove physical fencing or permit profile slot release",
+    "No profile checkpoint/restore, drag/upload/download extension or ComputerView",
+    "Public Browser readiness and full D09/T04/T05/T10/T24 acceptance remain incomplete"
+  ]
+}
