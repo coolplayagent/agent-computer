@@ -28,6 +28,6 @@
 
 6 项专项单元测试覆盖等待在途 I/O、旧及已删除句柄、真实同步错误、路径/链接/权限拒绝、普通目录错误，以及路径替换后的 inode 固定。全量默认 Cargo/Bazel 测试、Clippy、格式、文档验证和现有 Qualitygate 策略分别记录在[交付证据](../evidence/candidate-io-fence-2026-10-10.json)与[日志](../evidence/candidate-io-fence-2026-10-10.log)。
 
-显式 `candidate_worker_live_test` 使用真实 K3s/CSI、PostgreSQL、JuiceFS 和 S3。在其私有配置中增加 `fence_mount_root`，指向已存在、归 root 所有的目录，如 `/var/lib/agent-computer-fence`。在具备 FUSE 和 `/usr/bin/setpriv` 的一次性 VM 中以 root 运行。工作负载降为 UID/GID 1000 且没有附加组，经新挂载创建和修改文件，保留有名及无名打开句柄，并确认可写 mmap 被拒绝。操作者随后暂停指定原生 JuiceFS 客户端，观察到正在执行的修改，确认封存在 300 ms 内不能完成。恢复客户端后，封存成功，10 项修改操作被拒绝，读取仍得到正确内容；操作者还复核底层字节。
+显式 `candidate_worker_live_test` 使用真实 K3s/CSI、PostgreSQL、JuiceFS 和 S3。在其私有配置中增加 `fence_mount_root`，指向已存在、归 root 所有的目录，如 `/var/lib/agent-computer-fence`。在具备 FUSE 和 `/usr/bin/setpriv` 的一次性 VM 中以 root 运行。工作负载降为 UID/GID 1000 且没有附加组，经新挂载创建和修改文件，保留有名及无名打开句柄，并确认可写 mmap 被拒绝。操作者随后暂停指定原生 JuiceFS 客户端，观察到正在执行的修改，确认封存在 300 ms 内不能完成。恢复客户端后，封存成功，10 项修改操作被拒绝，读取仍得到正确内容；操作者还复核底层字节。另一个关闭数据缓存的只读 JuiceFS 进程在封存后独立读回相同的 7 字节。
 
 这属于单 VM 组件证据，不代表已验证崩溃/断电恢复、HA、产品 Pod 集成、通用进程 fencing 或完整 Computer 验收。T01–T43 保持 `not_run`。
