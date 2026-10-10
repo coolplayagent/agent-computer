@@ -31,6 +31,8 @@ AGENT_COMPUTER_WATCHDOG_BIN=/absolute/path/agent-computer-watchdog \
 
 Upload the binaries into that VM before invoking the command. The default Cargo/Bazel suites leave this root-only fixture ignored. Its kernel observations are component evidence, not full Computer runtime acceptance.
 
+The final source in `6cf9b82` passed all 307 default Bazel cases across ten targets, including 136 PostgreSQL cases, plus fmt and workspace Clippy. Its four explicit VM fault cases observed recursive empty state 1–9 ms after the original deadline. The [source-bound record](../evidence/redundant-watchdogs-2026-10-10.json) and [raw log](../evidence/redundant-watchdogs-2026-10-10.log) retain binary hashes, environment and boundaries. No watchdogs or fixture cgroups remained; the owned VM and ten private files were removed.
+
 ## 32.4 Remaining boundaries
 
 This tolerates one watchdog process failure. It does not provide a persistent node service, automatic restart, multi-node routing, storage drainage or durable fencing. Both guards share a host and failure domains: a host failure, frozen parent cgroup, operator killing both, or correlated binary/kernel failure can defeat both timers. Independent sessions do not isolate service cgroup teardown. Operators must keep both guards outside the workload and controller teardown groups. A stopped guard needs trusted cleanup; a detached waiter does not resume or replace it.

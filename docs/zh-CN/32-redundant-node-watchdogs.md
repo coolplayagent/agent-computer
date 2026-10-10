@@ -31,6 +31,8 @@ AGENT_COMPUTER_WATCHDOG_BIN=/absolute/path/agent-computer-watchdog \
 
 先将二进制上传到该 VM，再执行验证命令。默认 Cargo/Bazel 测试会忽略这个 root 专用 fixture。内核观察属于组件证据，不等于 Computer 完整运行验收。
 
+最终源码 `6cf9b82` 的 10 个默认 Bazel 目标共 307 项测试通过，其中 136 项为 PostgreSQL 测试；fmt 与工作区 Clippy 通过。四项显式 VM 故障场景在原始期限后 1–9 毫秒观察到递归空状态。[源码绑定记录](../evidence/redundant-watchdogs-2026-10-10.json)与[原始日志](../evidence/redundant-watchdogs-2026-10-10.log)保留二进制摘要、环境与边界。未遗留 watchdog 或 fixture cgroup；归本次验证所有的 VM 和十个私有文件已删除。
+
 ## 32.4 剩余边界
 
 本能力容忍一个 watchdog 进程失效，不提供持久节点服务、自动重启、多节点路由、存储排空或持久 fencing。两个进程共享主机及故障域：主机故障、共同父 cgroup 被冻结、管理员同时终止两者，或相同二进制/内核故障仍可能使两者失效。独立会话不隔离服务 cgroup 的清理；部署必须将两个 watchdog 放在 workload 和控制器清理组之外。暂停的 watchdog 需要可信清理，分离的回收线程不会恢复或替换它。
