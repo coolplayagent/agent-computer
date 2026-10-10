@@ -1,0 +1,116 @@
+{
+  "kind": "client-control-plane-verification",
+  "date": "2026-10-11",
+  "source_commit": "bdec9b3ec17a60281fabd8b4ed06a7e43ad45ce5",
+  "base_commit": "bcec848cd467bb0fa2545c71118753cbc0a5096b",
+  "source_manifest_sha256": "481932b78f8dc7326c10af699861a5b861861ad6c8d589505561f46b1d01db8a",
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "be8a97a7824717ce7acacdf65d4208a63b5879eb1111a1daade257ca4a14b65f"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "5aa8a739ee7cf5aa0d91facffe6fcec5a386524185c912084a8dfe1420fbebf4"
+    },
+    {
+      "path": "MODULE.bazel",
+      "sha256": "77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd"
+    },
+    {
+      "path": "MODULE.bazel.lock",
+      "sha256": "e12fa3507e2c19441bb31bbc4b01e0a2cfcd8a8dd65708ad822b282a9c2ac8c2"
+    },
+    {
+      "path": "crates/cli/BUILD.bazel",
+      "sha256": "ca080fb6cb747c5b77d0e1871740554df319e18cb523e4ae2fa2e4effb27688a"
+    },
+    {
+      "path": "crates/cli/Cargo.toml",
+      "sha256": "641368f8fc72c09c0dd01dd05bdb56d20ada9d98a41a2323fb99d9064a2002c8"
+    },
+    {
+      "path": "crates/cli/src/main.rs",
+      "sha256": "1712bdaa9e272a5dc09d725998e02f784e1beb49eaf16571b66220af46f6c573"
+    },
+    {
+      "path": "crates/cli/src/remote/options.rs",
+      "sha256": "c90cf11d18bbdfb8f937c24913e4cf24ea7fc40c195ee740e141ad5f9753cc6a"
+    },
+    {
+      "path": "crates/cli/src/remote/output.rs",
+      "sha256": "960d5f2d8700fc702498ef42e4265420505a90d4349cbba574d35419eb0f945f"
+    },
+    {
+      "path": "crates/cli/src/remote.rs",
+      "sha256": "a7754be7619319bf184f6c5fff993e9485894e241a6aa8cf9f9020caf1dc7a50"
+    },
+    {
+      "path": "crates/cli/src/validate.rs",
+      "sha256": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166"
+    },
+    {
+      "path": "crates/cli/tests/cli_contracts.rs",
+      "sha256": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f"
+    },
+    {
+      "path": "crates/cli/tests/remote_contracts.rs",
+      "sha256": "de63f3dea740c25e6348cdf21b76b842a36d66c211ea1f44005a23ebd63f5e42"
+    },
+    {
+      "path": "crates/cli/tests/remote_service.rs",
+      "sha256": "5e040cd62b09d5201ef40bcea38adcd205bcf4183e7f9961670679005370c782"
+    },
+    {
+      "path": "crates/cli/tests/support/runtime.rs",
+      "sha256": "0023808d88610d2d398723b32d643903e7ed14a12c811e5059b042549a76b0fc"
+    }
+  ],
+  "binary_sha256": "2eb625cc845d95c7033b8d56eef5f0f1286d29078eb919c93aba47c9c209b767",
+  "environment": {
+    "os": "Linux x86_64",
+    "rust": "1.97.1",
+    "bazel": "9.3.0",
+    "postgres": "18",
+    "transport": "real loopback TCP / Axum",
+    "storage_preparation": "synthetic receipt; no physical Candidate in this client test"
+  },
+  "checks": {
+    "bazel_targets_passed": 17,
+    "rust_cases_passed": 487,
+    "ignored_cases": 4,
+    "final_bazel": "17 pass; 3 CLI targets re-executed after HTTP uncertainty fix, 14 unaffected targets cached from successful full run",
+    "cargo_cli": "16 pass before final error handling fix; 8 wire cases rerun after fix; final Bazel service test covers rebuilt CLI",
+    "clippy": "workspace all-targets all-features locked warnings-denied: pass",
+    "format": "cargo fmt --all --check: pass",
+    "docs": {
+      "markdown_files": 127,
+      "local_links": 875,
+      "structured_examples": 58,
+      "yaml_files": 19,
+      "requirement_rows": 35,
+      "test_rows": 43
+    },
+    "maps": "native validation: both valid"
+  },
+  "observed": [
+    "One durable execution after exact retries; changed input under original key returns 409",
+    "Background session closes; original credential can query and cancel; principal revocation returns 401",
+    "SQL count: one execution request and zero dispatch intents",
+    "No redirects or automatic retries; ambiguous writes include explicit recovery guidance",
+    "Verified binary, empty and 1 MiB output downloads; corruption/incomplete bodies rejected; existing target preserved"
+  ],
+  "log_sha256": {
+    "bazel-tests.log": "2ecbf6817831ac8de9ae5655b9165b541b30f715370ebb126ed9c2689b45cc97",
+    "bazel-final.log": "6aa2b1bcbd4d592bc1d644c9d0620c8b2a32652c3327be28e9d97d4437245eec",
+    "clippy-final.log": "7ed970985067e5726ac0ea5f1c4fa1461a7cda2361a5924686483e55cac5cb78",
+    "remote-tests-final.log": "471748eab7747c16a0a64e6696802f2b3717b3f772a844eda985509965830e32",
+    "cli-tests.log": "9b37461f7c2596016477e3a5112e048ab1fcab6a8d6325a6b0fdb754a404bc13"
+  },
+  "limits": [
+    "Control-plane/client verification only; no new gVisor, JuiceFS or S3 runtime evidence",
+    "Four existing privileged runtime cases ignored by default; prior component evidence remains separately scoped",
+    "Computer ready=false; full lifecycle, Browser/ComputerView, OIDC and T01-T43 product acceptance incomplete",
+    "Qualitygate final snapshot report is retained locally; configured policy selects line-ending only"
+  ]
+}
