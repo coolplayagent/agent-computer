@@ -71,10 +71,16 @@ impl RequestContext {
                 "The Workspace has no committed input version.",
                 false,
             ),
+            Error::RuntimeStopBlocked => self.error(
+                StatusCode::CONFLICT,
+                "runtime_stop_blocked",
+                "Stop requires no prior user dispatch, no unreleased writer, no queued execution and no active human input.",
+                false,
+            ),
             Error::RuntimeConflict => self.error(
                 StatusCode::CONFLICT,
                 "runtime_conflict",
-                "The control revision or queued request no longer matches.",
+                "The control revision, request or runtime state no longer matches.",
                 false,
             ),
             Error::RuntimeCapacityUnavailable => self.error(

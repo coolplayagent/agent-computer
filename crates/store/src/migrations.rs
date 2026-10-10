@@ -152,6 +152,15 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0019_execution_outputs.sql")),
                     false,
                 ),
+                Migration::new(
+                    20,
+                    Cow::Borrowed("undispatched computer stop"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!(
+                        "../migrations/0020_undispatched_computer_stop.sql"
+                    )),
+                    false,
+                ),
             ])
         })
     }

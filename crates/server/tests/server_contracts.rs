@@ -9,5 +9,6 @@ mod cases {
     mod protocol;
     mod runtime;
     mod starts;
+    mod stops;
     mod writers;
 }

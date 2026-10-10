@@ -2,7 +2,13 @@ use super::*;
 use agent_computer_store::{Error, runtime::*};
 
 pub(super) async fn runtime_fixture() -> (Database, String, String, String, String) {
-    let (db, definition_token, document) = fixture().await;
+    runtime_fixture_with_quota(10 * 1024 * 1024 * 1024).await
+}
+pub(super) async fn runtime_fixture_with_quota(
+    quota: i64,
+) -> (Database, String, String, String, String) {
+    let (db, definition_token, mut document) = fixture().await;
+    document["spec"]["volumes"][0]["quotaBytes"] = quota.into();
     let plan = db
         .store
         .create_definition_plan(&definition_token, &key("runtime-plan"), &checked(&document))

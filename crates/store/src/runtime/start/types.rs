@@ -22,6 +22,7 @@ pub enum StartState {
     Preparing,
     Prepared,
     Cancelled,
+    Stopped,
 }
 
 /// Immutable admission receipt. Obtain current state from computer_runtime().
@@ -56,4 +57,30 @@ pub struct ComputerRuntime {
     pub active_request: Option<String>,
     pub start_state: Option<StartState>,
     pub ready: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stop_receipt: Option<ComputerStopReceipt>,
+}
+
+/// Stop only a fully prepared Candidate with no user dispatch in any epoch.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StopPreparedComputer {
+    pub expected_revision: i64,
+    pub request_id: String,
+}
+
+/// Historical receipt, not a physical fencing certificate for dispatched work.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct ComputerStopReceipt {
+    pub computer_id: String,
+    pub request_id: String,
+    pub generation: i64,
+    pub candidate_id: String,
+    pub control_revision: i64,
+    pub input_revision: i64,
+    pub input_manifest_digest: String,
+    pub retained_storage_bytes: i64,
+    pub proof: String,
+    pub stopped_at_ms: i64,
+    pub event_sequence: i64,
 }

@@ -38,6 +38,7 @@
 34. [节点常驻到期回收](zh-CN/34-node-expiry-reaper.md)
 35. [到期回收服务的启动准入](zh-CN/35-reaper-startup-admission.md)
 36. [有界执行输出持久化](zh-CN/36-durable-execution-outputs.md)
+37. [用户派发前的 Computer 停止](zh-CN/37-undispatched-computer-stop.md)
 
 ## 02. English
 
@@ -81,3 +82,5 @@
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
 Both language groups use matching numbers and topics and are updated with the implementation. Detailed specifications remain in `codespec/`; `relay-knowledge` manages the knowledge navigation maps.
+
+37. [Stop before user dispatch](en/37-undispatched-computer-stop.md)

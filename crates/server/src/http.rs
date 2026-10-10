@@ -104,6 +104,10 @@ fn configured_router(
             post(crate::computers::start),
         )
         .route(
+            "/v1alpha1/computers/{id}/stop",
+            post(crate::computers::stop),
+        )
+        .route(
             "/v1alpha1/computers/{id}/start/cancel",
             post(crate::computers::cancel),
         )
@@ -170,7 +174,7 @@ async fn capabilities(State(state): State<ServiceState>) -> Json<serde_json::Val
     Json(
         json!({"api_version":API_VERSION,"stage":"development","capabilities":{
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
-            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane",
+            "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane", "computer.stop_before_user_dispatch":"control-plane",
             "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"unsupported",
             "execution.admission":"connection-queued", "execution.outputs":"bounded-durable-observations", "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
