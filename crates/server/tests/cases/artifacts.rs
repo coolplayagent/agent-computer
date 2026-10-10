@@ -10,6 +10,13 @@ use axum::http::StatusCode;
 use serde_json::{Value, json};
 #[tokio::test]
 async fn artifact_http_authority_strict_input_and_durable_sealing() {
+    check_admission(false).await;
+}
+#[tokio::test]
+async fn checkpoint_stop_http_authority_strict_input_and_durable_acceptance() {
+    check_admission(true).await;
+}
+async fn check_admission(checkpoint: bool) {
     let s = Service::new().await;
     let org = OrganizationId::new("acme").unwrap();
     let principal = PrincipalId::new("alice").unwrap();
@@ -32,8 +39,16 @@ async fn artifact_http_authority_strict_input_and_durable_sealing() {
         .await
         .unwrap();
     let current = s.store.computer_runtime(token, &computer).await.unwrap();
-    let body = json!({"request_id":start.request_id,"expected_revision":current.revision,"base_revision":start.input_revision,"base_manifest":start.input_manifest_digest,"publish_current":true});
-    let path = format!("/v1alpha1/workspaces/{workspace}/artifacts");
+    let body = if checkpoint {
+        json!({"request_id":start.request_id,"expected_revision":current.revision,"publish_current":true})
+    } else {
+        json!({"request_id":start.request_id,"expected_revision":current.revision,"base_revision":start.input_revision,"base_manifest":start.input_manifest_digest,"publish_current":true})
+    };
+    let path = if checkpoint {
+        format!("/v1alpha1/computers/{computer}/checkpoint-stop")
+    } else {
+        format!("/v1alpha1/workspaces/{workspace}/artifacts")
+    };
     assert_eq!(
         s.send(req(token, "POST", &path, Some("artifact"), body.clone()))
             .await
@@ -54,6 +69,22 @@ async fn artifact_http_authority_strict_input_and_durable_sealing() {
         )
         .await
         .unwrap();
+    if checkpoint {
+        s.store
+            .set_runtime_grant(
+                RuntimeGrant {
+                    organization: &org,
+                    principal: &principal,
+                    kind: RuntimeKind::Computer,
+                    resource_id: &computer,
+                    permission: RuntimePermission::Manage,
+                    max_runtime_seconds: None,
+                },
+                true,
+            )
+            .await
+            .unwrap();
+    }
     let narrow = s
         .store
         .issue_credential(IssueCredential {
@@ -90,6 +121,8 @@ async fn artifact_http_authority_strict_input_and_durable_sealing() {
         "principal",
         "drain_confirmed",
         "state",
+        "force",
+        "stop_after_commit",
     ] {
         let mut bad = body.clone();
         bad[field] = true.into();
@@ -98,11 +131,66 @@ async fn artifact_http_authority_strict_input_and_durable_sealing() {
             StatusCode::BAD_REQUEST
         );
     }
+    if checkpoint {
+        use agent_computer_core::identity::IdempotencyKey;
+        use agent_computer_store::runtime::connections::*;
+        s.store
+            .set_runtime_grant(
+                RuntimeGrant {
+                    organization: &org,
+                    principal: &principal,
+                    kind: RuntimeKind::Computer,
+                    resource_id: &computer,
+                    permission: RuntimePermission::Connect,
+                    max_runtime_seconds: None,
+                },
+                true,
+            )
+            .await
+            .unwrap();
+        let connection = s
+            .store
+            .create_connection_session(
+                token,
+                &IdempotencyKey::new("active-input").unwrap(),
+                &computer,
+                &ConnectRequest {
+                    requested_capabilities: vec![RuntimePermission::Connect],
+                    lifetime_seconds: 300,
+                },
+            )
+            .await
+            .unwrap();
+        s.store
+            .heartbeat_connection_session(
+                token,
+                &IdempotencyKey::new("active-input-heartbeat").unwrap(),
+                &connection.session_id,
+                &ConnectionHeartbeat {
+                    expected_revision: connection.revision,
+                    activity: ConnectionActivity::Active,
+                    visibility: ConnectionVisibility::Visible,
+                },
+            )
+            .await
+            .unwrap();
+        let (code, error) = s
+            .send(req(token, "POST", &path, Some("artifact"), body.clone()))
+            .await;
+        assert_eq!(code, StatusCode::CONFLICT);
+        assert_eq!(error["code"], "active_use");
+        s.store
+            .close_connection_session(token, &connection.session_id)
+            .await
+            .unwrap();
+    }
     let (code, admitted) = s
         .send(req(token, "POST", &path, Some("artifact"), body.clone()))
         .await;
     assert_eq!(code, StatusCode::ACCEPTED, "{admitted}");
     assert_eq!(admitted["state"], "Capturing");
+    assert_eq!(admitted["stop_after_commit"], checkpoint);
+    assert!(admitted.get("stop_receipt").is_none());
     assert_eq!(
         s.send(req(token, "POST", &path, Some("artifact"), body))
             .await

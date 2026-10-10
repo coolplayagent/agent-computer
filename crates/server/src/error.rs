@@ -72,6 +72,7 @@ impl RequestContext {
                 "The Workspace has no committed input version.",
                 false,
             ),
+            Error::RuntimeActiveUse => self.error(StatusCode::CONFLICT,"active_use","Another active connection or active human input prevents normal stopping.",false),
             Error::RuntimeStopBlocked => self.error(
                 StatusCode::CONFLICT,
                 "runtime_stop_blocked",

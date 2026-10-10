@@ -20,6 +20,8 @@ use std::{
     path::PathBuf,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+#[path = "support/execution_checkpoint.rs"]
+mod checkpoint;
 #[path = "support/execution_faults.rs"]
 mod faults;
 #[path = "support/output_http.rs"]
@@ -189,8 +191,10 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "output-unknown",
         "output-completion-retry",
     ];
+    // Stopping retains the old Candidate reservation. The restoration needs
+    // one additional generation; keep the platform's admission limits intact.
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":names.len() as u64 * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":(names.len() as u64 + 1) * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
     for name in names {
         document["spec"]["workspaces"]
             .as_array_mut()
@@ -978,7 +982,18 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .await
             .unwrap();
     assert_eq!(drains, 13);
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
+    let checkpoint = checkpoint::verify(checkpoint::Context {
+        store: &store,
+        pool: &pool,
+        org: &org,
+        actor: &actor,
+        token,
+        config: &config,
+        local: &local,
+        normal: results.iter().find(|v| v["case"] == "normal").unwrap(),
+    })
+    .await;
+    let evidence = json!({"checkpoint_stop":checkpoint,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

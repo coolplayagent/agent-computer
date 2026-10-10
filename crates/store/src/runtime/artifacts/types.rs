@@ -8,6 +8,15 @@ pub struct CommitArtifact {
     pub base_manifest: String,
     pub publish_current: bool,
 }
+/// Preserve a verified file checkpoint and stop in the publication transaction.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CheckpointStop {
+    pub request_id: String,
+    pub expected_revision: i64,
+    /// Advance the Workspace head by CAS, or retain a fixed branch checkpoint.
+    pub publish_current: bool,
+}
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ArtifactState {
     Capturing,
@@ -29,6 +38,10 @@ pub struct ArtifactCommit {
     pub input_revision: Option<i64>,
     pub manifest_digest: Option<String>,
     pub published_at_ms: Option<i64>,
+    #[serde(default)]
+    pub stop_after_commit: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stop_receipt: Option<super::super::ComputerStopReceipt>,
 }
 /// Only a trusted claimed worker may capture/publish the sealed Candidate.
 pub struct ArtifactLease {

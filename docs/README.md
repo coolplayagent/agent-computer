@@ -47,6 +47,7 @@
 43. [认证后的执行输出下载](zh-CN/43-execution-output-downloads.md)
 44. [常驻执行队列 worker](zh-CN/44-queued-execution-worker.md)
 45. [常驻 Candidate 准备 worker](zh-CN/45-continuous-candidate-preparation.md)
+46. [持久检查点停止与 Artifact worker](zh-CN/46-checkpoint-stop-worker.md)
 
 ## 02. English
 
@@ -95,6 +96,7 @@
 43. [Authenticated execution output downloads](en/43-execution-output-downloads.md)
 44. [Continuous queued execution worker](en/44-queued-execution-worker.md)
 45. [Continuous Candidate preparation](en/45-continuous-candidate-preparation.md)
+46. [Durable checkpoint stop and Artifact worker](en/46-checkpoint-stop-worker.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

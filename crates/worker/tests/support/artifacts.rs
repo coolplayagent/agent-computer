@@ -147,16 +147,14 @@ pub async fn verify(c: Context<'_>) -> Value {
         assert_eq!(done.release_proof.as_deref(), Some("bounded_file_drained"));
     }
     let current = c.store.computer_runtime(c.token, c.computer).await.unwrap();
-    let input = CommitArtifact {
+    let input = CheckpointStop {
         request_id: start.request_id.clone(),
         expected_revision: current.revision,
-        base_revision: start.input_revision.unwrap(),
-        base_manifest: start.input_manifest_digest.clone().unwrap(),
         publish_current: true,
     };
     let admitted = c
         .store
-        .commit_workspace_artifact(c.token, &key("artifact-publish"), c.workspace, &input)
+        .checkpoint_stop_computer(c.token, &key("artifact-publish"), c.computer, &input)
         .await
         .unwrap();
     assert!(
@@ -204,7 +202,7 @@ pub async fn verify(c: Context<'_>) -> Value {
             .is_none()
     );
     private(&configuration, &good);
-    sqlx::raw_sql("CREATE FUNCTION reject_artifact_outbox() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS(SELECT 1 FROM events WHERE organization=NEW.organization AND sequence=NEW.sequence AND kind='artifact.committed') THEN RAISE EXCEPTION 'injected artifact outbox failure'; END IF; RETURN NEW; END $$; CREATE TRIGGER reject_artifact_outbox BEFORE INSERT ON outbox FOR EACH ROW EXECUTE FUNCTION reject_artifact_outbox();").execute(c.pool).await.unwrap();
+    sqlx::raw_sql("CREATE FUNCTION reject_artifact_outbox() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS(SELECT 1 FROM events WHERE organization=NEW.organization AND sequence=NEW.sequence AND kind='computer.stopped') THEN RAISE EXCEPTION 'injected stop outbox failure'; END IF; RETURN NEW; END $$; CREATE TRIGGER reject_artifact_outbox BEFORE INSERT ON outbox FOR EACH ROW EXECUTE FUNCTION reject_artifact_outbox();").execute(c.pool).await.unwrap();
     assert!(
         !publish(&c, &admitted.commit_id, &configuration)
             .status
@@ -233,18 +231,17 @@ pub async fn verify(c: Context<'_>) -> Value {
     fs::rename(&spool, spool.with_extension("retained")).unwrap();
     fs::create_dir(&spool).unwrap();
     fs::set_permissions(&spool, fs::Permissions::from_mode(0o700)).unwrap();
-    let output = publish(&c, &admitted.commit_id, &configuration);
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    let committed: ArtifactCommit = serde_json::from_slice(&output.stdout).unwrap();
+    let queue = artifact_queue::run(&c, &configuration, Some(&admitted.commit_id)).await;
+    let restart_queue = artifact_queue::run(&c, &configuration, None).await;
+    let committed: ArtifactCommit = serde_json::from_value(
+        queue.iter().find(|v| v["event"] == "finished").unwrap()["outcome"].clone(),
+    )
+    .unwrap();
     assert_eq!(committed.state, ArtifactState::Committed);
     assert_eq!(committed.input_revision, Some(2));
     assert_eq!(
         c.store
-            .commit_workspace_artifact(c.token, &key("artifact-publish"), c.workspace, &input)
+            .checkpoint_stop_computer(c.token, &key("artifact-publish"), c.computer, &input)
             .await
             .unwrap(),
         committed
@@ -269,19 +266,9 @@ pub async fn verify(c: Context<'_>) -> Value {
         .await
         .unwrap();
     let current = c.store.computer_runtime(c.token, c.computer).await.unwrap();
-    let stopped = c
-        .store
-        .stop_prepared_computer(
-            c.token,
-            &key("artifact-stop"),
-            c.computer,
-            &StopPreparedComputer {
-                expected_revision: current.revision,
-                request_id: start.request_id,
-            },
-        )
-        .await
-        .unwrap();
+    let stopped = committed.stop_receipt.clone().unwrap();
+    assert!(current.active_request.is_none());
+    assert_eq!(current.stop_receipt.as_ref(), Some(&stopped));
     assert_eq!(stopped.proof, "artifact_checkpoint");
     assert_eq!(stopped.input_revision, 2);
     // Privileged fault injection changes the retained old directory. Restoration
@@ -374,5 +361,5 @@ pub async fn verify(c: Context<'_>) -> Value {
         .unwrap(),
         1
     );
-    json!({"commit":committed,"checkpoint_stop":stopped,"capture":captured,"restored":restored,"new_start":next,"rejected_credentials_preserve_sealed_candidate":true,"outbox_rollback":true,"fresh_process_retry_without_local_spool":true,"restored_from_s3_without_cache":true,"retained_source_mutation_did_not_change_restoration":true,"independent_inodes_and_executable_mode":true,"sealed_writer_rejected":true})
+    json!({"queue":queue,"restart_queue":restart_queue,"commit":committed,"checkpoint_stop":stopped,"capture":captured,"restored":restored,"new_start":next,"rejected_credentials_preserve_sealed_candidate":true,"outbox_rollback":true,"fresh_process_retry_without_local_spool":true,"restored_from_s3_without_cache":true,"retained_source_mutation_did_not_change_restoration":true,"independent_inodes_and_executable_mode":true,"sealed_writer_rejected":true})
 }

@@ -2,6 +2,7 @@
 //! here: input publication, storage preparation, leases and fencing remain required.
 pub(super) mod graph;
 mod stop;
+pub(crate) use stop::commit_stop;
 mod types;
 use super::*;
 use crate::plans::types::{digest, random_id};

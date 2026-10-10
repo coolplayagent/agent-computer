@@ -44,7 +44,9 @@ pub async fn kill_controller(
         .spawn()
         .unwrap();
     let limit = tokio::time::Instant::now() + Duration::from_secs(25);
-    while !data.join("started.txt").exists() {
+    // Creation precedes the write. Observe the complete marker before killing
+    // the controller, otherwise the fixture may interrupt its own setup IO.
+    while !matches!(fs::read(data.join("started.txt")), Ok(bytes) if bytes == b"started") {
         assert!(
             controller.try_wait().unwrap().is_none(),
             "controller exited before child marker: {}",

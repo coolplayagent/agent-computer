@@ -52,6 +52,10 @@ pub fn router_with_gateways(
             "/v1alpha1/workspaces/{id}/artifacts",
             post(crate::artifacts::commit),
         )
+        .route(
+            "/v1alpha1/computers/{id}/checkpoint-stop",
+            post(crate::computers::checkpoint_stop),
+        )
         .route("/v1alpha1/artifacts/{id}", get(crate::artifacts::get))
         .route(
             "/v1alpha1/artifacts/{id}/manifest",
