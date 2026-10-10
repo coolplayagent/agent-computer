@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: app-admission
+    domain: agent-infrastructure
+    canonical_name: AppAdmission
+    definition: 为固定 Computer/App 代次预留独立 Sandbox 和显式主体 Profile 的持久记录；绑定原凭据、连接与固定期限，失效不可复活且继续占位，派发前取消可释放槽位，准入不等同于浏览器启动、GUI 控制授权或 ready。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/src/runtime/apps/mod.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0031_app_admission.sql
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/54-app-admission.md
   - id: browser-driver
     domain: agent-infrastructure
     canonical_name: BrowserDriver

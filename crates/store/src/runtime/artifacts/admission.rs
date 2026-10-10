@@ -237,6 +237,10 @@ async fn admit(
     {
         return Err(Error::RuntimeConflict);
     }
+    if sqlx::query_scalar::<_,bool>("SELECT EXISTS (SELECT 1 FROM app_instances WHERE organization=$1 AND request_id=$2 AND state<>'Cancelled')")
+        .bind(org).bind(&input.request_id).fetch_one(&mut **tx).await? {
+        return Err(Error::RuntimeStopBlocked);
+    }
     let clean: bool = sqlx::query_scalar("SELECT artifact_candidate_drained($1,$2)")
         .bind(org)
         .bind(&input.request_id)

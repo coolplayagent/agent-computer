@@ -14,6 +14,19 @@ pub async fn run(
     let required = |key| options.get(key).copied().ok_or_else(usage);
     let org = OrganizationId::new(required("organization")?).map_err(|_| usage())?;
     let principal = PrincipalId::new(required("principal")?).map_err(|_| usage())?;
+    if command == "browser-profile-owner-register" {
+        store
+            .register_browser_profile_owner(&org, required("resource-id")?, &principal)
+            .await
+            .map_err(|_| {
+                failed("Browser profile owner registration failed; ownership cannot be reassigned.")
+            })?;
+        println!(
+            "{}",
+            serde_json::json!({"registered":true,"runtime_started":false})
+        );
+        return Ok(());
+    }
     let kind: RuntimeKind = required("kind")?.parse().map_err(|_| usage())?;
     let permission: RuntimePermission = required("permission")?.parse().map_err(|_| usage())?;
     let max_runtime_seconds = options

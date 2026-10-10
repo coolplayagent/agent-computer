@@ -239,6 +239,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    31,
+                    Cow::Borrowed("app admission"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0031_app_admission.sql")),
+                    false,
+                ),
             ])
         })
     }

@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "component": "durable-app-admission",
+  "status": "component_contracts_passed",
+  "recorded_at": "2026-10-10T21:21:52.003945+00:00",
+  "base_commit": "f57b4de3c9d58949f98893f5216746ab501156a2",
+  "source_manifest_sha256": {
+    "crates/server/BUILD.bazel": "629dc16fe6582d9c47160496cf7735e1e13b845453a744704124528d385e69b4",
+    "crates/server/src/apps.rs": "d08166f188888d5d5226d498f877057a6a5c11d3c26b4f9092e04aaaa8023a60",
+    "crates/server/src/error.rs": "b98260077917e0d2cce91e96e458c9d2bc45fd2c033cbfb72c48498cb609652d",
+    "crates/server/src/http.rs": "c89aa0fd5235eeff63dbc626f21968b29006bdd6d989c065870aafcc3d2b7e38",
+    "crates/server/src/lib.rs": "537d849fb03e2b1e191fbe97b60dc14e1489bfdcfb34af501f23625657ec6a85",
+    "crates/server/src/operator.rs": "583f08ba38854c43ae8b48353032128ec21083a6b243dbbdec4ce6c54ad06c50",
+    "crates/server/src/runtime_admin.rs": "a652d63fa5044d98390965e81943aa1ad4e6a39d0d0296050eac2a47caf7f6d8",
+    "crates/server/tests/cases/apps.rs": "3c43a7a9499d725559f533034e4474c59fd5d63ae4aa17f5e5e3cf9d386770c0",
+    "crates/server/tests/cases/process.rs": "626d31398b29d43c0071f6b1d70b0e6ab1e81ea08a3f9b32f210aba0c226d14e",
+    "crates/server/tests/server_contracts.rs": "1ecfb28b01d5b1aa9832af090eec86df53db26549cb273bd4de0e3ccd89e6a50",
+    "crates/store/migrations/0031_app_admission.sql": "187533e9ce7f6c1a9e1f86c9ea6a1585f046c66721aa0ad3a1c2f6ae6c6b63d5",
+    "crates/store/src/migrations.rs": "d3e0b8f005822ce0fff07dea106a1427c388fac30ab242685788482723d2a521",
+    "crates/store/src/runtime/apps/authority.rs": "6d4e1456cf173db0c2660ffb31a49c0d36e90f50dc46c2b4d5e14a6747443005",
+    "crates/store/src/runtime/apps/mod.rs": "621775baa73dc26b1ad9009266edbfe615701814fbd57719518b19127ef8740f",
+    "crates/store/src/runtime/apps/types.rs": "1753474d78c021ce37e55580dfbc0c023d47f76bd19557d57967efb3ce35ebc4",
+    "crates/store/src/runtime/artifacts/admission.rs": "f4e281c1f9e99ec8bd57f1fa5d2c887ca432f2930b0d9527708694ad1d2eac92",
+    "crates/store/src/runtime/mod.rs": "b6a91c35bb66e4574fa99a0b2cf81f38f5908cdf101ee604b0441a752fdaa240",
+    "crates/store/src/runtime/start/stop.rs": "8d9a963dc862c64cf8bf1fa49359027665d05052baec601269b0da4c5fe6ec76",
+    "crates/store/tests/contracts/plans/apps.rs": "628d8bb6e52c9b499816040c6a3e18a1ab59e7058b99e073dd23f98f0e8dc751",
+    "crates/store/tests/contracts/plans/mod.rs": "d7d3b90d71cf37acddf23bd0ceb82e7a5814aefeefcae5a290ff1405eebbe737",
+    "crates/store/tests/support/checkpoint_upgrade.rs": "aa6e8662ad780b8bcc050d2389e4b261119314e253f6896cc50927b24421be14",
+    "crates/store/tests/support/mod.rs": "2dfb7f9f9dc47733fa1ae6772c461a89914e9a3e1e325c4405f1bacfcf57896d",
+    "schemas/openapi-v1alpha1.json": "f47a45ff9b0f021c34739db66a5dd81b7548e70c889a21a3e8a0095d8d2beca0"
+  },
+  "tests": {
+    "bazel_targets": [
+      {
+        "target": "crates/cli/cli_contracts_test",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "3d4850b92d3069a8ec5b4be278ebaf4bdc73560e8f010359680b8273c6db171a"
+      },
+      {
+        "target": "crates/cli/remote_contracts_test",
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "b9059ad67e0d352ce1225bcd89304b6f3c45ae1996040766ca26b3910d9da581"
+      },
+      {
+        "target": "crates/cli/remote_service_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "3129e891a8feaaef35634e7e822b718cd8422b6df73ba2e92e0f4a54d395e69b"
+      },
+      {
+        "target": "crates/core/core_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "46ee77c20f534dd5553533dfc8cad2f94fd9ba3e22c506879358c5afbec5dc86"
+      },
+      {
+        "target": "crates/csi/csi_contracts_test",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fba239b1728eee4fc1ca0b0cb86e9e0a2b5bf6b38a6623bf5763b9f63a73f8ea"
+      },
+      {
+        "target": "crates/definitions/definitions_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "3200b5e2acf4f51802665830be75732505d75c4bfdd8a12c7654c64c986c1ce5"
+      },
+      {
+        "target": "crates/fence/fence_contracts_test",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "abd882918741b34246501ac967ca244d4ea30730609e387ea7594f9c113d9c19"
+      },
+      {
+        "target": "crates/kubernetes/kubernetes_contracts_test",
+        "passed": 43,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fdab1295041c51ce41d469059e6e9a90ade7d567efd18828dc433c4c403ce96e"
+      },
+      {
+        "target": "crates/node/node_contracts_test",
+        "passed": 15,
+        "failed": 0,
+        "ignored": 3,
+        "language": "rust",
+        "log_sha256": "82d1bb6f0ca0b14a902ae086db2722ae29dd0b5f79643673cb11eac4f5289c96"
+      },
+      {
+        "target": "crates/objects/objects_contracts_test",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "3410508d9bbc9fc2f8d99beb8b8d6efc0588027d34265b3d396f8ccdab7312ab"
+      },
+      {
+        "target": "crates/sandbox/sandbox_contracts_test",
+        "passed": 27,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ec2028d44371ed1abb468e789dc69bf122a2125052c13634010eec8bceb1a8f3"
+      },
+      {
+        "target": "crates/server/server_contracts_test",
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "b1261e4150b81b51cc089709cf730ec5908facc2bef043dc98fab4daf8d2a93a"
+      },
+      {
+        "target": "crates/server/server_unit_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "369d97c3404152250321d4e4c777c0cb85966153d0c5559066b8206f592a8812"
+      },
+      {
+        "target": "crates/storage/storage_contracts_test",
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "2e154406ed5896cc1f231a83b3b4f571d3ca30cfd5bedf879e23291256d76cc8"
+      },
+      {
+        "target": "crates/store/postgres_contracts_test",
+        "passed": 239,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "353cab7be4ace2b3ec864b40d3e7b415c06b7acf11b2ed6e25ef84055c42ecab"
+      },
+      {
+        "target": "crates/watchdog/watchdog_contracts_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "339e8684d4396e969677269b2c00379c4f6f78812ee6f0dcc64b22ad8ae86a4a"
+      },
+      {
+        "target": "crates/worker/worker_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "11af2472242161964adac27a0a32c7efe0d06983ef4257639175add04b152b58"
+      },
+      {
+        "target": "packages/browser-driver/unit_test",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "51aa06b6b8310f457303a64d2dd9e6f35bf9cbcb7458d0de64bb51132a7a4bdc"
+      }
+    ],
+    "rust_passed": 500,
+    "typescript_unit_passed": 5,
+    "privileged_cases_ignored": 4,
+    "new_contracts": {
+      "postgres_admission": 9,
+      "http_admission": 3,
+      "real_operator_process": 1
+    },
+    "full_bazel_log_sha256": "c8ed39f90465cd4977ee40b72db21e85c2c59096c5d26f66c659a070132ed86a",
+    "fmt": "passed",
+    "clippy_all_workspace_all_targets_all_features_warnings_denied": "passed",
+    "clippy_log_sha256": "276801d58b300b04a74f559394dd91dce141647b389d1f818877b8d0e8c437da"
+  },
+  "scope": "Real PostgreSQL and HTTP/control command admission contracts only; storage preparation receipts are explicitly synthetic. No new Chromium runtime tests.",
+  "qualitygate": "Final unfiltered full delivery check runs after this record is written; existing policy selects line-ending only. Reports retained outside the source tree.",
+  "development_corrections": [
+    "Parenthesize SQL CASE expression in migration guard; concurrent migration test harness now returns first failure instead of hanging behind an advisory lock.",
+    "Register the new HTTP module in the explicit Bazel source list.",
+    "Preserve the migration-21 stop refusal before querying the newer App reservation table; targeted migration-22 upgrade regression verified.",
+    "Check known Computer/App grants before reporting pinned revision or generation details.",
+    "Add trusted profile owner operator command and real process test."
+  ],
+  "known_limits": [
+    "No production Browser Authority or ActionJournal adapter",
+    "No App launch worker, GUI control handoff, profile checkpoint/restore, cross-node fencing or ComputerView",
+    "Blocked reservations retain capacity until explicit pre-dispatch cancellation",
+    "Computer and Browser readiness remain unsupported; full product acceptance remains incomplete"
+  ]
+}

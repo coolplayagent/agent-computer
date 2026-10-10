@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 75
-updated_at: unix:1791663636
+map_version: 76
+updated_at: unix:1791665910
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -169,12 +169,13 @@ topics:
   title: runtime
   description: Added by CLI source registration.
   source_ids:
+  - app-admission
   - browser-driver
   - checkpoint-stop-drain
   - checkpoint-stop-worker
   - continuous-candidate-preparation
-  ref: topics/topic-d92c6a81b2ff5009-d4da2d5187cafd7e05495e0637e1b70fc8abc0d72ebdac569ca1cfd6cee1d775.yaml
-  digest: d4da2d5187cafd7e05495e0637e1b70fc8abc0d72ebdac569ca1cfd6cee1d775
+  ref: topics/topic-d92c6a81b2ff5009-d352ad1bf0f9e104eaa0143aa79a226375588b7e61200454cb380f109644f360.yaml
+  digest: d352ad1bf0f9e104eaa0143aa79a226375588b7e61200454cb380f109644f360
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -183,12 +184,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 59
+  omitted_through: 60
   recent:
-  - version: 60
-    action: source.add
-    actor: cli
-    summary: Added source 'workspace-artifact-checkpoints' to topic 'development'.
   - version: 61
     action: source.add
     actor: cli
@@ -249,3 +246,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'browser-driver' to topic 'runtime'.
+  - version: 76
+    action: source.add
+    actor: cli
+    summary: Added source 'app-admission' to topic 'runtime'.

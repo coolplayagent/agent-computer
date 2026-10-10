@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 74
-updated_at: unix:1791660972
+map_version: 75
+updated_at: unix:1791663636
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -169,11 +169,12 @@ topics:
   title: runtime
   description: Added by CLI source registration.
   source_ids:
+  - browser-driver
   - checkpoint-stop-drain
   - checkpoint-stop-worker
   - continuous-candidate-preparation
-  ref: topics/topic-d92c6a81b2ff5009-b6e70865b09ac5723b91ae9bd96aaa1c54f8b6349ced055ab9aa9149432980c5.yaml
-  digest: b6e70865b09ac5723b91ae9bd96aaa1c54f8b6349ced055ab9aa9149432980c5
+  ref: topics/topic-d92c6a81b2ff5009-d4da2d5187cafd7e05495e0637e1b70fc8abc0d72ebdac569ca1cfd6cee1d775.yaml
+  digest: d4da2d5187cafd7e05495e0637e1b70fc8abc0d72ebdac569ca1cfd6cee1d775
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -182,12 +183,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 58
+  omitted_through: 59
   recent:
-  - version: 59
-    action: source.add
-    actor: cli
-    summary: Added source 'undispatched-computer-stop' to topic 'development'.
   - version: 60
     action: source.add
     actor: cli
@@ -248,3 +245,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'authenticated-execution-cli' to topic 'cli'.
+  - version: 75
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-driver' to topic 'runtime'.
