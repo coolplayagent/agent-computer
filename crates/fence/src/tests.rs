@@ -133,7 +133,15 @@ fn persistence_failure_cannot_produce_or_revive_a_barrier() {
 #[test]
 fn path_escape_links_devices_foreign_identity_and_privileged_modes_are_rejected() {
     let (dir, g) = fixture();
-    for n in ["..", ".", "/tmp", "a/b", ".agent-computer-write-x"] {
+    for n in [
+        "..",
+        ".",
+        "/tmp",
+        "a/b",
+        ".agent-computer-write-x",
+        ".control",
+        ".jfs.control",
+    ] {
         assert!(
             g.access(uid(), false, |s| s.lookup(1, OsStr::new(n)))
                 .is_err()

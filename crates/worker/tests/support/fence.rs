@@ -15,6 +15,14 @@ import errno,json,mmap,os,sys
 os.chdir(sys.argv[1])
 assert os.getuid()==1000 and os.getgroups()==[]
 os.mkdir('fence-dir')
+os.mkdir('.config')
+with open('.config/settings','wb') as settings:settings.write(b'tenant-config')
+control_rejections=[]
+for prefix in ['', 'fence-dir/']:
+ for name in ['.control','.jfs.control']:
+  try:os.open(prefix+name,os.O_RDWR)
+  except OSError as e:assert e.errno==errno.EINVAL;control_rejections.append(prefix+name)
+  else:raise AssertionError('JuiceFS operator file exposed')
 fd=os.open('fence-dir/held',os.O_CREAT|os.O_RDWR,0o600)
 assert os.write(fd,b'before')==6
 os.fsync(fd)
@@ -54,7 +62,7 @@ assert os.pread(fd,99,0)==b'durable'
 assert os.pread(orphan,99,0)==b'orphan'
 assert os.listdir('fence-dir')==['renamed']
 os.close(orphan);os.close(fd)
-print(json.dumps({'phase':'done','uid':os.getuid(),'denied':denied,'bytes':'durable','mmap_rejected':True}),flush=True)
+print(json.dumps({'phase':'done','uid':os.getuid(),'denied':denied,'bytes':'durable','mmap_rejected':True,'operator_files_rejected':control_rejections}),flush=True)
 "#;
 
 struct Workload {
@@ -153,6 +161,13 @@ pub fn verify(worker: &Value, config: &Value, prepared: &Value) -> Value {
     )
     .unwrap();
     let prepared: Prepared = serde_json::from_value(prepared.clone()).unwrap();
+    // Prove the internal control inode actually exists below this Candidate in
+    // the qualified backend; merely denying an absent name is insufficient.
+    let backend_control = root
+        .join(&t.volume_path)
+        .join(&prepared.path_ref)
+        .join(".control");
+    assert!(fs::metadata(backend_control).unwrap().ino() >= 0x7FFF_FFFF_0000_0000);
     let target = Path::new(
         config["fence_mount_root"]
             .as_str()

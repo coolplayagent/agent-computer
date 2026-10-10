@@ -145,7 +145,7 @@ impl Drop for Gate {
 
 /// Operator-only local mount. The original Candidate must have exclusive writer
 /// admission, and workloads must receive only this mount, never its backing path.
-/// No passthrough FD, writeback cache, mmap, devices or tenant mount options exist.
+/// No passthrough FD, writeback cache, shared mmap, devices or tenant mount options exist.
 pub fn mount(candidate: CandidateDirectory, mountpoint: &Path) -> std::io::Result<MountedFence> {
     let (root, prepared, uid, gid) = candidate.into_parts();
     mount_inner(root, prepared, uid, gid, mountpoint)

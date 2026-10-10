@@ -18,6 +18,8 @@ pub(crate) type Result<T> = std::result::Result<T, Errno>;
 pub(crate) const MAX_NODES: usize = 16_384;
 pub(crate) const MAX_HANDLES: usize = 4096;
 pub(crate) const MAX_IO: usize = 128 * 1024;
+// Qualified JuiceFS v1.4.1 reserves this range for virtual operator files.
+const MIN_INTERNAL_INODE: u64 = 0x7FFF_FFFF_0000_0000;
 const RESOLVE: ResolveFlags = ResolveFlags::BENEATH
     .union(ResolveFlags::NO_SYMLINKS)
     .union(ResolveFlags::NO_XDEV);
@@ -33,6 +35,8 @@ pub(crate) fn name(n: &OsStr) -> Result<()> {
         || b.contains(&b'/')
         || b.contains(&0)
         || b.starts_with(b".agent-computer-")
+        || b.starts_with(b".jfs.")
+        || matches!(b, b".control")
     {
         Err(Errno::EINVAL)
     } else {
@@ -138,7 +142,13 @@ impl State {
         let m = file.metadata().map_err(err)?;
         kind(&m)?;
         let root = self.node(1)?.metadata().map_err(err)?;
-        if m.dev() != root.dev() || (m.is_file() && m.nlink() != 1) || m.mode() & 0o7000 != 0 {
+        if m.dev() != root.dev()
+            || m.ino() >= MIN_INTERNAL_INODE
+            || m.uid() != self.uid
+            || m.gid() != self.gid
+            || (m.is_file() && m.nlink() != 1)
+            || m.mode() & 0o7000 != 0
+        {
             return Err(Errno::EPERM);
         }
         let id = (m.dev(), m.ino());
@@ -317,10 +327,19 @@ impl State {
         }
         self.effect(fs::mkdirat(self.node(parent)?, n, permissions).map_err(Into::into))?;
         let result = (|| {
-            let ino = self.lookup(parent, n)?;
-            let f = self.reopen(ino, OFlags::RDONLY | OFlags::DIRECTORY)?;
+            let f = File::from(
+                fs::openat2(
+                    self.node(parent)?,
+                    n,
+                    OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
+                    Mode::empty(),
+                    RESOLVE,
+                )
+                .map_err(err)?,
+            );
             self.owned(&f, permissions)?;
             self.sync_node(parent)?;
+            let ino = self.register(f)?;
             self.attr(ino)
         })();
         if result.is_err() {
