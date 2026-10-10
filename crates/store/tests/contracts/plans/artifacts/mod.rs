@@ -10,6 +10,7 @@ use agent_computer_store::{
     reconciliation::WorkerId,
     runtime::{artifacts::*, *},
 };
+mod continuation;
 mod objects;
 mod recovery;
 use objects::Objects;
@@ -17,8 +18,14 @@ async fn setup() -> (Database, String, String, String, CommitArtifact) {
     setup_with_apps(false).await
 }
 async fn setup_with_apps(apps: bool) -> (Database, String, String, String, CommitArtifact) {
+    setup_many(apps, 1).await
+}
+async fn setup_many(
+    apps: bool,
+    computers: usize,
+) -> (Database, String, String, String, CommitArtifact) {
     let (db, token, computer, start, target) =
-        super::preparation::setup_with_apps(30 * 1024 * 1024 * 1024, apps).await;
+        super::preparation::setup_many(60 * 1024 * 1024 * 1024, apps, computers).await;
     let lease = super::preparation::claim(&db, &start, &target, "prepare").await;
     db.store.begin_candidate_preparation(&lease).await.unwrap();
     db.store
@@ -67,13 +74,20 @@ async fn admit(
         .unwrap()
 }
 async fn capture(db: &Database, id: &str, objects: &Objects) -> (ArtifactLease, Bundle) {
+    capture_bytes(db, id, objects, b"retained-file").await
+}
+async fn capture_bytes(
+    db: &Database,
+    id: &str,
+    objects: &Objects,
+    bytes: &[u8],
+) -> (ArtifactLease, Bundle) {
     let lease = db
         .store
         .claim_artifact(&org("acme"), id, &WorkerId::new("capture").unwrap())
         .await
         .unwrap()
         .unwrap();
-    let bytes = b"retained-file";
     let hash = sha256(bytes);
     let object = objects
         .client
@@ -177,6 +191,7 @@ async fn artifact_publication_checkpoint_and_restart_survive_wal_and_retries() {
                 expected_revision: stopped.control_revision,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await
@@ -226,21 +241,23 @@ async fn artifact_branch_and_conflict_preserve_fixed_versions_without_overwritin
             if branch { 1 } else { 2 }
         );
         let current = db.store.computer_runtime(&token, &computer).await.unwrap();
-        assert!(matches!(
-            db.store
-                .stop_prepared_computer(
-                    &token,
-                    &key("stop"),
-                    &computer,
-                    &StopPreparedComputer {
-                        expected_revision: current.revision,
-                        request_id: input.request_id
-                    }
-                )
-                .await,
-            Err(Error::RuntimeStopBlocked)
-        ));
-        assert_eq!(count(&db, "runtime_stops").await, 0);
+        let stopped = db
+            .store
+            .stop_prepared_computer(
+                &token,
+                &key("stop"),
+                &computer,
+                &StopPreparedComputer {
+                    expected_revision: current.revision,
+                    request_id: input.request_id,
+                },
+            )
+            .await
+            .unwrap();
+        assert_eq!(stopped.proof, "artifact_checkpoint");
+        assert_eq!(stopped.input_revision, done.input_revision.unwrap());
+        assert_eq!(stopped.checkpoint.unwrap().artifact_id, done.commit_id);
+        assert_eq!(count(&db, "runtime_stops").await, 1);
     }
 }
 #[tokio::test]

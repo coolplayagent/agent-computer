@@ -37,13 +37,13 @@ worker 上传不可变对象后完整读回所有分块及清单，校验长度�
 
 捕获、上传或数据库失败均保留已封存 Candidate 与已完成的 spool 对象。可重跑同一操作端命令，已记录的捕获不会被静默替换。失败 worker 只释放自己的租约；进程中断后可等待租约到期再接管。发布者凭据过期时，原 principal 使用重新授权的凭据、原幂等键及完全相同输入重复 POST，可废止旧 worker 权限而不修改捕获内容。任何错误路径都不会恢复 Candidate 写权限。
 
-`publish_current=true` 对 Workspace 当前 head 与 `base_revision` 做 CAS。匹配则推进 head；冲突则保留独立 Artifact/输入版本及 Candidate，返回 `Conflict`，不覆盖其他发布者的 head。`false` 创建分支版本并保持 head。分支目前继承 Workspace read ACL；尚未提供分支继续编辑、显式 fork/rebase、私有逐 Artifact ACL 或冲突解决入口，因此这些封存 Candidate 继续保留。
+`publish_current=true` 对 Workspace 当前 head 与 `base_revision` 做 CAS。匹配则推进 head；冲突则保留独立 Artifact/输入版本及 Candidate，返回 `Conflict`，不覆盖其他发布者的 head。`false` 创建分支版本并保持 head。分支目前继承 Workspace read ACL；后续 [39](39-artifact-candidate-continuation.md) 已提供显式分支/冲突继续编辑与并行 Candidate。跨 Workspace fork/rebase 和私有逐 Artifact ACL 仍待实现；旧封存 Candidate 继续保留。
 
 ## 38.3 checkpoint 停止与恢复
 
-成功发布为当前 head 后，原有[停止接口](37-undispatched-computer-stop.md) 接受 `Sealed` 的纯文件 Computer。`artifact_checkpoint` 回执绑定 Artifact、输入修订及清单哈希、Computer spec 哈希和原运行快照哈希；App 状态与未结束执行列表为空。声明任何 App 的 Computer 必须等待所需 App/profile 捕获实现后才能走此 checkpoint 路径。分支、冲突、已被替换的 Workspace head 及活跃人类输入同样阻止 checkpoint 停止。
+成功发布后，包括已保留分支与 CAS 冲突（[39](39-artifact-candidate-continuation.md)），原有[停止接口](37-undispatched-computer-stop.md) 接受 `Sealed` 的纯文件 Computer。`artifact_checkpoint` 回执绑定 Artifact、输入修订及清单哈希、Computer spec 哈希和原运行快照哈希；App 状态与未结束执行列表为空。声明任何 App 的 Computer 必须等待所需 App/profile 捕获实现后才能走此 checkpoint 路径。活跃人类输入仍阻止 checkpoint 停止。分支、冲突或 head 已被替换不再阻止停止；回执绑定固定版本。
 
-停止保留旧 Candidate 及完整存储预留。后续普通 start 创建新 generation 和 Candidate，并固定 Workspace 当前输入。Candidate worker 可选的 `artifacts` 配置提供同一个 S3 存储；恢复时校验远端分块和清单，构建私有内容哈希缓存，再实体化独立可写文件并复验完整哈希，不复制旧 Candidate。已有准备回执或已派发准备的观察重试无需再次下载对象。容量必须同时覆盖旧 Candidate 与新 Candidate；垃圾回收待实现。
+停止保留旧 Candidate 及完整存储预留。后续普通 start 创建新 generation 和 Candidate，并固定 Workspace 当前输入；传入 `input_artifact_id` 则选择指定 checkpoint 版本。Candidate worker 可选的 `artifacts` 配置提供同一个 S3 存储；恢复时校验远端分块和清单，构建私有内容哈希缓存，再实体化独立可写文件并复验完整哈希，不复制旧 Candidate。已有准备回执或已派发准备的观察重试无需再次下载对象。容量必须同时覆盖旧 Candidate 与新 Candidate；垃圾回收待实现。
 
 本增量也修正了此前停止回执的事件序号，使其等于实际提交的 `computer.stopped` 事件。Computer `ready` 仍为 false。任意进程存储 fencing、通用/强制停止、App/浏览器状态、checkpoint driver 版本协商、Artifact GC、Presentation 及 T01–T43 完整产品验收仍待实现。
 

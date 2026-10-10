@@ -4,7 +4,7 @@
 
 迁移 7 新增持久化启动请求和 Computer 控制计数器。服务可接收启动请求并保存为 `Queued`，在响应丢失后返回原始回执，查询当前准入状态，并取消尚未派发的请求。能力 `computer.start_admission` 为 `control-plane`；`computer` 仍为 `unsupported`。
 
-后续 [17 Candidate 准备 worker](17-candidate-preparation-worker.md) 已在准入时绑定已提交 Workspace 输入，并提供独立的授权存储 worker。新 Workspace 创建时记录明确的空初始输入；已有 Workspace 缺少输入时不会默认为空。非空 Artifact 发布、写入租约、Pod 派发、隔离与驱动健康仍待实现。启动准入本身不准备文件，也不报告 Ready。
+后续 [17 Candidate 准备 worker](17-candidate-preparation-worker.md) 已在准入时绑定已提交 Workspace 输入，并提供独立的授权存储 worker。新 Workspace 创建时记录明确的空初始输入；已有 Workspace 缺少输入时不会默认为空。后续增量已提供 [Artifact](38-workspace-artifact-checkpoints.md) 及[指定 Artifact 输入与并行 Candidate](39-artifact-candidate-continuation.md)；通用进程隔离与完整驱动健康仍待实现。启动准入本身不准备文件，也不报告 Ready。
 
 ## 16.2 原子准入
 
@@ -34,7 +34,8 @@
 | --- | --- |
 | 每组织未结束请求 | 64 |
 | 组织内每主体未结束请求 | 8 |
-| 每 Computer / 可写 Workspace 未结束请求 | 1 / 1 |
+| 每 Computer 未结束请求 | 1 |
+| 每 Workspace 的 Candidate | 可有多个，分别预留容量（[39](39-artifact-candidate-continuation.md)） |
 | 每组织 CPU 预留 | 64,000 millicores |
 | 每组织内存预留 | 131,072 MiB |
 | 每组织 Candidate 存储预留 | 1 TiB |

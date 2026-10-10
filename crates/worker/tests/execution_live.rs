@@ -341,6 +341,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                     expected_revision: 1,
                     expected_spec_revision: 1,
                     max_runtime_seconds: 300,
+                    input_artifact_id: None,
                 },
             )
             .await

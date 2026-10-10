@@ -40,6 +40,7 @@
 36. [有界执行输出持久化](zh-CN/36-durable-execution-outputs.md)
 37. [用户派发前的 Computer 停止](zh-CN/37-undispatched-computer-stop.md)
 38. [Workspace Artifact 与纯文件 checkpoint](zh-CN/38-workspace-artifact-checkpoints.md)
+39. [并行 Candidate 与 Artifact 继续编辑](zh-CN/39-artifact-candidate-continuation.md)
 
 ## 02. English
 
@@ -81,6 +82,7 @@
 36. [Durable bounded execution outputs](en/36-durable-execution-outputs.md)
 37. [Stop before user dispatch](en/37-undispatched-computer-stop.md)
 38. [Workspace artifacts and file-only checkpoints](en/38-workspace-artifact-checkpoints.md)
+39. [Parallel Candidates and Artifact continuation](en/39-artifact-candidate-continuation.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

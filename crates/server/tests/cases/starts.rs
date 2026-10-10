@@ -207,6 +207,28 @@ async fn queued_start_http_contract_validates_scope_identity_revisions_retry_and
         .headers_mut()
         .insert("origin", "https://untrusted.example".parse().unwrap());
     assert_eq!(service.send(browser).await.0, StatusCode::FORBIDDEN);
+    for (selector, expected) in [
+        (json!("artifact_unknown"), StatusCode::NOT_FOUND),
+        (json!("../object-key"), StatusCode::BAD_REQUEST),
+        (json!(""), StatusCode::BAD_REQUEST),
+        (json!({"digest":"forged"}), StatusCode::BAD_REQUEST),
+    ] {
+        let mut selected = body.clone();
+        selected["input_artifact_id"] = selector;
+        assert_eq!(
+            service
+                .send(request(
+                    token,
+                    "POST",
+                    &format!("{path}/start"),
+                    Some("start"),
+                    selected
+                ))
+                .await
+                .0,
+            expected
+        );
+    }
     let (status, receipt) = service
         .send(request(
             token,
@@ -219,6 +241,20 @@ async fn queued_start_http_contract_validates_scope_identity_revisions_retry_and
     assert_eq!(status, StatusCode::ACCEPTED);
     assert_eq!(receipt["state"], "Queued");
     assert_eq!(receipt["generation"], 1);
+    let mut null_selector = body.clone();
+    null_selector["input_artifact_id"] = Value::Null;
+    assert_eq!(
+        service
+            .send(request(
+                token,
+                "POST",
+                &format!("{path}/start"),
+                Some("start"),
+                null_selector
+            ))
+            .await,
+        (StatusCode::ACCEPTED, receipt.clone())
+    );
     assert_eq!(
         receipt,
         service

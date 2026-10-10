@@ -69,6 +69,7 @@ async fn stop_survives_wal_restart_and_new_generation_retains_old_storage() {
                 expected_revision: stopped.control_revision,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await
@@ -113,6 +114,7 @@ async fn stop_survives_wal_restart_and_new_generation_retains_old_storage() {
                     expected_revision: second.expected_revision + 1,
                     expected_spec_revision: 1,
                     max_runtime_seconds: 300,
+                    input_artifact_id: None,
                 }
             )
             .await,

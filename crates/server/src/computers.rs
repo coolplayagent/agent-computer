@@ -137,7 +137,7 @@ pub(crate) async fn cancel(
     mutate(state, context, path, request, true).await
 }
 
-/// Synchronous stop is available only before any user dispatch.
+/// Stops an undispatched Candidate or a verified file-only Artifact checkpoint.
 pub(crate) async fn stop(
     State(state): State<ServiceState>,
     Extension(context): Extension<RequestContext>,

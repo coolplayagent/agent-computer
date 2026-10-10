@@ -10,7 +10,24 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_artifact_continuation(&self) {
+        sqlx::raw_sql("DROP TRIGGER check_runtime_start_input ON runtime_start_inputs; DROP FUNCTION guard_runtime_start_input(); DROP INDEX runtime_workspace_candidates; CREATE UNIQUE INDEX runtime_one_active_workspace ON runtime_start_requests (organization,workspace_id) WHERE state NOT IN ('Cancelled','Stopped'); DELETE FROM _sqlx_migrations WHERE version=22;").execute(&self.pool).await.unwrap();
+        let previous = include_str!("../../migrations/0021_workspace_artifacts.sql")
+            .split("CREATE FUNCTION runtime_stop_checkpoint")
+            .nth(1)
+            .unwrap()
+            .split("$$;")
+            .next()
+            .unwrap();
+        sqlx::raw_sql(&format!(
+            "CREATE OR REPLACE FUNCTION runtime_stop_checkpoint{previous}$$;"
+        ))
+        .execute(&self.pool)
+        .await
+        .unwrap();
+    }
     pub async fn remove_workspace_artifacts(&self) {
+        self.remove_artifact_continuation().await;
         sqlx::raw_sql("DROP FUNCTION runtime_stop_checkpoint(TEXT,TEXT); ALTER TABLE workspace_input_versions DROP COLUMN artifact_commit_id; DROP TABLE artifact_commits; DROP FUNCTION guard_artifact_commit(); DROP FUNCTION artifact_candidate_drained(TEXT,TEXT); DELETE FROM _sqlx_migrations WHERE version=21;").execute(&self.pool).await.unwrap();
     }
     pub async fn remove_undispatched_stop(&self) {
