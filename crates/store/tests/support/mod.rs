@@ -10,7 +10,11 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_undispatched_stop(&self) {
+        sqlx::raw_sql("DROP TRIGGER check_writer_start ON candidate_writer_leases; DROP FUNCTION guard_writer_start_authority(); DROP TABLE runtime_stops; DROP FUNCTION runtime_stop_is_undispatched(TEXT,TEXT); DROP FUNCTION guard_runtime_stop_insert(); DELETE FROM _sqlx_migrations WHERE version=20;").execute(&self.pool).await.unwrap();
+    }
     pub async fn remove_execution_outputs(&self) {
+        self.remove_undispatched_stop().await;
         sqlx::raw_sql("DROP TABLE execution_outputs; DROP TABLE execution_output_intents; DROP FUNCTION guard_execution_output(); DELETE FROM _sqlx_migrations WHERE version=19;").execute(&self.pool).await.unwrap();
     }
     pub async fn remove_reaper_admission(&self) {

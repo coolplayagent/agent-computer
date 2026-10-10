@@ -1,6 +1,7 @@
 //! Durable start admission only. There is deliberately no external-effect dispatcher
 //! here: input publication, storage preparation, leases and fencing remain required.
 pub(super) mod graph;
+mod stop;
 mod types;
 use super::*;
 use crate::plans::types::{digest, random_id};
@@ -33,8 +34,9 @@ async fn capacity(
     seconds: u32,
 ) -> Result<()> {
     // Conservative platform ceilings, not caller-supplied capacity. All admissions
-    // and releases hold the organization lock; Queued and Preparing both reserve.
-    let row = sqlx::query("SELECT count(*)::bigint AS total, count(*) FILTER (WHERE principal=$2)::bigint AS actor, COALESCE(sum(cpu_millis),0)::bigint AS cpu, COALESCE(sum(memory_mib),0)::bigint AS memory, COALESCE(sum(storage_bytes),0)::bigint AS storage, COALESCE(sum(storage_bytes) FILTER (WHERE volume_id=$3),0)::bigint AS volume, COALESCE(sum(max_runtime_seconds) FILTER (WHERE principal=$2),0)::bigint AS seconds, count(*) FILTER (WHERE workspace_id=$4)::bigint AS workspace FROM runtime_start_requests WHERE organization=$1 AND state <> 'Cancelled'")
+    // and releases hold the organization lock. Stopped Candidates retain storage
+    // reservations until a separately verified garbage collection exists.
+    let row = sqlx::query("SELECT count(*) FILTER (WHERE state<>'Stopped')::bigint AS total, count(*) FILTER (WHERE principal=$2 AND state<>'Stopped')::bigint AS actor, COALESCE(sum(cpu_millis) FILTER (WHERE state<>'Stopped'),0)::bigint AS cpu, COALESCE(sum(memory_mib) FILTER (WHERE state<>'Stopped'),0)::bigint AS memory, COALESCE(sum(storage_bytes),0)::bigint AS storage, COALESCE(sum(storage_bytes) FILTER (WHERE volume_id=$3),0)::bigint AS volume, COALESCE(sum(max_runtime_seconds) FILTER (WHERE principal=$2 AND state<>'Stopped'),0)::bigint AS seconds, count(*) FILTER (WHERE workspace_id=$4 AND state<>'Stopped')::bigint AS workspace FROM runtime_start_requests WHERE organization=$1 AND state <> 'Cancelled'")
         .bind(org).bind(principal).bind(&admission.volume).bind(&admission.workspace).fetch_one(&mut **tx).await?;
     for (field, added, limit) in [
         ("total", 1, 64),
@@ -71,6 +73,7 @@ async fn state(
         active_request: None,
         start_state: None,
         ready: false,
+        stop_receipt: None,
     };
     if let Some(row) = row {
         result.revision = row.try_get("revision")?;
@@ -83,6 +86,14 @@ async fn state(
                     .map_err(|_| Error::InvalidStoredData)
             })
             .transpose()?;
+    }
+    if result.active_request.is_none() && result.generation > 0 {
+        let receipt: Option<serde_json::Value> = sqlx::query_scalar("SELECT s.receipt FROM runtime_stops s JOIN runtime_start_requests r USING(organization,request_id) WHERE r.organization=$1 AND r.computer_id=$2 AND r.generation=$3 AND r.state='Stopped'")
+            .bind(org).bind(computer).bind(result.generation).fetch_optional(&mut **tx).await?;
+        result.stop_receipt = receipt
+            .map(serde_json::from_value)
+            .transpose()
+            .map_err(|_| Error::InvalidStoredData)?;
     }
     Ok(result)
 }

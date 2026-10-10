@@ -11,6 +11,7 @@ mod authority;
 mod executions;
 mod reads;
 mod recovery;
+mod stops;
 
 async fn connection(
     db: &Database,

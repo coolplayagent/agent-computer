@@ -1,5 +1,5 @@
 use super::*;
-use super::{runtime::runtime_fixture, starts::grants};
+use super::{runtime::runtime_fixture_with_quota, starts::grants};
 use agent_computer_storage::{Manifest, Prepared};
 use agent_computer_store::{
     Error,
@@ -9,7 +9,12 @@ use agent_computer_store::{
 use serde_json::json;
 
 pub(super) async fn setup() -> (Database, String, String, StartReceipt, PreparationTarget) {
-    let (db, _, token, computer, _) = runtime_fixture().await;
+    setup_with_quota(10 * 1024 * 1024 * 1024).await
+}
+pub(super) async fn setup_with_quota(
+    quota: i64,
+) -> (Database, String, String, StartReceipt, PreparationTarget) {
+    let (db, _, token, computer, _) = runtime_fixture_with_quota(quota).await;
     grants(&db).await;
     let ClaimOutcome::Claimed(volume) = db
         .store

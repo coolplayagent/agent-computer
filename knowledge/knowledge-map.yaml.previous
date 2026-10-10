@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 57
-updated_at: unix:1791599329
+map_version: 58
+updated_at: unix:1791601427
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -124,12 +124,13 @@ topics:
   title: execution
   description: Added by CLI source registration.
   source_ids:
+  - durable-execution-outputs
   - node-expiry-reaper
   - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-a85227c6962c15d61793e83158e4e1bcf034e006add32bc999fb31361b603184.yaml
-  digest: a85227c6962c15d61793e83158e4e1bcf034e006add32bc999fb31361b603184
+  ref: topics/topic-a402c4336ebfd782-81aa05706c2a21980492fbbbf3a921a9cc4a5f4835512d878b5f7f18516d165e.yaml
+  digest: 81aa05706c2a21980492fbbbf3a921a9cc4a5f4835512d878b5f7f18516d165e
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -153,12 +154,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 41
+  omitted_through: 42
   recent:
-  - version: 42
-    action: source.add
-    actor: cli
-    summary: Added source 'bounded-candidate-file-saves' to topic 'development'.
   - version: 43
     action: source.add
     actor: cli
@@ -219,3 +216,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'reaper-startup-admission' to topic 'execution'.
+  - version: 58
+    action: source.add
+    actor: cli
+    summary: Added source 'durable-execution-outputs' to topic 'execution'.

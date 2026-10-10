@@ -2,7 +2,7 @@ use crate::{error::RequestContext, http::ServiceState, requests};
 use agent_computer_core::identity::ComputerId;
 use agent_computer_store::{
     auth::ServiceScope,
-    runtime::{CancelQueuedStart, StartRequest},
+    runtime::{CancelQueuedStart, StartRequest, StopPreparedComputer},
 };
 use axum::{
     Extension, Json,
@@ -135,4 +135,52 @@ pub(crate) async fn cancel(
     request: Request,
 ) -> Response {
     mutate(state, context, path, request, true).await
+}
+
+/// Synchronous stop is available only before any user dispatch.
+pub(crate) async fn stop(
+    State(state): State<ServiceState>,
+    Extension(context): Extension<RequestContext>,
+    path: Result<Path<String>, PathRejection>,
+    request: Request,
+) -> Response {
+    let token = match requests::authorize(
+        &state,
+        &context,
+        request.headers(),
+        ServiceScope::RuntimeManage,
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let id = match id(&context, path) {
+        Ok(v) => v,
+        Err(e) => return *e,
+    };
+    let key = match crate::plans::key(&context, request.headers()) {
+        Ok(v) => v,
+        Err(e) => return *e,
+    };
+    let body = match requests::body(&context, request).await {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let Ok(input) = serde_json::from_slice::<StopPreparedComputer>(&body) else {
+        return context.error(
+            StatusCode::BAD_REQUEST,
+            "invalid_request",
+            "Supply expected_revision and request_id.",
+            false,
+        );
+    };
+    match state
+        .store
+        .stop_prepared_computer(&token, &key, &id, &input)
+        .await
+    {
+        Ok(v) => Json(v).into_response(),
+        Err(e) => context.store_error(e),
+    }
 }

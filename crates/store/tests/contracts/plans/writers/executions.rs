@@ -2,7 +2,7 @@ mod dispatch;
 use super::*;
 use serde_json::json;
 
-async fn submission(db: &Database, lease: &WriterLease) -> SubmitExecution {
+pub(super) async fn submission(db: &Database, lease: &WriterLease) -> SubmitExecution {
     let sandbox: String = sqlx::query_scalar(
         "SELECT resource_id FROM resource_definitions WHERE kind='sandbox' AND name='exec-env'",
     )
@@ -27,7 +27,7 @@ async fn submission(db: &Database, lease: &WriterLease) -> SubmitExecution {
         },
     }
 }
-async fn submit(
+pub(super) async fn submit(
     db: &Database,
     token: &str,
     computer: &str,

@@ -3301,6 +3301,153 @@
           }
         }
       }
+    },
+    "/v1alpha1/computers/{id}/stop": {
+      "post": {
+        "operationId": "stopPreparedComputer",
+        "description": "Requires runtime.manage and an exact Computer manage grant. Stops only a Prepared Candidate with no user dispatch in any writer epoch, no unreleased writer, no queued execution and no active unexpired human input. Releases compute admission; retains the old Candidate and its storage reservation. Does not publish a checkpoint or prove fencing of dispatched IO. Replays return the historical receipt after fresh authorization and cannot stop a later generation. Queued cancellation remains separate.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope, browser Origin, or activation exceeds its grant cap.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Immutable stop receipt for the named generation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerStopReceipt"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stop blocked by user dispatch or active input, wrong control revision/request/state, or idempotency conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body or dependency snapshot too large.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Uncompressed application/json required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopPreparedComputer"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4429,12 +4576,16 @@
               "Preparing",
               "Prepared",
               "Cancelled",
+              "Stopped",
               null
             ]
           },
           "ready": {
             "type": "boolean",
             "const": false
+          },
+          "stop_receipt": {
+            "$ref": "#/components/schemas/ComputerStopReceipt"
           }
         }
       },
@@ -5263,6 +5414,94 @@
               "integer",
               "null"
             ]
+          }
+        }
+      },
+      "StopPreparedComputer": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_revision",
+          "request_id"
+        ],
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          }
+        }
+      },
+      "ComputerStopReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Historical no-user-dispatch receipt. Retained storage is not reclaimed; no flush, fencing or new checkpoint is claimed.",
+        "required": [
+          "computer_id",
+          "request_id",
+          "generation",
+          "candidate_id",
+          "control_revision",
+          "input_revision",
+          "input_manifest_digest",
+          "retained_storage_bytes",
+          "proof",
+          "stopped_at_ms",
+          "event_sequence"
+        ],
+        "properties": {
+          "computer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "control_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "input_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "input_manifest_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "retained_storage_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "proof": {
+            "const": "no_user_dispatch"
+          },
+          "stopped_at_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "event_sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
           }
         }
       }

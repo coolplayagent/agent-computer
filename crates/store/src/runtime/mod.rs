@@ -14,7 +14,10 @@ use crate::{
     plans::transactions,
 };
 use sqlx::{Postgres, Row, Transaction};
-pub use start::{CancelQueuedStart, ComputerRuntime, StartReceipt, StartRequest, StartState};
+pub use start::{
+    CancelQueuedStart, ComputerRuntime, ComputerStopReceipt, StartReceipt, StartRequest,
+    StartState, StopPreparedComputer,
+};
 pub use types::*;
 
 async fn target(
