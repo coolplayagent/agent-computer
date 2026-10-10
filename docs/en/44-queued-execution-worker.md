@@ -1,5 +1,7 @@
 # 44. Continuous queued execution worker
 
+[48 Bounded background execution](48-background-execution.md) adds a default background lifetime while preserving the original fixed deadlines and identity requirements.
+
 The trusted operator can run a persistent worker for one organization and one qualified local Volume. It automatically claims queued Candidate executions and runs the existing guarded execution, output publication, completion and cleanup path. Callers still submit through the durable execution admission API; they do not select nodes or supply worker configuration.
 
 ## Run and stop
@@ -24,7 +26,7 @@ The command emits JSON lines for readiness, claims, cancellations, completed job
 
 The store selects the oldest `Queued` execution by creation time and execution ID for the exact organization and complete storage target. Selection and the existing single-use dispatch admission share one transaction and organization stream lock. Competing workers and explicit one-shot dispatch therefore cannot both obtain an attempt for the same execution. Migration 24 adds a partial polling index over queued rows without changing historical requests.
 
-The transaction rechecks the original credential, current grants, connection, Candidate and writer before committing the dispatch intent and Outbox. Revoked or expired requests become Cancelled without external dispatch. An Outbox failure rolls back the claim. Cancellation does not invent a writer-release proof; ordinary lease reconciliation retains its existing semantics. The original queue deadline is never renewed by polling, lock waits, dispatch or process restart.
+The transaction rechecks the original credential, current grants, submitted connection/background lifetime, Candidate and writer before committing the dispatch intent and Outbox. Revoked or expired requests become Cancelled without external dispatch. An Outbox failure rolls back the claim. Cancellation does not invent a writer-release proof; ordinary lease reconciliation retains its existing semantics. The original queue deadline is never renewed by polling, lock waits, dispatch or process restart.
 
 Restart selects only requests still Queued. Dispatching, CancelRequested, Unknown and terminal requests are excluded. An ambiguous claim timeout is not retried by identity: a committed dispatch remains excluded, while a rolled-back transaction may be claimed later. Persistent records cannot recreate a live process/IO seal. Explicit observation-only recovery remains available; automatic recovery of previously dispatched jobs is outside this worker's scope.
 
@@ -34,4 +36,4 @@ PostgreSQL contracts exercise full target isolation, concurrent claims, WAL rest
 
 [Source-bound component record](../evidence/queued-execution-worker-2026-10-10.json) · [validation log](../evidence/queued-execution-worker-2026-10-10.log)
 
-This delivers node-local automatic dispatch for prepared Candidates. Full Computer lifecycle scheduling, automatic drain recovery, cross-node fencing, background execution lifetimes, browser/ComputerView and product acceptance remain pending. Computer `ready=false`, public `execution` remains unsupported, and T01–T43 remain `not_run`.
+This delivers node-local automatic dispatch for prepared Candidates. Full Computer lifecycle scheduling, automatic drain recovery, cross-node fencing, longer renewable execution budgets, browser/ComputerView and product acceptance remain pending. Computer `ready=false`, public `execution` remains unsupported, and T01–T43 remain `not_run`.

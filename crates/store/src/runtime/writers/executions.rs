@@ -1,4 +1,4 @@
-//! Durable connection-scoped admission and dispatch journal.
+//! Durable bounded execution admission and dispatch journal.
 mod dispatch;
 use super::*;
 use crate::plans::DefinitionKind;
@@ -36,10 +36,16 @@ impl ExecutionCommand {
         .map_err(|_| Error::InvalidRuntimeRequest)
     }
 }
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecutionLifetime {
+    #[default]
+    Background,
     Connection,
+}
+
+fn historical_lifetime() -> ExecutionLifetime {
+    ExecutionLifetime::Connection
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -48,6 +54,7 @@ pub struct SubmitExecution {
     pub lease_id: String,
     pub lease: WriterLeaseCommand,
     pub sandbox_id: String,
+    #[serde(default)]
     pub lifetime: ExecutionLifetime,
     pub command: ExecutionCommand,
 }
@@ -72,6 +79,8 @@ pub enum ExecutionState {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ExecutionRequest {
     pub execution_id: String,
+    #[serde(default = "historical_lifetime")]
+    pub lifetime: ExecutionLifetime,
     pub computer_id: String,
     pub generation: i64,
     pub candidate_id: String,
@@ -139,6 +148,9 @@ fn view(row: &PgRow) -> Result<ExecutionRequest> {
     };
     Ok(ExecutionRequest {
         execution_id: row.try_get("execution_id")?,
+        lifetime: serde_json::from_value::<SubmitExecution>(row.try_get("input")?)
+            .map_err(|_| Error::InvalidStoredData)?
+            .lifetime,
         computer_id: string("computer_id")?,
         generation: binding["generation"]
             .as_i64()
@@ -292,7 +304,7 @@ impl Store {
             .bind(org).bind(&id).bind(&input.lease_id).bind(input.lease.epoch).bind(&input.lease.connection_session_id)
             .bind(serde_json::to_value(input).map_err(|_|Error::InvalidRuntimeRequest)?).bind(binding).bind(&hash).bind(&binding_hash).bind(now).bind(until).execute(&mut *tx).await?;
         sqlx::query("UPDATE candidate_writer_leases SET revision=revision+1 WHERE organization=$1 AND lease_id=$2").bind(org).bind(&input.lease_id).execute(&mut *tx).await?;
-        transactions::emit(&mut tx,org,seq,"execution.status_changed",serde_json::json!({"execution_id":id,"computer_id":computer,"generation":input.lease.generation,"state":"Queued","dispatch_started":false,"input_digest":hash,"binding_digest":binding_hash})).await?;
+        transactions::emit(&mut tx,org,seq,"execution.status_changed",serde_json::json!({"execution_id":id,"computer_id":computer,"generation":input.lease.generation,"state":"Queued","lifetime":input.lifetime,"dispatch_started":false,"input_digest":hash,"binding_digest":binding_hash})).await?;
         transactions::save_receipt(&mut tx, &identity, op, key, &hash, &id).await?;
         live(&mut tx, token, &identity, &input.lease_id).await?;
         if transactions::now(&mut tx).await? >= until {

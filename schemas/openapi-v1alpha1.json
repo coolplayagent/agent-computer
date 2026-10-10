@@ -1604,7 +1604,7 @@
       },
       "delete": {
         "operationId": "closeConnectionSession",
-        "description": "Idempotently close an own connection. No key or body is required. Revokes later connection use, without cancelling background work, stopping compute, or proving input/writers drained. A repeated close leaves revision and events unchanged. Closing atomically marks Held writer leases Draining; a trusted reconcile can release only a zero-dispatch epoch.",
+        "description": "Idempotently close an own connection. No key or body is required. Revokes later connection use, without cancelling background work, stopping compute, or proving input/writers drained. A repeated close leaves revision and events unchanged. Closing atomically marks Held writer leases Draining except exact pending background execution reservations, which keep their original deadline and authority requirements; a trusted reconcile can release only a proven drained epoch.",
         "security": [
           {
             "serviceBearer": []
@@ -5851,7 +5851,6 @@
           "lease_id",
           "lease",
           "sandbox_id",
-          "lifetime",
           "command"
         ],
         "properties": {
@@ -5868,13 +5867,17 @@
           },
           "lifetime": {
             "type": "string",
-            "const": "connection"
+            "enum": [
+              "background",
+              "connection"
+            ],
+            "default": "background"
           },
           "command": {
             "$ref": "#/components/schemas/ExecutionCommand"
           }
         },
-        "description": "Connection-scoped queue reservation only. Selected gVisor Sandbox must belong to the pinned Computer snapshot and cannot host an App. Admission increments writer revision; re-read the lease before renewal/release. Background lifetime and runtime dispatch remain unsupported."
+        "description": "Bounded queue reservation on a Prepared Candidate. Background (default) survives logical connection close; connection lifetime requires an active connection. Neither mode extends the original writer or dispatch deadline (at most 30 seconds on the current guarded path). Original credential, grants, catalog and generation remain required. Selected gVisor Sandbox must belong to the pinned Computer snapshot and cannot host an App. Admission increments writer revision; re-read the lease before renewal/release. Public runtime execution remains unsupported."
       },
       "CancelExecution": {
         "type": "object",
@@ -5895,6 +5898,7 @@
         "additionalProperties": false,
         "required": [
           "execution_id",
+          "lifetime",
           "computer_id",
           "candidate_id",
           "sandbox_id",
@@ -5992,6 +5996,14 @@
           "dispatch_started": {
             "type": "boolean",
             "description": "True after the durable dispatch intent commits; does not assert that a process started or stopped."
+          },
+          "lifetime": {
+            "type": "string",
+            "enum": [
+              "background",
+              "connection"
+            ],
+            "description": "Immutable submitted lifetime, included in the input digest."
           }
         },
         "description": "Current execution metadata bound to the original credential. Succeeded/Failed require a live kernel and Candidate IO seal, verified output and current authority; dispatched Cancelled requires the seal and an explicit cancellation request. Unknown preserves uncertainty even when physical writes are sealed. Queue deadline is fixed at admission and never extended by retry or lease renewal.",

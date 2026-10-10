@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 69
-updated_at: unix:1791630150
+map_version: 70
+updated_at: unix:1791631785
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -128,6 +128,7 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - accepted-execution-completion
+  - background-execution
   - candidate-io-fence
   - durable-execution-outputs
   - execution-output-downloads
@@ -137,8 +138,8 @@ topics:
   - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-8262c11ad9e7ddaa73f60f702ab030fc4e665bb7a4dacddb54a23220c1b59265.yaml
-  digest: 8262c11ad9e7ddaa73f60f702ab030fc4e665bb7a4dacddb54a23220c1b59265
+  ref: topics/topic-a402c4336ebfd782-d46895cbcdc0dcb90ebe27428bdedb6648e5096b393bbf164b91a70b1f92ce8c.yaml
+  digest: d46895cbcdc0dcb90ebe27428bdedb6648e5096b393bbf164b91a70b1f92ce8c
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -171,12 +172,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 53
+  omitted_through: 54
   recent:
-  - version: 54
-    action: source.add
-    actor: cli
-    summary: Added source 'redundant-node-watchdogs' to topic 'execution'.
   - version: 55
     action: source.add
     actor: cli
@@ -237,3 +234,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'checkpoint-stop-drain' to topic 'runtime'.
+  - version: 70
+    action: source.add
+    actor: cli
+    summary: Added source 'background-execution' to topic 'execution'.

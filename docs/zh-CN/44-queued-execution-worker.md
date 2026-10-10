@@ -1,5 +1,7 @@
 # 44. 常驻执行队列 worker
 
+[48 有界后台执行](48-background-execution.md)增加默认后台 lifetime，仍保留原固定期限与身份要求。
+
 可信操作员可以为一个组织和一个已验证的本地 Volume 启动常驻 worker。它自动领取排队的 Candidate 执行请求，并运行已有的受保护执行、输出发布、完成确认和清理流程。调用者仍通过持久化执行准入 API 提交，不选择节点，也不提供 worker 配置。
 
 ## 启动与停止
@@ -24,7 +26,7 @@ SIGTERM 或 Ctrl-C 会停止新领取并等待已领取任务完成。正在进�
 
 Store 按创建时间、执行 ID 顺序选择精确组织及完整存储身份对应的最早 `Queued` 请求。选择和原有一次性派发准入共享事务与组织事件流锁。多个 worker 及显式单次派发不能同时取得同一执行的 attempt。迁移 24 为 Queued 记录增加部分索引，不修改历史请求。
 
-事务重新检查原始凭据、当前授权、连接、Candidate 和写入租约，再提交派发意图和 Outbox。撤权或过期请求会取消，不向外部派发。Outbox 失败会回滚领取。取消不会伪造写入者释放证明，租约协调仍遵循已有语义。轮询、锁等待、派发和重启均不会延长原始队列期限。
+事务重新检查原始凭据、当前授权、提交的 connection/background lifetime、Candidate 和写入租约，再提交派发意图和 Outbox。撤权或过期请求会取消，不向外部派发。Outbox 失败会回滚领取。取消不会伪造写入者释放证明，租约协调仍遵循已有语义。轮询、锁等待、派发和重启均不会延长原始队列期限。
 
 重启只选择仍为 Queued 的请求，排除 Dispatching、CancelRequested、Unknown 和终态。领取超时结果不明确时，不按 ID 重试派发：已经提交的请求会被排除，已回滚的请求可被后续轮询领取。持久记录不能重建活的进程与 I/O 封闭证明；显式只读观察恢复仍可使用，已派发任务的自动恢复不属于本 worker 的范围。
 
@@ -34,4 +36,4 @@ PostgreSQL 契约覆盖完整存储身份隔离、并发争抢、WAL 重启、�
 
 [固定源码的组件记录](../evidence/queued-execution-worker-2026-10-10.json) · [验证日志](../evidence/queued-execution-worker-2026-10-10.log)
 
-本增量交付已准备 Candidate 的节点本地自动派发。完整 Computer 生命周期调度、自动排空恢复、跨节点 fencing、后台执行生命周期、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。
+本增量交付已准备 Candidate 的节点本地自动派发。完整 Computer 生命周期调度、自动排空恢复、跨节点 fencing、可续期的长时间执行预算、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。

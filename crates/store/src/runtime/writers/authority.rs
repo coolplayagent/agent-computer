@@ -100,7 +100,8 @@ pub(super) async fn require(
 }
 
 /// Check the originally bound owner without accepting a credential-ID caller.
-/// Used only to lower authority or expose current own-lease state.
+/// A background reservation may outlive its logical connection. This does not
+/// authorize new interactive calls, which still require an active connection.
 pub(super) async fn active(
     tx: &mut Transaction<'_, Postgres>,
     org: &str,
@@ -126,8 +127,8 @@ async fn active_inner(
     cancelling: bool,
 ) -> Result<bool> {
     let session: String = row.try_get("session_id")?;
-    let valid:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM connection_sessions s JOIN service_credentials c ON c.credential_id=s.credential_id AND c.organization=s.organization AND c.principal=s.principal JOIN principals p ON p.organization=s.organization AND p.principal=s.principal WHERE s.organization=$1 AND s.session_id=$2 AND s.computer_id=$3 AND s.state='Active' AND s.expires_at_ms>floor(extract(epoch from clock_timestamp())*1000) AND NOT c.revoked AND c.expires_at>clock_timestamp() AND p.enabled AND s.requested @> '[\"connect\",\"read\",\"modify\"]'::jsonb AND c.scopes @> ARRAY['runtime.connect','runtime.read','runtime.modify']::text[] AND (SELECT count(*) FROM runtime_grants g WHERE g.organization=s.organization AND g.principal=s.principal AND ((g.kind='computer' AND g.resource_id=$3 AND g.permission IN ('connect','read','modify')) OR (g.kind='workspace' AND g.resource_id=$4 AND g.permission IN ('read','modify'))))=5)")
-        .bind(org).bind(session).bind(row.try_get::<String,_>("computer_id")?).bind(row.try_get::<String,_>("workspace_id")?).fetch_one(&mut **tx).await?;
+    let valid:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM connection_sessions s JOIN service_credentials c ON c.credential_id=s.credential_id AND c.organization=s.organization AND c.principal=s.principal JOIN principals p ON p.organization=s.organization AND p.principal=s.principal WHERE s.organization=$1 AND s.session_id=$2 AND s.computer_id=$3 AND ((s.state='Active' AND s.expires_at_ms>floor(extract(epoch from clock_timestamp())*1000)) OR writer_has_background_execution($1,$5,$6)) AND NOT c.revoked AND c.expires_at>clock_timestamp() AND p.enabled AND s.requested @> '[\"connect\",\"read\",\"modify\"]'::jsonb AND c.scopes @> ARRAY['runtime.connect','runtime.read','runtime.modify']::text[] AND (SELECT count(*) FROM runtime_grants g WHERE g.organization=s.organization AND g.principal=s.principal AND ((g.kind='computer' AND g.resource_id=$3 AND g.permission IN ('connect','read','modify')) OR (g.kind='workspace' AND g.resource_id=$4 AND g.permission IN ('read','modify'))))=5)")
+        .bind(org).bind(session).bind(row.try_get::<String,_>("computer_id")?).bind(row.try_get::<String,_>("workspace_id")?).bind(row.try_get::<String,_>("lease_id")?).bind(row.try_get::<i64,_>("epoch")?).fetch_one(&mut **tx).await?;
     if !valid {
         return Ok(false);
     }

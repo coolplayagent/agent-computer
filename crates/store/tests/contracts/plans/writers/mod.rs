@@ -9,6 +9,7 @@ use agent_computer_store::{
 
 mod artifacts;
 mod authority;
+mod background;
 mod executions;
 mod reads;
 mod recovery;
@@ -39,7 +40,11 @@ async fn connection(
         .unwrap()
 }
 async fn setup() -> (Database, String, String, AcquireWriterLease) {
-    let (db, token, computer, start, target) = super::preparation::setup().await;
+    setup_with_apps(true).await
+}
+async fn setup_with_apps(apps: bool) -> (Database, String, String, AcquireWriterLease) {
+    let (db, token, computer, start, target) =
+        super::preparation::setup_with_apps(10 * 1024 * 1024 * 1024, apps).await;
     let preparation = super::preparation::claim(&db, &start, &target, "preparer").await;
     db.store
         .begin_candidate_preparation(&preparation)

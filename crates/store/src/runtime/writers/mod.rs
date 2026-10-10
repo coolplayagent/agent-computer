@@ -99,14 +99,15 @@ async fn live(
     Ok((row, connection, prepared))
 }
 
-/// Lower authority in the same transaction as closing a connection or revoking
-/// a grant. The enclosing connection/grant event records the changed count.
+/// Closing a connection lowers its interactive writer authority. A submitted
+/// background execution retains its fixed reservation and original identity.
+/// Grant revocation below invalidates writers regardless of execution lifetime.
 pub(super) async fn invalidate_session(
     tx: &mut Transaction<'_, Postgres>,
     org: &str,
     session: &str,
 ) -> Result<u64> {
-    Ok(sqlx::query("UPDATE candidate_writer_leases SET state='Draining',revision=revision+1 WHERE organization=$1 AND session_id=$2 AND state='Held'")
+    Ok(sqlx::query("UPDATE candidate_writer_leases l SET state='Draining',revision=revision+1 WHERE organization=$1 AND session_id=$2 AND state='Held' AND NOT EXISTS(SELECT 1 FROM execution_requests e WHERE e.organization=l.organization AND e.lease_id=l.lease_id AND e.epoch=l.epoch AND e.input->>'lifetime'='background' AND e.state IN ('Queued','Dispatching','CancelRequested'))")
         .bind(org).bind(session).execute(&mut **tx).await?.rows_affected())
 }
 pub(super) async fn invalidate_grant(
