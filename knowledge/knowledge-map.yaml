@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 71
-updated_at: unix:1791641079
+map_version: 72
+updated_at: unix:1791644898
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -130,6 +130,7 @@ topics:
   - accepted-execution-completion
   - background-execution
   - candidate-io-fence
+  - durable-execution-output
   - durable-execution-outputs
   - execution-output-downloads
   - fenced-execution-csi
@@ -139,8 +140,8 @@ topics:
   - redundant-node-watchdogs
   - renewable-execution-leases
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-28f3b1e5dd28c6de320084d6816b45b59557adaba78c9a0f2531a7ecd915492b.yaml
-  digest: 28f3b1e5dd28c6de320084d6816b45b59557adaba78c9a0f2531a7ecd915492b
+  ref: topics/topic-a402c4336ebfd782-41ac33b7ab256eed59029d5d2737ec02be96bc21eea9bdabfbe518670b0630f0.yaml
+  digest: 41ac33b7ab256eed59029d5d2737ec02be96bc21eea9bdabfbe518670b0630f0
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -173,12 +174,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 55
+  omitted_through: 56
   recent:
-  - version: 56
-    action: source.add
-    actor: cli
-    summary: Added source 'node-expiry-reaper' to topic 'execution'.
   - version: 57
     action: source.add
     actor: cli
@@ -239,3 +236,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'renewable-execution-leases' to topic 'execution'.
+  - version: 72
+    action: source.add
+    actor: cli
+    summary: Added source 'durable-execution-output' to topic 'execution'.

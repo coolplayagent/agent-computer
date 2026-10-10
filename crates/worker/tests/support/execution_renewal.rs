@@ -109,6 +109,7 @@ pub async fn run(c: Context<'_>, cases: &[(String, String, String)]) -> Vec<Valu
                 computer,
                 &SubmitExecution {
                     renewable: None,
+                    stream_output: Some(false),
                     lease_id: lease.lease_id.clone(),
                     lease: WriterLeaseCommand {
                         connection_session_id: lease.connection_session_id.clone(),

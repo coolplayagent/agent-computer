@@ -53,7 +53,9 @@ impl ExecutionDispatchIntent {
             output_limit_bytes: command.output_limit_bytes,
         };
         let result = Bootstrap {
-            version: if self.hard_deadline_at_ms.is_some() {
+            version: if self.execution.stream_output {
+                agent_computer_sandbox::STREAMING_PROTOCOL
+            } else if self.hard_deadline_at_ms.is_some() {
                 2
             } else {
                 STARTUP_PROTOCOL

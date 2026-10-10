@@ -156,6 +156,12 @@ impl SealedExecution {
     }
 }
 impl ArmedGuard {
+    /// Read-only observation of the original pinned cgroup and every runtime
+    /// pidfd. This allows receiving a buffered report after normal process exit;
+    /// it grants no execution/renewal authority and does not replace an IO seal.
+    pub fn process_termination_observed(&self) -> bool {
+        self.termination.stopped().is_ok()
+    }
     /// Stop the admitted workload and join accepted Candidate mutations. The
     /// independent timers remain armed, including after any intermediate error.
     pub fn seal(self, fence: &MountedFence) -> Result<SealedExecution> {

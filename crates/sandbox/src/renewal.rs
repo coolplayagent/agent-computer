@@ -166,6 +166,9 @@ impl Window {
     pub fn progress(&self) -> &Progress {
         &self.progress
     }
+    pub(crate) fn awaiting_grant(&self) -> bool {
+        self.pending.is_some()
+    }
     /// Call before writing the challenge. At most one challenge is outstanding.
     pub fn challenge(&mut self, now: Instant) -> Result<Option<Challenge>> {
         self.require_live(now)?;

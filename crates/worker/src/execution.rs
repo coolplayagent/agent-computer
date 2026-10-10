@@ -3,6 +3,7 @@ mod plan;
 mod queue;
 pub use queue::{QueueEvent, QueueOptions, QueueSummary, run_queue};
 mod storage;
+mod stream;
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_kubernetes::{
     Client, DeleteOutcome, ExecutionEvent, PodObservation, PodPhase, StartupObservation,
@@ -40,6 +41,7 @@ pub enum Phase {
     RenewalAuthorize,
     RenewalWatchdog,
     RenewalAcknowledge,
+    OutputStream,
     Recovery,
 }
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -159,6 +161,8 @@ async fn execute_admitted(
     let mut fence = None;
     let mut node_guard = None;
     let mut registered = false;
+    let mut publisher = None;
+    let mut runtime_stopped = false;
     let run=tokio::time::timeout(hard_budget, async {
         let mut channel=tokio::time::timeout(budget, async {
         let inputs=store.candidate_execution_runtime_inputs(org,id).await?;
@@ -230,13 +234,21 @@ async fn execute_admitted(
         let running=backend(channel.start(&grant.grant().grant).await)?;
         Ok::<_,Error>(running)
         }).await.map_err(|_|Error::WriterLeaseInactive)??;
+        publisher=attempt.output_capture()?.map(|capture|stream::Publisher::new(store.clone(),capture,output_client.clone(),output_spool.clone()));
         phase=Phase::Run;
         loop {
+            if publisher.as_ref().is_some_and(stream::Publisher::failed) {phase=Phase::OutputStream;return Err(Error::ExecutionOutputUnavailable);}
             let remaining=Duration::from_millis(attempt.remaining_budget_ms()?.into());
             tokio::select! {
-                value=channel.next_event() => match backend(value)? {
+                value=channel.next_event(), if publisher.as_ref().is_none_or(stream::Publisher::has_capacity) => match backend(value)? {
                     ExecutionEvent::Complete(observation) => break Ok(observation),
+                    ExecutionEvent::Output(observation) => {
+                        phase=Phase::OutputStream;
+                        publisher.as_ref().ok_or(Error::InvalidReconcileResult)?.enqueue(observation)?;
+                        phase=Phase::Run;
+                    },
                     ExecutionEvent::Renewal(challenge) => {
+                        if runtime_stopped {return Err(Error::WriterLeaseInactive);}
                         phase=Phase::RenewalAuthorize;
                         let guard=node_guard.as_mut().ok_or(Error::InvalidStoredData)?;
                         let permit=tokio::time::timeout(remaining,store.authorize_candidate_execution_renewal(&attempt,&challenge,guard)).await.map_err(|_|Error::WriterLeaseInactive)??;
@@ -258,7 +270,16 @@ async fn execute_admitted(
                 _=tokio::time::sleep(Duration::from_millis(200)) => {
                     let remaining=Duration::from_millis(attempt.remaining_budget_ms()?.into());
                     tokio::time::timeout(remaining,active(store,org,id)).await.map_err(|_|Error::WriterLeaseInactive)??;
-                    node_guard.as_mut().ok_or(Error::InvalidStoredData)?.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?;
+                    if !runtime_stopped {
+                        let guard=node_guard.as_mut().ok_or(Error::InvalidStoredData)?;
+                        if guard.remaining_budget_ms().is_err() {
+                            if !guard.process_termination_observed() {return Err(Error::WriterLeaseInactive);}
+                            // The original domain is already empty, but a large
+                            // report may still be buffered in attach transport.
+                            fence.as_ref().ok_or(Error::InvalidStoredData)?.close();
+                            runtime_stopped=true;
+                        }
+                    }
                 },
             }
         }
@@ -296,6 +317,11 @@ async fn execute_admitted(
     } else {
         None
     };
+    let stream_unconfirmed = if let Some(publisher) = publisher {
+        publisher.finish().await.is_err()
+    } else {
+        false
+    };
     let (output, output_unconfirmed) = if let Some(observation) = &observation {
         match tokio::time::timeout(
             Duration::from_secs(30),
@@ -314,6 +340,7 @@ async fn execute_admitted(
     } else {
         (None, false)
     };
+    let output_unconfirmed = output_unconfirmed || stream_unconfirmed;
     let completion = if let Some(sealed) = &sealed {
         tokio::time::timeout(Duration::from_secs(5), async {
             // The same immutable seal makes ambiguous commit responses safe to

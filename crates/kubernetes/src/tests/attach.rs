@@ -5,6 +5,7 @@ use tokio_tungstenite::tungstenite::{self, Message, WebSocket, protocol::Role};
 
 mod candidate;
 mod renewal;
+mod streaming;
 
 type Socket = WebSocket<TcpStream>;
 
@@ -123,7 +124,7 @@ fn expect_grant(socket: &mut Socket, plan: &StartupSandboxPlan) {
         StartupGrant::parse(&bytes[1..]).unwrap().digest().unwrap(),
         grant(plan).digest().unwrap()
     );
-    if plan.bootstrap().hard_budget_ms.is_none() {
+    if plan.bootstrap().hard_budget_ms.is_none() && plan.bootstrap().version != 3 {
         assert_eq!(read_binary(socket), [255, 0]);
     }
 }

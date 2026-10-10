@@ -9,8 +9,9 @@ use super::*;
 use crate::plans::types::{digest, random_id};
 use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
 pub use executions::{
-    CancelExecution, ExecutionCommand, ExecutionCompletion, ExecutionDispatchAttempt,
-    ExecutionDispatchIntent, ExecutionLifetime, ExecutionOutput, ExecutionOutputDownload,
+    CancelExecution, ExecutionChunkDownload, ExecutionChunkPage, ExecutionCommand,
+    ExecutionCompletion, ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionLifetime,
+    ExecutionOutput, ExecutionOutputCapture, ExecutionOutputChunk, ExecutionOutputDownload,
     ExecutionPodAttempt, ExecutionPodPlan, ExecutionRenewalAttempt, ExecutionRenewalGrant,
     ExecutionRequest, ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant,
     ExecutionState, ExecutionWatchdogArm, OutputState, OutputStream, QueuedDispatch,

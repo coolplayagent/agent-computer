@@ -4,17 +4,20 @@
 //! authority. Its report must never release a durable writer lease by itself.
 #![forbid(unsafe_code)]
 
+mod control;
 mod output;
 pub mod renewal;
 mod request;
 mod startup;
+pub mod streaming;
 mod supervisor;
 
 pub use output::Output;
 pub use request::{MAX_REQUEST_BYTES, Request};
+pub const MAX_OUTPUT_BYTES: usize = 1024 * 1024;
 pub use startup::{
-    Bootstrap, STARTUP_PROTOCOL, STARTUP_WAIT_MS, StartupChallenge, StartupGrant, StartupHello,
-    StartupReport, startup, startup_attached,
+    Bootstrap, STARTUP_PROTOCOL, STARTUP_WAIT_MS, STREAMING_PROTOCOL, StartupChallenge,
+    StartupGrant, StartupHello, StartupReport, startup, startup_attached,
 };
 pub use supervisor::{Outcome, Report, run};
 

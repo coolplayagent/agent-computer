@@ -9,6 +9,7 @@ use std::{
 
 pub const STARTUP_PROTOCOL: u32 = 1;
 pub const RENEWABLE_PROTOCOL: u32 = 2;
+pub const STREAMING_PROTOCOL: u32 = 3;
 pub const STARTUP_WAIT_MS: u32 = 30000;
 
 /// Immutable, operator-delivered bootstrap. Its lease budget is a ceiling only;
@@ -19,7 +20,7 @@ pub struct Bootstrap {
     pub version: u32,
     pub intent_digest: String,
     pub request: Request,
-    /// Version 2 only; an immutable ceiling, never authority to launch or renew.
+    /// Required in version 2, optional in version 3; an immutable renewal ceiling.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hard_budget_ms: Option<u32>,
 }
@@ -43,10 +44,10 @@ impl Bootstrap {
     pub fn digest(&self) -> Result<String> {
         self.validate()?;
         digest(
-            if self.version == STARTUP_PROTOCOL {
-                "agent-computer/sandbox-bootstrap-v1"
-            } else {
-                "agent-computer/sandbox-bootstrap-v2"
+            match self.version {
+                STARTUP_PROTOCOL => "agent-computer/sandbox-bootstrap-v1",
+                RENEWABLE_PROTOCOL => "agent-computer/sandbox-bootstrap-v2",
+                _ => "agent-computer/sandbox-bootstrap-v3",
             },
             self,
         )
@@ -72,8 +73,10 @@ impl StartupChallenge {
         Ok(value)
     }
     pub fn validate(&self) -> Result<()> {
-        if !matches!(self.version, STARTUP_PROTOCOL | RENEWABLE_PROTOCOL)
-            || self.execution_id.is_empty()
+        if !matches!(
+            self.version,
+            STARTUP_PROTOCOL | RENEWABLE_PROTOCOL | STREAMING_PROTOCOL
+        ) || self.execution_id.is_empty()
             || self.execution_id.len() > 128
             || !self
                 .execution_id
@@ -94,10 +97,10 @@ impl StartupChallenge {
     pub fn digest(&self) -> Result<String> {
         self.validate()?;
         digest(
-            if self.version == STARTUP_PROTOCOL {
-                "agent-computer/sandbox-challenge-v1"
-            } else {
-                "agent-computer/sandbox-challenge-v2"
+            match self.version {
+                STARTUP_PROTOCOL => "agent-computer/sandbox-challenge-v1",
+                RENEWABLE_PROTOCOL => "agent-computer/sandbox-challenge-v2",
+                _ => "agent-computer/sandbox-challenge-v3",
             },
             self,
         )
@@ -143,10 +146,10 @@ impl StartupGrant {
     pub fn digest(&self) -> Result<String> {
         self.validate()?;
         digest(
-            if self.version == STARTUP_PROTOCOL {
-                "agent-computer/sandbox-startup-grant-v1"
-            } else {
-                "agent-computer/sandbox-startup-grant-v2"
+            match self.version {
+                STARTUP_PROTOCOL => "agent-computer/sandbox-startup-grant-v1",
+                RENEWABLE_PROTOCOL => "agent-computer/sandbox-startup-grant-v2",
+                _ => "agent-computer/sandbox-startup-grant-v3",
             },
             self,
         )
@@ -174,12 +177,14 @@ pub struct StartupReport {
     pub report: Report,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub renewal: Option<renewal::Progress>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream: Option<crate::streaming::Progress>,
 }
 
 fn protocol_budget(version: u32, initial: u32, hard: Option<u32>) -> bool {
     match (version, hard) {
-        (STARTUP_PROTOCOL, None) => true,
-        (RENEWABLE_PROTOCOL, Some(hard)) => {
+        (STARTUP_PROTOCOL | STREAMING_PROTOCOL, None) => true,
+        (RENEWABLE_PROTOCOL | STREAMING_PROTOCOL, Some(hard)) => {
             (initial..=renewal::MAX_EXECUTION_BUDGET_MS).contains(&hard)
         }
         _ => false,
@@ -324,25 +329,43 @@ async fn serve(bootstrap: Bootstrap, attached: bool) -> Result<StartupReport> {
     let grant_digest = grant.digest()?;
     let mut request = bootstrap.request;
     request.lease_budget_ms = grant.lease_budget_ms;
-    let mut control = grant
-        .hard_budget_ms
-        .map(|hard| {
-            renewal::Channel::new(renewal::Window::new(
-                grant_digest.clone(),
-                grant.lease_budget_ms,
-                hard,
-                anchor,
-            )?)
+    let mut control = if bootstrap.version == STREAMING_PROTOCOL {
+        Some(crate::control::Control::Streaming {
+            channel: Box::new(crate::streaming::Channel::new(
+                renewal::Window::new(
+                    grant_digest.clone(),
+                    grant.lease_budget_ms,
+                    grant.hard_budget_ms.unwrap_or(grant.lease_budget_ms),
+                    anchor,
+                )?,
+                request.output_limit_bytes,
+            )?),
+            renewable: grant.hard_budget_ms.is_some(),
         })
-        .transpose()?;
+    } else {
+        grant
+            .hard_budget_ms
+            .map(|hard| {
+                renewal::Channel::new(renewal::Window::new(
+                    grant_digest.clone(),
+                    grant.lease_budget_ms,
+                    hard,
+                    anchor,
+                )?)
+                .map(|channel| crate::control::Control::Renewal(Box::new(channel)))
+            })
+            .transpose()?
+    };
     let report = supervisor::run_controlled(request, namespace, anchor, control.as_mut()).await?;
-    let renewal = control.as_ref().map(|c| c.window.progress().clone());
+    let renewal = control.as_ref().and_then(|c| c.renewal());
+    let stream = control.as_ref().map(|c| c.stream()).transpose()?.flatten();
     Ok(StartupReport {
         version: bootstrap.version,
         challenge_digest,
         grant_digest,
         report,
         renewal,
+        stream,
     })
 }
 
@@ -365,6 +388,38 @@ mod tests {
                 output_limit_bytes: 10,
             },
         }
+    }
+    #[test]
+    fn streaming_negotiation_is_independent_of_renewal_and_preserves_legacy_hashes() {
+        let fixed = bootstrap();
+        let fixed_json = serde_json::to_vec(&fixed).unwrap();
+        assert_eq!(
+            fixed.digest().unwrap(),
+            digest("agent-computer/sandbox-bootstrap-v1", &fixed).unwrap()
+        );
+        let mut streamed = fixed.clone();
+        streamed.version = STREAMING_PROTOCOL;
+        streamed.validate().unwrap();
+        assert_ne!(fixed.digest().unwrap(), streamed.digest().unwrap());
+        for hard in [None, Some(60000)] {
+            streamed.hard_budget_ms = hard;
+            let challenge = StartupChallenge {
+                version: STREAMING_PROTOCOL,
+                execution_id: streamed.request.execution_id.clone(),
+                generation: streamed.request.generation,
+                bootstrap_digest: streamed.digest().unwrap(),
+                nonce: "b".repeat(64),
+            };
+            let grant = StartupGrant {
+                version: STREAMING_PROTOCOL,
+                challenge_digest: challenge.digest().unwrap(),
+                lease_budget_ms: 1000,
+                hard_budget_ms: hard.map(|_| 50000),
+            };
+            grant.accept(&challenge, &streamed).unwrap();
+            assert!(grant.accept(&challenge, &fixed).is_err());
+        }
+        assert_eq!(serde_json::to_vec(&fixed).unwrap(), fixed_json);
     }
     #[test]
     fn startup_binds_nonce_bootstrap_and_bounded_budget() {

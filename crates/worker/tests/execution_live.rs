@@ -34,6 +34,8 @@ mod outputs;
 mod queue;
 #[path = "support/execution_renewal.rs"]
 mod renewal;
+#[path = "support/execution_streaming.rs"]
+mod streaming;
 
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
@@ -69,6 +71,16 @@ impl Drop for ReaperPause {
 
 #[tokio::test]
 async fn real_candidate_execution_uses_durable_grants_and_observation_only_recovery() {
+    run(false).await;
+}
+
+#[tokio::test]
+#[ignore = "focused disposable-VM streaming probe; run separately from the full fixture"]
+async fn real_streaming_execution_outputs_and_publication_recovery() {
+    run(true).await;
+}
+
+async fn run(streaming_only: bool) {
     let config: Value = serde_json::from_slice(
         &fs::read(
             std::env::var("AGENT_COMPUTER_EXECUTION_TEST_CONFIG")
@@ -125,6 +137,17 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         })
         .await
         .unwrap();
+    let stream_actor = PrincipalId::new("stream-operator").unwrap();
+    let stream_credential = store
+        .issue_credential(IssueCredential {
+            organization: &org,
+            principal: &stream_actor,
+            kind: PrincipalKind::Human,
+            scopes: &ServiceScope::ALL,
+            lifetime: Duration::from_secs(1800),
+        })
+        .await
+        .unwrap();
     for kind in [
         DefinitionKind::Declaration,
         DefinitionKind::Volume,
@@ -155,7 +178,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .register_catalog_reference(&org, kind, name)
             .await
             .unwrap();
-        for principal in [&actor, &output_actor, &renewal_actor] {
+        for principal in [&actor, &output_actor, &renewal_actor, &stream_actor] {
             store
                 .set_definition_grant(
                     DefinitionGrant {
@@ -213,6 +236,13 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "renew-db-failure",
         "renew-ack-failure",
         "renew-hard",
+        "stream-long",
+        "stream-fixed",
+        "stream-flood",
+        "stream-cancel",
+        "stream-controller-kill",
+        "stream-store-failure",
+        "stream-db-failure",
     ];
     // Stopping retains old Candidate reservations. The two restorations need
     // one additional generation each; keep platform admission limits intact.
@@ -322,7 +352,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             _ => continue,
         };
         for permission in permissions {
-            for principal in [&actor, &output_actor, &renewal_actor] {
+            for principal in [&actor, &output_actor, &renewal_actor, &stream_actor] {
                 store
                     .set_runtime_grant(
                         RuntimeGrant {
@@ -342,10 +372,64 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         }
     }
     let worker = json!({"approved_supervisor_image":image,"storage":storage,"candidate":local,"node":config["node"],"outputs":config["outputs"],"output_spool":config["output_spool"]});
+    if streaming_only {
+        let cases: Vec<_> = [
+            "stream-flood",
+            "stream-long",
+            "stream-fixed",
+            "stream-cancel",
+            "stream-controller-kill",
+            "stream-store-failure",
+            "stream-db-failure",
+        ]
+        .into_iter()
+        .map(|name| {
+            let resource = |kind| {
+                declaration
+                    .resources
+                    .iter()
+                    .find(|r| r.kind == kind && r.name == name)
+                    .unwrap()
+                    .resource_id
+                    .clone()
+            };
+            (
+                name.to_owned(),
+                resource(DefinitionKind::Computer),
+                resource(DefinitionKind::Sandbox),
+            )
+        })
+        .collect();
+        let private = json!({"api_url":kube["api_url"],"ca_file":kube["ca_file"],"token_file":kube["token_file"],"deployment":deployment,"execution":worker});
+        let results = streaming::run(
+            renewal::Context {
+                store: &store,
+                pool: &pool,
+                client: &client,
+                org: &org,
+                actor: &stream_actor,
+                token: stream_credential.expose_token(),
+                config: &config,
+                worker: &worker,
+                private: &private,
+                local: &local,
+                root: &root,
+                owner: &owner,
+                storage: &storage,
+                image,
+            },
+            &cases,
+        )
+        .await;
+        assert_eq!(results.len(), 7);
+        fs::write(PathBuf::from(field(&config, "result_file")).with_file_name("streaming-only-result.json"), serde_json::to_vec_pretty(&json!({"scope":"seven streaming cases only; full regression remains separate","organization":org.as_str(),"results":results})).unwrap()).unwrap();
+        println!("SEVEN_STREAMING_EXECUTION_CASES_PASSED");
+        return;
+    }
     let mut results = vec![];
     let mut queue_evidence = Value::Null;
     for name in names {
-        if name.starts_with("renew-") {
+        if name.starts_with("renew-") || name.starts_with("stream-") {
             continue;
         }
         let token = if name.starts_with("output-") {
@@ -457,6 +541,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 computer,
                 &SubmitExecution {
                     renewable: Some(false),
+                    stream_output: Some(false),
                     lease_id: lease.lease_id.clone(),
                     lease: WriterLeaseCommand {
                         connection_session_id: lease.connection_session_id.clone(),
@@ -1124,6 +1209,27 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             ((*name).to_owned(), computer, sandbox)
         })
         .collect();
+    let stream_cases: Vec<_> = names
+        .iter()
+        .filter(|name| name.starts_with("stream-"))
+        .map(|name| {
+            let computer = declaration
+                .resources
+                .iter()
+                .find(|r| r.kind == DefinitionKind::Computer && r.name == *name)
+                .unwrap()
+                .resource_id
+                .clone();
+            let sandbox = declaration
+                .resources
+                .iter()
+                .find(|r| r.kind == DefinitionKind::Sandbox && r.name == *name)
+                .unwrap()
+                .resource_id
+                .clone();
+            ((*name).to_owned(), computer, sandbox)
+        })
+        .collect();
     let private = json!({"api_url":kube["api_url"],"ca_file":kube["ca_file"],"token_file":kube["token_file"],"deployment":deployment,"execution":worker});
     let renewals = renewal::run(
         renewal::Context {
@@ -1146,13 +1252,34 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
     )
     .await;
     results.extend(renewals);
+    let streamed = streaming::run(
+        renewal::Context {
+            store: &store,
+            pool: &pool,
+            client: &client,
+            org: &org,
+            actor: &stream_actor,
+            token: stream_credential.expose_token(),
+            config: &config,
+            worker: &worker,
+            private: &private,
+            local: &local,
+            root: &root,
+            owner: &owner,
+            storage: &storage,
+            image,
+        },
+        &stream_cases,
+    )
+    .await;
+    results.extend(streamed);
     let total_drains: i64 =
         sqlx::query_scalar("SELECT count(*) FROM candidate_writer_drains WHERE organization=$1")
             .bind(org.as_str())
             .fetch_one(&pool)
             .await
             .unwrap();
-    assert_eq!(total_drains, drains + 7);
+    assert_eq!(total_drains, drains + 7 + 6);
     let evidence = json!({"cancelled_checkpoint_stop":cancelled_checkpoint,"checkpoint_stop":checkpoint,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":total_drains,"legacy_writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
     fs::write(
         field(&config, "result_file"),

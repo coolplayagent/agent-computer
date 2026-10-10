@@ -35,6 +35,93 @@ fn gateway() -> (tempfile::TempDir, agent_computer_server::OutputGateway) {
         .unwrap();
     (dir, gateway)
 }
+
+#[tokio::test]
+async fn output_chunk_http_cursor_is_bounded_and_authentication_precedes_validation() {
+    let (s, token, computer, input) = super::executions::setup().await;
+    let (_, queued) = s
+        .send(super::connections::req(
+            &token,
+            "POST",
+            &format!("/v1alpha1/computers/{computer}/executions"),
+            Some("stream"),
+            input,
+        ))
+        .await;
+    assert_eq!(queued["stream_output"], true);
+    let path = format!(
+        "/v1alpha1/executions/{}/output-chunks",
+        queued["execution_id"].as_str().unwrap()
+    );
+    for query in [
+        "",
+        "?after_sequence=0&limit=32",
+        "?limit=1&after_sequence=8192",
+    ] {
+        let (status, page) = s.send(req(&token, &format!("{path}{query}"))).await;
+        assert_eq!(status, StatusCode::OK, "{page}");
+        assert_eq!(page["enabled"], true);
+        assert_eq!(page["execution_state"], "Queued");
+        assert_eq!(page["chunks"], serde_json::json!([]));
+        assert_eq!(page["available_sequence"], 0);
+        assert_eq!(page["final_sequence"], Value::Null);
+        assert_eq!(page["final_report_verified"], false);
+    }
+    for suffix in [
+        "?",
+        "?limit=0",
+        "?limit=33",
+        "?after_sequence=-1",
+        "?after_sequence=8193",
+        "?limit=1&limit=2",
+        "?after_sequence=0&after_sequence=1",
+        "?key=private",
+        "?limit=+1",
+        "?limit=4294967296",
+        "/0",
+        "/8193",
+        "/1?",
+        "/1?offset=0",
+        "/report",
+    ] {
+        let uri = format!("{path}{suffix}");
+        assert_eq!(
+            s.send(req("invalid", &uri)).await.0,
+            StatusCode::UNAUTHORIZED
+        );
+        assert_eq!(
+            s.send(req(&token, &uri)).await.0,
+            StatusCode::BAD_REQUEST,
+            "{suffix}"
+        );
+    }
+    let limited = s.issue("alice", &[ServiceScope::RuntimeConnect]).await;
+    assert_eq!(
+        s.send(req(limited.expose_token(), &path)).await.0,
+        StatusCode::FORBIDDEN
+    );
+    let other = s.issue("alice", &ServiceScope::ALL).await;
+    assert_eq!(
+        s.send(req(other.expose_token(), &path)).await.0,
+        StatusCode::NOT_FOUND
+    );
+    let mut ranged = req(&token, &path);
+    ranged
+        .headers_mut()
+        .insert("range", "bytes=0-1".parse().unwrap());
+    assert_eq!(s.send(ranged).await.0, StatusCode::BAD_REQUEST);
+    assert_eq!(
+        s.send(req(&token, &format!("{path}/1"))).await.1["code"],
+        "outputs_unavailable"
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM execution_dispatch_intents")
+            .fetch_one(&s.database.pool)
+            .await
+            .unwrap(),
+        0
+    );
+}
 #[tokio::test]
 async fn output_download_http_authentication_configuration_and_capabilities_are_explicit() {
     let mut s = Service::new().await;

@@ -7,7 +7,10 @@ pub use renewal::{ExecutionRenewalAttempt, ExecutionRenewalGrant};
 mod inputs;
 pub use completion::ExecutionCompletion;
 mod outputs;
-pub use outputs::{ExecutionOutput, ExecutionOutputDownload, OutputState, OutputStream};
+pub use outputs::{
+    ExecutionChunkDownload, ExecutionChunkPage, ExecutionOutput, ExecutionOutputCapture,
+    ExecutionOutputChunk, ExecutionOutputDownload, OutputState, OutputStream,
+};
 mod pods;
 mod startup;
 mod watchdogs;
