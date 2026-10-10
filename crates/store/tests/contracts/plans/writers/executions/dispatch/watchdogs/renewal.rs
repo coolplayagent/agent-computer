@@ -13,6 +13,55 @@ struct Fixture {
     arm: Value,
     startup: String,
 }
+
+#[tokio::test]
+async fn drain_recovery_waits_for_issued_but_unacknowledged_renewal() {
+    let f = fixture(10000).await;
+    let original = f.deadline().await;
+    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+    let grant = f.grant(1, original, &f.startup).await;
+    let mut tx = f.db.pool.begin().await.unwrap();
+    f.insert(&mut tx, &grant).await.unwrap();
+    tx.commit().await.unwrap();
+    assert_eq!(count(&f.db, "execution_renewal_acks").await, 0);
+    let target =
+        serde_json::from_value(f.attempt.intent().binding["storage_target"].clone()).unwrap();
+    let node = agent_computer_kubernetes::NodeIdentity {
+        name: "node-one".into(),
+        uid: "node-one".into(),
+        boot_id: "boot-one".into(),
+    };
+    let org = org("acme");
+    sqlx::query("SELECT pg_sleep(GREATEST(0,($1::bigint-floor(extract(epoch from clock_timestamp())*1000)::bigint)::double precision/1000.0)+0.01)")
+        .bind(f.attempt.intent().deadline_at_ms).execute(&f.db.pool).await.unwrap();
+    let now: i64 =
+        sqlx::query_scalar("SELECT floor(extract(epoch from clock_timestamp())*1000)::bigint")
+            .fetch_one(&f.db.pool)
+            .await
+            .unwrap();
+    assert!(
+        now < grant.deadline_at_ms,
+        "fixture must observe the pending renewal window"
+    );
+    assert!(
+        f.db.store
+            .candidate_execution_completion_queue(&org, &target, &node, None)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    sqlx::query("SELECT pg_sleep(GREATEST(0,($1::bigint-floor(extract(epoch from clock_timestamp())*1000)::bigint)::double precision/1000.0)+0.01)")
+        .bind(grant.deadline_at_ms).execute(&f.db.pool).await.unwrap();
+    assert_eq!(
+        f.db.store
+            .candidate_execution_completion_queue(&org, &target, &node, None)
+            .await
+            .unwrap(),
+        vec![f.id().to_owned()]
+    );
+    assert_eq!(count(&f.db, "execution_completions").await, 0);
+    assert_eq!(count(&f.db, "candidate_writer_drains").await, 0);
+}
 impl Fixture {
     fn id(&self) -> &str {
         &self.attempt.intent().execution.execution_id

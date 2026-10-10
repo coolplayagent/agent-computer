@@ -200,7 +200,7 @@ impl Fixture<'_> {
         let summary = &initial.last().unwrap()["summary"];
         assert_eq!(
             summary,
-            &json!({"claimed":2,"cancelled_before_dispatch":0,"finished":2,"unconfirmed":0,"poll_failures":0})
+            &json!({"claimed":2,"cancelled_before_dispatch":0,"finished":2,"unconfirmed":0,"poll_failures":0,"completions_recovered":0,"completion_recovery_failures":0})
         );
         let result = |id: &str| {
             initial
@@ -279,7 +279,7 @@ impl Fixture<'_> {
         let restart = events(&log);
         assert_eq!(
             restart.last().unwrap()["summary"],
-            json!({"claimed":0,"cancelled_before_dispatch":0,"finished":0,"unconfirmed":0,"poll_failures":0})
+            json!({"claimed":0,"cancelled_before_dispatch":0,"finished":0,"unconfirmed":0,"poll_failures":0,"completions_recovered":0,"completion_recovery_failures":0})
         );
         (
             command_result,

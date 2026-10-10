@@ -1,5 +1,7 @@
 //! Trusted single-execution controller. Completion requires live kernel and IO seals.
+mod completion;
 mod plan;
+pub use completion::recover_completion;
 mod queue;
 pub use queue::{QueueEvent, QueueOptions, QueueSummary, run_queue};
 mod storage;

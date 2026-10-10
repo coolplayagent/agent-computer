@@ -52,6 +52,7 @@
 48. [有界后台执行](zh-CN/48-background-execution.md)
 49. [可续期执行租约](zh-CN/49-renewable-execution-leases.md)
 50. [持久执行输出分块](zh-CN/50-durable-execution-output.md)
+51. [已完成执行排空的持久恢复](zh-CN/51-durable-drain-recovery.md)
 
 ## 02. English
 
@@ -105,6 +106,7 @@
 48. [Bounded background execution](en/48-background-execution.md)
 49. [Renewable execution leases](en/49-renewable-execution-leases.md)
 50. [Durable execution output chunks](en/50-durable-execution-output.md)
+51. [Durable recovery of completed execution drains](en/51-durable-drain-recovery.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

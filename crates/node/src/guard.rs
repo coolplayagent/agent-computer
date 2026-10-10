@@ -47,6 +47,7 @@ pub struct ArmedGuard {
     failed: bool,
     reaper: agent_computer_watchdog::admission::Client,
     pub(super) termination: crate::termination::ProcessDomain,
+    pub(super) drain_spool: File,
 }
 impl ArmedGuard {
     pub fn evidence(&self) -> &Evidence {
@@ -209,6 +210,7 @@ pub(crate) fn launch(
     deadline: Instant,
     termination: crate::termination::ProcessDomain,
 ) -> Result<ArmedGuard> {
+    let drain_spool = crate::drain::open(spool)?;
     let [
         (armed, primary, primary_stdout, primary_stdin),
         (backup_armed, backup, backup_stdout, backup_stdin),
@@ -247,6 +249,7 @@ pub(crate) fn launch(
         failed: false,
         reaper,
         termination,
+        drain_spool,
     };
     guard.remaining_budget_ms()?;
     Ok(guard)
