@@ -21,7 +21,102 @@ pub trait ObjectSource {
 pub struct ObjectCache(Dir);
 impl ObjectCache {
     pub fn open(path: &Path) -> Result<Self> {
-        Ok(Self(Dir::root(path)?))
+        let dir = Dir::root(path)?;
+        dir.private()?;
+        Ok(Self(dir))
+    }
+}
+/// A private staged object, published only after its full digest and size match.
+pub struct CacheWriter {
+    root: Dir,
+    temporary: String,
+    file: File,
+    expected: String,
+    size: u64,
+    written: u64,
+    hash: Sha256,
+}
+impl ObjectCache {
+    pub fn begin_file(&self, digest: &str, size: u64) -> Result<CacheWriter> {
+        if !model::is_digest(digest) || size > 10 * 1024 * 1024 * 1024 {
+            return Err(Error::InvalidRequest);
+        }
+        self.0.private()?;
+        let mut nonce = [0u8; 16];
+        getrandom::fill(&mut nonce).map_err(|_| Error::Io)?;
+        let temporary = format!(
+            "pending-{}",
+            nonce.iter().map(|b| format!("{b:02x}")).collect::<String>()
+        );
+        let file = self.0.create(&temporary)?;
+        Ok(CacheWriter {
+            root: Dir(self.0.0.try_clone()?),
+            temporary,
+            file,
+            expected: digest.into(),
+            size,
+            written: 0,
+            hash: Sha256::new(),
+        })
+    }
+}
+impl Write for CacheWriter {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if bytes.len() as u64 > self.size - self.written {
+            return Err(std::io::Error::other("cache object size exceeded"));
+        }
+        let n = self.file.write(bytes)?;
+        self.hash.update(&bytes[..n]);
+        self.written += n as u64;
+        Ok(n)
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.file.flush()
+    }
+}
+impl CacheWriter {
+    pub fn finish(self) -> Result<()> {
+        if self.written != self.size
+            || format!("sha256:{:x}", self.hash.clone().finalize()) != self.expected
+        {
+            return Err(Error::InputMismatch);
+        }
+        fs::fchmod(&self.file, fs::Mode::from_raw_mode(0o400))?;
+        self.file.sync_all()?;
+        match fs::renameat_with(
+            &self.root.0,
+            &self.temporary,
+            &self.root.0,
+            &self.expected[7..],
+            RenameFlags::NOREPLACE,
+        ) {
+            Ok(()) => {}
+            Err(rustix::io::Errno::EXIST) => {
+                let mut file = self.root.file(&self.expected[7..])?;
+                if file.metadata()?.len() != self.size {
+                    return Err(Error::InputMismatch);
+                }
+                let mut hash = Sha256::new();
+                let mut buffer = [0; 65536];
+                loop {
+                    let n = file.read(&mut buffer)?;
+                    if n == 0 {
+                        break;
+                    }
+                    hash.update(&buffer[..n]);
+                }
+                if format!("sha256:{:x}", hash.finalize()) != self.expected {
+                    return Err(Error::InputMismatch);
+                }
+            }
+            Err(e) => return Err(e.into()),
+        }
+        self.root.sync()
+    }
+}
+impl Drop for CacheWriter {
+    fn drop(&mut self) {
+        let _ = fs::unlinkat(&self.root.0, &self.temporary, fs::AtFlags::empty());
     }
 }
 impl ObjectSource for ObjectCache {

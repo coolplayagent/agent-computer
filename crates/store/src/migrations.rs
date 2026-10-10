@@ -161,6 +161,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    21,
+                    Cow::Borrowed("workspace artifacts"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0021_workspace_artifacts.sql")),
+                    false,
+                ),
             ])
         })
     }

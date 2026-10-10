@@ -74,7 +74,7 @@ impl RequestContext {
             Error::RuntimeStopBlocked => self.error(
                 StatusCode::CONFLICT,
                 "runtime_stop_blocked",
-                "Stop requires no prior user dispatch, no unreleased writer, no queued execution and no active human input.",
+                "Stop requires a verified file-only checkpoint or no prior user dispatch, with no unreleased writer, queued execution or active human input.",
                 false,
             ),
             Error::RuntimeConflict => self.error(

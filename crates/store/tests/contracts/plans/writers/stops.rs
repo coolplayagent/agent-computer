@@ -35,6 +35,13 @@ async fn stop_survives_wal_restart_and_new_generation_retains_old_storage() {
     assert_eq!(stopped.control_revision, 5);
     assert_eq!(stopped.proof, "no_user_dispatch");
     assert_eq!(
+        stopped.event_sequence,
+        sqlx::query_scalar::<_, i64>("SELECT sequence FROM events WHERE kind='computer.stopped'")
+            .fetch_one(&db.pool)
+            .await
+            .unwrap()
+    );
+    assert_eq!(
         stopped.input_manifest_digest,
         first.input_manifest_digest.unwrap()
     );

@@ -13,7 +13,7 @@
 
 Preparation advances the control revision; the original start admission receipt does not contain the latest revision. Queued requests still use `/start/cancel`. Preparing requests cannot use either stop path once storage preparation has started.
 
-The stop transaction checks all writer epochs, not just the current epoch. Any user dispatch blocks this endpoint, including a completed bounded file save in an older epoch: preserving those changes requires checkpoint publication, which is not implemented here. An unreleased writer, a queued execution, or an unexpired human connection reporting active input also blocks stopping. Idle connections may remain connected. Close or idle active connections, cancel queued work and release/reconcile undispatched writers before retrying. Lease expiry alone does not release a writer. There is no force parameter or caller-supplied fencing proof.
+The stop transaction checks all writer epochs, not just the current epoch. Any user dispatch blocks this endpoint, including a completed bounded file save in an older epoch, unless a verified file-only checkpoint was published through the [Artifact path](38-workspace-artifact-checkpoints.md). An unreleased writer, a queued execution, or an unexpired human connection reporting active input also blocks stopping. Idle connections may remain connected. Close or idle active connections, cancel queued work and release/reconcile undispatched writers before retrying. Lease expiry alone does not release a writer. There is no force parameter or caller-supplied fencing proof.
 
 ## 37.2 Receipts, restart and reservations
 

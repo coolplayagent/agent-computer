@@ -14,7 +14,7 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 
 执行链路已连接单次数据库派发、Candidate Pod 创建和 CSI 身份复核、启动挑战与有界 gVisor attach。[31 节点布防后的启动](docs/zh-CN/31-node-guarded-startup.md)新增本地 Pod/运行时/cgroup/Candidate 身份绑定，要求独立节点 watchdog 布防并持久登记后才能发出启动授权。执行结果仍保留 Unknown/Draining；输出接纳、存储排空、持久 fencing 和自动恢复尚未交付。
 
-当前源码通过 303 项默认 Cargo/Bazel 测试，另有固定源码的 K3s/gVisor、JuiceFS/PostgreSQL/S3 组件证据。宿主子进程回收修复后的七个节点布防启动场景已完成 VM 复验，证据已回读并清理临时 VM。组件通过不表示完整 Computer 可用：浏览器、ComputerView、Artifact/Presentation、部署运维及生态适配仍待实现，公开执行能力仍不支持，T01–T43 保持 `not_run`。构建方法与完整进度见[编号中英文文档](docs/README.md)。以下仍为首版目标，CodeSpec 中未交付的 API、命令和声明属于待实现契约。
+当前源码通过 354 项默认 Cargo 测试及 11 个 Bazel 测试目标，另有固定源码的 K3s/gVisor、JuiceFS/PostgreSQL/S3 组件证据。宿主子进程回收修复后的七个节点布防启动场景已完成 VM 复验，证据已回读并清理临时 VM。组件通过不表示完整 Computer 可用：纯文件 Artifact/checkpoint 与 S3 恢复已交付；浏览器、ComputerView、完整 App checkpoint、Presentation、部署运维及生态适配仍待实现，公开执行能力仍不支持，T01–T43 保持 `not_run`。构建方法与完整进度见[编号中英文文档](docs/README.md)。以下仍为首版目标，CodeSpec 中未交付的 API、命令和声明属于待实现契约。
 
 - 开发者与平台团队负责集成部署；人和 Agent 都是直接使用者。私有多机 Linux，本地采用同构单节点环境。
 - 认证后的稳定连接链接与嵌入视图提供同等能力；日常 ComputerView 与运维管理界面分开。

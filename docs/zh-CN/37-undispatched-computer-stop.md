@@ -32,3 +32,5 @@
 PostgreSQL 契约覆盖 WAL 重启、证据不可变、当前授权、提交前凭据到期、outbox 故障回滚、并发获取 writer、旧 epoch 派发、活动人类输入、Queued/Preparing 拒绝、已有派发历史的迁移、新 generation 与旧存储配额保留。HTTP 契约覆盖 scope、严格请求结构、Origin 拒绝、错误响应、当前停止回执及授权重试。这些测试中的准备和文件回执为合成数据，仅验证数据库权限边界；本轮不声称新增 Kubernetes/CSI 运行实验。
 
 2026-10-10 的[源码绑定验证记录](../evidence/undispatched-computer-stop-2026-10-10.json)及[日志](../evidence/undispatched-computer-stop-2026-10-10.log)记录 338 个 Cargo 测试通过（含 151 个 PostgreSQL 用例），11 个 Bazel 测试目标通过，其中新增 11 个停止边界用例。格式、Clippy、文档和现有 Qualitygate 策略检查均通过。
+
+迁移 21 已在此接口增加[纯文件 Artifact checkpoint 停止](38-workspace-artifact-checkpoints.md)；本文的 `no_user_dispatch` 路径继续适用于尚未发生用户派发的 Candidate。

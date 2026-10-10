@@ -21,6 +21,8 @@ pub enum StartState {
     Queued,
     Preparing,
     Prepared,
+    Sealing,
+    Sealed,
     Cancelled,
     Stopped,
 }
@@ -61,7 +63,7 @@ pub struct ComputerRuntime {
     pub stop_receipt: Option<ComputerStopReceipt>,
 }
 
-/// Stop only a fully prepared Candidate with no user dispatch in any epoch.
+/// Stop a verified file-only checkpoint or an undispatched prepared Candidate.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StopPreparedComputer {
@@ -81,6 +83,21 @@ pub struct ComputerStopReceipt {
     pub input_manifest_digest: String,
     pub retained_storage_bytes: i64,
     pub proof: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub checkpoint: Option<WorkspaceCheckpoint>,
     pub stopped_at_ms: i64,
     pub event_sequence: i64,
+}
+
+/// Complete only for Computers with no declared Apps or unfinished executions.
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WorkspaceCheckpoint {
+    pub artifact_id: String,
+    pub input_revision: i64,
+    pub manifest_digest: String,
+    pub snapshot_digest: String,
+    pub computer_spec_digest: String,
+    pub app_states: Vec<serde_json::Value>,
+    pub unfinished_execution_ids: Vec<String>,
 }

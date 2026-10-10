@@ -7,6 +7,7 @@ use agent_computer_store::{
     runtime::{connections::*, writers::*, *},
 };
 
+mod artifacts;
 mod authority;
 mod executions;
 mod reads;

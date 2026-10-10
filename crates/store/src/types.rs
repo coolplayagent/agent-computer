@@ -115,7 +115,7 @@ impl fmt::Display for Error {
             Self::ConnectionInactive => "connection is no longer active",
             Self::ConnectionRevisionConflict => "connection revision no longer matches",
             Self::WorkspaceInputUnavailable => "workspace has no committed input version",
-            Self::RuntimeStopBlocked => "stopping requires no user dispatch and no active inputs",
+            Self::RuntimeStopBlocked => "stopping requires a verified checkpoint or an undispatched Candidate, with no active inputs",
             Self::RuntimeConflict => "runtime revision or queued request no longer matches",
             Self::RuntimeCapacityUnavailable => "runtime admission capacity is unavailable",
             Self::InvalidRuntimeRequest => "invalid runtime authorization request",

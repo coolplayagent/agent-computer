@@ -24,7 +24,7 @@ impl Manifest {
     pub fn digest(&self) -> Result<String> {
         digest("agent-computer/candidate-manifest-v1", self)
     }
-    pub(crate) fn validate(&self, quota: u64) -> Result<BTreeSet<String>> {
+    pub fn validate(&self, quota: u64) -> Result<BTreeSet<String>> {
         if self.entries.len() > 10_000 {
             return Err(Error::InvalidRequest);
         }

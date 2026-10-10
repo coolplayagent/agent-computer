@@ -26,6 +26,8 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+#[path = "support/artifacts.rs"]
+mod artifacts;
 #[path = "support/file_http.rs"]
 mod file_http;
 #[path = "support/file_writer.rs"]
@@ -38,7 +40,9 @@ fn checked(value: &Value) -> agent_computer_definitions::ValidatedDefinition {
     validate_bytes(&serde_json::to_vec(value).unwrap(), Format::Json).unwrap()
 }
 
-#[tokio::test]
+// Operator subprocesses must not starve SQLx's asynchronous rollback after an
+// intentionally rejected request in the parent test process.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement() {
     let path = std::env::var("AGENT_COMPUTER_CANDIDATE_TEST_CONFIG")
         .expect("explicit disposable root-owned environment required");
@@ -116,9 +120,9 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         .unwrap();
     storage.reference = format!("id:{catalog}");
     let document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"candidate-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":32212254720_u64,"reclaimPolicy":"Retain"}],
-        "workspaces":[{"name":"one","volumeRef":"data","conflictPolicy":"explicit"},{"name":"two","volumeRef":"data","conflictPolicy":"explicit"},{"name":"three","volumeRef":"data","conflictPolicy":"explicit"}],
-        "computers":[{"name":"one","workspaceRef":"one","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"two","workspaceRef":"two","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"three","workspaceRef":"three","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"}]
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":64424509440_u64,"reclaimPolicy":"Retain"}],
+        "workspaces":[{"name":"one","volumeRef":"data","conflictPolicy":"explicit"},{"name":"two","volumeRef":"data","conflictPolicy":"explicit"},{"name":"three","volumeRef":"data","conflictPolicy":"explicit"},{"name":"artifact","volumeRef":"data","conflictPolicy":"explicit"}],
+        "computers":[{"name":"one","workspaceRef":"one","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"two","workspaceRef":"two","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"three","workspaceRef":"three","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"artifact","workspaceRef":"artifact","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"}]
     }});
     let plan = store
         .create_definition_plan(credential.expose_token(), &key("plan"), &checked(&document))
@@ -228,11 +232,16 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
                     RuntimePermission::Activate,
                     RuntimePermission::Connect,
                     RuntimePermission::Modify,
+                    RuntimePermission::Manage,
                 ],
             ),
             DefinitionKind::Workspace => (
                 RuntimeKind::Workspace,
-                &[RuntimePermission::Read, RuntimePermission::Modify],
+                &[
+                    RuntimePermission::Read,
+                    RuntimePermission::Modify,
+                    RuntimePermission::Publish,
+                ],
             ),
             _ => continue,
         };
@@ -414,7 +423,30 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         }
         observations.push(json!({"request_id":admitted.request_id,"receipt":receipt,"control_revision":current.revision,"ready":current.ready,"observed_existing_publication":index==1}));
     }
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","initial empty inputs only; Artifact publication and nonempty input retrieval pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
+    let artifact = artifacts::verify(artifacts::Context {
+        store: &store,
+        pool: &pool,
+        token: credential.expose_token(),
+        org: &org,
+        computer: &plan
+            .resources
+            .iter()
+            .find(|r| r.kind == DefinitionKind::Computer && r.name == "artifact")
+            .unwrap()
+            .resource_id,
+        workspace: &plan
+            .resources
+            .iter()
+            .find(|r| r.kind == DefinitionKind::Workspace && r.name == "artifact")
+            .unwrap()
+            .resource_id,
+        worker: &worker_config,
+        config: &config,
+        root: &root,
+        owner: &owner,
+    })
+    .await;
+    let evidence = json!({"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
     fs::write(
         config["observation_file"].as_str().unwrap(),
         serde_json::to_vec_pretty(&evidence).unwrap(),

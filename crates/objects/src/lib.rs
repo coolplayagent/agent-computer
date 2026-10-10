@@ -1,5 +1,6 @@
 //! Bounded content-addressed output objects. No execution or fencing authority.
 #![forbid(unsafe_code)]
+pub mod artifact;
 mod s3;
 mod spool;
 pub use s3::{Client, Configuration};
@@ -25,7 +26,7 @@ impl ObjectRef {
             || self.size > MAX_BYTES as u64
             || self.key.len() > 512
             || parts.len() != 5
-            || parts[0] != "execution-outputs"
+            || !matches!(parts[0], "execution-outputs" | "artifacts")
             || parts[1] != "v1"
             || !parts.iter().all(|s| identifier(s))
             || parts[4] != &self.sha256[7..]

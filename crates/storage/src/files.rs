@@ -126,7 +126,7 @@ impl MountedVolume {
         read(&self.prepared_data(prepared)?, path)
     }
 
-    fn prepared_data(&self, prepared: &Prepared) -> Result<Dir> {
+    pub(crate) fn prepared_data(&self, prepared: &Prepared) -> Result<Dir> {
         if prepared.version != 1
             || prepared.filesystem_uuid != self.filesystem_uuid
             || prepared.volume_uid != self.volume_uid

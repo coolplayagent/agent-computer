@@ -630,3 +630,5 @@ fn manifest_digest_matches_independent_canonical_json_vector() {
         "sha256:3f22170f4a95fbc35c21a70a7b0ef9c3b5e7e4921de0b77331d1c1dfc31e43b9"
     );
 }
+
+mod capture_tests;

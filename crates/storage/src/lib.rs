@@ -4,6 +4,7 @@
 #[cfg(not(target_os = "linux"))]
 compile_error!("Candidate storage currently requires Linux openat2 and renameat2");
 
+pub mod capture;
 mod directory;
 pub mod files;
 mod materialize;

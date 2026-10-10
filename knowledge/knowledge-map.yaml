@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 59
-updated_at: unix:1791603362
+map_version: 60
+updated_at: unix:1791605389
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -119,8 +119,9 @@ topics:
   - sandbox-process-supervisor
   - undispatched-computer-stop
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-223861012dd31297e8f670b86e515bbec892d95e01e82420f8b573d94cd4d1f6.yaml
-  digest: 223861012dd31297e8f670b86e515bbec892d95e01e82420f8b573d94cd4d1f6
+  - workspace-artifact-checkpoints
+  ref: topics/topic-875b9380866e9d56-1dec99db709258e1372c45822f19096197b14fdc7deecbc91332e23e181fc678.yaml
+  digest: 1dec99db709258e1372c45822f19096197b14fdc7deecbc91332e23e181fc678
 - id: execution
   title: execution
   description: Added by CLI source registration.
@@ -155,12 +156,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 43
+  omitted_through: 44
   recent:
-  - version: 44
-    action: source.add
-    actor: cli
-    summary: Added source 'sandbox-process-supervisor' to topic 'development'.
   - version: 45
     action: source.add
     actor: cli
@@ -221,3 +218,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'undispatched-computer-stop' to topic 'development'.
+  - version: 60
+    action: source.add
+    actor: cli
+    summary: Added source 'workspace-artifact-checkpoints' to topic 'development'.
