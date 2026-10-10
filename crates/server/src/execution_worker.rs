@@ -33,7 +33,7 @@ pub async fn run(
     .map_err(|_| failed("Invalid private execution worker configuration."))?;
     if matches!(
         command,
-        "execution-output-recover" | "execution-output-read"
+        "execution-output-recover" | "execution-output-chunks-recover" | "execution-output-read"
     ) {
         let client = agent_computer_objects::Client::new(&config.execution.outputs)
             .map_err(|_| failed("Invalid private output store configuration."))?;
@@ -49,6 +49,12 @@ pub async fn run(
         } else {
             let spool = agent_computer_objects::Spool::open(&config.execution.output_spool)
                 .map_err(|_| failed("Private output spool is unavailable."))?;
+            if command == "execution-output-chunks-recover" {
+                let chunk = store.recover_candidate_execution_chunks(&org, id, &client, &spool).await
+                    .map_err(|_| failed("Chunk publication is unconfirmed; retain its original spool and object identity."))?;
+                println!("{}", serde_json::json!({"recovered_chunk":chunk}));
+                return Ok(());
+            }
             let output=store.recover_candidate_execution_output(&org,id,&client,&spool).await.map_err(|_|failed("Output publication is unconfirmed; retain the original spool and object identities."))?;
             println!(
                 "{}",

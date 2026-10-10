@@ -1,6 +1,6 @@
 # 49. 可续期执行租约
 
-新执行准入默认采用 `renewable: true`。原受信任 worker 可以让命令跨过初始 30 秒窗口继续执行，同时保留监督器、双节点 watchdog 和数据库的有界到期约束。`renewable: false` 保留固定期限的 v1 协议。该策略与[后台 lifetime](48-background-execution.md)独立：关闭逻辑连接不会续约。
+新执行准入默认采用 `renewable: true`。原受信任 worker 可以让命令跨过初始 30 秒窗口继续执行，同时保留监督器、双节点 watchdog 和数据库的有界到期约束。`renewable: false` 保留固定期限。启用[输出流](50-durable-execution-output.md)时使用 v3；显式 `stream_output: false` 保留 v1/v2。该策略与[后台 lifetime](48-background-execution.md)独立：关闭逻辑连接不会续约。
 
 ## 准入与兼容
 
@@ -34,4 +34,4 @@ reaper 使用绑定原 root 私有日志及不可变逐序号记录的最新有�
 
 契约测试覆盖 v1 序列化、严格 v2 通道、锚定到期、不可变策略、WAL 恢复、双确认和事务回滚。显式临时 VM 夹具包括断开连接后运行超过 30 秒、续约后取消/撤权/控制器退出、授权/确认事务失败，以及硬到期。root 节点夹具还冻结私有日志文件系统，独立检查持久化卡住时的终止。[固定源码记录](../evidence/renewable-execution-leases-2026-10-10.json)和[运行日志](../evidence/renewable-execution-leases-2026-10-10.log)保留 451 项 Cargo 测试、15 个 Bazel 目标、25 个真实执行场景及八个节点续约场景的通过证据。长命令断连后完成四次续约；独立 SQL 核验 13 次授权和 12 次确认，包含故意失败的第二次确认事务。单独回读验证 48 个 S3 引用、22 次认证输出下载和十个 Candidate 文件。取证后已移除本次 VM 及私有状态。早期夹具失败和最终仅注释变化的源码差异均明确保留。
 
-范围仍是节点本地 Candidate 执行链路。完整 Computer 生命周期调度、自动排空恢复、多节点 fencing、输出流、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。
+范围仍是节点本地 Candidate 执行链路。完整 Computer 生命周期调度、自动排空恢复、多节点 fencing、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。

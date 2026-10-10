@@ -4119,6 +4119,331 @@
         },
         "summary": "Save a verified file checkpoint and stop"
       }
+    },
+    "/v1alpha1/executions/{id}/output-chunks": {
+      "get": {
+        "operationId": "listCandidateExecutionChunks",
+        "description": "Requires the original currently valid credential with runtime.connect/runtime.read, current Computer connect/read and original Workspace read grants. Logical disconnect or loss of modify authority does not remove historical read access. Returns up to 32 verified chunks after a shared sequence cursor (default after_sequence=0, limit=16). No output gateway required for metadata. Duplicate/unknown/empty query parameters, nondecimal integers and Range are rejected. Polling never grants execution authority.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "name": "after_sequence",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 8192,
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32,
+              "default": 16
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid identifier, cursor, limit, duplicate/unknown/empty query, or Range.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Immutable output binding changed during verification.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database or request capacity unavailable; metadata does not require an output gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Verified contiguous prefix metadata, including an empty page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionChunkPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/executions/{id}/output-chunks/{sequence}": {
+      "get": {
+        "operationId": "downloadCandidateExecutionChunk",
+        "description": "Requires the original currently valid credential with runtime.connect/runtime.read, current Computer connect/read and original Workspace read grants. Logical disconnect or loss of modify authority does not remove historical read access. Requires the configured output gateway. Returns one fully verified chunk (at most 8192 bytes); both size/SHA-256 and the startup-bound wire digest are rechecked after signed object GET. Authority is rechecked after GET, even failed GET. Chunk and final downloads share four slots, held until the response body is consumed/dropped. No ranges, query parameters, presigned URLs or streaming HTTP body.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "name": "sequence",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8192
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID or sequence (1..8192), Range or any query parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Immutable output binding changed during verification.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Output gateway unconfigured (outputs_unavailable), four download slots occupied (output_io_busy), publication pending or object unavailable/unverified (execution_output_unavailable), or database unavailable. No partial bytes are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Verified bytes for exactly one chunk; zero bytes are permitted only for EOF. This does not assert execution success.",
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment named chunk-SEQUENCE.bin.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "const": "nosniff"
+                }
+              },
+              "Accept-Ranges": {
+                "schema": {
+                  "const": "none"
+                }
+              },
+              "X-Output-Sha256": {
+                "description": "SHA-256 of the returned retained bytes.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              },
+              "X-Output-Observed-Bytes": {
+                "description": "Total observed stream length, including discarded bytes.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "X-Output-Truncated": {
+                "description": "Whether observed stream bytes exceed the admitted retention cap; this chunk may contain only part of the retained prefix.",
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "X-Output-Eof": {
+                "description": "Whether the supervisor observed EOF for this stream.",
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "Content-Length": {
+                "description": "Exact verified retained stream length.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 8192
+                }
+              },
+              "X-Output-Chunk-Digest": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              },
+              "X-Output-Sequence": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8192
+                }
+              },
+              "X-Output-Stream": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "stdout",
+                    "stderr"
+                  ]
+                }
+              },
+              "X-Output-Offset": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1048576
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5879,7 +6204,12 @@
           "renewable": {
             "type": "boolean",
             "default": true,
-            "description": "New admissions allow trusted worker renewals by default. False pins fixed startup protocol v1. Retry identity distinguishes omitted, true and false. Historical rows retain their original fixed policy."
+            "description": "New admissions allow trusted worker renewals by default. False pins a fixed deadline, independently of output streaming. Retry identity distinguishes omitted, true and false. Historical rows retain their original policy."
+          },
+          "stream_output": {
+            "type": "boolean",
+            "default": true,
+            "description": "New admissions stream retained stdout/stderr through protocol v3 by default. False uses legacy v1/v2 according to renewable policy. Omitted, true and false are distinct retry inputs; historical bindings without output_stream stay disabled."
           }
         },
         "description": "Bounded queue reservation on a Prepared Candidate. Background (default) survives logical connection close; connection lifetime requires an active connection. The queue deadline cannot be renewed. New renewable admissions allow the original worker to extend execution windows by at most 30 seconds after fresh authorization and both node watchdog acknowledgments. The immutable execution hard limit is capped by command timeout plus 30 seconds, the pinned Computer start duration and original credential expiry; connection lifetime also caps it by session expiry. This is an execution duration, not a full Computer activation or idle lifetime implementation. Original grants, catalog and generation remain required. Selected gVisor Sandbox must belong to the pinned Computer snapshot and cannot host an App. Public runtime execution remains unsupported."
@@ -5919,7 +6249,8 @@
           "input_digest",
           "binding_digest",
           "dispatch_started",
-          "renewable"
+          "renewable",
+          "stream_output"
         ],
         "properties": {
           "execution_id": {
@@ -6014,6 +6345,10 @@
           "renewable": {
             "type": "boolean",
             "description": "Immutable admitted policy. False for historical fixed execution records. This does not indicate a live controller or a renewed deadline."
+          },
+          "stream_output": {
+            "type": "boolean",
+            "description": "Immutable admitted chunk-stream policy; historical bindings default to false. Does not assert any published bytes, live worker or success."
           }
         },
         "description": "Current execution metadata bound to the original credential. Succeeded/Failed require a live kernel and Candidate IO seal, verified output and current authority; dispatched Cancelled requires the seal and an explicit cancellation request. Unknown preserves uncertainty even when physical writes are sealed. Queue deadline is fixed at admission and never extended by retry or lease renewal.",
@@ -6532,6 +6867,141 @@
             "description": "Explicitly request cancellation of queued/running Candidate executions. Durably enters Draining and rejects new writes before waiting for existing process and IO drain evidence. Unknown blocks capture; no Apps or other active use allowed."
           }
         }
+      },
+      "ExecutionOutputChunk": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "stream",
+          "offset",
+          "retained_bytes",
+          "observed_bytes",
+          "truncated",
+          "eof",
+          "sha256",
+          "chunk_digest",
+          "verified_at_ms"
+        ],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8192
+          },
+          "stream": {
+            "type": "string",
+            "enum": [
+              "stdout",
+              "stderr"
+            ]
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048576
+          },
+          "retained_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8192
+          },
+          "observed_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "eof": {
+            "type": "boolean"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "chunk_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "verified_at_ms": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "description": "Immutable chunk metadata. Offset is per stream; sequence is shared across both streams. No output bytes, object key or URL. EOF applies to this stream only."
+      },
+      "ExecutionChunkPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "execution_id",
+          "enabled",
+          "execution_state",
+          "after_sequence",
+          "next_sequence",
+          "available_sequence",
+          "final_sequence",
+          "final_report_verified",
+          "chunks"
+        ],
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "execution_state": {
+            "type": "string",
+            "enum": [
+              "Queued",
+              "Cancelled",
+              "Dispatching",
+              "CancelRequested",
+              "Unknown",
+              "Succeeded",
+              "Failed"
+            ]
+          },
+          "after_sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8192
+          },
+          "next_sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8192
+          },
+          "available_sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8192
+          },
+          "final_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 8192
+          },
+          "final_report_verified": {
+            "type": "boolean"
+          },
+          "chunks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "$ref": "#/components/schemas/ExecutionOutputChunk"
+            }
+          }
+        },
+        "description": "Contiguous verified prefix, available during execution and after interruption. Resume after next_sequence without rerunning a command. Final report verification and EOF do not assert accepted execution completion. Empty pages are not proof of terminal state. Missing final report remains explicit."
       }
     },
     "responses": {

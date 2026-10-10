@@ -1,9 +1,13 @@
 //! Publication of observations only. No terminal execution or writer transition.
+mod chunks;
 mod download;
 use super::*;
 use agent_computer_kubernetes::StartupObservation;
 use agent_computer_objects::{Client, ObjectRef, Spool};
 use agent_computer_sandbox::{Outcome, Output, StartupReport};
+pub use chunks::{
+    ExecutionChunkDownload, ExecutionChunkPage, ExecutionOutputCapture, ExecutionOutputChunk,
+};
 pub use download::{ExecutionOutputDownload, OutputStream};
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -35,6 +39,8 @@ struct Manifest {
     arm_digest: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     renewal: Option<agent_computer_sandbox::renewal::Progress>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    stream: Option<agent_computer_sandbox::streaming::Progress>,
     // Fixed order: envelope, stdout, stderr, supervisor diagnostics.
     objects: [ObjectRef; 4],
     summary: Summary,
@@ -45,8 +51,8 @@ impl Manifest {
     }
     fn validate(&self) -> Result<()> {
         if !matches!(
-            (self.version, self.renewal.is_some()),
-            (1, false) | (2, true)
+            (self.version, self.renewal.is_some(), self.stream.is_some()),
+            (1, false, false) | (2, true, false) | (3, _, true)
         ) || !agent_computer_objects::identifier(&self.organization)
             || !agent_computer_objects::identifier(&self.execution_id)
             || self.pod_uid.is_empty()
@@ -57,6 +63,9 @@ impl Manifest {
             return Err(Error::InvalidStoredData);
         }
         if let Some(progress) = &self.renewal {
+            progress.validate().map_err(|_| Error::InvalidStoredData)?;
+        }
+        if let Some(progress) = &self.stream {
             progress.validate().map_err(|_| Error::InvalidStoredData)?;
         }
         for object in &self.objects {
@@ -148,6 +157,7 @@ fn content(
     bytes: &[u8],
     diagnostics: &[u8],
     renewal: Option<&agent_computer_sandbox::renewal::Progress>,
+    stream_progress: Option<&agent_computer_sandbox::streaming::Progress>,
 ) -> Result<(Summary, Vec<Vec<u8>>)> {
     let cap = dispatch.input.command.output_limit_bytes;
     if bytes.len() > 8 * cap + 16384 || diagnostics.len() > 65536 {
@@ -160,6 +170,7 @@ fn content(
     let r = &parsed.report;
     if parsed.version != grant.grant.version
         || parsed.renewal.as_ref() != renewal
+        || parsed.stream.as_ref() != stream_progress
         || r.version != 1
         || r.execution_id != dispatch.execution.execution_id
         || r.generation != dispatch.execution.generation as u64
@@ -235,6 +246,14 @@ pub(super) async fn verified_outcome(
         || manifest.grant_digest != grant.grant_digest
         || manifest.pod_uid != grant.pod_uid
         || manifest.renewal != renewal_progress(tx, dispatch, &grant).await?
+        || manifest.stream
+            != chunks::progress(
+                tx,
+                &dispatch.organization,
+                &dispatch.execution.execution_id,
+                &grant,
+            )
+            .await?
     {
         return Err(Error::InvalidStoredData);
     }
@@ -248,7 +267,7 @@ async fn renewal_progress(
     dispatch: &ExecutionDispatchIntent,
     startup: &ExecutionStartupGrant,
 ) -> Result<Option<agent_computer_sandbox::renewal::Progress>> {
-    if startup.grant.version == 1 {
+    if startup.grant.hard_budget_ms.is_none() {
         return Ok(None);
     }
     let ack = super::renewal::latest_ack(tx, dispatch).await?;
@@ -288,6 +307,7 @@ impl Store {
             return Err(Error::InvalidReconcileResult);
         }
         let renewal = renewal_progress(&mut tx, &dispatch, &grant).await?;
+        let stream = chunks::progress(&mut tx, org, id, &grant).await?;
         let (summary, bytes) = content(
             &dispatch,
             &grant,
@@ -295,6 +315,7 @@ impl Store {
             observation.report_bytes(),
             observation.supervisor_stderr(),
             renewal.as_ref(),
+            stream.as_ref(),
         )?;
         let objects: Vec<_> = bytes
             .iter()
@@ -305,7 +326,7 @@ impl Store {
             })
             .collect::<Result<_>>()?;
         let m = Manifest {
-            version: if renewal.is_some() { 2 } else { 1 },
+            version: grant.grant.version as u8,
             organization: org.clone(),
             execution_id: id.clone(),
             pod_uid: observation.pod_uid().into(),
@@ -313,6 +334,7 @@ impl Store {
             grant_digest: grant.grant_digest,
             arm_digest: arm,
             renewal,
+            stream,
             objects: objects.try_into().map_err(|_| Error::InvalidStoredData)?,
             summary,
         };

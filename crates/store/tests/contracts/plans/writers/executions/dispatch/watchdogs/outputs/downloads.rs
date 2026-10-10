@@ -12,18 +12,18 @@ use std::{
     time::Duration,
 };
 
-struct Http {
-    config: Configuration,
+pub(super) struct Http {
+    pub(super) config: Configuration,
     _directory: tempfile::TempDir,
-    response: Arc<Mutex<(u16, Vec<u8>)>>,
-    requests: Arc<AtomicUsize>,
-    hold: Arc<AtomicBool>,
-    received: Arc<tokio::sync::Notify>,
+    pub(super) response: Arc<Mutex<(u16, Vec<u8>)>>,
+    pub(super) requests: Arc<AtomicUsize>,
+    pub(super) hold: Arc<AtomicBool>,
+    pub(super) received: Arc<tokio::sync::Notify>,
     stop: Arc<AtomicBool>,
     thread: Option<std::thread::JoinHandle<()>>,
 }
 impl Http {
-    fn new() -> Self {
+    pub(super) fn new() -> Self {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         listener.set_nonblocking(true).unwrap();
         let directory = tempfile::tempdir().unwrap();
@@ -105,7 +105,7 @@ impl Http {
             thread: Some(thread),
         }
     }
-    fn client(&self) -> Client {
+    pub(super) fn client(&self) -> Client {
         Client::new(&self.config).unwrap()
     }
 }

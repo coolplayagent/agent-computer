@@ -5,7 +5,7 @@ use std::{
     net::{SocketAddr, TcpListener, TcpStream},
     process::{Child, Command, Stdio},
 };
-struct Server {
+pub(super) struct Server {
     child: Child,
     address: SocketAddr,
 }
@@ -17,7 +17,16 @@ impl Drop for Server {
 }
 impl Server {
     fn get(&self, token: &str, path: &str) -> (u16, String, Vec<u8>) {
-        let mut stream = TcpStream::connect(self.address).unwrap();
+        Self::request(self.address, token, path)
+    }
+    pub(super) async fn get_live(&self, token: &str, path: &str) -> (u16, String, Vec<u8>) {
+        let (address, token, path) = (self.address, token.to_owned(), path.to_owned());
+        tokio::task::spawn_blocking(move || Self::request(address, &token, &path))
+            .await
+            .unwrap()
+    }
+    fn request(address: SocketAddr, token: &str, path: &str) -> (u16, String, Vec<u8>) {
+        let mut stream = TcpStream::connect(address).unwrap();
         stream
             .set_read_timeout(Some(Duration::from_secs(15)))
             .unwrap();
@@ -48,42 +57,7 @@ pub async fn verify(
     report: &Value,
     metadata: &Value,
 ) -> Value {
-    let path = PathBuf::from(field(config, "result_file")).with_file_name("http-outputs.json");
-    fs::write(
-        &path,
-        serde_json::to_vec(&private["execution"]["outputs"]).unwrap(),
-    )
-    .unwrap();
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o600)).unwrap();
-    let address = TcpListener::bind("127.0.0.1:0")
-        .unwrap()
-        .local_addr()
-        .unwrap();
-    let child = Command::new(field(config, "server_binary"))
-        .args([
-            "serve",
-            "--database-url-file",
-            field(config, "database_url_file"),
-            "--listen",
-            &address.to_string(),
-            "--output-config",
-        ])
-        .arg(&path)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
-    let mut server = Server { child, address };
-    for _ in 0..100 {
-        if TcpStream::connect(address).is_ok() {
-            break;
-        }
-        assert!(
-            server.child.try_wait().unwrap().is_none(),
-            "output service exited"
-        );
-        tokio::time::sleep(Duration::from_millis(20)).await;
-    }
+    let server = start(config, private).await;
     let (code, _, caps) = server.get(token, "/v1alpha1/capabilities");
     assert_eq!(code, 200);
     let caps: Value = serde_json::from_slice(&caps).unwrap();
@@ -123,6 +97,46 @@ pub async fn verify(
         assert_eq!(server.get("invalid", &route).0, 401);
         streams.push(json!({"stream":name,"status":status,"bytes":bytes.len(),"sha256":sha,"matches_original_report":true,"unauthenticated_status":401}));
     }
-    fs::remove_file(path).unwrap();
     json!({"transport":"real_http","object_source":"signed_s3_get","streams":streams})
+}
+
+pub(super) async fn start(config: &Value, private: &Value) -> Server {
+    let path = PathBuf::from(field(config, "result_file")).with_file_name("http-outputs.json");
+    fs::write(
+        &path,
+        serde_json::to_vec(&private["execution"]["outputs"]).unwrap(),
+    )
+    .unwrap();
+    fs::set_permissions(&path, fs::Permissions::from_mode(0o600)).unwrap();
+    let address = TcpListener::bind("127.0.0.1:0")
+        .unwrap()
+        .local_addr()
+        .unwrap();
+    let child = Command::new(field(config, "server_binary"))
+        .args([
+            "serve",
+            "--database-url-file",
+            field(config, "database_url_file"),
+            "--listen",
+            &address.to_string(),
+            "--output-config",
+        ])
+        .arg(&path)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    let mut server = Server { child, address };
+    for _ in 0..100 {
+        if TcpStream::connect(address).is_ok() {
+            break;
+        }
+        assert!(
+            server.child.try_wait().unwrap().is_none(),
+            "output service exited"
+        );
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    fs::remove_file(path).unwrap();
+    server
 }

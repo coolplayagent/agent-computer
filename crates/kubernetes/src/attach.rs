@@ -22,7 +22,7 @@ const MAX_FRAMES: usize = 4096;
 type Socket = WebSocketStream<reqwest::Upgraded>;
 
 mod running;
-pub use running::{ExecutionChannel, ExecutionEvent};
+pub use running::{ExecutionChannel, ExecutionEvent, OutputChunkObservation};
 
 /// A single live channel to one verified Pod. It cannot be cloned/deserialized.
 /// Dropping it closes transport, not a process or a Candidate writer lease.
@@ -104,9 +104,10 @@ async fn next(
     socket: &mut Socket,
     frames: &mut usize,
     deadline: Instant,
+    limit: usize,
 ) -> Result<Option<Vec<u8>>> {
     loop {
-        if *frames >= MAX_FRAMES || Instant::now() >= deadline {
+        if *frames >= limit || Instant::now() >= deadline {
             return Err(Error::ResponseLimit);
         }
         let message = timeout_at(deadline, socket.next())
@@ -228,7 +229,7 @@ impl Client {
         let mut buffer = Vec::new();
         let mut frames = 0;
         let challenge = loop {
-            let frame = next(&mut socket, &mut frames, deadline)
+            let frame = next(&mut socket, &mut frames, deadline, MAX_FRAMES)
                 .await?
                 .ok_or(Error::InvalidResponse)?;
             if frame[0] != 1 {
@@ -284,7 +285,9 @@ impl<'a> StartupChannel<'a> {
         let mut running = self.start(grant).await?;
         match running.next_event().await? {
             ExecutionEvent::Complete(observation) => Ok(observation),
-            ExecutionEvent::Renewal(_) => Err(Error::MutationUnconfirmed),
+            ExecutionEvent::Renewal(_) | ExecutionEvent::Output(_) => {
+                Err(Error::MutationUnconfirmed)
+            }
         }
     }
     /// Consume the verified startup channel. Version 1 closes stdin immediately;
@@ -307,7 +310,9 @@ impl<'a> StartupChannel<'a> {
         send(&mut self.socket, bytes, send_deadline)
             .await
             .map_err(|_| Error::MutationUnconfirmed)?;
-        if grant.hard_budget_ms.is_none() {
+        if grant.hard_budget_ms.is_none()
+            && grant.version != agent_computer_sandbox::STREAMING_PROTOCOL
+        {
             send(&mut self.socket, vec![255, 0], send_deadline)
                 .await
                 .map_err(|_| Error::MutationUnconfirmed)?;
@@ -329,6 +334,8 @@ struct Envelope {
     report: Box<serde_json::value::RawValue>,
     #[serde(default)]
     renewal: Option<agent_computer_sandbox::renewal::Progress>,
+    #[serde(default)]
+    stream: Option<agent_computer_sandbox::streaming::Progress>,
 }
 // Only correlation is checked here. Result semantics and durable acceptance are
 // the collector's responsibility; ignoring fields does not attest their validity.

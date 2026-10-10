@@ -14,6 +14,16 @@ sources:
   status: active
   version: 1
   description: Live pinned process and Candidate IO seals, verified execution outcomes, atomic writer release and historical recovery
+- id: background-execution
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/48-background-execution.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Bounded background execution disconnect semantics, immutable lifetimes, authority and real component evidence
 - id: candidate-io-fence
   topic: execution
   kind: doc
@@ -24,6 +34,15 @@ sources:
   status: active
   version: 1
   description: Revocable per-Candidate FUSE content/namespace barrier, real paused JuiceFS verification and pending process/Pod integration; paired Chinese docs/zh-CN/40-candidate-io-fence.md
+- id: durable-execution-output
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/50-durable-execution-output.md
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Bounded running output chunks, verified cursor reads and publication-only recovery
 - id: durable-execution-outputs
   topic: execution
   kind: doc
@@ -94,6 +113,15 @@ sources:
   status: active
   version: 1
   description: Redundant fixed node watchdog deadlines, durable pair evidence, fault tests and remaining fencing boundaries.
+- id: renewable-execution-leases
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/49-renewable-execution-leases.md
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Worker-owned execution renewal windows, dual watchdog acknowledgments and immutable hard deadlines
 - id: watchdog-journals
   topic: execution
   kind: doc
@@ -117,4 +145,7 @@ route:
   - accepted-execution-completion
   - execution-output-downloads
   - queued-execution-worker
+  - background-execution
+  - renewable-execution-leases
+  - durable-execution-output
   fallback: bounded-search

@@ -3,7 +3,8 @@ mod dispatch;
 use super::*;
 use crate::plans::DefinitionKind;
 pub use dispatch::{
-    ExecutionCompletion, ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionOutput,
+    ExecutionChunkDownload, ExecutionChunkPage, ExecutionCompletion, ExecutionDispatchAttempt,
+    ExecutionDispatchIntent, ExecutionOutput, ExecutionOutputCapture, ExecutionOutputChunk,
     ExecutionOutputDownload, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRenewalAttempt,
     ExecutionRenewalGrant, ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant,
     ExecutionWatchdogArm, OutputState, OutputStream, QueuedDispatch,
@@ -60,6 +61,10 @@ pub struct SubmitExecution {
     /// canonical input bytes, so retries of historical fixed records still match.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub renewable: Option<bool>,
+    /// New admissions stream retained output by default; old canonical inputs
+    /// remain byte-identical when this field was omitted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stream_output: Option<bool>,
     pub command: ExecutionCommand,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -87,6 +92,8 @@ pub struct ExecutionRequest {
     pub lifetime: ExecutionLifetime,
     #[serde(default)]
     pub renewable: bool,
+    #[serde(default)]
+    pub stream_output: bool,
     pub computer_id: String,
     pub generation: i64,
     pub candidate_id: String,
@@ -158,6 +165,7 @@ fn view(row: &PgRow) -> Result<ExecutionRequest> {
             .map_err(|_| Error::InvalidStoredData)?
             .lifetime,
         renewable: binding.get("execution_lease").is_some(),
+        stream_output: binding.get("output_stream").is_some(),
         computer_id: string("computer_id")?,
         generation: binding["generation"]
             .as_i64()
@@ -321,6 +329,9 @@ impl Store {
                 ));
             binding["execution_lease"] =
                 serde_json::json!({"version":1,"max_budget_ms":max_budget_ms});
+        }
+        if input.stream_output.unwrap_or(true) {
+            binding["output_stream"] = serde_json::json!({"version":1});
         }
         let binding_hash = digest("agent-computer/execution-binding-v1", &binding)?;
         let id = random_id("exec")?;

@@ -1,7 +1,31 @@
 use super::Database;
 
 impl Database {
+    pub async fn remove_execution_output_chunks(&self) {
+        sqlx::raw_sql("DROP TRIGGER check_execution_output_stream_final ON execution_output_intents; DROP FUNCTION guard_execution_output_stream_final(); DROP TABLE execution_output_chunks,execution_output_chunk_intents; DROP FUNCTION guard_execution_output_chunk(); DROP FUNCTION execution_output_stream_progress(TEXT,TEXT); ALTER TABLE execution_requests DROP CONSTRAINT execution_stream_policy; DELETE FROM _sqlx_migrations WHERE version=30;")
+            .execute(&self.pool).await.unwrap();
+        let source = include_str!("../../migrations/0029_execution_renewal.sql");
+        for name in [
+            "guard_execution_startup",
+            "guard_execution_renewal_grant",
+            "execution_renewal_progress",
+            "guard_execution_output",
+        ] {
+            let body = source
+                .split(&format!("FUNCTION {name}"))
+                .nth(1)
+                .unwrap()
+                .split("$$;")
+                .next()
+                .unwrap();
+            sqlx::raw_sql(&format!("CREATE OR REPLACE FUNCTION {name}{body}$$;"))
+                .execute(&self.pool)
+                .await
+                .unwrap();
+        }
+    }
     pub async fn remove_execution_renewal(&self) {
+        self.remove_execution_output_chunks().await;
         sqlx::raw_sql("DROP TABLE execution_renewal_acks,execution_renewal_grants; DROP FUNCTION guard_execution_renewal_grant(); DROP FUNCTION guard_execution_renewal_ack(); DROP FUNCTION complete_execution_renewal(); DROP FUNCTION execution_effective_deadline(TEXT,TEXT); DROP FUNCTION execution_renewal_progress(TEXT,TEXT); DROP TRIGGER check_execution_hard_limit ON execution_dispatch_intents; DROP FUNCTION guard_execution_hard_limit(); DROP TRIGGER check_execution_watchdog_lease_policy ON execution_watchdog_arms; DROP FUNCTION guard_execution_watchdog_lease_policy(); ALTER TABLE execution_requests DROP CONSTRAINT execution_renewal_input, DROP CONSTRAINT execution_renewal_policy; ALTER TABLE execution_dispatch_intents DROP COLUMN hard_deadline_at_ms; DELETE FROM _sqlx_migrations WHERE version=29;")
             .execute(&self.pool).await.unwrap();
         for (source, name) in [

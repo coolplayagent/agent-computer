@@ -1,10 +1,36 @@
 use super::*;
 use agent_computer_sandbox::renewal::{Challenge, ChallengeFrame, Grant, Progress};
+use agent_computer_sandbox::streaming::{Chunk, Frame as OutputFrame, Transcript};
 
 #[derive(Debug)]
 pub enum ExecutionEvent {
     Renewal(Challenge),
+    Output(OutputChunkObservation),
     Complete(StartupObservation),
+}
+
+/// Created only from this live authenticated channel after transcript checks.
+/// Bytes are observations, not a completion receipt or renewed execution lease.
+pub struct OutputChunkObservation {
+    pod_uid: String,
+    chunk: Chunk,
+}
+impl OutputChunkObservation {
+    pub fn pod_uid(&self) -> &str {
+        &self.pod_uid
+    }
+    pub fn chunk(&self) -> &Chunk {
+        &self.chunk
+    }
+}
+impl fmt::Debug for OutputChunkObservation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OutputChunkObservation")
+            .field("sequence", &self.chunk.sequence)
+            .field("stream", &self.chunk.stream)
+            .field("bytes", &self.chunk.bytes.len())
+            .finish_non_exhaustive()
+    }
 }
 
 /// One live attach stream. A received challenge does not extend its deadline.
@@ -19,7 +45,8 @@ pub struct ExecutionChannel<'a> {
     stdout: Vec<u8>,
     stderr: Vec<u8>,
     status: Vec<u8>,
-    report: bool,
+    report: Option<Vec<u8>>,
+    transcript: Option<Transcript>,
     finished: bool,
 }
 impl fmt::Debug for ExecutionChannel<'_> {
@@ -47,6 +74,17 @@ impl<'a> ExecutionChannel<'a> {
             })
             .transpose()
             .map_err(|_| Error::InvalidCommand)?;
+        let transcript = if grant.version == agent_computer_sandbox::STREAMING_PROTOCOL {
+            Some(
+                Transcript::new(
+                    grant.digest().map_err(|_| Error::InvalidCommand)?,
+                    channel.plan.bootstrap.request.output_limit_bytes,
+                )
+                .map_err(|_| Error::InvalidCommand)?,
+            )
+        } else {
+            None
+        };
         Ok(Self {
             channel,
             grant,
@@ -57,7 +95,8 @@ impl<'a> ExecutionChannel<'a> {
             stdout: Vec::new(),
             stderr: Vec::new(),
             status: Vec::new(),
-            report: false,
+            report: None,
+            transcript,
             finished: false,
         })
     }
@@ -83,7 +122,46 @@ impl<'a> ExecutionChannel<'a> {
         );
         let limit = 8 * self.channel.plan.bootstrap.request.output_limit_bytes + 16384;
         loop {
-            if self.report
+            if let Some(end) = self.stdout.iter().position(|b| *b == b'\n') {
+                let bytes = self.stdout.drain(..=end).collect::<Vec<_>>();
+                if self.report.is_some() {
+                    return Err(Error::InvalidResponse);
+                }
+                if let Ok(control) = ChallengeFrame::parse(&bytes) {
+                    let progress = self.progress.as_ref().ok_or(Error::InvalidResponse)?;
+                    let challenge = control.renewal;
+                    if Instant::now() >= self.deadline
+                        || Instant::now() >= self.hard_deadline
+                        || challenge.sequence != progress.sequence + 1
+                        || challenge.startup_grant_digest
+                            != self.grant.digest().map_err(|_| Error::InvalidCommand)?
+                    {
+                        return Err(Error::IdentityMismatch);
+                    }
+                    self.pending = Some((challenge.clone(), Instant::now()));
+                    return Ok(ExecutionEvent::Renewal(challenge));
+                }
+                if let Ok(output) = OutputFrame::parse(&bytes) {
+                    let transcript = self.transcript.as_mut().ok_or(Error::InvalidResponse)?;
+                    transcript
+                        .accept(&output.output)
+                        .map_err(|_| Error::IdentityMismatch)?;
+                    return Ok(ExecutionEvent::Output(OutputChunkObservation {
+                        pod_uid: self.channel.pod_uid.clone(),
+                        chunk: output.output,
+                    }));
+                }
+                if bytes.len() > limit {
+                    return Err(Error::ResponseLimit);
+                }
+                self.validate_report(&bytes)?;
+                self.report = Some(bytes);
+                if self.stdout.iter().any(|b| !b.is_ascii_whitespace()) {
+                    return Err(Error::InvalidResponse);
+                }
+                self.stdout.clear();
+            }
+            if self.report.is_some()
                 && serde_json::from_slice::<RemoteStatus>(&self.status)
                     .is_ok_and(|s| s.status == "Success")
             {
@@ -93,36 +171,24 @@ impl<'a> ExecutionChannel<'a> {
                 &mut self.channel.socket,
                 &mut self.channel.frames,
                 self.deadline + grace,
+                if self.transcript.is_some() {
+                    65536
+                } else {
+                    MAX_FRAMES
+                },
             )
             .await?
             .ok_or(Error::InvalidResponse)?;
             match frame[0] {
                 1 => {
-                    if self.report {
+                    if self.report.is_some() {
                         return Err(Error::InvalidResponse);
                     }
-                    append(&mut self.stdout, &frame[1..], limit)?;
-                    if let Some(bytes) = line(&self.stdout)? {
-                        if let Ok(control) = ChallengeFrame::parse(bytes) {
-                            let progress = self.progress.as_ref().ok_or(Error::InvalidResponse)?;
-                            let challenge = control.renewal;
-                            if Instant::now() >= self.deadline
-                                || Instant::now() >= self.hard_deadline
-                                || challenge.sequence != progress.sequence + 1
-                                || challenge.startup_grant_digest
-                                    != self.grant.digest().map_err(|_| Error::InvalidCommand)?
-                            {
-                                return Err(Error::IdentityMismatch);
-                            }
-                            self.pending = Some((challenge.clone(), Instant::now()));
-                            self.stdout.clear();
-                            return Ok(ExecutionEvent::Renewal(challenge));
-                        }
-                        // A malformed control frame is rejected by the strict
-                        // final envelope parser, never treated as authorization.
-                        self.validate_report(bytes)?;
-                        self.report = true;
-                    }
+                    append(
+                        &mut self.stdout,
+                        &frame[1..],
+                        limit.max(agent_computer_sandbox::streaming::MAX_FRAME_BYTES) + FRAME_LIMIT,
+                    )?;
                 }
                 2 => append(&mut self.stderr, &frame[1..], DIAGNOSTIC_LIMIT)?,
                 3 => append(&mut self.status, &frame[1..], 4096)?,
@@ -183,13 +249,28 @@ impl<'a> ExecutionChannel<'a> {
         {
             return Err(Error::IdentityMismatch);
         }
+        match (&self.transcript, &envelope.stream) {
+            (Some(transcript), Some(progress)) => {
+                let report: agent_computer_sandbox::Report =
+                    serde_json::from_str(envelope.report.get())
+                        .map_err(|_| Error::InvalidResponse)?;
+                let complete = transcript
+                    .verify_report(progress, [&report.stdout, &report.stderr])
+                    .map_err(|_| Error::IdentityMismatch)?;
+                if report.outcome == agent_computer_sandbox::Outcome::Succeeded && !complete {
+                    return Err(Error::InvalidResponse);
+                }
+            }
+            (None, None) => {}
+            _ => return Err(Error::IdentityMismatch),
+        }
         Ok(())
     }
     fn complete(&mut self) -> Result<ExecutionEvent> {
         self.finished = true;
         Ok(ExecutionEvent::Complete(StartupObservation {
             pod_uid: self.channel.pod_uid.clone(),
-            report: std::mem::take(&mut self.stdout),
+            report: self.report.take().ok_or(Error::InvalidResponse)?,
             supervisor_stderr: std::mem::take(&mut self.stderr),
         }))
     }

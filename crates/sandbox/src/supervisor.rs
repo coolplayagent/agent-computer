@@ -131,7 +131,7 @@ pub(crate) async fn run_controlled(
     request: Request,
     namespace: NamespaceInit,
     start: Instant,
-    mut control: Option<&mut crate::renewal::Channel>,
+    mut control: Option<&mut crate::control::Control>,
 ) -> Result<Report> {
     let process_start = Instant::now();
     let mut report = Report {
@@ -252,14 +252,12 @@ pub(crate) async fn run_controlled(
                 .drain(&mut stderr, request.output_limit_bytes)
                 .is_err();
         }
-        if stop.is_none()
-            && let Some(control) = control.as_mut()
-        {
-            match control.poll() {
+        if let Some(control) = control.as_mut() {
+            match control.poll([&report.stdout, &report.stderr], stop.is_none()) {
                 Ok(()) | Err(Error::LeaseExpired) => {}
                 Err(_) => fault = true,
             }
-            lease_deadline = control.window.deadline();
+            lease_deadline = control.deadline();
         }
         let now = Instant::now();
         // Deadline has priority over an exit first observed after it expired.
@@ -281,7 +279,13 @@ pub(crate) async fn run_controlled(
                 stop = Some((reason, now));
             }
         }
-        if no_children && (pipe_setup_failed || (report.stdout.eof && report.stderr.eof)) {
+        let output_complete = control
+            .as_ref()
+            .is_none_or(|c| c.output_complete([&report.stdout, &report.stderr]));
+        if no_children
+            && (pipe_setup_failed
+                || (report.stdout.eof && report.stderr.eof && (fault || output_complete)))
+        {
             report.children_reaped = true;
             report.outcome = if fault {
                 Outcome::Unknown

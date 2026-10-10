@@ -14,7 +14,7 @@ pub struct Request {
     /// Empty means /workspace. Otherwise a normalized relative directory.
     pub cwd: String,
     pub timeout_seconds: u32,
-    /// Conservative remaining time supplied by the dispatcher; no renewal yet.
+    /// Conservative initial window; the startup protocol may authorize renewals.
     pub lease_budget_ms: u32,
     pub term_grace_ms: u32,
     /// Retained bytes per stream; excess is drained and counted, never buffered.
@@ -48,7 +48,7 @@ impl Request {
             || !(1..=3600).contains(&self.timeout_seconds)
             || !(1..=30000).contains(&self.lease_budget_ms)
             || self.term_grace_ms > 5000
-            || self.output_limit_bytes > 1_048_576
+            || self.output_limit_bytes > crate::MAX_OUTPUT_BYTES
         {
             return Err(Error::InvalidRequest);
         }

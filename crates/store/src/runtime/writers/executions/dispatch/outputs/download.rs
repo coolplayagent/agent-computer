@@ -1,7 +1,8 @@
 //! Historical output reads never acquire a writer or change execution state.
 use super::*;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum OutputStream {
     Stdout,
     Stderr,
@@ -13,43 +14,53 @@ pub struct ExecutionOutputDownload {
     pub output: ExecutionOutput,
 }
 
+pub(super) async fn authorize_read(
+    tx: &mut Transaction<'_, Postgres>,
+    token: &str,
+    identity: &AuthenticatedPrincipal,
+    id: &str,
+) -> Result<PgRow> {
+    let record = own_execution(tx, token, identity, id).await?;
+    let execution = super::super::super::view(&record)?;
+    // The immutable epoch keeps this read bound to the original Workspace
+    // after the writer slot advances. A current Candidate is not required.
+    let workspace: String = sqlx::query_scalar("SELECT r.workspace_id FROM candidate_writer_epochs e JOIN candidate_writer_leases l USING(organization,lease_id) JOIN runtime_start_requests r USING(organization,request_id) WHERE e.organization=$1 AND e.lease_id=$2 AND e.epoch=$3 AND r.computer_id=$4 AND r.candidate_id=$5 AND r.generation=$6")
+        .bind(identity.organization().as_str()).bind(&execution.lease_id).bind(execution.epoch)
+        .bind(&execution.computer_id).bind(&execution.candidate_id).bind(execution.generation)
+        .fetch_optional(&mut **tx).await?.ok_or(Error::RuntimeAccessUnavailable)?;
+    authorize_in(
+        tx,
+        token,
+        &[
+            RuntimeRequirement {
+                kind: RuntimeKind::Computer,
+                resource_id: execution.computer_id.clone(),
+                permission: RuntimePermission::Connect,
+                runtime_seconds: None,
+            },
+            RuntimeRequirement {
+                kind: RuntimeKind::Computer,
+                resource_id: execution.computer_id,
+                permission: RuntimePermission::Read,
+                runtime_seconds: None,
+            },
+            RuntimeRequirement {
+                kind: RuntimeKind::Workspace,
+                resource_id: workspace,
+                permission: RuntimePermission::Read,
+                runtime_seconds: None,
+            },
+        ],
+    )
+    .await?;
+    Ok(record)
+}
+
 impl Store {
     async fn readable_execution_output(&self, token: &str, id: &str) -> Result<(Manifest, i64)> {
         valid_id(id)?;
         let (mut tx, identity, _) = begin(self, token, ServiceScope::RuntimeRead).await?;
-        let record = own_execution(&mut tx, token, &identity, id).await?;
-        let execution = super::super::super::view(&record)?;
-        // The immutable epoch keeps this read bound to the original Workspace
-        // after the writer slot advances. A current Candidate is not required.
-        let workspace: String = sqlx::query_scalar("SELECT r.workspace_id FROM candidate_writer_epochs e JOIN candidate_writer_leases l USING(organization,lease_id) JOIN runtime_start_requests r USING(organization,request_id) WHERE e.organization=$1 AND e.lease_id=$2 AND e.epoch=$3 AND r.computer_id=$4 AND r.candidate_id=$5 AND r.generation=$6")
-            .bind(identity.organization().as_str()).bind(&execution.lease_id).bind(execution.epoch)
-            .bind(&execution.computer_id).bind(&execution.candidate_id).bind(execution.generation)
-            .fetch_optional(&mut *tx).await?.ok_or(Error::RuntimeAccessUnavailable)?;
-        authorize_in(
-            &mut tx,
-            token,
-            &[
-                RuntimeRequirement {
-                    kind: RuntimeKind::Computer,
-                    resource_id: execution.computer_id.clone(),
-                    permission: RuntimePermission::Connect,
-                    runtime_seconds: None,
-                },
-                RuntimeRequirement {
-                    kind: RuntimeKind::Computer,
-                    resource_id: execution.computer_id,
-                    permission: RuntimePermission::Read,
-                    runtime_seconds: None,
-                },
-                RuntimeRequirement {
-                    kind: RuntimeKind::Workspace,
-                    resource_id: workspace,
-                    permission: RuntimePermission::Read,
-                    runtime_seconds: None,
-                },
-            ],
-        )
-        .await?;
+        let record = authorize_read(&mut tx, token, &identity, id).await?;
         let (manifest, verified) = load(&mut tx, identity.organization().as_str(), id)
             .await?
             .ok_or(Error::ExecutionOutputUnavailable)?;

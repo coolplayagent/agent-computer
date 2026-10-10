@@ -55,6 +55,27 @@ pub async fn kill_controller(
         assert!(tokio::time::Instant::now() < limit, "fault marker deadline");
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
+    if case == "stream-controller-kill" {
+        let pool = sqlx::PgPool::connect(
+            fs::read_to_string(field(config, "database_url_file"))
+                .unwrap()
+                .trim(),
+        )
+        .await
+        .unwrap();
+        let until = tokio::time::Instant::now() + Duration::from_secs(10);
+        loop {
+            let n:i64=sqlx::query_scalar("SELECT count(*) FROM execution_output_chunks WHERE organization=$1 AND execution_id=$2").bind(org.as_str()).bind(execution).fetch_one(&pool).await.unwrap();
+            if n > 0 {
+                break;
+            }
+            assert!(
+                tokio::time::Instant::now() < until,
+                "no durable output before controller kill"
+            );
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+    }
     let renewed_deadline = if case == "renew-controller-kill" {
         let pool = sqlx::PgPool::connect(
             fs::read_to_string(field(config, "database_url_file"))

@@ -205,7 +205,9 @@ impl Store {
         let startup = startup::receipt(&mut tx, org, id)
             .await?
             .ok_or(Error::InvalidStoredData)?;
-        if startup.grant.version != 2 || challenge.startup_grant_digest != startup.grant_digest {
+        if startup.grant.hard_budget_ms.is_none()
+            || challenge.startup_grant_digest != startup.grant_digest
+        {
             return Err(Error::RuntimeConflict);
         }
         watchdogs::require_live(&mut tx, &dispatch, &startup.pod_uid, Some(guard)).await?;

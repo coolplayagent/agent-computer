@@ -1,5 +1,6 @@
 //! Synthetic SQL fixtures check bindings only; no S3 receipt or live guard is invented.
 use super::*;
+mod chunks;
 mod completions;
 mod downloads;
 

@@ -50,9 +50,24 @@ async fn fixture_with_policy(
     i64,
     String,
 ) {
+    fixture_with_output_policy(fenced, renewable, Some(false)).await
+}
+async fn fixture_with_output_policy(
+    fenced: bool,
+    renewable: bool,
+    stream: Option<bool>,
+) -> (
+    Database,
+    ExecutionDispatchAttempt,
+    ExecutionPodPlan,
+    Value,
+    i64,
+    String,
+) {
     let (db, token, computer, acquire_input) = setup().await;
     let lease = acquire(&db, &token, &computer, &acquire_input).await;
     let mut input = submission(&db, &lease).await;
+    input.stream_output = stream;
     if renewable {
         input.renewable = None;
     }

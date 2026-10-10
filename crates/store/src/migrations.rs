@@ -230,6 +230,15 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0029_execution_renewal.sql")),
                     false,
                 ),
+                Migration::new(
+                    30,
+                    Cow::Borrowed("execution output chunks"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!(
+                        "../migrations/0030_execution_output_chunks.sql"
+                    )),
+                    false,
+                ),
             ])
         })
     }

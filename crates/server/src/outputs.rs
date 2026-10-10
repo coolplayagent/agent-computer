@@ -1,4 +1,5 @@
 //! Bounded downloads keep control-plane capacity available. No output URL is exposed.
+pub(crate) mod chunks;
 use crate::{error::RequestContext, http::ServiceState, requests};
 use agent_computer_core::identity::ComputerId;
 use agent_computer_objects::{Client, Configuration};
