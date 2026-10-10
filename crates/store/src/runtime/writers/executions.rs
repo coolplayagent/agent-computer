@@ -6,7 +6,7 @@ pub use dispatch::{
     ExecutionCompletion, ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionOutput,
     ExecutionOutputDownload, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRuntimeInputs,
     ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionWatchdogArm, OutputState,
-    OutputStream,
+    OutputStream, QueuedDispatch,
 };
 use serde::{Deserialize, Serialize};
 

@@ -1,0 +1,27 @@
+[Unit]
+Description=Agent Computer bounded execution queue worker
+After=network-online.target agent-computer-csi.service agent-computer-expiry-reaper.service
+Wants=network-online.target
+Requires=agent-computer-csi.service agent-computer-expiry-reaper.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+UMask=0077
+# Operator-owned file supplies ORGANIZATION, DATABASE_URL_FILE and CONFIG_FILE.
+# CONFIG_FILE pins the qualified local node and a single Volume/PVC/PV identity.
+EnvironmentFile=/etc/agent-computer/execution-worker.env
+ExecStart=/usr/local/bin/agent-computer-server execution-worker --database-url-file ${DATABASE_URL_FILE} --organization ${ORGANIZATION} --config-file ${CONFIG_FILE} --concurrency 4 --poll-ms 250
+Restart=on-failure
+RestartSec=2s
+# SIGTERM stops new claims while current jobs seal, publish and conditionally clean up.
+# A stuck process still has fixed independent node watchdog deadlines.
+KillMode=mixed
+TimeoutStopSec=180s
+NoNewPrivileges=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

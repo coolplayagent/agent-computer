@@ -36,4 +36,4 @@ Default tests cover binary and empty streams, WAL recovery, pending publication,
 
 [source-bound component record](../evidence/execution-output-downloads-2026-10-10.json) · [validation log](../evidence/execution-output-downloads-2026-10-10.log)
 
-This is a bounded output-reading capability. Automatic execution dispatch, browser/ComputerView, cross-node fencing and full product acceptance remain unfinished. Public `execution` remains unsupported, Computer `ready=false`, and T01–T43 remain `not_run`.
+This is a bounded output-reading capability. Automatic node-local dispatch is documented in [44](44-queued-execution-worker.md). Browser/ComputerView, cross-node fencing and full product acceptance remain unfinished. Public `execution` remains unsupported, Computer `ready=false`, and T01–T43 remain `not_run`.

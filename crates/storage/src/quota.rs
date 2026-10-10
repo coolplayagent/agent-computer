@@ -20,7 +20,7 @@ pub trait Quota {
     fn ensure(&self, filesystem_uuid: &str, absolute_path: &str, bytes: u64) -> Result<()>;
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct JuiceFsConfig {
     pub executable: PathBuf,

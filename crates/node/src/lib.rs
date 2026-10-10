@@ -20,7 +20,7 @@ pub use termination::{SealEvidence, SealedExecution};
 
 /// Qualified local K3s/containerd/runsc adapter. All paths and hashes are private
 /// operator configuration, never caller-provided runtime API fields.
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Configuration {
     pub node: NodeIdentity,
@@ -28,6 +28,30 @@ pub struct Configuration {
     pub watchdog: Executable,
     pub runtime_socket: PathBuf,
     pub spool: PathBuf,
+}
+
+/// Check local operator bindings before a queue worker consumes any admissions.
+/// Reaper availability and the actual runtime identity still require per-start arming.
+pub fn validate_local_configuration(config: &Configuration) -> Result<()> {
+    if !rustix::process::geteuid().is_root() {
+        return Err(Error::RootRequired);
+    }
+    let boot = std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
+        .map_err(|_| Error::Configuration)?;
+    if config.node.boot_id != boot.trim_end() {
+        return Err(Error::IdentityMismatch);
+    }
+    config.k3s.open()?;
+    config.watchdog.open()?;
+    let spool = command::trusted_file(&config.spool, true)?;
+    if spool.metadata().map_err(|_| Error::Configuration)?.mode() & 0o077 != 0 {
+        return Err(Error::Configuration);
+    }
+    command::trusted_file(
+        config.runtime_socket.parent().ok_or(Error::Configuration)?,
+        true,
+    )?;
+    Ok(())
 }
 
 pub struct CandidateIdentity {

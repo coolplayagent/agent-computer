@@ -11,7 +11,7 @@ pub use executions::{
     ExecutionDispatchIntent, ExecutionLifetime, ExecutionOutput, ExecutionOutputDownload,
     ExecutionPodAttempt, ExecutionPodPlan, ExecutionRequest, ExecutionRuntimeInputs,
     ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionState, ExecutionWatchdogArm,
-    OutputState, OutputStream, SubmitExecution,
+    OutputState, OutputStream, QueuedDispatch, SubmitExecution,
 };
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;

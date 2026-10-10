@@ -4,6 +4,16 @@ topic:
   title: execution
   description: Added by CLI source registration.
 sources:
+- id: accepted-execution-completion
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/42-accepted-execution-completion.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Live pinned process and Candidate IO seals, verified execution outcomes, atomic writer release and historical recovery
 - id: candidate-io-fence
   topic: execution
   kind: doc
@@ -24,6 +34,16 @@ sources:
   status: active
   version: 1
   description: Bounded final-report S3 publication, private retry spool, immutable metadata and observation-only recovery.
+- id: execution-output-downloads
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/43-execution-output-downloads.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authenticated historical stdout and stderr downloads, per-read S3 integrity and current authority checks, bounded HTTP capacity
 - id: fenced-execution-csi
   topic: execution
   kind: doc
@@ -44,6 +64,16 @@ sources:
   status: active
   version: 1
   description: Persistent systemd expiry recovery, immutable enrollment, independent recovery reports and remaining fencing boundaries.
+- id: queued-execution-worker
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/44-queued-execution-worker.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 常驻执行队列原子领取、精确存储身份、有界并发、SIGTERM 排空及重启不重放
 - id: reaper-startup-admission
   topic: execution
   kind: doc
@@ -84,4 +114,7 @@ route:
   - durable-execution-outputs
   - candidate-io-fence
   - fenced-execution-csi
+  - accepted-execution-completion
+  - execution-output-downloads
+  - queued-execution-worker
   fallback: bounded-search

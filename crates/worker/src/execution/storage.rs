@@ -79,3 +79,19 @@ pub(super) async fn fence(
     .await
     .map_err(|_| Error::ReferenceUnavailable)?
 }
+
+/// Configuration preflight only: never prepares or changes a Candidate quota.
+pub(super) fn validate_configuration(config: &crate::candidate::Configuration) -> Result<()> {
+    let t = &config.target;
+    MountedVolume::open(
+        &config.mount_root,
+        &t.volume_path,
+        &t.filesystem_uuid,
+        &t.pvc_uid,
+        t.writer_uid,
+        t.writer_gid,
+    )
+    .map_err(|_| Error::ReferenceUnavailable)?;
+    JuiceFsQuota::new(config.quota.clone()).map_err(|_| Error::ReferenceUnavailable)?;
+    Ok(())
+}

@@ -22,7 +22,11 @@ pub async fn run(
 ) -> Result<(), Failure> {
     let org = OrganizationId::new(*options.get("organization").ok_or_else(usage)?)
         .map_err(|_| usage())?;
-    let id = options.get("execution-id").ok_or_else(usage)?;
+    let id = if command == "execution-worker" {
+        ""
+    } else {
+        options.get("execution-id").ok_or_else(usage)?
+    };
     let config: Configuration = serde_json::from_str(&private_file(
         options.get("config-file").ok_or_else(usage)?,
     )?)
@@ -63,6 +67,54 @@ pub async fn run(
         config.deployment,
     )
     .map_err(|_| failed("Invalid Kubernetes transport or deployment configuration."))?;
+    if command == "execution-worker" {
+        let concurrency = options
+            .get("concurrency")
+            .unwrap_or(&"1")
+            .parse()
+            .map_err(|_| usage())?;
+        let poll_ms = options
+            .get("poll-ms")
+            .unwrap_or(&"250")
+            .parse()
+            .map_err(|_| usage())?;
+        let options =
+            execution::QueueOptions::new(concurrency, std::time::Duration::from_millis(poll_ms))
+                .map_err(|_| usage())?;
+        let mut terminate =
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+                .map_err(|_| failed("Unable to install worker shutdown handler."))?;
+        let shutdown = async move {
+            tokio::select! { _ = tokio::signal::ctrl_c() => {}, _ = terminate.recv() => {} }
+        };
+        // Persisted journals remain authoritative if an operator log is lost.
+        // Output reports omit user stdout/stderr bytes through WorkResult's serde contract.
+        let summary = execution::run_queue(
+            store.clone(),
+            std::sync::Arc::new(client),
+            org,
+            config.execution,
+            options,
+            shutdown,
+            |event| {
+                if let Ok(line) = serde_json::to_string(&event) {
+                    use std::io::Write;
+                    let _ = writeln!(std::io::stdout().lock(), "{line}");
+                }
+            },
+        )
+        .await
+        .map_err(|_| {
+            failed(
+                "Execution queue worker configuration is not ready; no queue replay is permitted.",
+            )
+        })?;
+        println!(
+            "{}",
+            serde_json::json!({"event":"stopped","summary":summary})
+        );
+        return Ok(());
+    }
     let result=if command=="execution-dispatch-once" {
         let revision=options.get("expected-revision").ok_or_else(usage)?.parse().map_err(|_|usage())?;
         execution::execute_once(store,&client,&org,id,revision,config.execution).await

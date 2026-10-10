@@ -11,7 +11,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Executable {
     pub path: PathBuf,

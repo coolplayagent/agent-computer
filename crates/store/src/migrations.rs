@@ -184,6 +184,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0023_execution_completions.sql")),
                     false,
                 ),
+                Migration::new(
+                    24,
+                    Cow::Borrowed("execution queue polling"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0024_execution_queue_poll.sql")),
+                    false,
+                ),
             ])
         })
     }

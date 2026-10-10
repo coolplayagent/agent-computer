@@ -45,6 +45,7 @@
 41. [经 CSI 发布执行文件屏障](zh-CN/41-fenced-execution-csi.md)
 42. [执行完成与写租约释放](zh-CN/42-accepted-execution-completion.md)
 43. [认证后的执行输出下载](zh-CN/43-execution-output-downloads.md)
+44. [常驻执行队列 worker](zh-CN/44-queued-execution-worker.md)
 
 ## 02. English
 
@@ -91,6 +92,7 @@
 41. [Fenced execution mounts through CSI](en/41-fenced-execution-csi.md)
 42. [Accepted execution completion](en/42-accepted-execution-completion.md)
 43. [Authenticated execution output downloads](en/43-execution-output-downloads.md)
+44. [Continuous queued execution worker](en/44-queued-execution-worker.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
