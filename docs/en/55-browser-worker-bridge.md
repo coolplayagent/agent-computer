@@ -34,7 +34,7 @@ The pipe is private to the already admitted controller. Wire IDs do not authenti
 
 Do not treat the driver digest alone as a database identity check. Retain full normalized input and a server-side digest; cross-language JSON numeric encodings may differ. A denied/lost completion acknowledgement produces `recorded: false` and Unknown, blocks new control, and cannot cause a repeat effect. Reconnecting, restarting this executable, changing request IDs or allocating a new action ID does not prove a prior effect was absent. The durable controller must reconcile its original intent and physical runtime before replacing it.
 
-This increment has no PostgreSQL callback adapter, GUI control-epoch implementation, Kubernetes Browser plan/attach adapter or node process guard. Those are mandatory before connecting public App dispatch/Ready. The existing execution node guard requires a Candidate mount and cannot be reused by inventing Candidate identity for a Browser. A Browser needs its own Pod and private profile storage. No fixture callback grants production authority.
+The subsequent [Browser runtime component](56-browser-runtime.md) adds the Rust protocol, separate Kubernetes Pod/attach and Browser node guard. PostgreSQL callbacks, GUI control epochs and production App dispatch/Ready remain pending. No fixture callback grants production authority.
 
 ## Bounds and validation
 

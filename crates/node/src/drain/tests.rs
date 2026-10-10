@@ -40,7 +40,7 @@ fn partial_corrupt_and_foreign_drain_receipts_never_become_proof() {
     std::fs::write(dir.path().join("drain-crashed.pending"), b"{").unwrap();
     assert!(read(&fd, &s["arm"]).unwrap().is_none());
     record(&fd, s.clone()).unwrap();
-    let path = dir.path().join(name(&s["arm"]).unwrap());
+    let path = dir.path().join(name(&s["arm"], Kind::Candidate).unwrap());
     let bytes = std::fs::read(&path).unwrap();
     let mut record: Value = serde_json::from_slice(&bytes).unwrap();
     record["seal"]["domain"] = json!("removed");
@@ -51,7 +51,11 @@ fn partial_corrupt_and_foreign_drain_receipts_never_become_proof() {
     let mut foreign = s["arm"].clone();
     foreign["runtime"]["workspace_mount"]["instance"] = json!("b".repeat(64));
     std::fs::write(&path, &bytes).unwrap();
-    std::fs::rename(&path, dir.path().join(name(&foreign).unwrap())).unwrap();
+    std::fs::rename(
+        &path,
+        dir.path().join(name(&foreign, Kind::Candidate).unwrap()),
+    )
+    .unwrap();
     assert!(read(&fd, &foreign).is_err());
 }
 
@@ -60,7 +64,7 @@ fn drain_reader_rejects_links_devices_oversize_and_public_permissions() {
     let (dir, fd) = fixture();
     let s = seal();
     record(&fd, s.clone()).unwrap();
-    let path = dir.path().join(name(&s["arm"]).unwrap());
+    let path = dir.path().join(name(&s["arm"], Kind::Candidate).unwrap());
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o640)).unwrap();
     assert!(read(&fd, &s["arm"]).is_err());
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
@@ -73,7 +77,7 @@ fn drain_reader_rejects_links_devices_oversize_and_public_permissions() {
     std::fs::remove_file(&path).unwrap();
     fs::mknodat(
         &fd,
-        name(&s["arm"]).unwrap(),
+        name(&s["arm"], Kind::Candidate).unwrap(),
         fs::FileType::Fifo,
         Mode::from_raw_mode(0o600),
         0,
@@ -129,4 +133,57 @@ fn public_drain_recovery_requires_operator_owned_ancestors() {
     // Even a correctly shaped private file below the untrusted test directory
     // cannot be imported as node evidence through the public API.
     assert!(read_recorded_seal(dir.path(), &seal()["arm"]).is_err());
+}
+
+fn browser_stop() -> Value {
+    json!({"version":1,"kind":"browser_process_stop","arm":{"version":2,"observed_boottime_ms":10,"armed":{"request":{"execution_id":"app","boot_id":"boot"}},"runtime":{"kind":"browser","binding":{"scope":{"app_instance_id":"app"}},"identity":{"node":{"boot_id":"boot"}},"profile":{"inode":42,"device":7,"filesystem":0x0102_1994u64}}},"domain":"empty","observed_boottime_ms":20})
+}
+#[test]
+fn browser_stop_is_immutable_and_never_a_candidate_seal() {
+    let (dir, fd) = fixture();
+    let stop = browser_stop();
+    record_browser(&fd, stop.clone()).unwrap();
+    record_browser(&fd, stop.clone()).unwrap();
+    assert_eq!(
+        read_payload(&fd, &stop["arm"], Kind::Browser)
+            .unwrap()
+            .unwrap(),
+        stop
+    );
+    assert!(read(&fd, &stop["arm"]).unwrap().is_none());
+    assert!(record(&fd, stop.clone()).is_err());
+    let mut different = stop.clone();
+    different["domain"] = json!("removed");
+    assert!(record_browser(&fd, different).is_err());
+    assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1);
+    assert!(read_recorded_browser_stop(dir.path(), &stop["arm"]).is_err());
+    // Even a valid hash under the wrong kind's name is not a Candidate proof.
+    std::fs::rename(
+        dir.path().join(name(&stop["arm"], Kind::Browser).unwrap()),
+        dir.path()
+            .join(name(&stop["arm"], Kind::Candidate).unwrap()),
+    )
+    .unwrap();
+    assert!(read(&fd, &stop["arm"]).is_err());
+}
+#[test]
+fn browser_stop_rejects_missing_physical_profile_or_cross_workload_evidence() {
+    let (_dir, fd) = fixture();
+    for (pointer, value) in [
+        ("/kind", json!("candidate")),
+        ("/domain", json!("path_absent")),
+        ("/arm/runtime/kind", json!("candidate")),
+        ("/arm/runtime/profile/inode", json!(0)),
+        ("/arm/runtime/profile/filesystem", json!(0x6573_5546)),
+        ("/arm/runtime/binding/scope/app_instance_id", json!("other")),
+        ("/arm/runtime/identity/node/boot_id", json!("reboot")),
+        ("/observed_boottime_ms", json!(9)),
+    ] {
+        let mut stop = browser_stop();
+        *stop.pointer_mut(pointer).unwrap() = value;
+        assert!(record_browser(&fd, stop).is_err(), "{pointer}");
+    }
+    let mut stop = browser_stop();
+    stop["io"] = json!({"version":1});
+    assert!(record_browser(&fd, stop).is_err());
 }

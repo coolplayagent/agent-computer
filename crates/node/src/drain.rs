@@ -24,6 +24,33 @@ impl RecordedSeal {
     }
 }
 
+/// Browser process-only completion, distinct from a Candidate process/IO seal.
+pub struct RecordedBrowserStop(Value);
+impl RecordedBrowserStop {
+    pub fn evidence(&self) -> &Value {
+        &self.0
+    }
+}
+#[derive(Clone, Copy)]
+enum Kind {
+    Candidate,
+    Browser,
+}
+impl Kind {
+    fn prefix(self) -> &'static str {
+        match self {
+            Self::Candidate => "drain",
+            Self::Browser => "browser-stop",
+        }
+    }
+    fn validate(self, value: &Value) -> Result<()> {
+        match self {
+            Self::Candidate => validate(value),
+            Self::Browser => validate_browser(value),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Record {
@@ -36,8 +63,8 @@ fn hash(value: &Value) -> Result<String> {
     let bytes = serde_json::to_vec(value).map_err(|_| Error::InvalidObservation)?;
     Ok(format!("{:x}", Sha256::digest(bytes)))
 }
-fn name(arm: &Value) -> Result<String> {
-    Ok(format!("drain-{}.json", hash(arm)?))
+fn name(arm: &Value, kind: Kind) -> Result<String> {
+    Ok(format!("{}-{}.json", kind.prefix(), hash(arm)?))
 }
 
 pub(crate) fn open(path: &Path) -> Result<File> {
@@ -57,10 +84,16 @@ pub fn read_recorded_seal(path: &Path, arm: &Value) -> Result<Option<RecordedSea
     read(&open(path)?, arm)
 }
 
+pub fn read_recorded_browser_stop(path: &Path, arm: &Value) -> Result<Option<RecordedBrowserStop>> {
+    Ok(read_payload(&open(path)?, arm, Kind::Browser)?.map(RecordedBrowserStop))
+}
 fn read(directory: &File, arm: &Value) -> Result<Option<RecordedSeal>> {
+    Ok(read_payload(directory, arm, Kind::Candidate)?.map(RecordedSeal))
+}
+fn read_payload(directory: &File, arm: &Value, kind: Kind) -> Result<Option<Value>> {
     let file = match fs::openat(
         directory,
-        name(arm)?,
+        name(arm, kind)?,
         OFlags::RDONLY | OFlags::NOFOLLOW | OFlags::NONBLOCK | OFlags::CLOEXEC,
         Mode::empty(),
     ) {
@@ -92,8 +125,8 @@ fn read(directory: &File, arm: &Value) -> Result<Option<RecordedSeal>> {
     if record.version != 1 || record.seal["arm"] != *arm || record.digest != hash(&record.seal)? {
         return Err(Error::IdentityMismatch);
     }
-    validate(&record.seal)?;
-    Ok(Some(RecordedSeal(record.seal)))
+    kind.validate(&record.seal)?;
+    Ok(Some(record.seal))
 }
 
 fn validate(seal: &Value) -> Result<()> {
@@ -114,12 +147,44 @@ fn validate(seal: &Value) -> Result<()> {
     Ok(())
 }
 
+fn validate_browser(stop: &Value) -> Result<()> {
+    let arm = &stop["arm"];
+    let runtime = &arm["runtime"];
+    let profile = &runtime["profile"];
+    if stop["version"] != 1
+        || stop["kind"] != "browser_process_stop"
+        || arm["version"] != 2
+        || runtime["kind"] != "browser"
+        || !runtime["workspace_mount"].is_null()
+        || !stop["io"].is_null()
+        || !matches!(stop["domain"].as_str(), Some("empty" | "removed"))
+        || profile["inode"].as_u64().is_none_or(|v| v == 0)
+        || profile["device"].as_u64().is_none_or(|v| v == 0)
+        || profile["filesystem"].as_u64() != Some(0x0102_1994)
+        || runtime["binding"]["scope"]["app_instance_id"] != arm["armed"]["request"]["execution_id"]
+        || runtime["identity"]["node"]["boot_id"] != arm["armed"]["request"]["boot_id"]
+        || stop["observed_boottime_ms"]
+            .as_u64()
+            .zip(arm["observed_boottime_ms"].as_u64())
+            .is_none_or(|(a, b)| a < b)
+    {
+        return Err(Error::InvalidObservation);
+    }
+    Ok(())
+}
+
 /// Only termination::seal supplies this input in production. Publish while its
 /// pinned process descriptors and sealed IO gate are still held. A failed write
 /// cannot reopen either gate and cannot produce recovery authority.
 pub(crate) fn record(directory: &File, seal: Value) -> Result<()> {
-    validate(&seal)?;
-    let target = name(&seal["arm"])?;
+    record_payload(directory, seal, Kind::Candidate)
+}
+pub(crate) fn record_browser(directory: &File, stop: Value) -> Result<()> {
+    record_payload(directory, stop, Kind::Browser)
+}
+fn record_payload(directory: &File, seal: Value, kind: Kind) -> Result<()> {
+    kind.validate(&seal)?;
+    let target = name(&seal["arm"], kind)?;
     let record = Record {
         version: 1,
         digest: hash(&seal)?,
@@ -135,7 +200,7 @@ pub(crate) fn record(directory: &File, seal: Value) -> Result<()> {
     File::open("/dev/urandom")
         .and_then(|mut f| f.read_exact(&mut random))
         .map_err(|_| Error::Configuration)?;
-    let pending = format!("drain-{:x}.pending", Sha256::digest(random));
+    let pending = format!("{}-{:x}.pending", kind.prefix(), Sha256::digest(random));
     let mut file = File::from(
         fs::openat(
             directory,
@@ -158,7 +223,9 @@ pub(crate) fn record(directory: &File, seal: Value) -> Result<()> {
         ) {
             Ok(()) => {}
             Err(rustix::io::Errno::EXIST) => {
-                if read(directory, &record.seal["arm"])?.is_none_or(|r| r.0 != record.seal) {
+                if read_payload(directory, &record.seal["arm"], kind)?
+                    .is_none_or(|r| r != record.seal)
+                {
                     return Err(Error::IdentityMismatch);
                 }
             }

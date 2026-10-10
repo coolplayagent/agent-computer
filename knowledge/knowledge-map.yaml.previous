@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 76
-updated_at: unix:1791665910
+map_version: 78
+updated_at: unix:1791671229
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -171,11 +171,13 @@ topics:
   source_ids:
   - app-admission
   - browser-driver
+  - browser-runtime-components
+  - browser-worker-bridge
   - checkpoint-stop-drain
   - checkpoint-stop-worker
   - continuous-candidate-preparation
-  ref: topics/topic-d92c6a81b2ff5009-d352ad1bf0f9e104eaa0143aa79a226375588b7e61200454cb380f109644f360.yaml
-  digest: d352ad1bf0f9e104eaa0143aa79a226375588b7e61200454cb380f109644f360
+  ref: topics/topic-d92c6a81b2ff5009-d99e530b75b99a18c075a1d608c574708e78db104548162232ac572a85df7e3f.yaml
+  digest: d99e530b75b99a18c075a1d608c574708e78db104548162232ac572a85df7e3f
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -184,16 +186,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 60
+  omitted_through: 62
   recent:
-  - version: 61
-    action: source.add
-    actor: cli
-    summary: Added source 'artifact-candidate-continuation' to topic 'development'.
-  - version: 62
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-io-fence' to topic 'execution'.
   - version: 63
     action: source.add
     actor: cli
@@ -250,3 +244,11 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'app-admission' to topic 'runtime'.
+  - version: 77
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-worker-bridge' to topic 'runtime'.
+  - version: 78
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-runtime-components' to topic 'runtime'.

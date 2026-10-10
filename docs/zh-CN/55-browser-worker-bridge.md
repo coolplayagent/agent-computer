@@ -34,7 +34,7 @@ Worker 的 `callback` 含 version/session/request ID、递增 callback_id、meth
 
 不能只信任驱动摘要：应保留完整规范化输入和服务端独立摘要，跨语言 JSON 数值编码可能不同。Complete 应答拒绝或丢失会返回 recorded=false、Unknown 并阻止新控制，不重复效果。重连、重启进程、更换请求或动作 ID 都不证明旧效果未发生；持久控制器须对账原 intent 和原物理实例。
 
-本次尚无 PostgreSQL 回调适配器、GUI control epoch、Kubernetes Browser Pod/attach 适配器及节点进程保护，这些接通前不能开放 App 派发/Ready。现有执行节点保护依赖 Candidate 挂载，不能伪造 Candidate 身份用于 Browser；Browser 需要独立 Pod 和私有 profile。测试回调不构成生产授权。
+后续 [Browser 运行时组件](56-browser-runtime.md)已提供 Rust 协议、独立 Kubernetes Pod/attach 和 Browser 节点保护；PostgreSQL 回调、GUI control epoch 及生产 App 派发/Ready 仍待接入。测试回调不构成生产授权。
 
 ## 边界与验证
 

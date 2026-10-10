@@ -100,7 +100,7 @@ impl EphemeralSandboxPlan {
         }))
         .map_err(|_| Error::InvalidIdentity)?;
         let cpu = cpu_quantity(sandbox.resources.cpu_millis);
-        let memory = format!("{}Mi", sandbox.resources.memory_mi_b);
+        let memory = memory_quantity(sandbox.resources.memory_mi_b);
         let pod = json!({
             "apiVersion": "v1", "kind": "Pod",
             "metadata": {"name": name, "namespace": namespace,
@@ -157,6 +157,17 @@ fn cpu_quantity(millis: u32) -> String {
     }
 }
 
+// Kubernetes canonicalizes binary quantities on readback (4096Mi -> 4Gi).
+// Emit that representation so exact verification preserves the numeric limit.
+fn memory_quantity(mib: u32) -> String {
+    for (unit, factor) in [("Pi", 1_073_741_824), ("Ti", 1_048_576), ("Gi", 1024)] {
+        if mib.is_multiple_of(factor) {
+            return format!("{}{unit}", mib / factor);
+        }
+    }
+    format!("{mib}Mi")
+}
+
 pub(crate) fn opaque(value: &str) -> bool {
     !value.is_empty()
         && value.len() <= 128
@@ -172,4 +183,20 @@ pub(crate) fn dns_label(value: &str) -> bool {
         && end(value.as_bytes()[0])
         && end(value.as_bytes()[value.len() - 1])
         && value.bytes().all(|b| end(b) || b == b'-')
+}
+
+#[cfg(test)]
+mod quantity_tests {
+    #[test]
+    fn binary_memory_quantities_use_exact_kubernetes_canonical_units() {
+        for (mib, expected) in [
+            (256, "256Mi"),
+            (4096, "4Gi"),
+            (4097, "4097Mi"),
+            (1_048_576, "1Ti"),
+            (1_073_741_824, "1Pi"),
+        ] {
+            assert_eq!(super::memory_quantity(mib), expected);
+        }
+    }
 }

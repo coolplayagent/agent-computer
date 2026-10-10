@@ -3,6 +3,18 @@
 version = 4
 
 [[package]]
+name = "agent-computer-browser"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "agent-computer-cli"
 version = "0.1.0"
 dependencies = [
@@ -77,6 +89,7 @@ dependencies = [
 name = "agent-computer-kubernetes"
 version = "0.1.0"
 dependencies = [
+ "agent-computer-browser",
  "agent-computer-definitions",
  "agent-computer-fence",
  "agent-computer-sandbox",
@@ -95,6 +108,8 @@ dependencies = [
 name = "agent-computer-node"
 version = "0.1.0"
 dependencies = [
+ "agent-computer-browser",
+ "agent-computer-definitions",
  "agent-computer-fence",
  "agent-computer-kubernetes",
  "agent-computer-watchdog",
@@ -103,6 +118,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "tempfile",
+ "tokio",
 ]
 
 [[package]]

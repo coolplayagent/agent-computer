@@ -24,9 +24,9 @@ pub struct ArmedReceipt {
 }
 
 #[derive(Debug, Serialize)]
-pub struct Evidence {
+pub struct Evidence<R = RuntimeObservation> {
     pub version: u8,
-    pub runtime: RuntimeObservation,
+    pub runtime: R,
     pub armed: ArmedReceipt,
     pub backup_armed: ArmedReceipt,
     pub watchdog_pids: [u32; 2],
@@ -38,8 +38,8 @@ pub struct Evidence {
 /// Dropping it detaches the children. Fixed guards keep their original deadline;
 /// renewable guards terminate when their control pipes close.
 #[derive(Debug)]
-pub struct ArmedGuard {
-    evidence: Evidence,
+pub struct ArmedGuard<R = RuntimeObservation> {
+    evidence: Evidence<R>,
     children: [DetachedChild; 2],
     stdout: [ChildStdout; 2],
     stdin: [Option<ChildStdin>; 2],
@@ -49,8 +49,8 @@ pub struct ArmedGuard {
     pub(super) termination: crate::termination::ProcessDomain,
     pub(super) drain_spool: File,
 }
-impl ArmedGuard {
-    pub fn evidence(&self) -> &Evidence {
+impl<R> ArmedGuard<R> {
+    pub fn evidence(&self) -> &Evidence<R> {
         &self.evidence
     }
     pub fn remaining_budget_ms(&mut self) -> Result<u32> {
@@ -202,14 +202,14 @@ impl Drop for DetachedChild {
     }
 }
 
-pub(crate) fn launch(
+pub(crate) fn launch<R>(
     executable: &File,
     spool: &std::path::Path,
     request: Request,
-    runtime: RuntimeObservation,
+    runtime: R,
     deadline: Instant,
     termination: crate::termination::ProcessDomain,
-) -> Result<ArmedGuard> {
+) -> Result<ArmedGuard<R>> {
     let drain_spool = crate::drain::open(spool)?;
     let [
         (armed, primary, primary_stdout, primary_stdin),

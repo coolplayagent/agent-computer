@@ -1,23 +1,26 @@
 //! Trusted local node adapter. Tenant input cannot select binaries, paths or IDs.
 #![forbid(unsafe_code)]
+mod browser;
 mod command;
+pub use browser::{
+    BrowserGuard, BrowserRuntimeObservation, BrowserStopEvidence, PrivateProfile, StoppedBrowser,
+    arm_browser,
+};
 mod drain;
+pub use drain::{RecordedBrowserStop, read_recorded_browser_stop};
 pub use drain::{RecordedSeal, read_recorded_seal};
 mod guard;
 mod journals;
 pub use journals::{JournalObservations, JournalStatus, observe_journals};
 mod observation;
+mod runtime;
 mod termination;
 use agent_computer_kubernetes::{NodeIdentity, PodRuntimeIdentity};
-use agent_computer_watchdog::{Request, boottime_ms};
+use agent_computer_watchdog::Request;
 pub use command::Executable;
 pub use guard::{ArmedGuard, Evidence};
 use serde::Deserialize;
-use std::{
-    os::unix::fs::MetadataExt,
-    path::PathBuf,
-    time::{Duration, Instant},
-};
+use std::{os::unix::fs::MetadataExt, path::PathBuf};
 pub use termination::{SealEvidence, SealedExecution};
 
 /// Qualified local K3s/containerd/runsc adapter. All paths and hashes are private
@@ -121,83 +124,8 @@ fn arm_inner(
     fence: Option<&agent_computer_fence::MountedFence>,
 ) -> Result<ArmedGuard> {
     let deadline_boottime_ms = lease.deadline_boottime_ms;
-    if !rustix::process::geteuid().is_root() {
-        return Err(Error::RootRequired);
-    }
-    let boot = std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
-        .map_err(|_| Error::Configuration)?;
-    if &config.node != identity.node() || config.node.boot_id != boot.trim_end() {
-        return Err(Error::IdentityMismatch);
-    }
-    let budget = deadline_boottime_ms.saturating_sub(boottime_ms());
-    if budget == 0 || budget > 30000 {
-        return Err(Error::Deadline);
-    }
-    let deadline = Instant::now() + Duration::from_millis(budget.min(10_000));
-    let k3s = config.k3s.open()?;
-    let watchdog = config.watchdog.open()?;
-    let spool = command::trusted_file(&config.spool, true)?;
-    if spool.metadata().map_err(|_| Error::Configuration)?.mode() & 0o077 != 0 {
-        return Err(Error::Configuration);
-    }
-    let socket = config.runtime_socket.to_str().ok_or(Error::Configuration)?;
-    let parent = config.runtime_socket.parent().ok_or(Error::Configuration)?;
-    command::trusted_file(parent, true)?;
-    let metadata =
-        std::fs::symlink_metadata(&config.runtime_socket).map_err(|_| Error::Configuration)?;
-    use std::os::unix::fs::FileTypeExt;
-    if !metadata.file_type().is_socket()
-        || metadata.uid() != 0
-        || metadata.gid() != 0
-        || metadata.mode() & 0o007 != 0
-    {
-        return Err(Error::Configuration);
-    }
-    let endpoint = format!("unix://{socket}");
-    let container = command::read_json(
-        &k3s,
-        "k3s",
-        &[
-            "crictl",
-            "--runtime-endpoint",
-            &endpoint,
-            "--timeout",
-            "3s",
-            "inspect",
-            identity.container_id(),
-        ],
-        deadline,
-    )?;
-    let sid = observation::sandbox_id(&container)?;
-    let sandbox = command::read_json(
-        &k3s,
-        "k3s",
-        &[
-            "crictl",
-            "--runtime-endpoint",
-            &endpoint,
-            "--timeout",
-            "3s",
-            "inspectp",
-            sid,
-        ],
-        deadline,
-    )?;
-    let metadata = command::read_json(
-        &k3s,
-        "k3s",
-        &[
-            "ctr",
-            "--address",
-            socket,
-            "--namespace",
-            "k8s.io",
-            "containers",
-            "info",
-            identity.container_id(),
-        ],
-        deadline,
-    )?;
+    let readback = runtime::read(config, &identity, deadline_boottime_ms)?;
+    let deadline = readback.deadline;
     if candidate.volume_path.is_empty()
         || candidate.volume_path.len() > 128
         || !candidate
@@ -211,9 +139,9 @@ fn arm_inner(
         &identity,
         command,
         &candidate.volume_path,
-        &container,
-        &sandbox,
-        &metadata,
+        &readback.container,
+        &readback.sandbox,
+        &readback.metadata,
         fence.is_some(),
     )
     .map_err(|_| Error::RuntimeBinding)?;
@@ -231,7 +159,7 @@ fn arm_inner(
     let mount = std::fs::File::from(
         rustix::fs::openat2(
             rustix::fs::CWD,
-            &fields.workspace,
+            &fields.mount_source,
             rustix::fs::OFlags::RDONLY
                 | rustix::fs::OFlags::DIRECTORY
                 | rustix::fs::OFlags::CLOEXEC,
@@ -292,10 +220,11 @@ fn arm_inner(
     let termination = termination::ProcessDomain::pin(
         &request,
         group.metadata().map_err(|_| Error::ProcessBinding)?.dev(),
-        &runtime,
+        &runtime.runtime_processes,
+        &runtime.sandbox_id,
     )?;
     guard::launch(
-        &watchdog,
+        &readback.watchdog,
         &config.spool,
         request,
         runtime,
@@ -312,6 +241,7 @@ pub enum Error {
     RuntimeBinding,
     ProcessBinding,
     WorkspaceBinding,
+    ProfileBinding,
     RuntimeUnavailable,
     InvalidObservation,
     ResponseLimit,

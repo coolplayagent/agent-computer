@@ -29,7 +29,7 @@ pub(crate) struct RuntimeFields {
     pub sandbox: String,
     pub pid: u32,
     pub parent: String,
-    pub workspace: String,
+    pub mount_source: String,
 }
 
 pub(crate) fn hex_id(value: &str) -> bool {
@@ -107,6 +107,54 @@ fn parse(
     sandbox: &Value,
     metadata: &Value,
     fenced: bool,
+) -> Result<RuntimeFields> {
+    parse_mount(
+        id,
+        command,
+        Mount::Workspace {
+            volume_path,
+            fenced,
+        },
+        container,
+        sandbox,
+        metadata,
+    )
+}
+
+enum Mount<'a> {
+    Workspace { volume_path: &'a str, fenced: bool },
+    BrowserProfile,
+}
+
+pub(crate) fn browser_fields(
+    id: &PodRuntimeIdentity,
+    command: &Value,
+    container: &Value,
+    sandbox: &Value,
+    metadata: &Value,
+) -> Result<RuntimeFields> {
+    parse_mount(
+        &Identity {
+            namespace: id.namespace(),
+            pod: id.pod_name(),
+            uid: id.pod_uid(),
+            container: id.container_id(),
+        },
+        command,
+        Mount::BrowserProfile,
+        container,
+        sandbox,
+        metadata,
+    )
+}
+
+fn parse_mount(
+    id: &Identity<'_>,
+    command: &Value,
+    mount: Mount<'_>,
+    container: &Value,
+    sandbox: &Value,
+    metadata: &Value,
 ) -> Result<RuntimeFields> {
     let sid = sandbox_id(container)?;
     let labels = container
@@ -202,9 +250,18 @@ fn parse(
         }
     }
     let mounts = spec["mounts"].as_array().ok_or(Error::InvalidObservation)?;
+    let destination = match mount {
+        Mount::Workspace { .. } => "/workspace",
+        Mount::BrowserProfile => "/browser-state",
+    };
+    if matches!(mount, Mount::BrowserProfile)
+        && mounts.iter().any(|m| m["destination"] == "/workspace")
+    {
+        return Err(Error::IdentityMismatch);
+    }
     let workspace: Vec<_> = mounts
         .iter()
-        .filter(|m| m["destination"] == "/workspace")
+        .filter(|m| m["destination"] == destination)
         .collect();
     if workspace.len() != 1 || workspace[0]["type"] != "bind" {
         return Err(Error::IdentityMismatch);
@@ -212,16 +269,22 @@ fn parse(
     let source = workspace[0]["source"]
         .as_str()
         .ok_or(Error::InvalidObservation)?;
-    let expected = if fenced {
-        format!(
+    let expected = match mount {
+        Mount::Workspace { fenced: true, .. } => format!(
             "/var/lib/kubelet/pods/{}/volumes/kubernetes.io~csi/workspace/mount",
             id.pod_uid()
-        )
-    } else {
-        format!(
+        ),
+        Mount::Workspace {
+            volume_path,
+            fenced: false,
+        } => format!(
             "/var/lib/kubelet/pods/{}/volume-subpaths/{volume_path}/sandbox/2",
             id.pod_uid()
-        )
+        ),
+        Mount::BrowserProfile => format!(
+            "/var/lib/kubelet/pods/{}/volume-subpaths/browser-profile/sandbox/2",
+            id.pod_uid()
+        ),
     };
     if source != expected {
         return Err(Error::IdentityMismatch);
@@ -236,7 +299,7 @@ fn parse(
         sandbox: sid.into(),
         pid: pid as u32,
         parent: parent[1..].into(),
-        workspace: source.into(),
+        mount_source: source.into(),
     })
 }
 
@@ -397,6 +460,73 @@ mod tests {
         ));
         assert!(parse(&id, &command, "pvc-id", &fenced, &sandbox, &metadata, true).is_ok());
         assert!(parse(&id, &command, "pvc-id", &fenced, &sandbox, &metadata, false).is_err());
+        let mut browser = container.clone();
+        browser["info"]["runtimeSpec"]["mounts"][0]["destination"] = json!("/browser-state");
+        browser["info"]["runtimeSpec"]["mounts"][0]["source"] = json!(format!(
+            "/var/lib/kubelet/pods/{uid}/volume-subpaths/browser-profile/sandbox/2"
+        ));
+        assert!(
+            parse_mount(
+                &id,
+                &command,
+                Mount::BrowserProfile,
+                &browser,
+                &sandbox,
+                &metadata
+            )
+            .is_ok()
+        );
+        assert!(
+            parse(
+                &id, &command, "pvc-id", &browser, &sandbox, &metadata, false
+            )
+            .is_err()
+        );
+        for (pointer, value) in [
+            (
+                "/info/runtimeSpec/mounts/0/source",
+                json!(format!(
+                    "/var/lib/kubelet/pods/{uid}/volumes/kubernetes.io~empty-dir/browser-profile"
+                )),
+            ),
+            ("/info/runtimeSpec/mounts/0/options", json!(["ro"])),
+            (
+                "/info/runtimeSpec/mounts/0/destination",
+                json!("/workspace"),
+            ),
+            ("/info/runtimeType", json!("io.containerd.runc.v2")),
+            ("/info/runtimeSpec/process/user/uid", json!(0)),
+        ] {
+            let mut changed = browser.clone();
+            *changed.pointer_mut(pointer).unwrap() = value;
+            assert!(
+                parse_mount(
+                    &id,
+                    &command,
+                    Mount::BrowserProfile,
+                    &changed,
+                    &sandbox,
+                    &metadata
+                )
+                .is_err(),
+                "{pointer}"
+            );
+        }
+        browser["info"]["runtimeSpec"]["mounts"]
+            .as_array_mut()
+            .unwrap()
+            .push(container["info"]["runtimeSpec"]["mounts"][0].clone());
+        assert!(
+            parse_mount(
+                &id,
+                &command,
+                Mount::BrowserProfile,
+                &browser,
+                &sandbox,
+                &metadata
+            )
+            .is_err()
+        );
         for (pointer, value) in [
             ("/status/id", json!("c".repeat(64))),
             ("/status/labels/io.kubernetes.pod.uid", json!("replacement")),

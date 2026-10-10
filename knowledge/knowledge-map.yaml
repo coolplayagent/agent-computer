@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 77
-updated_at: unix:1791668390
+map_version: 79
+updated_at: unix:1791672009
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -55,8 +55,9 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - agent-computer-acceptance
-  ref: topics/topic-c1514c6cdad166c1-aa8b51e876c034f3be7c3b0d216be1372607c013f62419877d19f57fbb604413.yaml
-  digest: aa8b51e876c034f3be7c3b0d216be1372607c013f62419877d19f57fbb604413
+  - browser-runtime-component-evidence
+  ref: topics/topic-c1514c6cdad166c1-092c5eb676629b54100e6da6423afe3cb81196bba783dce58838734c983a870a.yaml
+  digest: 092c5eb676629b54100e6da6423afe3cb81196bba783dce58838734c983a870a
 - id: api
   title: api
   description: Added by CLI source registration.
@@ -171,12 +172,13 @@ topics:
   source_ids:
   - app-admission
   - browser-driver
+  - browser-runtime-components
   - browser-worker-bridge
   - checkpoint-stop-drain
   - checkpoint-stop-worker
   - continuous-candidate-preparation
-  ref: topics/topic-d92c6a81b2ff5009-c676925af88c1b1e36fe9b146155a39441756c98b361375c90fd461599eee82d.yaml
-  digest: c676925af88c1b1e36fe9b146155a39441756c98b361375c90fd461599eee82d
+  ref: topics/topic-d92c6a81b2ff5009-d99e530b75b99a18c075a1d608c574708e78db104548162232ac572a85df7e3f.yaml
+  digest: d99e530b75b99a18c075a1d608c574708e78db104548162232ac572a85df7e3f
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -185,16 +187,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 61
+  omitted_through: 63
   recent:
-  - version: 62
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-io-fence' to topic 'execution'.
-  - version: 63
-    action: source.add
-    actor: cli
-    summary: Added source 'fenced-execution-csi' to topic 'execution'.
   - version: 64
     action: source.add
     actor: cli
@@ -251,3 +245,11 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'browser-worker-bridge' to topic 'runtime'.
+  - version: 78
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-runtime-components' to topic 'runtime'.
+  - version: 79
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-runtime-component-evidence' to topic 'acceptance'.

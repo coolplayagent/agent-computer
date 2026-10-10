@@ -1,6 +1,6 @@
 //! Completion authority combines the original kernel identities with a live
 //! Candidate IO seal. Serialized metadata cannot recreate any of these handles.
-use crate::{ArmedGuard, Error, Result, observation::RuntimeObservation};
+use crate::{ArmedGuard, Error, Result, observation::ProcessIdentity};
 use agent_computer_fence::{MountedFence, SealedFence};
 use agent_computer_watchdog::{
     Request, boottime_ms,
@@ -19,17 +19,22 @@ pub(super) struct ProcessDomain {
     processes: Vec<OwnedFd>,
 }
 impl ProcessDomain {
-    pub fn pin(request: &Request, device: u64, runtime: &RuntimeObservation) -> Result<Self> {
-        if runtime.runtime_processes.is_empty() || runtime.runtime_processes.len() > 32 {
+    pub fn pin(
+        request: &Request,
+        device: u64,
+        runtime_processes: &[ProcessIdentity],
+        sandbox_id: &str,
+    ) -> Result<Self> {
+        if runtime_processes.is_empty() || runtime_processes.len() > 32 {
             return Err(Error::ProcessBinding);
         }
         let group = PinnedDomain::pin(request, device).map_err(|_| Error::ProcessBinding)?;
         let membership = format!(
             "0::/{}/cri-containerd-{}.scope\n",
-            runtime.cgroup_path, runtime.sandbox_id
+            request.cgroup_path, sandbox_id
         );
         let mut processes = Vec::new();
-        for process in &runtime.runtime_processes {
+        for process in runtime_processes {
             let pid = i32::try_from(process.pid)
                 .ok()
                 .and_then(Pid::from_raw)
@@ -48,7 +53,7 @@ impl ProcessDomain {
         }
         Ok(Self { group, processes })
     }
-    fn stopped(&self) -> Result<EmptyDomain> {
+    pub(super) fn stopped(&self) -> Result<EmptyDomain> {
         let observed = self
             .group
             .observe_empty()
@@ -61,7 +66,7 @@ impl ProcessDomain {
         }
         Ok(observed)
     }
-    fn terminate(&self) -> Result<EmptyDomain> {
+    pub(super) fn terminate(&self) -> Result<EmptyDomain> {
         self.group
             .terminate()
             .map_err(|_| Error::TerminationUnconfirmed)?;
@@ -155,13 +160,15 @@ impl SealedExecution {
         }
     }
 }
-impl ArmedGuard {
+impl<R> ArmedGuard<R> {
     /// Read-only observation of the original pinned cgroup and every runtime
     /// pidfd. This allows receiving a buffered report after normal process exit;
     /// it grants no execution/renewal authority and does not replace an IO seal.
     pub fn process_termination_observed(&self) -> bool {
         self.termination.stopped().is_ok()
     }
+}
+impl ArmedGuard {
     /// Stop the admitted workload and join accepted Candidate mutations. The
     /// independent timers remain armed, including after any intermediate error.
     pub fn seal(self, fence: &MountedFence) -> Result<SealedExecution> {
