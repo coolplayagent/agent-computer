@@ -1,6 +1,6 @@
 //! Atomic publication of a live process/IO seal, accepted outcome and writer drain.
 use super::*;
-use agent_computer_node::SealedExecution;
+use agent_computer_node::{RecordedSeal, SealedExecution};
 use agent_computer_sandbox::Outcome;
 use serde_json::json;
 
@@ -68,11 +68,37 @@ impl Store {
         attempt: &ExecutionDispatchAttempt,
         sealed: &SealedExecution,
     ) -> Result<ExecutionCompletion> {
-        let original = attempt.intent();
-        let org = original.organization.as_str();
-        let id = original.execution.execution_id.as_str();
         let seal =
             serde_json::to_value(sealed.evidence()).map_err(|_| Error::InvalidReconcileResult)?;
+        self.finish_execution_seal(
+            &attempt.intent().organization,
+            &attempt.intent().execution.execution_id,
+            seal,
+            Some(attempt),
+        )
+        .await
+    }
+
+    /// Publish a node's durable receipt after the original execution window has
+    /// closed. Recovery never accepts success/failure or recreates authority.
+    pub async fn recover_candidate_execution_completion(
+        &self,
+        org: &OrganizationId,
+        id: &str,
+        sealed: &RecordedSeal,
+    ) -> Result<ExecutionCompletion> {
+        valid_id(id)?;
+        self.finish_execution_seal(org.as_str(), id, sealed.evidence().clone(), None)
+            .await
+    }
+
+    async fn finish_execution_seal(
+        &self,
+        org: &str,
+        id: &str,
+        seal: serde_json::Value,
+        attempt: Option<&ExecutionDispatchAttempt>,
+    ) -> Result<ExecutionCompletion> {
         let seal_digest = digest("agent-computer/execution-seal-v1", &seal)?;
         let mut tx = self.pool.begin().await?;
         let seq = Self::lock_stream(&mut tx, org).await?;
@@ -82,7 +108,7 @@ impl Store {
             .await?
             .ok_or(Error::InvalidReconcileResult)?;
         let mount = &arm.evidence["runtime"]["workspace_mount"];
-        if dispatch.intent_digest != original.intent_digest
+        if attempt.is_some_and(|a| dispatch.intent_digest != a.intent().intent_digest)
             || seal["arm"] != arm.evidence
             || mount.is_null()
             || seal["io"]["instance"] != mount["instance"]
@@ -103,6 +129,16 @@ impl Store {
             ExecutionState::Dispatching | ExecutionState::CancelRequested | ExecutionState::Unknown
         ) {
             return Err(Error::RuntimeConflict);
+        }
+        if attempt.is_none() {
+            // Include pending renewals: an unacknowledged node grant may already
+            // have extended physical execution. Never race its original worker.
+            let latest: Option<i64> = sqlx::query_scalar("SELECT MAX(deadline_at_ms) FROM execution_renewal_grants WHERE organization=$1 AND execution_id=$2")
+                .bind(org).bind(id).fetch_one(&mut *tx).await?;
+            if transactions::now(&mut tx).await? < dispatch.deadline_at_ms.max(latest.unwrap_or(0))
+            {
+                return Err(Error::WriterLeaseInactive);
+            }
         }
         let lease = authority::row(&mut tx, org, &dispatch.execution.lease_id).await?;
         let renewal = super::renewal::latest_ack(&mut tx, &dispatch).await?;
@@ -127,7 +163,7 @@ impl Store {
             && seal["renewals"] == confirmed_renewal
             && authority::active(&mut tx, org, &lease).await?
             && transactions::now(&mut tx).await? < effective_deadline
-            && attempt.remaining_budget_ms().is_ok();
+            && attempt.is_some_and(|a| a.remaining_budget_ms().is_ok());
         let output = outputs::verified_outcome(&mut tx, &dispatch, &arm).await?;
         let accepted = outcome(
             dispatch.execution.state,
@@ -155,7 +191,7 @@ impl Store {
         if matches!(accepted, ExecutionState::Succeeded | ExecutionState::Failed)
             && (!authority::active(&mut tx, org, &lease).await?
                 || transactions::now(&mut tx).await? >= effective_deadline
-                || attempt.remaining_budget_ms().is_err())
+                || attempt.is_none_or(|a| a.remaining_budget_ms().is_err()))
         {
             return Err(Error::WriterLeaseInactive);
         }

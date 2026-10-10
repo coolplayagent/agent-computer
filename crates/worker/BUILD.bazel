@@ -31,7 +31,7 @@ rust_test(
 rust_test(
     name = "execution_worker_live_test",
     size = "large",
-    srcs = ["tests/execution_live.rs", "tests/support/execution_faults.rs", "tests/support/execution_outputs.rs", "tests/support/output_http.rs", "tests/support/execution_queue.rs", "tests/support/execution_checkpoint.rs", "tests/support/execution_background.rs", "tests/support/execution_renewal.rs", "tests/support/execution_streaming.rs"],
+    srcs = ["tests/execution_live.rs", "tests/support/execution_faults.rs", "tests/support/execution_outputs.rs", "tests/support/output_http.rs", "tests/support/execution_queue.rs", "tests/support/execution_checkpoint.rs", "tests/support/execution_background.rs", "tests/support/execution_renewal.rs", "tests/support/execution_streaming.rs", "tests/support/execution_drain.rs"],
     crate_root = "tests/execution_live.rs",
     tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
     edition = "2024",

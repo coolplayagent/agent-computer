@@ -42,3 +42,5 @@ The default suite covers SQL binding rejection, atomic release, explicit cancell
 Evidence is collected separately from the controller using SQL records, signed S3 reads and a fresh read-only JuiceFS client. Component evidence does not establish full Computer product acceptance.
 
 [component record](../evidence/accepted-execution-completion-2026-10-10.json) · [logs](../evidence/accepted-execution-completion-2026-10-10.log)
+
+[51 Durable drain recovery](51-durable-drain-recovery.md) adds automatic publication of original node seals after controller loss. Pre-seal loss and unresolved outcomes remain blocked; this does not complete general drain recovery or cross-node fencing.

@@ -35,3 +35,5 @@ Explicit cancellation and durable Draining are implemented; original process/IO 
 [48 Bounded background execution](48-background-execution.md) adds a default background lifetime while preserving the original fixed deadlines and identity requirements.
 
 [49 Renewable execution leases](49-renewable-execution-leases.md) implements running-phase renewals across the Store, attach channel, supervisor and original dual guards, with an immutable hard ceiling. [Source-bound evidence](../evidence/renewable-execution-leases-2026-10-10.json) records 25 real execution cases and eight node renewal cases.
+
+[51 Durable drain recovery](51-durable-drain-recovery.md) adds automatic publication of original node seals after controller loss. Pre-seal loss and unresolved outcomes remain blocked; this does not complete general drain recovery or cross-node fencing.

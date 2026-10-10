@@ -31,6 +31,12 @@ pub async fn run(
         options.get("config-file").ok_or_else(usage)?,
     )?)
     .map_err(|_| failed("Invalid private execution worker configuration."))?;
+    if command == "execution-completion-recover" {
+        let receipt = execution::recover_completion(store, &org, id, &config.execution.node.spool).await
+            .map_err(|_| failed("Drain publication remains unconfirmed; retain the original node spool. No execution was dispatched."))?;
+        println!("{}", serde_json::json!({"completion":receipt}));
+        return Ok(());
+    }
     if matches!(
         command,
         "execution-output-recover" | "execution-output-chunks-recover" | "execution-output-read"

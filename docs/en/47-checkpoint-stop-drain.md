@@ -34,3 +34,5 @@ Database and HTTP regressions cover atomic cancellation and outbox rollback, WAL
 [Source-bound record](../evidence/checkpoint-stop-drain-2026-10-10.json) · [Validation log](../evidence/checkpoint-stop-drain-2026-10-10.log)
 
 Evidence covers one node and the integrated execution path. General process draining, automatic recovery after controller loss, cross-node fencing, App/browser checkpointing, GC and full lifecycle scheduling remain incomplete. Computer ready=false, public execution remains unsupported, and T01–T43 product acceptance is unchanged.
+
+[51 Durable drain recovery](51-durable-drain-recovery.md) adds automatic publication of original node seals after controller loss. Pre-seal loss and unresolved outcomes remain blocked; this does not complete general drain recovery or cross-node fencing.

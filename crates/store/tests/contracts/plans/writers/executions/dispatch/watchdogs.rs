@@ -84,7 +84,7 @@ async fn fixture_with_output_policy(
         )
         .unwrap();
         binding["workspace"]["fence"] =
-            json!({"mount":mount,"node":{"uid":"node-one","boot_id":"boot-one"}});
+            json!({"mount":mount,"node":{"name":"node-one","uid":"node-one","boot_id":"boot-one"}});
         manifest["metadata"]["annotations"]["agent-computer.io/binding"] =
             json!(binding.to_string());
         db.store
@@ -109,7 +109,7 @@ async fn fixture_with_output_policy(
             .fetch_one(&db.pool)
             .await
             .unwrap();
-    let mut evidence = json!({"runtime":{"identity":{"pod_uid":"pod-one","node":{"uid":"node-one","boot_id":"boot-one"},"container_id":"a".repeat(64)},"cgroup_inode":123,"cgroup_path":"fixture-only"},"armed":{"version":1,"event":"armed","request":{"execution_id":queued.execution_id,"boot_id":"boot-one","cgroup_inode":123,"cgroup_path":"fixture-only"}}});
+    let mut evidence = json!({"runtime":{"identity":{"pod_uid":"pod-one","node":{"name":"node-one","uid":"node-one","boot_id":"boot-one"},"container_id":"a".repeat(64)},"cgroup_inode":123,"cgroup_path":"fixture-only"},"armed":{"version":1,"event":"armed","request":{"execution_id":queued.execution_id,"boot_id":"boot-one","cgroup_inode":123,"cgroup_path":"fixture-only"}}});
     evidence["version"] = json!(2);
     evidence["armed"]["request"]["version"] = json!(1);
     if fenced {

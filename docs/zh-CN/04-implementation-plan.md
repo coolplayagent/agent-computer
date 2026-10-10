@@ -35,3 +35,5 @@
 [48 有界后台执行](48-background-execution.md)增加默认后台 lifetime，仍保留原固定期限与身份要求。
 
 [49 可续期执行租约](49-renewable-execution-leases.md)贯通 Store、attach、监督器与原双 guard 的运行期续约，并保留不可变硬上限。[固定源码证据](../evidence/renewable-execution-leases-2026-10-10.json)记录 25 个真实执行场景和八个节点续约场景。
+
+[51 持久排空恢复](51-durable-drain-recovery.md)新增控制器丢失后自动补交原节点已完成的封闭回执。封闭前丢失和未知结果仍保持阻塞，尚不代表通用排空恢复或跨节点 fencing 已完成。

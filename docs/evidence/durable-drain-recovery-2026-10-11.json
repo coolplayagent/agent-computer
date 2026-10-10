@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "feature": "Recover completed original-node execution drains after controller loss",
+  "recorded_at": "2026-10-10T19:21:34.797589+00:00",
+  "base_commit": "4a53e8e561148596adc1fd95e1641d3f3ecd435e",
+  "source": {
+    "base_commit": "4a53e8e561148596adc1fd95e1641d3f3ecd435e",
+    "files": {},
+    "manifest_sha256": "81716b9acbd8d7a9725df97c05cf79a1936c79226c999399ad28624121e5dbb7"
+  },
+  "binary_sha256": {
+    "agent-computer-server": "e5e5f4ba08f4b9b64f2e293521ca5648c040f328ae25213f5b3d808d23d41666",
+    "agent-computer-sandbox": "19fa5d78d45b0f73c41217ee9a801462ff4b1d98583e6def584a183403dba273",
+    "agent-computer-watchdog": "09e0ae6eddb5c66c277b39031d834593cdd5b25d81b236ec0415666a1db196f8",
+    "node_contracts_test": "a38ae45c40174963101c5cbcf22d575068789040673ba6b264d321580a09ab4e",
+    "watchdog_contracts_test": "d97abe327d56ef37cf5d5efb37f28234ecd2826e37212a17aa460228286b2a4f",
+    "execution_worker_live_test": "08550bb6df3a0c30473b07edee357aa79d03d15dd08d9a76082fe864ededb2c1",
+    "candidate_worker_live_test": "25b738a6193923a3c65fbb62993822a73ab281c1eb854ec5cc68302dc03f56c0",
+    "agent-computer-csi": "591f4805409d8dac2e3efae8e0febffbebe571c036d299eec6d3c55fc611de5e",
+    "csi_live_test": "35e0c5bb2c0669f9009479ecc82ae0977e1e155a94c2d8084fa611d07d4821c3"
+  },
+  "image": {
+    "image": "registry.invalid/agent-computer/startup-component@sha256:99f0cad9a68ca8e578a3cbafa24691d728c394d09ba337e1d49f69e55a9b8ecf",
+    "supervisor_sha256": "19fa5d78d45b0f73c41217ee9a801462ff4b1d98583e6def584a183403dba273",
+    "archive_sha256": "8ee7de76e3f66d096c3eb82b43f299555cffb02d15de133182c1fd29b2fe1011"
+  },
+  "environment": {
+    "kernel": "6.8.0-142-generic",
+    "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+    "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+    "juicefs": "juicefs version 1.4.1+2026-07-30.0b90c7d",
+    "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+    "seaweedfs": "version 30GB 4.48 530be3e37337488ecc34d58441e0bc476e121c93 linux amd64"
+  },
+  "organization": "execution_probe_1791659262752853593",
+  "runtime_summary": {
+    "execution_cases": 35,
+    "case_names": [
+      "normal",
+      "queue-concurrent",
+      "command",
+      "cancel",
+      "lost",
+      "rejected",
+      "controller-kill",
+      "pid1-stop",
+      "reaper-missing",
+      "output-store-failure",
+      "output-db-failure",
+      "output-truncated",
+      "output-failed",
+      "output-timeout",
+      "output-revoked",
+      "output-unknown",
+      "output-completion-retry",
+      "renew-short",
+      "renew-long",
+      "renew-cancel",
+      "renew-revoked",
+      "renew-controller-kill",
+      "renew-db-failure",
+      "renew-ack-failure",
+      "renew-hard",
+      "stream-long",
+      "stream-fixed",
+      "stream-flood",
+      "stream-cancel",
+      "stream-controller-kill",
+      "stream-store-failure",
+      "stream-db-failure",
+      "drain-cancel",
+      "drain-unknown",
+      "drain-unsealed"
+    ],
+    "database_counts": {
+      "execution_requests": 35,
+      "execution_dispatch_intents": 35,
+      "execution_pod_plans": 34,
+      "execution_pod_observations": 34,
+      "execution_watchdog_arms": 32,
+      "execution_startup_grants": 32,
+      "execution_output_chunk_intents": 272,
+      "execution_output_chunks": 271,
+      "execution_output_intents": 16,
+      "execution_outputs": 16,
+      "execution_completions": 27,
+      "execution_renewal_grants": 18,
+      "execution_renewal_acks": 17,
+      "candidate_writer_leases": 34,
+      "candidate_writer_drains": 28,
+      "candidate_writer_completions": 1
+    },
+    "independently_verified_stream_chunks": 271,
+    "independently_verified_final_objects": 64,
+    "cold_candidate_reads": [
+      {
+        "case": "normal",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "command",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "output-store-failure",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "output-db-failure",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "output-truncated",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "output-failed",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "output-timeout",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "output-completion-retry",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "renew-short",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "renew-long",
+        "bytes": 9,
+        "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+      },
+      {
+        "case": "stream-long",
+        "bytes": 4,
+        "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+      },
+      {
+        "case": "stream-fixed",
+        "bytes": 4,
+        "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+      },
+      {
+        "case": "stream-flood",
+        "bytes": 4,
+        "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+      }
+    ],
+    "csi_rpc": {
+      "cleanup_idempotent": true,
+      "driver": "csi.agent-computer.io",
+      "foreign_mount_retained": true,
+      "foreign_target_denied": true,
+      "instance": "07920c3d9589540d7cdfe8e46c3531d2bb73fe89cb2fab6621079bf5f281fa83",
+      "non_root_denied": true,
+      "replacement_pod_denied": true,
+      "revoked_republish_denied": true,
+      "unregistered_instance_denied": true
+    },
+    "terminated_pods_retained_before_separate_cleanup": [
+      "9f320b48-843f-44ef-ac18-8c1c2ecbe1e6",
+      "f9aee16b-8814-4831-bbbf-5b61d6731fc0",
+      "f99319e0-ab03-4026-90f2-776cda49debd"
+    ]
+  },
+  "recovery_cases": [],
+  "independent_drain_recovery": {},
+  "recovery_database_records": {},
+  "validation": {
+    "cargo_workspace": {
+      "passed": 478,
+      "ignored": 4,
+      "parallel_attempt_failed": "private PostgreSQL initdb exhausted /tmp quota; serial run passed"
+    },
+    "pending_unacknowledged_renewal": {
+      "passed": 1
+    },
+    "bazel": {
+      "targets_passed": 15,
+      "postgres_tests": 230
+    },
+    "clippy": "workspace, all targets, all features, warnings denied",
+    "node_vm": {
+      "passed": 18,
+      "ignored": 0
+    },
+    "watchdog_vm": {
+      "passed": 15,
+      "ignored": 0
+    },
+    "focused_vm": "three drain cases passed",
+    "full_vm": "35 execution cases passed"
+  },
+  "attempts": [
+    {
+      "attempt": "live-focused-1",
+      "result": "failed before startup marker; offline image digest reference missing; imported digest alias before retry"
+    },
+    {
+      "attempt": "bazel-test-1",
+      "result": "test dependency missing; added direct Kubernetes dependency to PostgreSQL test target"
+    },
+    {
+      "attempt": "live-full-1",
+      "result": "old queue summary assertions omitted new counters; fixed expected JSON without removing checks"
+    },
+    {
+      "attempt": "live-full-2",
+      "result": "controller terminated in Authorize before startup marker; no startup grant; deadline and session remained valid. Exact transient cause not retained by existing worker; later rerun with unchanged production code passed."
+    },
+    {
+      "attempt": "live-full-3",
+      "result": "all 32 prior execution cases completed, then new drain family hit existing eight-Candidate actor ceiling; assigned a separate fixture principal without changing platform limits"
+    },
+    {
+      "attempt": "runtime-collection-1",
+      "result": "collector initially expected only two retained Pods; all three new drain cases omit separate observation/deletion, including unsealed refusal; corrected exact UID/terminated-phase check against actual fixture code"
+    },
+    {
+      "attempt": "live-watchdog-1",
+      "result": "disposable cgroup opt-in environment variable omitted; explicit opt-in rerun passed"
+    }
+  ],
+  "local_archive": {
+    "directory": "/opt/workspace/agent-computer-drain-recovery-validation",
+    "collector_sha256": "3fb8b2716ffc61d31f53fedfdca6099a566a9d84482c49f160fc70903a3c9ed6",
+    "runtime_record": {
+      "path": "runtime-evidence.json",
+      "bytes": 2962954,
+      "sha256": "0022c17ada6bf08c3ff2256921ad14955b2c5ff2796a932657f7e36d3a158903"
+    },
+    "logs": {
+      "cargo-all-2.log": {
+        "sha256": "3c28776baf625b522a729f701447c9894d2d8127a702095a05499cfecb3eca1e",
+        "bytes": 59089
+      },
+      "pending-renewal-test-1.log": {
+        "sha256": "98a09c00a77d574898bfdfd9b61d9fee01c5f4c69b77d87e28cac8c584f3cd01",
+        "bytes": 556
+      },
+      "clippy-5.log": {
+        "sha256": "a67f479868094103628bdd5ee1268a02535458fec8e7eb51029f648682011629",
+        "bytes": 175
+      },
+      "bazel-build-2.log": {
+        "sha256": "051d58725bb35d457e01e8286403703bce277e899f4beb431148eef224aff718",
+        "bytes": 9403
+      },
+      "bazel-fixture-5.log": {
+        "sha256": "46d13078f059688dd35bf8f78374b58168162e260803769a5b03909ab6b4d2ab",
+        "bytes": 859
+      },
+      "bazel-test-2.log": {
+        "sha256": "df924272f7c3ab501c62b6f63711805d9ad9a7530c0d55a015f1b2a6b00e3c9a",
+        "bytes": 4180
+      },
+      "live-focused-2.log": {
+        "sha256": "b6f424146faa2bc8d5bcb9507ea53d953fb017d335276aa8ae83f5eb9f5232c4",
+        "bytes": 223
+      },
+      "live-full-4.log": {
+        "sha256": "4d877d23f3dec16f655111b370e29386047146e6444c191c9529b8d172951413",
+        "bytes": 30650
+      },
+      "live-node-watchdog-1.log": {
+        "sha256": "5b19d5ec22adeffff477cf688f6ef892438a46f49251309e38845c27a4d153d1",
+        "bytes": 3650
+      },
+      "live-watchdog-2.log": {
+        "sha256": "8a17248083a75a49f10f969f7aa19bd42f1d3f13a64795296a511154e912bf15",
+        "bytes": 1334
+      },
+      "runtime-collection-2.log": {
+        "sha256": "3e3f4ddcafbc8d46a51955cb0502b1d6da2ddd3b31a6e255f7d1e2392183b5aa",
+        "bytes": 841
+      }
+    }
+  },
+  "cleanup": {
+    "owned_vm_pid": 4169381,
+    "stopped": true,
+    "removed_owned_files": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "known_hosts",
+      "user-data",
+      "meta-data",
+      "qemu.log",
+      "serial.log",
+      "vm.json"
+    ],
+    "private_vm_state_removed": true,
+    "public_download_cache_retained": true
+  },
+  "limits": [
+    "Single disposable VM; not cross-node fencing or power-loss certification.",
+    "Only a persisted completed original process/IO seal establishes recovered drainage; pre-seal loss remains Unknown.",
+    "Recovered success reports remain Unknown; only pending cancellation accepts Cancelled.",
+    "No arbitrary App/profile checkpoint, browser/ComputerView or full product acceptance.",
+    "Existing Qualitygate policy checks line endings; Cargo/Bazel/live runtime checks are separately recorded."
+  ],
+  "detail_artifacts": {
+    "schema_version": 2,
+    "fragment_max_bytes": 8192,
+    "reconstruction": "Verify with docs/evidence/verify_fragments.py; all fragments are digest bound.",
+    "original_canonical_sha256": "2cd219d0964d7b50101764af7e55c954d66c6912518dd5122d24db88c876be91",
+    "entries": [
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0009.json",
+        "sha256": "fe09c4ca4bddf8d1e66b393561f8b961f0fef9237dede8275c3bb3982a799e39",
+        "target": [
+          "independent_drain_recovery"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0008.json",
+        "sha256": "e72ff2f65cb13f49e78ebc3f98de480aeac18e8af9e933a7fdcb93ae0f7581c6",
+        "target": [
+          "recovery_cases"
+        ],
+        "operation": "append",
+        "start": 0
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0017.json",
+        "sha256": "e918af3cb90f1e62420dedd6e0e383a9666c98bd5e7582221210a81ebda56db3",
+        "target": [
+          "recovery_database_records"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0010.json",
+        "sha256": "8e68325fdf76fac1d4dab58cbad85b7e42d87aa8714faff65a77b6e7e8ddea03",
+        "target": [
+          "recovery_database_records",
+          "execution_requests"
+        ],
+        "operation": "append",
+        "start": 0
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0011.json",
+        "sha256": "3a99fa40f52374f57e54c2fbbf8223cb616ba630b1dd674f3762d314a817815f",
+        "target": [
+          "recovery_database_records",
+          "execution_requests"
+        ],
+        "operation": "append",
+        "start": 2
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0001.json",
+        "sha256": "7598914b1ad1e06d94c2bf414e1935da1a689424faec4bc7381df057362cc90f",
+        "target": [
+          "source",
+          "files"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0002.json",
+        "sha256": "6b8b03c8b8e9c7f7c04964d834860a0e1f5355797daf8a216cb6ec1933e95b6b",
+        "target": [
+          "source",
+          "files"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0003.json",
+        "sha256": "d94772e8d9d38141eb7d63eab8e772c15cfdd5a9def2966d5c926e235e8b969a",
+        "target": [
+          "source",
+          "files"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0004.json",
+        "sha256": "ddb5d9e1de0f088b2d6ad80530fa86abca23a4def07d539e6e4f5900662a69c3",
+        "target": [
+          "source",
+          "files"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0005.json",
+        "sha256": "c85d8a5bd49ed53b3c5c8f79c7cfc8c4f7d24b4997b4ade364e851b4dc9b5dea",
+        "target": [
+          "source",
+          "files"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0006.json",
+        "sha256": "5b52d3b944e2f51c393cd4ac81705650fb037ce62b3a62ddeed310330e777928",
+        "target": [
+          "source",
+          "files"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0007.json",
+        "sha256": "7406f6a524d61039e236332b1f9e4c5831377ea5e2285f3cdf24cf16b261068b",
+        "target": [
+          "recovery_cases",
+          0,
+          "checkpoint"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0012.json",
+        "sha256": "4304768fcdfd583cb8e6bd325a2b1f88eba30b8cb76ee15d1c42afaf9c7cb055",
+        "target": [
+          "recovery_database_records",
+          "execution_watchdog_arms",
+          0
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0013.json",
+        "sha256": "44ae3ea9094bdfa34d8d36749f215d77185611e5eb9bcea27884274aab2e90de",
+        "target": [
+          "recovery_database_records",
+          "execution_watchdog_arms",
+          1
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0014.json",
+        "sha256": "d8b72812c990fa88921e291f83bcd9929272171e5a5b7b9d31bf78ffbe670113",
+        "target": [
+          "recovery_database_records",
+          "execution_watchdog_arms",
+          2
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0015.json",
+        "sha256": "4ce9082ce9a3c120e7bcacf896f312bb28703357cfc2ff6c9b4e17c67f7cf3b1",
+        "target": [
+          "recovery_database_records",
+          "execution_completions",
+          0,
+          "seal"
+        ],
+        "operation": "merge"
+      },
+      {
+        "path": "durable-drain-recovery-2026-10-11.parts/0016.json",
+        "sha256": "745421fc73767424b73aaa4f7c7ef9f729db7398f437fd091afbc6bbae16a149",
+        "target": [
+          "recovery_database_records",
+          "execution_completions",
+          1,
+          "seal"
+        ],
+        "operation": "merge"
+      }
+    ]
+  }
+}

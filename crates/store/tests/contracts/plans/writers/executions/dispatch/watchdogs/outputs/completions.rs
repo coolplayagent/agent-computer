@@ -3,6 +3,123 @@
 use super::*;
 use sqlx::{Postgres, Transaction};
 
+#[tokio::test]
+async fn drain_recovery_discovery_is_expired_scoped_cursor_bound_and_read_only() {
+    use agent_computer_kubernetes::NodeIdentity;
+    use agent_computer_store::runtime::preparation::PreparationTarget;
+    let (mut db, attempt, _, _) = output_fixture_with_fence(true).await;
+    let id = &attempt.intent().execution.execution_id;
+    let target: PreparationTarget =
+        serde_json::from_value(attempt.intent().binding["storage_target"].clone()).unwrap();
+    let node = NodeIdentity {
+        name: "node-one".into(),
+        uid: "node-one".into(),
+        boot_id: "later-boot".into(),
+    };
+    let organization = org("acme");
+    assert!(
+        db.store
+            .candidate_execution_completion_queue(&organization, &target, &node, None)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    // Wait for the real pinned deadline; do not rewrite immutable dispatch data
+    // or simulate expiration by disabling the database's guards.
+    sqlx::query("SELECT pg_sleep(GREATEST(0,($1::bigint-floor(extract(epoch from clock_timestamp())*1000)::bigint)::double precision/1000.0)+0.01)")
+        .bind(attempt.intent().deadline_at_ms).execute(&db.pool).await.unwrap();
+    let before = count(&db, "events").await;
+    assert_eq!(
+        db.store
+            .candidate_execution_completion_queue(&organization, &target, &node, None)
+            .await
+            .unwrap(),
+        vec![id.clone()]
+    );
+    assert!(
+        db.store
+            .candidate_execution_completion_queue(&organization, &target, &node, Some(id))
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    assert!(
+        db.store
+            .candidate_execution_completion_queue(&org("other"), &target, &node, None)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    for field in [
+        "volume_id",
+        "namespace_uid",
+        "pvc_uid",
+        "pv_uid",
+        "filesystem_uuid",
+        "volume_path",
+        "writer_uid",
+        "writer_gid",
+    ] {
+        let mut other = serde_json::to_value(&target).unwrap();
+        other[field] = if field.starts_with("writer_") {
+            json!(12345)
+        } else {
+            json!("foreign")
+        };
+        let other = serde_json::from_value(other).unwrap();
+        assert!(
+            db.store
+                .candidate_execution_completion_queue(&organization, &other, &node, None)
+                .await
+                .unwrap()
+                .is_empty(),
+            "{field}"
+        );
+    }
+    for field in ["name", "uid"] {
+        let mut other = serde_json::to_value(&node).unwrap();
+        other[field] = json!("foreign");
+        let other = serde_json::from_value(other).unwrap();
+        assert!(
+            db.store
+                .candidate_execution_completion_queue(&organization, &target, &other, None)
+                .await
+                .unwrap()
+                .is_empty(),
+            "{field}"
+        );
+    }
+    assert_eq!(count(&db, "events").await, before);
+    assert_eq!(count(&db, "execution_completions").await, 0);
+    assert_eq!(count(&db, "candidate_writer_drains").await, 0);
+    db.store
+        .mark_candidate_execution_unknown(&organization, id, 2)
+        .await
+        .unwrap();
+    db.crash_and_restart().await;
+    assert_eq!(
+        db.store
+            .candidate_execution_completion_queue(&organization, &target, &node, None)
+            .await
+            .unwrap(),
+        vec![id.clone()]
+    );
+    let mut tx = db.pool.begin().await.unwrap();
+    insert_completion(&mut tx, &seal(&db).await, "Unknown", None)
+        .await
+        .unwrap();
+    transition(&mut tx, "Unknown").await;
+    tx.commit().await.unwrap();
+    assert!(
+        db.store
+            .candidate_execution_completion_queue(&organization, &target, &node, None)
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    assert!(!artifact_ready(&db).await);
+}
+
 async fn seal(db: &Database) -> Value {
     let arm: Value = sqlx::query_scalar("SELECT evidence FROM execution_watchdog_arms")
         .fetch_one(&db.pool)

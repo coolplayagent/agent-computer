@@ -1,6 +1,8 @@
 //! Trusted local node adapter. Tenant input cannot select binaries, paths or IDs.
 #![forbid(unsafe_code)]
 mod command;
+mod drain;
+pub use drain::{RecordedSeal, read_recorded_seal};
 mod guard;
 mod journals;
 pub use journals::{JournalObservations, JournalStatus, observe_journals};

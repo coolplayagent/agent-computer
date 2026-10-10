@@ -34,3 +34,5 @@ Content-Type: application/json
 [源码绑定记录](../evidence/checkpoint-stop-drain-2026-10-10.json) · [验证日志](../evidence/checkpoint-stop-drain-2026-10-10.log)
 
 范围为单节点的已接入执行链路。一般进程排空、丢失控制器后的自动恢复、跨节点 fencing、App/浏览器 checkpoint、GC 与完整生命周期调度尚未完成。Computer `ready=false`、公开执行能力不支持，T01–T43 的产品验收状态保持不变。
+
+[51 持久排空恢复](51-durable-drain-recovery.md)新增控制器丢失后自动补交原节点已完成的封闭回执。封闭前丢失和未知结果仍保持阻塞，尚不代表通用排空恢复或跨节点 fencing 已完成。

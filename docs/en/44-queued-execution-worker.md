@@ -39,3 +39,5 @@ PostgreSQL contracts exercise full target isolation, concurrent claims, WAL rest
 This delivers node-local automatic dispatch for prepared Candidates. Full Computer lifecycle scheduling, automatic drain recovery, cross-node fencing, browser/ComputerView and product acceptance remain pending. Computer `ready=false`, public `execution` remains unsupported, and T01–T43 remain `not_run`.
 
 [Renewable execution leases](49-renewable-execution-leases.md) extend the running phase only; queue and setup deadlines remain fixed.
+
+[51 Durable drain recovery](51-durable-drain-recovery.md) adds automatic publication of original node seals after controller loss. Pre-seal loss and unresolved outcomes remain blocked; this does not complete general drain recovery or cross-node fencing.

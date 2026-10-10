@@ -52,11 +52,15 @@ pub async fn begin(c: &Context<'_>, cancel_running: bool) -> ArtifactCommit {
     c.store
         .checkpoint_stop_computer(
             c.token,
-            &key(if cancel_running {
-                "cancel-execution-checkpoint"
-            } else {
-                "after-execution-checkpoint"
-            }),
+            &key(&format!(
+                "{}-{}",
+                if cancel_running {
+                    "cancel-execution-checkpoint"
+                } else {
+                    "after-execution-checkpoint"
+                },
+                field(c.normal, "execution_id")
+            )),
             &computer,
             &request,
         )
@@ -103,11 +107,15 @@ pub async fn verify(c: Context<'_>) -> Value {
         .store
         .admit_computer_start(
             c.token,
-            &key(if cancelling {
-                "restart-after-cancel"
-            } else {
-                "restart-after-execution-checkpoint"
-            }),
+            &key(&format!(
+                "{}-{}",
+                if cancelling {
+                    "restart-after-cancel"
+                } else {
+                    "restart-after-execution-checkpoint"
+                },
+                field(c.normal, "execution_id")
+            )),
             &computer,
             &StartRequest {
                 expected_revision: stopped.control_revision,

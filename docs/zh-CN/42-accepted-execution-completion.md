@@ -42,3 +42,5 @@ Cancelled 表示显式取消后的执行写入已经封闭，不会回滚先前�
 证据通过独立 SQL 查询、签名 S3 读取及新的只读 JuiceFS 客户端收集。组件证据不代表完整 Computer 产品验收。
 
 [组件记录](../evidence/accepted-execution-completion-2026-10-10.json) · [日志](../evidence/accepted-execution-completion-2026-10-10.log)
+
+[51 持久排空恢复](51-durable-drain-recovery.md)新增控制器丢失后自动补交原节点已完成的封闭回执。封闭前丢失和未知结果仍保持阻塞，尚不代表通用排空恢复或跨节点 fencing 已完成。

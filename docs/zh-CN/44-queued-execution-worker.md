@@ -39,3 +39,5 @@ PostgreSQL 契约覆盖完整存储身份隔离、并发争抢、WAL 重启、�
 本增量交付已准备 Candidate 的节点本地自动派发。完整 Computer 生命周期调度、自动排空恢复、跨节点 fencing、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。
 
 [可续期执行租约](49-renewable-execution-leases.md)只扩展运行阶段，队列和准备期限保持固定。
+
+[51 持久排空恢复](51-durable-drain-recovery.md)新增控制器丢失后自动补交原节点已完成的封闭回执。封闭前丢失和未知结果仍保持阻塞，尚不代表通用排空恢复或跨节点 fencing 已完成。

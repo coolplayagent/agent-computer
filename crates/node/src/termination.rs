@@ -178,12 +178,17 @@ impl ArmedGuard {
         self.termination.terminate()?;
         let io = fence.seal().map_err(|_| Error::IoUnconfirmed)?;
         let domain = self.termination.stopped()?;
-        Ok(SealedExecution {
+        let sealed = SealedExecution {
             guard: self,
             io,
             domain,
             observed_boottime_ms: boottime_ms(),
-        })
+        };
+        crate::drain::record(
+            &sealed.guard.drain_spool,
+            serde_json::to_value(sealed.evidence()).map_err(|_| Error::InvalidObservation)?,
+        )?;
+        Ok(sealed)
     }
 }
 
