@@ -56,6 +56,7 @@
 52. [认证执行命令行](zh-CN/52-authenticated-execution-cli.md)
 53. [内部 Browser Driver](zh-CN/53-browser-driver.md)
 54. [App 持久化准入](zh-CN/54-app-admission.md)
+55. [Browser worker 桥接](zh-CN/55-browser-worker-bridge.md)
 
 ## 02. English
 
@@ -113,6 +114,7 @@
 52. [Authenticated execution CLI](en/52-authenticated-execution-cli.md)
 53. [Internal Browser Driver](en/53-browser-driver.md)
 54. [Durable App admission](en/54-app-admission.md)
+55. [Browser worker bridge](en/55-browser-worker-bridge.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

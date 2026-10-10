@@ -41,3 +41,5 @@ Tests exercise real pages and HTTP effects, PNG/DOM observations, structured and
 [Source-bound component evidence](../evidence/browser-driver-2026-10-11.json) and [actual browser test output](../evidence/browser-driver-2026-10-11.log) record 11 passing cases in a disposable VM with gVisor and Chromium sandbox enabled. This is not App lifecycle or product acceptance.
 
 [Durable App admission](54-app-admission.md) now supplies a separate reservation API. It does not yet implement the driver authority/journal callbacks.
+
+[Browser worker bridge](55-browser-worker-bridge.md) provides the private process transport; persistent controller and node integration remain pending.

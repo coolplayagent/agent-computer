@@ -77,3 +77,5 @@
 [认证执行 CLI](52-authenticated-execution-cli.md)新增八项线路契约测试和一项真实 CLI/TCP/Axum/PostgreSQL 测试。最终 Bazel 快照的 17 个目标共通过 487 项 Rust 测试，四项已有特权运行测试按默认配置忽略。准备回执为合成数据且派发意图为零，仅证明客户端与控制面行为，见[源码绑定记录](../evidence/authenticated-execution-cli-2026-10-11.json)。
 
 [App 持久化准入](54-app-admission.md)新增九项 PostgreSQL 契约、三项 HTTP 契约和一项实际运维进程测试。最终快照通过 18 个 Bazel 目标：500 项 Rust 测试及五项 TypeScript 单元测试，四项已有特权测试忽略。存储准备为合成证据，本次不新增 Chromium 运行时认证，详见[源码绑定记录](../evidence/app-admission-2026-10-11.json)。App 启动/GUI 适配器和完整产品验收仍待完成。
+
+[Browser worker 桥接](55-browser-worker-bridge.md)新增 14 项传输契约及四项实际 worker 进程测试。最终快照通过 19 个 Bazel 目标（500 项 Rust、19 项 TypeScript 单元测试，四项已有特权测试忽略），以及 gVisor 中 15 项启用 Chromium 沙箱的测试。[源码绑定记录](../evidence/browser-worker-bridge-2026-10-11.json)和[浏览器测试输出](../evidence/browser-worker-bridge-2026-10-11.log)绑定实际编译产物；不等同生产 App 控制器、数据库回调或节点 fencing 验收。

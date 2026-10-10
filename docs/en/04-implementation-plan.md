@@ -43,3 +43,5 @@ The authenticated [execution CLI](52-authenticated-execution-cli.md) supports th
 [53. Internal Browser Driver](53-browser-driver.md) describes the component boundary and remaining lifecycle integration.
 
 [54. Durable App admission](54-app-admission.md) adds pinned instance reservations and explicit profile ownership; actual launch and GUI authority remain pending.
+
+[Browser worker bridge](55-browser-worker-bridge.md) provides the private process transport; persistent controller and node integration remain pending.

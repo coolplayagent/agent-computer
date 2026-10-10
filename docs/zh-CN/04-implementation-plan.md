@@ -43,3 +43,5 @@
 [53. 内部 Browser Driver](53-browser-driver.md) 说明组件边界及尚未接入的生命周期能力。
 
 [54. App 持久化准入](54-app-admission.md)补齐固定实例预留和显式 profile 主体，实际启动及 GUI 授权仍待接入。
+
+[Browser worker 桥接](55-browser-worker-bridge.md)现提供私有进程通信入口，持久控制器和节点接入仍待完成。
