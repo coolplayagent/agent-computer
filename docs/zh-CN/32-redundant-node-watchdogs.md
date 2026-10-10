@@ -42,3 +42,5 @@ AGENT_COMPUTER_WATCHDOG_BIN=/absolute/path/agent-computer-watchdog \
 [33](33-watchdog-journals.md) 已交付节点本地意图/报告日志及只读恢复观察，持久 fencing 与 writer 释放仍待实现。
 
 常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。
+
+[当前新启动授权还要求回收服务可用性准入。](35-reaper-startup-admission.md)

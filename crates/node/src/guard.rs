@@ -30,6 +30,7 @@ pub struct Evidence {
     pub armed: ArmedReceipt,
     pub backup_armed: ArmedReceipt,
     pub watchdog_pids: [u32; 2],
+    pub reaper: agent_computer_watchdog::admission::Receipt,
     pub observed_boottime_ms: u64,
 }
 
@@ -40,12 +41,17 @@ pub struct ArmedGuard {
     evidence: Evidence,
     children: [DetachedChild; 2],
     _stdout: [ChildStdout; 2],
+    reaper: agent_computer_watchdog::admission::Client,
 }
 impl ArmedGuard {
     pub fn evidence(&self) -> &Evidence {
         &self.evidence
     }
     pub fn remaining_budget_ms(&mut self) -> Result<u32> {
+        self.reaper.check().map_err(|_| Error::ReaperUnavailable)?;
+        for child in &mut self.children {
+            child.require_running()?;
+        }
         let remaining = self
             .evidence
             .armed
@@ -54,9 +60,6 @@ impl ArmedGuard {
             .saturating_sub(boottime_ms());
         if remaining == 0 {
             return Err(Error::Deadline);
-        }
-        for child in &mut self.children {
-            child.require_running()?;
         }
         u32::try_from(remaining).map_err(|_| Error::Deadline)
     }
@@ -114,6 +117,19 @@ pub(crate) fn launch(
         primary.0.as_ref().unwrap().id(),
         backup.0.as_ref().unwrap().id(),
     ];
+    let reaper = agent_computer_watchdog::admission::Client::connect(
+        spool,
+        &request,
+        [
+            armed.journal.clone().ok_or(Error::InvalidObservation)?,
+            backup_armed
+                .journal
+                .clone()
+                .ok_or(Error::InvalidObservation)?,
+        ],
+        armed.cgroup_device,
+    )
+    .map_err(|_| Error::ReaperUnavailable)?;
     let mut guard = ArmedGuard {
         evidence: Evidence {
             version: 2,
@@ -121,10 +137,12 @@ pub(crate) fn launch(
             armed,
             backup_armed,
             watchdog_pids,
+            reaper: reaper.receipt().clone(),
             observed_boottime_ms: boottime_ms(),
         },
         children: [primary, backup],
         _stdout: [primary_stdout, backup_stdout],
+        reaper,
     };
     guard.remaining_budget_ms()?;
     Ok(guard)

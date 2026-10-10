@@ -33,6 +33,28 @@ fn field<'a>(v: &'a Value, k: &str) -> &'a str {
     v[k].as_str().unwrap()
 }
 
+// This named service belongs only to the explicitly disposable fixture VM.
+struct ReaperPause;
+impl ReaperPause {
+    fn begin() -> Self {
+        assert!(
+            std::process::Command::new("systemctl")
+                .args(["stop", "ac-execution-reaper-test.service"])
+                .status()
+                .unwrap()
+                .success()
+        );
+        Self
+    }
+}
+impl Drop for ReaperPause {
+    fn drop(&mut self) {
+        let _ = std::process::Command::new("systemctl")
+            .args(["start", "ac-execution-reaper-test.service"])
+            .status();
+    }
+}
+
 #[tokio::test]
 async fn real_candidate_execution_uses_durable_grants_and_observation_only_recovery() {
     let config: Value = serde_json::from_slice(
@@ -136,9 +158,10 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "rejected",
         "controller-kill",
         "pid1-stop",
+        "reaper-missing",
     ];
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":75161927680u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":names.len() as u64 * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
     for name in names {
         document["spec"]["workspaces"]
             .as_array_mut()
@@ -377,7 +400,31 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         .await
         .unwrap();
         let data = root.join(field(&prepared, "path_ref"));
+        let _reaper_pause = (name == "reaper-missing").then(ReaperPause::begin);
         let outcome = match name {
+            "reaper-missing" => {
+                let result = execution::execute_once(
+                    &store,
+                    &client,
+                    &org,
+                    &queued.execution_id,
+                    queued.revision,
+                    make_config(),
+                )
+                .await
+                .unwrap();
+                assert!(
+                    matches!(result.interrupted_at, Some(execution::Phase::Watchdog)),
+                    "{result:?}"
+                );
+                assert_eq!(
+                    result.node_error,
+                    Some(agent_computer_node::Error::ReaperUnavailable)
+                );
+                assert!(result.observation.is_none());
+                assert!(!data.join("output.txt").exists());
+                serde_json::to_value(result).unwrap()
+            }
             "controller-kill" | "pid1-stop" => {
                 let private = json!({"api_url":kube["api_url"],"ca_file":kube["ca_file"],"token_file":kube["token_file"],"deployment":deployment,"execution":worker});
                 faults::kill_controller(
@@ -655,7 +702,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .await
             .unwrap();
     assert_eq!(drains, 0);
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants, local node watchdog and CSI mounts","raw process report is not accepted completion","API deletion is not physical fencing","watchdog failure recovery and controller crash recovery scheduler pending"]});
+    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report is not accepted completion","API deletion is not physical fencing","multi-node fencing and accepted completion pending"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

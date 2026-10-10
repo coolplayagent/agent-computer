@@ -59,3 +59,5 @@ The journal probe covers normal persistence, closed/full output pipes, report pu
 The 2026-10-10 [source-bound record](../evidence/watchdog-journals-2026-10-10.json) and [raw logs](../evidence/watchdog-journals-2026-10-10.log) record 310 passing default tests (including 136 PostgreSQL cases) and 22 root VM component scenarios: four redundant guard faults, six journal IO cases and twelve kernel regressions. The initial directory-permission failure and its explicit `0700` fix are retained. Final VM binaries matched local Bazel hashes, and the owned VM, private key and writable disk were removed.
 
 The persistent expiry service and separate recovery reports are described in [34](34-node-expiry-reaper.md).
+
+[New startup authorization also requires live reaper admission.](35-reaper-startup-admission.md)

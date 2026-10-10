@@ -51,3 +51,5 @@
 当前适配器要求两个进程独立布防并共用原始截止时间，见 [32 冗余节点 watchdog](32-redundant-node-watchdogs.md)。上文单 watchdog 运行证据仍绑定其原始源码版本。
 
 常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。
+
+[当前新启动授权还要求回收服务可用性准入。](35-reaper-startup-admission.md)

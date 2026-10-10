@@ -33,11 +33,13 @@ fn notify(value: &[u8]) -> Result<()> {
 pub fn run(spool: &Path, once: bool) -> Result<bool> {
     let mut reaper = Reaper::open(spool)?;
     if !once {
+        reaper.enable_admission()?;
         notify(b"READY=1\nSTATUS=Expiry reaper scanning; not fencing authority")?;
     }
     let mut errors = 0;
     loop {
         let batch = reaper.step()?;
+        reaper.poll_admission()?;
         errors += batch
             .entries
             .iter()
@@ -67,7 +69,12 @@ pub fn run(spool: &Path, once: bool) -> Result<bool> {
                 .as_bytes(),
             )?;
             if batch.pass_complete {
-                std::thread::sleep(Duration::from_millis(250));
+                // Service requests between expiry passes without a second
+                // heartbeat thread that could hide a stalled enforcement loop.
+                for _ in 0..25 {
+                    reaper.poll_admission()?;
+                    std::thread::sleep(Duration::from_millis(10));
+                }
                 errors = 0;
             }
         }

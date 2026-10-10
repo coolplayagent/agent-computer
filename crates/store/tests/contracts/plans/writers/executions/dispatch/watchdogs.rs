@@ -40,6 +40,11 @@ async fn fixture() -> (
     evidence["backup_armed"]["armed_boottime_ms"] = json!(1100);
     evidence["observed_boottime_ms"] = json!(1200);
     evidence["watchdog_pids"] = json!([100, 101]);
+    let first = json!({"id":"journal-primary","device":7,"inode":101,"intent_digest":format!("sha256:{}","a".repeat(64))});
+    let second = json!({"id":"journal-backup","device":7,"inode":102,"intent_digest":format!("sha256:{}","b".repeat(64))});
+    evidence["armed"]["journal"] = first.clone();
+    evidence["backup_armed"]["journal"] = second.clone();
+    evidence["reaper"] = json!({"version":1,"instance":"a".repeat(64),"nonce":"b".repeat(64),"request":evidence["armed"]["request"],"journals":[first,second],"cgroup_device":42,"pid":102,"spool_device":7,"spool_inode":8,"observed_boottime_ms":1190});
     (db, attempt, plan, evidence, now)
 }
 
@@ -249,7 +254,7 @@ async fn redundant_watchdogs_require_matching_timers_and_distinct_live_process_e
 async fn migration_seventeen_preserves_single_guard_history_but_denies_new_grants() {
     let (db, attempt, plan, mut evidence, now) = fixture().await;
     db.remove_redundant_watchdogs().await;
-    for field in ["version", "backup_armed", "watchdog_pids"] {
+    for field in ["version", "backup_armed", "watchdog_pids", "reaper"] {
         evidence.as_object_mut().unwrap().remove(field);
     }
     insert(&db, &attempt, &plan, &evidence, now, now + 5000)
@@ -275,11 +280,80 @@ async fn migration_seventeen_preserves_single_guard_history_but_denies_new_grant
     assert_eq!(before.evidence, after.evidence);
     let error=sqlx::query("INSERT INTO execution_startup_grants (organization,execution_id,pod_uid,challenge,grant_body,grant_digest,granted_at_ms) SELECT organization,execution_id,'pod-one',$1,'{\"version\":1,\"lease_budget_ms\":1000}'::jsonb,$2,floor(extract(epoch from clock_timestamp())*1000) FROM execution_requests")
         .bind(serde_json::to_value(pods::challenge(&attempt)).unwrap()).bind(format!("sha256:{}","a".repeat(64))).execute(&db.pool).await.unwrap_err();
-    assert!(
-        error
-            .to_string()
-            .contains("redundant watchdog is not armed")
-    );
+    assert!(error.to_string().contains("watchdog is not armed"));
+    assert_eq!(count(&db, "execution_startup_grants").await, 0);
+    assert_eq!(count(&db, "candidate_writer_drains").await, 0);
+}
+
+#[tokio::test]
+async fn reaper_metadata_requires_fresh_exact_journal_and_challenge_bindings() {
+    let (db, attempt, plan, evidence, now) = fixture().await;
+    for (pointer, value) in [
+        ("/reaper", Value::Null),
+        ("/reaper/version", json!(2)),
+        ("/reaper/instance", json!("bad")),
+        ("/reaper/nonce", json!("A".repeat(64))),
+        ("/reaper/pid", json!(0)),
+        ("/reaper/spool_device", json!(0)),
+        ("/reaper/spool_inode", json!(0)),
+        ("/reaper/request/execution_id", json!("other")),
+        ("/reaper/cgroup_device", json!(43)),
+        ("/reaper/journals/1", evidence["armed"]["journal"].clone()),
+        ("/reaper/journals/0/intent_digest", json!("wrong")),
+        ("/reaper/journals", json!([])),
+        ("/reaper/observed_boottime_ms", json!(999)),
+        ("/reaper/observed_boottime_ms", json!(1201)),
+        ("/armed/journal", Value::Null),
+    ] {
+        let mut bad = evidence.clone();
+        *bad.pointer_mut(pointer).unwrap() = value;
+        assert!(
+            insert(&db, &attempt, &plan, &bad, now, now + 5000)
+                .await
+                .is_err(),
+            "{pointer}"
+        );
+    }
+    assert_eq!(count(&db, "execution_watchdog_arms").await, 0);
+    insert(&db, &attempt, &plan, &evidence, now, now + 5000)
+        .await
+        .unwrap();
+    assert_eq!(count(&db, "execution_startup_grants").await, 0);
+}
+
+#[tokio::test]
+async fn migration_eighteen_preserves_arms_without_reaper_but_denies_new_startup() {
+    let (db, attempt, plan, mut evidence, now) = fixture().await;
+    db.remove_reaper_admission().await;
+    evidence.as_object_mut().unwrap().remove("reaper");
+    evidence["armed"].as_object_mut().unwrap().remove("journal");
+    evidence["backup_armed"]
+        .as_object_mut()
+        .unwrap()
+        .remove("journal");
+    insert(&db, &attempt, &plan, &evidence, now, now + 5000)
+        .await
+        .unwrap();
+    let id = &attempt.intent().execution.execution_id;
+    let before = db
+        .store
+        .candidate_execution_watchdog(&org("acme"), id)
+        .await
+        .unwrap()
+        .unwrap();
+    db.store.migrate().await.unwrap();
+    db.store.ready().await.unwrap();
+    let after = db
+        .store
+        .candidate_execution_watchdog(&org("acme"), id)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(before.evidence_digest, after.evidence_digest);
+    assert_eq!(before.evidence, after.evidence);
+    let error=sqlx::query("INSERT INTO execution_startup_grants (organization,execution_id,pod_uid,challenge,grant_body,grant_digest,granted_at_ms) SELECT organization,execution_id,'pod-one',$1,'{\"version\":1,\"lease_budget_ms\":1000}'::jsonb,$2,floor(extract(epoch from clock_timestamp())*1000) FROM execution_requests")
+        .bind(serde_json::to_value(pods::challenge(&attempt)).unwrap()).bind(format!("sha256:{}","a".repeat(64))).execute(&db.pool).await.unwrap_err();
+    assert!(error.to_string().contains("reaper watchdog is not armed"));
     assert_eq!(count(&db, "execution_startup_grants").await, 0);
     assert_eq!(count(&db, "candidate_writer_drains").await, 0);
 }
