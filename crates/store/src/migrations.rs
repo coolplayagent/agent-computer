@@ -191,6 +191,15 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0024_execution_queue_poll.sql")),
                     false,
                 ),
+                Migration::new(
+                    25,
+                    Cow::Borrowed("candidate preparation queue polling"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!(
+                        "../migrations/0025_preparation_queue_poll.sql"
+                    )),
+                    false,
+                ),
             ])
         })
     }

@@ -1,4 +1,5 @@
 //! Trusted local JuiceFS worker for one durably admitted Candidate.
+mod queue;
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_storage::{
     MountedVolume, ObjectCache,
@@ -9,6 +10,7 @@ use agent_computer_store::{
     reconciliation::{ClaimMode, WorkerId},
     runtime::preparation::*,
 };
+pub use queue::{QueueEvent, QueueOptions, QueueSummary, run_queue};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -39,18 +41,11 @@ pub async fn prepare_once(
     config: Configuration,
 ) -> agent_computer_store::Result<WorkResult> {
     // Validate the actual local mount before consuming a durable dispatch permit.
+    let checked = config.clone();
+    let (mount, cache, quota) = tokio::task::spawn_blocking(move || resources(&checked))
+        .await
+        .map_err(|_| Error::ReferenceUnavailable)??;
     let target = &config.target;
-    let mount = MountedVolume::open(
-        &config.mount_root,
-        &target.volume_path,
-        &target.filesystem_uuid,
-        &target.pvc_uid,
-        target.writer_uid,
-        target.writer_gid,
-    )
-    .map_err(|_| Error::ReferenceUnavailable)?;
-    let cache = ObjectCache::open(&config.object_cache).map_err(|_| Error::ReferenceUnavailable)?;
-    let quota = JuiceFsQuota::new(config.quota).map_err(|_| Error::ReferenceUnavailable)?;
     let lease = match store
         .claim_candidate_preparation(org, request_id, owner, target)
         .await?
@@ -99,4 +94,22 @@ pub async fn prepare_once(
             Ok(WorkResult::StorageUnknown)
         }
     }
+}
+
+fn resources(
+    config: &Configuration,
+) -> agent_computer_store::Result<(MountedVolume, ObjectCache, JuiceFsQuota)> {
+    let target = &config.target;
+    let mount = MountedVolume::open(
+        &config.mount_root,
+        &target.volume_path,
+        &target.filesystem_uuid,
+        &target.pvc_uid,
+        target.writer_uid,
+        target.writer_gid,
+    )
+    .map_err(|_| Error::ReferenceUnavailable)?;
+    let cache = ObjectCache::open(&config.object_cache).map_err(|_| Error::ReferenceUnavailable)?;
+    let quota = JuiceFsQuota::new(config.quota.clone()).map_err(|_| Error::ReferenceUnavailable)?;
+    Ok((mount, cache, quota))
 }

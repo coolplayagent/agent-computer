@@ -4,6 +4,7 @@
 pub mod candidate;
 pub mod execution;
 pub mod files;
+mod queue_options;
 
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_definitions::{Format, validate_bytes};

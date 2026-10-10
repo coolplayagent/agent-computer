@@ -10,7 +10,12 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_preparation_queue_poll(&self) {
+        sqlx::raw_sql("DROP INDEX candidate_preparation_queue_poll; DELETE FROM _sqlx_migrations WHERE version=25;")
+            .execute(&self.pool).await.unwrap();
+    }
     pub async fn remove_execution_queue_poll(&self) {
+        self.remove_preparation_queue_poll().await;
         sqlx::raw_sql(
             "DROP INDEX execution_queue_poll; DELETE FROM _sqlx_migrations WHERE version=24;",
         )

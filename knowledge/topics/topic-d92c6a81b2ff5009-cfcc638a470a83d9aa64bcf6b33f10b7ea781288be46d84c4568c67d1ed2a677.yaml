@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: runtime
+  title: runtime
+  description: Added by CLI source registration.
+sources:
+- id: continuous-candidate-preparation
+  topic: runtime
+  kind: doc
+  uri: docs/zh-CN/45-continuous-candidate-preparation.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Candidate 常驻准备、原始授权、有限并发、轮换发现、停止等待与只观察恢复
+route:
+  topic: runtime
+  source_order:
+  - continuous-candidate-preparation
+  fallback: bounded-search

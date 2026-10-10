@@ -36,6 +36,8 @@ mod fence;
 mod file_http;
 #[path = "support/file_writer.rs"]
 mod file_writer;
+#[path = "support/preparation_queue.rs"]
+mod queue;
 
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
@@ -269,6 +271,15 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
     }
     let mut observations = vec![];
     let mut file_evidence = Value::Null;
+    let mut fence = Value::Null;
+    let mut pending = vec![];
+    let mut queue_evidence = vec![];
+    let queue_fixture = queue::Fixture {
+        config: &config,
+        worker: &worker_config,
+        org: &org,
+        pool: &pool,
+    };
     for (index, name) in ["one", "two", "three"].into_iter().enumerate() {
         let computer = &plan
             .resources
@@ -337,44 +348,45 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
             // Fault injection affects the coordination clock only, not storage.
             sqlx::query("UPDATE candidate_preparations SET lease_until_ms=1 WHERE organization=$1 AND request_id=$2").bind(org.as_str()).bind(&admitted.request_id).execute(&pool).await.unwrap();
         }
-        let outcome = if index == 0 {
-            let command_config = PathBuf::from(config["observation_file"].as_str().unwrap())
-                .with_file_name("candidate-command.json");
-            fs::write(&command_config, serde_json::to_vec(&worker_config).unwrap()).unwrap();
-            fs::set_permissions(&command_config, fs::Permissions::from_mode(0o600)).unwrap();
-            let output = std::process::Command::new(config["server_binary"].as_str().unwrap())
-                .args([
-                    "candidate-prepare-once",
-                    "--database-url-file",
-                    config["database_url_file"].as_str().unwrap(),
-                    "--organization",
-                    org.as_str(),
-                    "--worker-id",
-                    owner.as_str(),
-                    "--request-id",
-                    &admitted.request_id,
-                    "--config-file",
-                ])
-                .arg(command_config)
-                .output()
-                .unwrap();
-            assert!(
-                output.status.success(),
-                "{}",
-                String::from_utf8_lossy(&output.stderr)
+        pending.push((
+            index,
+            computer.clone(),
+            admitted,
+            expected_inode,
+            absent_path,
+        ));
+        if index == 1 {
+            let ids: Vec<_> = pending
+                .iter()
+                .map(|(_, _, start, _, _)| start.request_id.clone())
+                .collect();
+            queue_evidence.push(queue_fixture.run(&ids, true).await);
+            queue_evidence.push(queue_fixture.run(&[], false).await);
+        } else if index == 2 {
+            queue_evidence.push(
+                queue_fixture
+                    .run(
+                        std::slice::from_ref(&pending.last().unwrap().2.request_id),
+                        false,
+                    )
+                    .await,
             );
-            assert_eq!(
-                serde_json::from_slice::<Value>(&output.stdout).unwrap(),
-                "prepared"
-            );
-            WorkResult::Prepared
-        } else {
-            prepare_once(&store, &org, &admitted.request_id, &owner, make_config())
-                .await
-                .unwrap()
-        };
+        }
+    }
+    for (index, computer, admitted, expected_inode, absent_path) in pending {
+        let computer = &computer;
+        let make_config =
+            || serde_json::from_value::<Configuration>(worker_config.clone()).unwrap();
+        let outcome = queue_evidence
+            .iter()
+            .flat_map(|batch| batch["events"].as_array().unwrap())
+            .find(|event| {
+                event["event"] == "finished" && event["request_id"] == admitted.request_id
+            })
+            .unwrap()["outcome"]
+            .clone();
         if index == 2 {
-            assert!(matches!(outcome, WorkResult::StorageUnknown));
+            assert_eq!(outcome, "storage_unknown");
             assert!(!absent_path.unwrap().try_exists().unwrap());
             assert_eq!(
                 store
@@ -387,7 +399,7 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
             observations.push(json!({"request_id":admitted.request_id,"state":"Preparing","missing_publication_not_recreated":true}));
             continue;
         }
-        assert!(matches!(outcome, WorkResult::Prepared));
+        assert_eq!(outcome, "prepared");
         let receipt:Prepared=serde_json::from_value(sqlx::query_scalar::<_,Value>("SELECT receipt FROM candidate_preparations WHERE organization=$1 AND request_id=$2").bind(org.as_str()).bind(&admitted.request_id).fetch_one(&pool).await.unwrap()).unwrap();
         let data = root.join(&receipt.path_ref);
         assert_eq!(data.metadata().unwrap().ino(), receipt.data_inode);
@@ -412,6 +424,14 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         assert_eq!(current.start_state, Some(StartState::Prepared));
         assert!(!current.ready);
         if index == 0 {
+            // Fence verification requires an exclusively owned, valid directory.
+            // Later gateway fault tests deliberately leave root-owned symlinks
+            // and an unresolved writer; do not treat that Candidate as mountable.
+            fence = fence::verify(
+                &worker_config,
+                &config,
+                &serde_json::to_value(&receipt).unwrap(),
+            );
             file_evidence = file_writer::verify(file_writer::Context {
                 store: &store,
                 pool: &pool,
@@ -476,8 +496,7 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         owner: &owner,
     })
     .await;
-    let fence = fence::verify(&worker_config, &config, &observations[0]["receipt"]);
-    let evidence = json!({"fence":fence,"continuation":continuation,"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
+    let evidence = json!({"preparation_queue":queue_evidence,"fence":fence,"continuation":continuation,"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
     fs::write(
         config["observation_file"].as_str().unwrap(),
         serde_json::to_vec_pretty(&evidence).unwrap(),

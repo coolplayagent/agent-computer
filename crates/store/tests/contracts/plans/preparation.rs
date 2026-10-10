@@ -7,6 +7,7 @@ use agent_computer_store::{
     runtime::{preparation::*, *},
 };
 use serde_json::json;
+mod queue;
 
 pub(super) async fn setup() -> (Database, String, String, StartReceipt, PreparationTarget) {
     setup_with_quota(10 * 1024 * 1024 * 1024).await
