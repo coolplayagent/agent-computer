@@ -56,3 +56,5 @@ agent-computer-server execution-output-read --database-url-file /private/databas
 测试覆盖私有 spool 重开/篡改、存储身份绑定、SigV4、条件 PUT、丢失确认、损坏/截断/超量 GET、重定向、鉴权和服务故障、SQL 引用移植拒绝、不可变发布、WAL 恢复及历史迁移。真实一次性 PostgreSQL/SeaweedFS/K3s/CSI/gVisor 环境验证正常输出、运维派发、双流截断、S3 凭据拒绝及数据库发布失败。全新运维进程在 Kubernetes 凭据不可用时恢复两个 pending 场景，并重复恢复，确认不增加授权或事件。
 
 权威完成仍需物理存储 fencing 和 writer 排空。按 [JuiceFS CSI 架构](https://juicefs.com/docs/csi/introduction/)，使用同一 PV 的 Pod 可能共享 CSI 客户端；删除 Pod、进程死亡或 cgroup 为空不能证明该客户端写入已排空。本轮不宣称产品 T01–T43 验收完成。
+
+2026-10-10 的[源码绑定证据](../evidence/durable-execution-outputs-2026-10-10.json)和[日志](../evidence/durable-execution-outputs-2026-10-10.log)记录了 327 项默认测试通过（含 141 项 PostgreSQL 用例）、11 个 Bazel 测试目标及 11 个真实 worker 场景。五份发布的二十个引用由独立 S3 客户端再次校验；两个发布故障恢复后均未增加授权或重复事件。已删除本轮虚拟机、测试服务及私有磁盘/密钥文件。
