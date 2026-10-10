@@ -42,6 +42,7 @@ pub struct ArmedGuard {
     children: [DetachedChild; 2],
     _stdout: [ChildStdout; 2],
     reaper: agent_computer_watchdog::admission::Client,
+    pub(super) termination: crate::termination::ProcessDomain,
 }
 impl ArmedGuard {
     pub fn evidence(&self) -> &Evidence {
@@ -108,6 +109,7 @@ pub(crate) fn launch(
     request: Request,
     runtime: RuntimeObservation,
     deadline: Instant,
+    termination: crate::termination::ProcessDomain,
 ) -> Result<ArmedGuard> {
     let [
         (armed, primary, primary_stdout),
@@ -143,6 +145,7 @@ pub(crate) fn launch(
         children: [primary, backup],
         _stdout: [primary_stdout, backup_stdout],
         reaper,
+        termination,
     };
     guard.remaining_budget_ms()?;
     Ok(guard)

@@ -4,6 +4,26 @@ topic:
   title: execution
   description: Added by CLI source registration.
 sources:
+- id: accepted-execution-completion
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/42-accepted-execution-completion.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Live pinned process and Candidate IO seals, verified execution outcomes, atomic writer release and historical recovery
+- id: candidate-io-fence
+  topic: execution
+  kind: doc
+  uri: docs/en/40-candidate-io-fence.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Revocable per-Candidate FUSE content/namespace barrier, real paused JuiceFS verification and pending process/Pod integration; paired Chinese docs/zh-CN/40-candidate-io-fence.md
 - id: durable-execution-outputs
   topic: execution
   kind: doc
@@ -14,6 +34,16 @@ sources:
   status: active
   version: 1
   description: Bounded final-report S3 publication, private retry spool, immutable metadata and observation-only recovery.
+- id: fenced-execution-csi
+  topic: execution
+  kind: doc
+  uri: docs/zh-CN/41-fenced-execution-csi.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Trusted inline CSI publication of live Candidate IO fences, node identity checks and fail-closed execution cleanup
 - id: node-expiry-reaper
   topic: execution
   kind: doc
@@ -62,4 +92,7 @@ route:
   - node-expiry-reaper
   - reaper-startup-admission
   - durable-execution-outputs
+  - candidate-io-fence
+  - fenced-execution-csi
+  - accepted-execution-completion
   fallback: bounded-search

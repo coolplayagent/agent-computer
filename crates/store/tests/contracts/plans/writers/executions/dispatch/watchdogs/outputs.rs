@@ -1,8 +1,14 @@
 //! Synthetic SQL fixtures check bindings only; no S3 receipt or live guard is invented.
 use super::*;
+mod completions;
 
 async fn output_fixture() -> (Database, ExecutionDispatchAttempt, Value, i64) {
-    let (db, attempt, plan, evidence, now) = fixture().await;
+    output_fixture_with_fence(false).await
+}
+async fn output_fixture_with_fence(
+    fenced: bool,
+) -> (Database, ExecutionDispatchAttempt, Value, i64) {
+    let (db, attempt, plan, evidence, now) = fixture_with_fence(fenced).await;
     insert(&db, &attempt, &plan, &evidence, now, now + 10000)
         .await
         .unwrap();

@@ -14,7 +14,14 @@ pub async fn verify(
 ) -> Value {
     let expected = matches!(
         case,
-        "normal" | "command" | "output-store-failure" | "output-db-failure" | "output-truncated"
+        "normal"
+            | "command"
+            | "output-store-failure"
+            | "output-db-failure"
+            | "output-truncated"
+            | "output-failed"
+            | "output-timeout"
+            | "output-completion-retry"
     );
     let pending = matches!(case, "output-store-failure" | "output-db-failure");
     let before = store.candidate_execution_output(token, id).await.unwrap();
@@ -83,7 +90,14 @@ pub async fn verify(
     );
     let report: Value = serde_json::from_slice(&read.stdout).unwrap();
     assert_eq!(report["report"]["execution_id"], id);
-    assert_eq!(report["report"]["outcome"], "succeeded");
+    assert_eq!(
+        report["report"]["outcome"],
+        match case {
+            "output-failed" => "failed",
+            "output-timeout" => "timed_out",
+            _ => "succeeded",
+        }
+    );
     if case != "command" {
         assert_eq!(report, outcome["raw_report"]);
     }

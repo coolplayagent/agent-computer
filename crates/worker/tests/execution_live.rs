@@ -179,6 +179,11 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "output-store-failure",
         "output-db-failure",
         "output-truncated",
+        "output-failed",
+        "output-timeout",
+        "output-revoked",
+        "output-unknown",
+        "output-completion-retry",
     ];
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
         "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":names.len() as u64 * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
@@ -389,7 +394,13 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             )
             .await
             .unwrap();
-        let script = if name == "output-truncated" {
+        let script = if name == "output-failed" {
+            "printf persisted > output.txt; /bin/sync output.txt; exit 7"
+        } else if name == "output-timeout" {
+            "printf persisted > output.txt; /bin/sync output.txt; /bin/sleep 20"
+        } else if matches!(name, "output-revoked" | "output-unknown") {
+            "printf started > started.txt; /bin/sync started.txt; /bin/sleep 20; printf unexpected > late.txt"
+        } else if name == "output-truncated" {
             "i=0; while [ \"$i\" -lt 5000 ]; do printf x; printf y >&2; i=$((i+1)); done; printf persisted > output.txt; /bin/sync output.txt"
         } else if name == "pid1-stop" {
             "kill -STOP 1; /bin/cat /proc/1/status > pid1-status.txt; /bin/sync pid1-status.txt; printf started > started.txt; /bin/sync started.txt; while :; do printf tick >> ticks.txt; /bin/sync ticks.txt; /bin/sleep 0.1; done"
@@ -418,7 +429,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                     command: ExecutionCommand {
                         argv: vec!["/bin/sh".into(), "-c".into(), script.into()],
                         cwd: String::new(),
-                        timeout_seconds: 25,
+                        timeout_seconds: if name == "output-timeout" { 1 } else { 25 },
                         term_grace_ms: 100,
                         output_limit_bytes: 4096,
                     },
@@ -439,7 +450,55 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         if name == "output-db-failure" {
             sqlx::raw_sql("CREATE FUNCTION reject_output_publication() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.kind='execution.output_verified' THEN RAISE EXCEPTION 'fixture output acknowledgement failure'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_output_publication BEFORE INSERT ON events FOR EACH ROW EXECUTE FUNCTION reject_output_publication();").execute(&pool).await.unwrap();
         }
+        if name == "output-completion-retry" {
+            // Sequences do not roll back: reject exactly the first completion
+            // transaction, then require the same live seal to succeed on retry.
+            sqlx::raw_sql("CREATE SEQUENCE completion_retry_probe; CREATE FUNCTION reject_first_completion() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.kind='execution.completed' AND nextval('completion_retry_probe')=1 THEN RAISE EXCEPTION 'fixture completion transaction failed'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_first_completion BEFORE INSERT ON events FOR EACH ROW EXECUTE FUNCTION reject_first_completion();").execute(&pool).await.unwrap();
+        }
         let outcome = match name {
+            "output-revoked" | "output-unknown" => {
+                let running = execution::execute_once(
+                    &store,
+                    &client,
+                    &org,
+                    &queued.execution_id,
+                    queued.revision,
+                    make_config(),
+                );
+                let lower = async {
+                    let until = tokio::time::Instant::now() + Duration::from_secs(20);
+                    while !data.join("started.txt").exists() {
+                        assert!(tokio::time::Instant::now() < until, "authority barrier");
+                        tokio::time::sleep(Duration::from_millis(50)).await;
+                    }
+                    if name == "output-revoked" {
+                        store
+                            .set_runtime_grant(
+                                RuntimeGrant {
+                                    organization: &org,
+                                    principal: &output_actor,
+                                    kind: RuntimeKind::Computer,
+                                    resource_id: computer,
+                                    permission: RuntimePermission::Modify,
+                                    max_runtime_seconds: None,
+                                },
+                                false,
+                            )
+                            .await
+                            .unwrap();
+                    } else {
+                        store
+                            .mark_candidate_execution_unknown(&org, &queued.execution_id, 2)
+                            .await
+                            .unwrap();
+                    }
+                };
+                let (result, ()) = tokio::join!(running, lower);
+                let result = result.unwrap();
+                assert!(result.observation.is_none());
+                assert!(!data.join("late.txt").exists());
+                serde_json::to_value(result).unwrap()
+            }
             "reaper-missing" => {
                 let result = execution::execute_once(
                     &store,
@@ -686,7 +745,12 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                         .report_bytes(),
                 )
                 .unwrap();
-                assert_eq!(report["report"]["outcome"], "succeeded", "{report}");
+                let expected = match name {
+                    "output-failed" => "failed",
+                    "output-timeout" => "timed_out",
+                    _ => "succeeded",
+                };
+                assert_eq!(report["report"]["outcome"], expected, "{report}");
                 assert_eq!(fs::read(data.join("output.txt")).unwrap(), b"persisted");
                 let mut result = serde_json::to_value(result).unwrap();
                 result["raw_report"] = report;
@@ -695,6 +759,17 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         };
         if name == "output-db-failure" {
             sqlx::raw_sql("DROP TRIGGER reject_output_publication ON events; DROP FUNCTION reject_output_publication();").execute(&pool).await.unwrap();
+        }
+        if name == "output-completion-retry" {
+            let attempts: i64 = sqlx::query_scalar("SELECT last_value FROM completion_retry_probe")
+                .fetch_one(&pool)
+                .await
+                .unwrap();
+            assert_eq!(
+                attempts, 2,
+                "the first rollback must be retried with the same seal"
+            );
+            sqlx::raw_sql("DROP TRIGGER reject_first_completion ON events; DROP FUNCTION reject_first_completion(); DROP SEQUENCE completion_retry_probe;").execute(&pool).await.unwrap();
         }
         if !matches!(name, "lost" | "rejected" | "controller-kill" | "pid1-stop") {
             assert_eq!(outcome["publication_revoked"], true, "{outcome}");
@@ -747,21 +822,44 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             &outcome,
         )
         .await;
-        assert!(matches!(
+        let completed = !matches!(
+            name,
+            "lost" | "rejected" | "controller-kill" | "pid1-stop" | "reaper-missing"
+        );
+        let expected_state = match name {
+            "normal" | "command" | "output-truncated" | "output-completion-retry" => {
+                ExecutionState::Succeeded
+            }
+            "output-failed" | "output-timeout" => ExecutionState::Failed,
+            "cancel" => ExecutionState::Cancelled,
+            _ => ExecutionState::Unknown,
+        };
+        assert_eq!(
             store
                 .reconcile_candidate_writer(&org, &lease.lease_id)
                 .await
                 .unwrap()
                 .state,
-            WriterLeaseState::Draining
-        ));
+            if completed {
+                WriterLeaseState::Released
+            } else {
+                WriterLeaseState::Draining
+            }
+        );
+        assert_eq!(!outcome["completion"].is_null(), completed, "{outcome}");
+        if completed {
+            assert_eq!(
+                outcome["completion"]["accepted_state"],
+                serde_json::to_value(expected_state).unwrap()
+            );
+        }
         assert_eq!(
             store
                 .candidate_execution(token, &queued.execution_id)
                 .await
                 .unwrap()
                 .state,
-            ExecutionState::Unknown
+            expected_state
         );
         assert!(matches!(
             execution::execute_once(
@@ -791,8 +889,43 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                     | "output-store-failure"
                     | "output-db-failure"
                     | "output-truncated"
+                    | "output-failed"
+                    | "output-timeout"
+                    | "output-revoked"
+                    | "output-unknown"
+                    | "output-completion-retry"
             )
         );
+        let next_writer = if name == "normal" {
+            let next = store
+                .acquire_candidate_writer(
+                    token,
+                    &key("after-execution"),
+                    computer,
+                    &AcquireWriterLease {
+                        connection_session_id: lease.connection_session_id.clone(),
+                        generation: lease.generation,
+                        candidate_id: lease.candidate_id.clone(),
+                        scope: WriterScope::Modify,
+                        duration_seconds: 30,
+                    },
+                )
+                .await
+                .unwrap();
+            assert_eq!(next.epoch, lease.epoch + 1);
+            let saved=agent_computer_worker::files::save_once(&store,token,&next.lease_id,
+                serde_json::from_value(json!({"lease":{"connection_session_id":next.connection_session_id,"generation":next.generation,"epoch":next.epoch,"expected_revision":next.revision},"dispatch_id":"after-execution-file","edit":{"path":"after-execution.txt","expected":null,"content":b"next-writer","executable":false}})).unwrap(),
+                serde_json::from_value(json!({"target":local["target"],"mount_root":local["mount_root"]})).unwrap()
+            ).await.unwrap();
+            assert_eq!(saved.state, WriterLeaseState::Released);
+            assert_eq!(
+                fs::read(data.join("after-execution.txt")).unwrap(),
+                b"next-writer"
+            );
+            Some(saved)
+        } else {
+            None
+        };
         let recovery = execution::recover_once(
             &store,
             &client,
@@ -820,9 +953,28 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                     | "output-store-failure"
                     | "output-db-failure"
                     | "output-truncated"
+                    | "output-failed"
+                    | "output-timeout"
+                    | "output-revoked"
+                    | "output-unknown"
+                    | "output-completion-retry"
             )
         );
-        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"outputs":output_evidence,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
+        assert_eq!(recovery.execution.state, expected_state);
+        assert_eq!(
+            serde_json::to_value(&recovery.completion).unwrap(),
+            outcome["completion"]
+        );
+        if let Some(next) = &next_writer {
+            let after = store
+                .reconcile_candidate_writer(&org, &lease.lease_id)
+                .await
+                .unwrap();
+            assert_eq!(after.epoch, next.epoch);
+            assert_eq!(after.revision, next.revision);
+            assert_eq!(after.state, WriterLeaseState::Released);
+        }
+        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"outputs":output_evidence,"next_writer":next_writer,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
     }
     let drains: i64 =
         sqlx::query_scalar("SELECT count(*) FROM candidate_writer_drains WHERE organization=$1")
@@ -830,8 +982,8 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .fetch_one(&pool)
             .await
             .unwrap();
-    assert_eq!(drains, 0);
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report is not accepted completion","API deletion is not physical fencing","multi-node fencing and accepted completion pending"]});
+    assert_eq!(drains, 12);
+    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

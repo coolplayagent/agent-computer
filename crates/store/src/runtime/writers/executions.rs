@@ -3,9 +3,9 @@ mod dispatch;
 use super::*;
 use crate::plans::DefinitionKind;
 pub use dispatch::{
-    ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionOutput, ExecutionPodAttempt,
-    ExecutionPodPlan, ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant,
-    ExecutionWatchdogArm, OutputState,
+    ExecutionCompletion, ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionOutput,
+    ExecutionPodAttempt, ExecutionPodPlan, ExecutionRuntimeInputs, ExecutionStartupAttempt,
+    ExecutionStartupGrant, ExecutionWatchdogArm, OutputState,
 };
 use serde::{Deserialize, Serialize};
 
@@ -63,6 +63,8 @@ pub enum ExecutionState {
     Dispatching,
     CancelRequested,
     Unknown,
+    Succeeded,
+    Failed,
 }
 
 /// Metadata only. Command bytes and storage paths are not exposed in this view.
@@ -155,10 +157,11 @@ fn view(row: &PgRow) -> Result<ExecutionRequest> {
         binding_digest: row.try_get("binding_digest")?,
         created_at_ms: row.try_get("created_at_ms")?,
         queue_deadline_at_ms: row.try_get("queue_deadline_at_ms")?,
-        dispatch_started: matches!(
-            row.try_get::<String, _>("state")?.as_str(),
-            "Dispatching" | "CancelRequested" | "Unknown"
-        ),
+        dispatch_started: row.try_get::<String, _>("reason")? == "completed_cancelled"
+            || matches!(
+                row.try_get::<String, _>("state")?.as_str(),
+                "Dispatching" | "CancelRequested" | "Unknown" | "Succeeded" | "Failed"
+            ),
     })
 }
 async fn own_execution(
@@ -184,7 +187,10 @@ async fn reconcile(
     seq: i64,
 ) -> Result<()> {
     let state: String = row.try_get("state")?;
-    if matches!(state.as_str(), "Cancelled" | "Unknown") {
+    if matches!(
+        state.as_str(),
+        "Cancelled" | "Unknown" | "Succeeded" | "Failed"
+    ) {
         return Ok(());
     }
     let lease: String = row.try_get("lease_id")?;
@@ -346,7 +352,7 @@ impl Store {
                 }
                 // CancelRequested/Unknown already require external stopping;
                 // recording a retry receipt does not claim it has happened.
-                "Cancelled" | "CancelRequested" | "Unknown" => {}
+                "Cancelled" | "CancelRequested" | "Unknown" | "Succeeded" | "Failed" => {}
                 _ => return Err(Error::InvalidStoredData),
             }
             transactions::save_receipt(&mut tx, &identity, op, key, &hash, &id).await?;

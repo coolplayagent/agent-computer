@@ -203,6 +203,34 @@ async fn load(
     }
     Ok(Some((m, row.try_get("verified_at_ms")?)))
 }
+
+/// Only the already verified immutable publication can support a terminal
+/// outcome. The original grant and node arm remain part of that binding.
+pub(super) async fn verified_outcome(
+    tx: &mut Transaction<'_, Postgres>,
+    dispatch: &ExecutionDispatchIntent,
+    arm: &ExecutionWatchdogArm,
+) -> Result<Option<(String, Outcome)>> {
+    let Some((manifest, Some(_))) =
+        load(tx, &dispatch.organization, &dispatch.execution.execution_id).await?
+    else {
+        return Ok(None);
+    };
+    let grant = startup::receipt(tx, &dispatch.organization, &dispatch.execution.execution_id)
+        .await?
+        .ok_or(Error::InvalidStoredData)?;
+    if manifest.dispatch_digest != dispatch.intent_digest
+        || manifest.arm_digest != arm.evidence_digest
+        || manifest.grant_digest != grant.grant_digest
+        || manifest.pod_uid != grant.pod_uid
+    {
+        return Err(Error::InvalidStoredData);
+    }
+    Ok(Some((
+        manifest.digest()?,
+        manifest.summary.observed_outcome,
+    )))
+}
 impl Store {
     /// The live attach observation and original dispatch handle are required for
     /// first capture. A durable intent cannot manufacture report bytes or a grant.

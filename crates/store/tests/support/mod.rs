@@ -10,7 +10,41 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_execution_completions(&self) {
+        sqlx::raw_sql("DROP TABLE execution_completions; DROP FUNCTION guard_execution_completion(); DROP FUNCTION complete_execution_completion(); DELETE FROM _sqlx_migrations WHERE version=23; ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_state_check; ALTER TABLE execution_requests DROP CONSTRAINT execution_requests_reason_check; ALTER TABLE execution_requests ADD CHECK (state IN ('Queued','Cancelled','Dispatching','CancelRequested','Unknown')); ALTER TABLE execution_requests ADD CHECK (reason IN ('awaiting_runtime_dispatch','user_requested','writer_unavailable','dispatch_committed','dispatch_unconfirmed')); ALTER TABLE candidate_writer_drains DROP CONSTRAINT candidate_writer_drains_proof_check; ALTER TABLE candidate_writer_drains ADD CHECK (proof IN ('no_dispatch','bounded_file_drained'));").execute(&self.pool).await.unwrap();
+        for (source, name) in [
+            (
+                include_str!("../../migrations/0011_candidate_file_completions.sql"),
+                "guard_writer_record_insert",
+            ),
+            (
+                include_str!("../../migrations/0013_execution_dispatch.sql"),
+                "guard_execution_request",
+            ),
+            (
+                include_str!("../../migrations/0013_execution_dispatch.sql"),
+                "guard_execution_writer_slot",
+            ),
+            (
+                include_str!("../../migrations/0021_workspace_artifacts.sql"),
+                "artifact_candidate_drained",
+            ),
+        ] {
+            let body = source
+                .split(&format!("FUNCTION {name}"))
+                .nth(1)
+                .unwrap()
+                .split("$$;")
+                .next()
+                .unwrap();
+            sqlx::raw_sql(&format!("CREATE OR REPLACE FUNCTION {name}{body}$$;"))
+                .execute(&self.pool)
+                .await
+                .unwrap();
+        }
+    }
     pub async fn remove_artifact_continuation(&self) {
+        self.remove_execution_completions().await;
         sqlx::raw_sql("DROP TRIGGER check_runtime_start_input ON runtime_start_inputs; DROP FUNCTION guard_runtime_start_input(); DROP INDEX runtime_workspace_candidates; CREATE UNIQUE INDEX runtime_one_active_workspace ON runtime_start_requests (organization,workspace_id) WHERE state NOT IN ('Cancelled','Stopped'); DELETE FROM _sqlx_migrations WHERE version=22;").execute(&self.pool).await.unwrap();
         let previous = include_str!("../../migrations/0021_workspace_artifacts.sql")
             .split("CREATE FUNCTION runtime_stop_checkpoint")

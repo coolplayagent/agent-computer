@@ -7,6 +7,7 @@ mod cgroup;
 pub mod journal;
 pub mod reaper;
 mod request;
+pub mod termination;
 
 pub use request::{MAX_BUDGET_MS, MAX_REQUEST_BYTES, Request};
 use rustix::{

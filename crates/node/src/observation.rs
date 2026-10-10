@@ -342,7 +342,7 @@ pub(crate) fn runtime_processes(
     Ok(found)
 }
 
-fn start_ticks(stat: &str) -> Result<u64> {
+pub(crate) fn start_ticks(stat: &str) -> Result<u64> {
     let tail = stat.rsplit_once(") ").ok_or(Error::InvalidObservation)?.1;
     let fields: Vec<_> = tail.split_whitespace().collect();
     if fields.first().is_none_or(|s| matches!(*s, "Z" | "X" | "x")) {

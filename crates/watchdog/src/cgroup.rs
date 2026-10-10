@@ -3,11 +3,13 @@ use rustix::fs::{Mode, OFlags, ResolveFlags, fstat, fstatfs, open, openat2};
 use std::{fs::File, io::Read, os::unix::fs::FileExt};
 
 /// Open descriptions pin the original kernfs nodes, including across path reuse.
+#[derive(Debug)]
 pub(crate) struct Cgroup {
     _directory: File,
     kill: File,
     events: File,
     pub device: u64,
+    kill_on_drop: bool,
 }
 
 impl Cgroup {
@@ -22,7 +24,40 @@ impl Cgroup {
             kill,
             events,
             device,
+            kill_on_drop: true,
         })
+    }
+
+    pub fn pin_matching(request: &Request, device: u64) -> Result<Self> {
+        let (directory, kill, events, device) = Self::files(request, Some(device))?;
+        Ok(Self {
+            _directory: directory,
+            kill,
+            events,
+            device,
+            kill_on_drop: false,
+        })
+    }
+
+    /// On an admitted cgroup v2 core events FD, ENODEV means kernfs has
+    /// deactivated that original node. cgroup destruction checks population and
+    /// prevents migration before removing core files. Directory st_nlink is not
+    /// a removal signal on kernfs (Linux 6.8 retains 2 after rmdir).
+    pub fn removed(&self) -> Result<bool> {
+        let mut bytes = [0; 4096];
+        match self.events.read_at(&mut bytes, 0) {
+            Err(error) if error.raw_os_error() == Some(rustix::io::Errno::NODEV.raw_os_error()) => {
+                Ok(true)
+            }
+            Err(_) => Err(Error::ObservationFailed),
+            Ok(count) if count < bytes.len() => {
+                let value =
+                    std::str::from_utf8(&bytes[..count]).map_err(|_| Error::ObservationFailed)?;
+                populated(value)?;
+                Ok(false)
+            }
+            _ => Err(Error::ObservationFailed),
+        }
     }
 
     /// Admission observation must never construct the kill-on-drop handle.
@@ -77,7 +112,9 @@ impl Cgroup {
 impl Drop for Cgroup {
     fn drop(&mut self) {
         // Best effort after any setup/report failure; never a drain assertion.
-        let _ = self.kill();
+        if self.kill_on_drop {
+            let _ = self.kill();
+        }
     }
 }
 

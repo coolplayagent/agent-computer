@@ -5,6 +5,7 @@ mod guard;
 mod journals;
 pub use journals::{JournalObservations, JournalStatus, observe_journals};
 mod observation;
+mod termination;
 use agent_computer_kubernetes::{NodeIdentity, PodRuntimeIdentity};
 use agent_computer_watchdog::{Request, boottime_ms};
 pub use command::Executable;
@@ -15,6 +16,7 @@ use std::{
     path::PathBuf,
     time::{Duration, Instant},
 };
+pub use termination::{SealEvidence, SealedExecution};
 
 /// Qualified local K3s/containerd/runsc adapter. All paths and hashes are private
 /// operator configuration, never caller-provided runtime API fields.
@@ -246,7 +248,19 @@ fn arm_inner(
         volume_path: candidate.volume_path.clone(),
         runtime_processes,
     };
-    guard::launch(&watchdog, &config.spool, request, runtime, deadline)
+    let termination = termination::ProcessDomain::pin(
+        &request,
+        group.metadata().map_err(|_| Error::ProcessBinding)?.dev(),
+        &runtime,
+    )?;
+    guard::launch(
+        &watchdog,
+        &config.spool,
+        request,
+        runtime,
+        deadline,
+        termination,
+    )
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize)]
@@ -263,6 +277,8 @@ pub enum Error {
     Deadline,
     WatchdogUnavailable,
     ReaperUnavailable,
+    TerminationUnconfirmed,
+    IoUnconfirmed,
 }
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

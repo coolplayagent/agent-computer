@@ -35,7 +35,7 @@ impl Store {
         Self::lock_stream(&mut tx, org.as_str()).await?;
         let record = row(&mut tx, org.as_str(), id).await?;
         let dispatch = intent(&mut tx, org.as_str(), &record).await?;
-        let source = sqlx::query("SELECT p.binding,p.request,p.request_digest,p.receipt,r.snapshot,r.snapshot_digest,i.revision,v.manifest,v.digest AS manifest_digest FROM candidate_writer_leases l JOIN candidate_preparations p USING(organization,request_id) JOIN runtime_start_requests r USING(organization,request_id) JOIN runtime_start_inputs i USING(organization,request_id) JOIN workspace_input_versions v ON v.organization=i.organization AND v.workspace_id=i.workspace_id AND v.revision=i.revision WHERE l.organization=$1 AND l.lease_id=$2 AND l.epoch=$3")
+        let source = sqlx::query("SELECT p.binding,p.request,p.request_digest,p.receipt,r.snapshot,r.snapshot_digest,i.revision,v.manifest,v.digest AS manifest_digest FROM candidate_writer_epochs e JOIN candidate_writer_leases l USING(organization,lease_id) JOIN candidate_preparations p USING(organization,request_id) JOIN runtime_start_requests r USING(organization,request_id) JOIN runtime_start_inputs i USING(organization,request_id) JOIN workspace_input_versions v ON v.organization=i.organization AND v.workspace_id=i.workspace_id AND v.revision=i.revision WHERE l.organization=$1 AND l.lease_id=$2 AND e.epoch=$3")
             .bind(org.as_str()).bind(&dispatch.execution.lease_id).bind(dispatch.execution.epoch).fetch_one(&mut *tx).await?;
         let target: PreparationTarget = decode(source.try_get("binding")?)?;
         let preparation: PrepareRequest = decode(source.try_get("request")?)?;
