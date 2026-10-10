@@ -19,6 +19,8 @@ pub struct Configuration {
     pub mount_root: PathBuf,
     pub object_cache: PathBuf,
     pub quota: JuiceFsConfig,
+    #[serde(default)]
+    pub artifacts: Option<agent_computer_objects::Configuration>,
 }
 
 #[derive(Debug, Serialize)]
@@ -58,6 +60,19 @@ pub async fn prepare_once(
         PreparationClaim::Claimed(lease) => *lease,
     };
     let permit = if lease.mode() == ClaimMode::Execute {
+        if let Some(bundle) = store.candidate_input_artifact(org, request_id).await? {
+            let client = agent_computer_objects::Client::new(
+                config
+                    .artifacts
+                    .as_ref()
+                    .ok_or(Error::ReferenceUnavailable)?,
+            )
+            .map_err(|_| Error::ReferenceUnavailable)?;
+            agent_computer_objects::artifact::restore(&client, &bundle, &cache)
+                .await
+                .map_err(|_| Error::InvalidReconcileResult)?;
+        }
+
         Some(store.begin_candidate_preparation(&lease).await?)
     } else {
         None

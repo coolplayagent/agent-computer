@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 58
-updated_at: unix:1791601427
+map_version: 59
+updated_at: unix:1791603362
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -117,9 +117,10 @@ topics:
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - sandbox-process-supervisor
+  - undispatched-computer-stop
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a.yaml
-  digest: 49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a
+  ref: topics/topic-875b9380866e9d56-223861012dd31297e8f670b86e515bbec892d95e01e82420f8b573d94cd4d1f6.yaml
+  digest: 223861012dd31297e8f670b86e515bbec892d95e01e82420f8b573d94cd4d1f6
 - id: execution
   title: execution
   description: Added by CLI source registration.
@@ -154,12 +155,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 42
+  omitted_through: 43
   recent:
-  - version: 43
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-file-http-gateway' to topic 'development'.
   - version: 44
     action: source.add
     actor: cli
@@ -220,3 +217,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'durable-execution-outputs' to topic 'execution'.
+  - version: 59
+    action: source.add
+    actor: cli
+    summary: Added source 'undispatched-computer-stop' to topic 'development'.

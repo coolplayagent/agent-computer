@@ -78,7 +78,7 @@ pub async fn save_once(
     store.finish_candidate_file_edit(&closed).await
 }
 
-fn open_mount(config: &Configuration) -> agent_computer_store::Result<MountedVolume> {
+pub(crate) fn open_mount(config: &Configuration) -> agent_computer_store::Result<MountedVolume> {
     let target = &config.target;
     MountedVolume::open(
         &config.mount_root,

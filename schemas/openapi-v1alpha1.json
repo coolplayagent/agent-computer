@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-computer control API",
     "version": "0.1.0",
-    "description": "Development control API: static validation, revocable service credentials, independent runtime grants, authorized definition plans, atomic apply, durable coordination and bounded queued Computer start admission. Candidate preparation has a separate trusted local worker. Pod dispatch, Ready, OIDC and execution remain unsupported. Credential-bound logical ConnectionSession creation, current views, bounded heartbeats and close are implemented; OIDC/browser login, connection tokens, ViewerSession and lease consumers remain unsupported. Candidate modify leases now provide durable connection-owned acquisition, renewal, guarded one-time internal dispatch journaling and zero-dispatch release. A trusted one-shot bounded file save worker now consumes a dispatch, enforces a conservative local deadline and records closed IO evidence. HTTP file mutation, general process executors/watchdogs, physical fencing and GUI control leases remain unsupported."
+    "description": "Development control API: revocable service credentials, independent runtime grants, authorized definition plans, queued Computer start admission, durable connection and writer coordination, authenticated bounded file reads/saves, trusted guarded execution workers with durable outputs, and sealed Workspace artifacts with file-only checkpoint restart. Trusted operators provision storage and publish artifacts. Computer Ready, browser/OIDC, arbitrary-process storage fencing, App/profile checkpoint capture, Presentation, GC and full product acceptance remain pending."
   },
   "servers": [
     {
@@ -3305,7 +3305,7 @@
     "/v1alpha1/computers/{id}/stop": {
       "post": {
         "operationId": "stopPreparedComputer",
-        "description": "Requires runtime.manage and an exact Computer manage grant. Stops only a Prepared Candidate with no user dispatch in any writer epoch, no unreleased writer, no queued execution and no active unexpired human input. Releases compute admission; retains the old Candidate and its storage reservation. Does not publish a checkpoint or prove fencing of dispatched IO. Replays return the historical receipt after fresh authorization and cannot stop a later generation. Queued cancellation remains separate.",
+        "description": "Requires runtime.manage and an exact Computer manage grant. Stops an undispatched Prepared Candidate or a Sealed file-only Computer with a verified artifact published as the current Workspace input. Undrained writers, dispatched process executions, queued work, required uncaptured Apps or active human input block checkpoint stop. Retains old Candidate storage. A normal next start pins the current input and allocates a new Candidate. Queued cancellation remains separate.",
         "security": [
           {
             "serviceBearer": []
@@ -3397,7 +3397,7 @@
             }
           },
           "409": {
-            "description": "Stop blocked by user dispatch or active input, wrong control revision/request/state, or idempotency conflict.",
+            "description": "Stop requires a verified eligible checkpoint or an undispatched Candidate; active input, mismatched revision/state or idempotency conflict also blocks stopping.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3443,6 +3443,348 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/StopPreparedComputer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/workspaces/{id}/artifacts": {
+      "post": {
+        "operationId": "commitWorkspaceArtifact",
+        "description": "Requires runtime.publish plus current Workspace read/modify/publish and Computer read/modify grants. Atomically seals the Candidate and creates durable capture work. A trusted artifact-publish-once worker performs filesystem capture and full S3 verification. Replaying the same key and input reads the current result and may refresh the original publisher credential; it does not reopen writes. publish_current=true uses base-revision CAS; false creates a branch version with the same Workspace read ACL.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope, browser Origin, or activation exceeds its grant cap.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Writer not drained, mismatched base/control revision, already sealed Candidate or idempotency conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body or dependency snapshot too large.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Uncompressed application/json required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Sealed artifact work admitted or idempotently replayed. Inspect state; acceptance does not mean publication completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactCommit"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitArtifact"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/artifacts/{id}": {
+      "get": {
+        "operationId": "getWorkspaceArtifact",
+        "description": "Current artifact metadata; requires runtime.read and current Workspace read permission.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope, browser Origin, or activation exceeds its grant cap.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Current artifact metadata; requires runtime.read and current Workspace read permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactCommit"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1alpha1/artifacts/{id}/manifest": {
+      "get": {
+        "operationId": "getArtifactManifest",
+        "description": "Fixed relative manifest; null while Capturing. Requires runtime.read and current Workspace read permission.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope, browser Origin, or activation exceeds its grant cap.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Fixed relative manifest; null while Capturing. Requires runtime.read and current Workspace read permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ArtifactManifest"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -4575,6 +4917,8 @@
               "Queued",
               "Preparing",
               "Prepared",
+              "Sealing",
+              "Sealed",
               "Cancelled",
               "Stopped",
               null
@@ -5439,7 +5783,7 @@
       "ComputerStopReceipt": {
         "type": "object",
         "additionalProperties": false,
-        "description": "Historical no-user-dispatch receipt. Retained storage is not reclaimed; no flush, fencing or new checkpoint is claimed.",
+        "description": "Historical stop receipt with retained Candidate storage. artifact_checkpoint identifies a verified published file-only checkpoint; no_user_dispatch retains the original pinned input. Neither proves fencing of arbitrary processes.",
         "required": [
           "computer_id",
           "request_id",
@@ -5491,7 +5835,10 @@
             "maximum": 9223372036854775807
           },
           "proof": {
-            "const": "no_user_dispatch"
+            "enum": [
+              "no_user_dispatch",
+              "artifact_checkpoint"
+            ]
           },
           "stopped_at_ms": {
             "type": "integer",
@@ -5502,6 +5849,260 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 9223372036854775807
+          },
+          "checkpoint": {
+            "$ref": "#/components/schemas/WorkspaceCheckpoint"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "proof": {
+                  "const": "artifact_checkpoint"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "checkpoint"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "checkpoint"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CommitArtifact": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Permanently seals a Prepared Candidate whose bounded file writers are all drained. The expected revision is the current Computer control revision; the base identifies its pinned Workspace input. No caller manifest or drain proof is accepted.",
+        "required": [
+          "request_id",
+          "expected_revision",
+          "base_revision",
+          "base_manifest",
+          "publish_current"
+        ],
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "base_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "base_manifest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "publish_current": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ArtifactCommit": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Immutable publication identity and current status. Conflict preserves a fixed input version but leaves the default Workspace pointer unchanged. Capturing is sealed and may require the same-key retry with renewed publisher credentials plus a trusted operator retry.",
+        "required": [
+          "commit_id",
+          "workspace_id",
+          "computer_id",
+          "candidate_id",
+          "creator",
+          "generation",
+          "state",
+          "base_revision",
+          "base_manifest",
+          "publish_current",
+          "input_revision",
+          "manifest_digest",
+          "published_at_ms"
+        ],
+        "properties": {
+          "commit_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "workspace_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "computer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "creator": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "state": {
+            "enum": [
+              "Capturing",
+              "Committed",
+              "Conflict"
+            ]
+          },
+          "base_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "base_manifest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "publish_current": {
+            "type": "boolean"
+          },
+          "input_revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "manifest_digest": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "published_at_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          }
+        }
+      },
+      "ArtifactManifest": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Relative file tree of a fixed artifact. Published only after full object verification; storage credentials, object paths and signed URLs are never returned.",
+        "required": [
+          "entries"
+        ],
+        "properties": {
+          "entries": {
+            "type": "object",
+            "maxProperties": 10000,
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "An empty or nonempty relative directory.",
+                  "required": [
+                    "kind"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "const": "directory"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "A regular file. Executable permission is retained; ownership, timestamps, special bits and links are not portable metadata.",
+                  "required": [
+                    "kind",
+                    "sha256",
+                    "size",
+                    "executable"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "const": "file"
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 10737418240
+                    },
+                    "executable": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "WorkspaceCheckpoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "File-only Computer checkpoint: no declared Apps and no dispatched process executions. App/profile capture and general process fencing are pending.",
+        "required": [
+          "artifact_id",
+          "input_revision",
+          "manifest_digest",
+          "snapshot_digest",
+          "computer_spec_digest",
+          "app_states",
+          "unfinished_execution_ids"
+        ],
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "input_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9223372036854775807
+          },
+          "manifest_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "snapshot_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "computer_spec_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "app_states": {
+            "type": "array",
+            "maxItems": 0
+          },
+          "unfinished_execution_ids": {
+            "type": "array",
+            "maxItems": 0
           }
         }
       }

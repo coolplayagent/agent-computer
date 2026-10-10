@@ -123,6 +123,28 @@ impl Client {
             size: bytes.len() as u64,
         })
     }
+    pub fn artifact_reference(
+        &self,
+        organization: &str,
+        commit: &str,
+        hash: &str,
+        size: u64,
+    ) -> Result<ObjectRef> {
+        if !identifier(organization) || !identifier(commit) {
+            return Err(Error::Invalid);
+        }
+        let object = ObjectRef {
+            store_digest: self.store_digest.clone(),
+            key: format!(
+                "artifacts/v1/{organization}/{commit}/{}",
+                hash.strip_prefix("sha256:").ok_or(Error::Invalid)?
+            ),
+            sha256: hash.into(),
+            size,
+        };
+        object.validate()?;
+        Ok(object)
+    }
     fn bound(&self, object: &ObjectRef) -> Result<Url> {
         object.validate()?;
         if object.store_digest != self.store_digest {

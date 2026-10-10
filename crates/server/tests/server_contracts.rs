@@ -1,5 +1,6 @@
 mod support;
 mod cases {
+    mod artifacts;
     mod authentication;
     mod connections;
     mod executions;

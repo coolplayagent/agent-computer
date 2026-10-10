@@ -1,6 +1,7 @@
 //! HTTP control plane with an optional bounded Candidate file gateway.
 #![forbid(unsafe_code)]
 
+mod artifacts;
 mod computers;
 mod connections;
 mod error;

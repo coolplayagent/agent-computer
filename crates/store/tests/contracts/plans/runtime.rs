@@ -7,7 +7,17 @@ pub(super) async fn runtime_fixture() -> (Database, String, String, String, Stri
 pub(super) async fn runtime_fixture_with_quota(
     quota: i64,
 ) -> (Database, String, String, String, String) {
+    runtime_fixture_with_apps(quota, true).await
+}
+pub(super) async fn runtime_fixture_with_apps(
+    quota: i64,
+    apps: bool,
+) -> (Database, String, String, String, String) {
     let (db, definition_token, mut document) = fixture().await;
+    if !apps {
+        document["spec"]["computers"][0]["appRefs"] = serde_json::json!([]);
+        document["spec"]["apps"] = serde_json::json!([]);
+    }
     document["spec"]["volumes"][0]["quotaBytes"] = quota.into();
     let plan = db
         .store
