@@ -58,6 +58,7 @@
 54. [App 持久化准入](zh-CN/54-app-admission.md)
 55. [Browser worker 桥接](zh-CN/55-browser-worker-bridge.md)
 56. [Browser Pod 与节点运行时](zh-CN/56-browser-runtime.md)
+57. [Browser 持久启动控制器](zh-CN/57-browser-controller.md)
 
 ## 02. English
 
@@ -117,6 +118,7 @@
 54. [Durable App admission](en/54-app-admission.md)
 55. [Browser worker bridge](en/55-browser-worker-bridge.md)
 56. [Browser Pod and node runtime](en/56-browser-runtime.md)
+57. [Durable Browser launch controller](en/57-browser-controller.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

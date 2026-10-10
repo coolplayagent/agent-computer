@@ -7621,7 +7621,10 @@
             "enum": [
               "Queued",
               "Blocked",
-              "Cancelled"
+              "Cancelled",
+              "Dispatching",
+              "Running",
+              "Draining"
             ]
           },
           "ready": {

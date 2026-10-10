@@ -1,6 +1,6 @@
 # 56. Browser Pod 与节点运行时
 
-[私有 worker 桥接](55-browser-worker-bridge.md)现已增加 Rust 控制器协议、Kubernetes Browser 计划/attach 适配器和独立节点进程保护。这些属于内部组件；公开 App API 仍只持久化排队准入，生产派发、GUI 持久授权/动作日志与 profile checkpoint/恢复仍待接入，Browser readiness 不变。
+[私有 worker 桥接](55-browser-worker-bridge.md)现已增加 Rust 控制器协议、Kubernetes Browser 计划/attach 适配器和独立节点进程保护。这些属于内部组件；公开 App API 仍只持久化排队准入，[启动控制器](57-browser-controller.md)消费预留，GUI 持久授权/动作日志与 profile checkpoint/恢复仍待接入，Browser readiness 不变。
 
 ## 独立 Pod
 
@@ -27,3 +27,7 @@
 夹具只在取得并保持活进程停止证明后，执行带 UID 前置条件的立即 API 清理，避免 kubelet 的滞后资源账目拒绝下一个 3 CPU 测试 Pod。这不是生产强制删除路径。期限场景保持空闲管道直到原 watchdog 截止时间，避免 EOF 自然关闭掩盖到期终止。
 
 [绑定源码的验证记录](../evidence/browser-runtime-2026-10-11.json)列出测试结果、实际运行回读和适用范围。
+
+## 控制器接入
+
+[持久启动控制器](57-browser-controller.md)现已使用这些组件提供一次性 Pod 创建、数据库启动授权与停止记录。GUI 控制及 profile 检查点/释放仍未开放。

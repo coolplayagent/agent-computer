@@ -1,6 +1,6 @@
 # 56. Browser Pod and node runtime
 
-The [private worker bridge](55-browser-worker-bridge.md) now has a Rust controller protocol, Kubernetes Browser plan/attach adapter, and a separate node process guard. These are internal components. The public App API still queues admissions; production dispatch, durable GUI authority/action journals and profile checkpoint/restore remain pending. Browser readiness is unchanged.
+The [private worker bridge](55-browser-worker-bridge.md) now has a Rust controller protocol, Kubernetes Browser plan/attach adapter, and a separate node process guard. These are internal components. The public App API queues admissions for the [durable launch controller](57-browser-controller.md); GUI authority/action journals and profile checkpoint/restore remain pending. Browser readiness is unchanged.
 
 ## Separate Pod
 
@@ -27,3 +27,7 @@ The adapter opens Kubernetes v5 attach once, validates the nonce exchange and re
 The fixture performs UID-preconditioned immediate API cleanup only after retaining a live process-stop proof. This prevents stale kubelet accounting from rejecting the next 3-CPU fixture; it is not a product force-delete path. The deadline case keeps its idle pipe open until the original watchdog deadline, so EOF cannot substitute natural shutdown for expiry.
 
 See the [source-bound validation record](../evidence/browser-runtime-2026-10-11.json) for all test results, actual runtime readback and limitations.
+
+## Controller integration
+
+[The durable controller](57-browser-controller.md) now supplies one-shot Pod creation and database launch authorization using these components. GUI control and profile checkpoint/release remain unavailable.

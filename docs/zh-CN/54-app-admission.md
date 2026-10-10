@@ -38,7 +38,7 @@ agent-computer-server browser-profile-owner-register --database-url-file /privat
 
 组织事务锁串行化准入、取消和资源 grant 修改。每个 Computer/App 只能有一个未取消实例；每个准备请求/Sandbox 只能占用一次；每个组织/Profile 同时只能被一个实例占用。共享 Sandbox 的不同 App 不能重复使用同一份 CPU/内存预留，现有执行准入也已排除 App Sandbox。Queued 和 Blocked 都占用每组织 64、每主体 8 的容量上限。App 代次在取消和 Computer 换代后继续递增，Store 与 SQL 变更保护禁止删除或改写历史。
 
-状态为 `Queued → Blocked → Cancelled` 或 `Queued → Cancelled`。凭据撤销、主体禁用、连接关闭/撤销会在同一事务中写入 Blocked；移除必要 grant 或降低 activation 预算也会永久阻断预留，恢复权限不会使其复活。查询和原请求重试还会核对原身份、连接、grant、目录、Computer 代次与期限，过期或失去授权后转为 Blocked。Blocked 继续占位，直到显式取消；它不是进程已终止的证据，本增量尚无派发路径。
+未派发预留的状态为 `Queued → Blocked → Cancelled` 或 `Queued → Cancelled`。凭据撤销、主体禁用、连接关闭/撤销会在同一事务中写入 Blocked；移除必要 grant 或降低 activation 预算也会永久阻断预留，恢复权限不会使其复活。查询和原请求重试还会核对原身份、连接、grant、目录、Computer 代次与期限，过期或失去授权后转为 Blocked。Blocked 继续占位，直到显式取消；它不是进程已终止的证据。独立控制器使用 Dispatching、Running 和 Draining 状态，同样持续占位，已派发实例不能通过准入取消释放。
 
 取消需提供 `app_generation` 和 `expected_revision`。同键同输入重试只返回原记录当前状态，不创建新实例。原主体的新凭据可按当前 grant 查询或取消，但不能继承旧连接、复活 Blocked 准入。任何 App 预留仍存在时，Computer 都不能停止或封存 Candidate；Store 前置检查和数据库保护共同强制此约束，过期记录也不例外。应先取消尚未派发的 App。
 
@@ -48,6 +48,10 @@ agent-computer-server browser-profile-owner-register --database-url-file /privat
 
 PostgreSQL 与 HTTP 契约覆盖 WAL 重启、从迁移 30 升级、幂等、并发归属、不可变 Profile 主体、旧代次、独立 scope、凭据/grant/连接失效、固定过期、取消及 Computer 停止/封存阻断。另一个 HTTP 场景使用两个不同 App、两个不同 Profile 和同一个 Sandbox，验证预算槽位独占。夹具中的存储准备回执明确为合成证据，仅证明数据库和服务行为，不启动 Chromium，也不认证部署环境。
 
-下一步仍须接入实际 App 启动 worker 与 Pod 身份、节点 fencing、持久 GUI 控制代次与动作 journal、BrowserDriver 可信桥接、profile checkpoint/restore 和 ComputerView。Queued 记录不等同于生产 `Authority` 或 `ActionJournal` 适配器。完整 D09 与 T04/T05/T10/T24 验收仍未完成。[本增量源码绑定记录](../evidence/app-admission-2026-10-11.json)保留这些限制。
+[启动控制器](57-browser-controller.md)已接入实际 Pod、数据库启动授权与节点停止记录；持久 GUI 控制代次与动作 journal、profile checkpoint/restore 和 ComputerView 仍待接入。Queued 记录不等同于生产 `Authority` 或 `ActionJournal` 适配器。完整 D09 与 T04/T05/T10/T24 验收仍未完成。[本增量源码绑定记录](../evidence/app-admission-2026-10-11.json)保留这些限制。
 
-[Browser worker 桥接](55-browser-worker-bridge.md)现提供私有进程通信入口，持久控制器和节点接入仍待完成。
+[Browser worker 桥接](55-browser-worker-bridge.md)现提供私有进程通信入口，节点与持久启动控制器已接入，GUI 控制授权仍待完成。
+
+## 启动控制器接入
+
+[Browser 启动控制器](57-browser-controller.md)通过独立运维命令消费预留。已派发实例新增 Dispatching、Running、Draining 状态；它们持续占用原槽位，不能使用取消排队接口释放。运行实例撤权后进入 Draining，不表示已停止或已提交 profile 检查点。GUI 授权和动作日志仍待接入。

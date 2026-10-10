@@ -23,6 +23,9 @@ pub enum AppState {
     Queued,
     Blocked,
     Cancelled,
+    Dispatching,
+    Running,
+    Draining,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -40,7 +43,7 @@ pub struct AppInstance {
     pub binding_digest: String,
     pub revision: i64,
     pub state: AppState,
-    /// This admission API neither launches an App nor establishes runtime readiness.
+    /// Browser launch observation alone does not establish complete App readiness.
     pub ready: bool,
     pub created_at_ms: i64,
     pub expires_at_ms: i64,

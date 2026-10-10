@@ -1,5 +1,5 @@
 use super::*;
-use super::{runtime::runtime_fixture_many, starts::grants};
+use super::{runtime::runtime_fixture_many_for_browser, starts::grants};
 use agent_computer_storage::{Manifest, Prepared};
 use agent_computer_store::{
     Error,
@@ -28,7 +28,16 @@ pub(super) async fn setup_many(
     apps: bool,
     computers: usize,
 ) -> (Database, String, String, StartReceipt, PreparationTarget) {
-    let (db, _, token, computer, _) = runtime_fixture_many(quota, apps, computers).await;
+    setup_browser(quota, apps, computers, None).await
+}
+pub(super) async fn setup_browser(
+    quota: i64,
+    apps: bool,
+    computers: usize,
+    image: Option<&str>,
+) -> (Database, String, String, StartReceipt, PreparationTarget) {
+    let (db, _, token, computer, _) =
+        runtime_fixture_many_for_browser(quota, apps, computers, image).await;
     grants(&db).await;
     let ClaimOutcome::Claimed(volume) = db
         .store

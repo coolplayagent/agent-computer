@@ -1,6 +1,7 @@
 //! Trusted, one-claim reconciliation workers. Runtime activation and storage
 //! mounting are separate admissions; a definition is never an implicit Pod start.
 #![forbid(unsafe_code)]
+pub mod browser;
 pub mod candidate;
 pub mod execution;
 pub mod files;
