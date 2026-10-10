@@ -35,4 +35,4 @@
 
 真实临时 K3s/CSI + JuiceFS + S3 实验运行同时存在的写租约与不同内容保存，拒绝跨 Candidate 权限借用，保留两个实际发布结果，分别恢复默认与冲突版本，继续编辑并恢复分支，最后从当前 head 显式合并。内容和 inode 检查证明文件独立。独立 Python SigV4 客户端从 S3 读取全部五个 Artifact 清单与六个分块对象，校验七个完整文件，其中包含原有空文件场景。这是单 VM 组件证据；数据库构造数据本身不证明存储行为。
 
-交付包含绑定源码的证据与日志。Computer `ready` 仍为 false，T01–T43 产品验收保持 `not_run`。通用进程/CSI 排空、强制停止、App/browser/profile checkpoint、跨 Workspace fork、私有 Artifact ACL、自动冲突解决、Presentation 和垃圾回收仍待实现。保留的旧 Candidate 与新 Candidate 均占用容量。
+[绑定源码的交付证据](../evidence/artifact-candidate-continuation-2026-10-10.json)与[日志](../evidence/artifact-candidate-continuation-2026-10-10.log)包含最终二进制哈希、独立 S3 回读以及已完成的 VM/临时凭据清理。Computer `ready` 仍为 false，T01–T43 产品验收保持 `not_run`。通用进程/CSI 排空、强制停止、App/browser/profile checkpoint、跨 Workspace fork、私有 Artifact ACL、自动冲突解决、Presentation 和垃圾回收仍待实现。保留的旧 Candidate 与新 Candidate 均占用容量。
