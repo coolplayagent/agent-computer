@@ -2,11 +2,11 @@
   "schema_version": 1,
   "date": "2026-10-10",
   "scope": "Trusted local node arming and database-backed Candidate startup, single disposable K3s/gVisor/CSI VM; not product acceptance",
-  "status": "final_worktree_verified_awaiting_commit_binding",
-  "source_commit": null,
+  "status": "passed_component_verification",
+  "source_commit": "fd672ef230f345947237af0915cd3b897a562b4b",
   "source_base_commit": "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
   "source_worktree_dirty_at_execution": true,
-  "source_binding_method": "Source/build input hashes were checked before and after the final tests. Fresh Bazel execution/server binaries were uploaded and their remote SHA-256 matched the local binaries. The unchanged watchdog binary matches the twelve-case kernel probe. Source-to-feature-commit binding is recorded in the following evidence commit.",
+  "source_binding_method": "All 240 source/build input hashes were verified against both the final tested worktree and feature commit fd672ef230f345947237af0915cd3b897a562b4b. Fresh Bazel execution/server binaries were uploaded and all three remote binary hashes matched local binaries. The unchanged watchdog binary matches the twelve-case kernel probe. This later evidence commit changes documentation/evidence only.",
   "source_inputs_sha256": {
     ".bazelrc": "9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
     ".bazelversion": "14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
@@ -871,11 +871,275 @@
           ]
         }
       }
+    },
+    "implementation_qualitygate": {
+      "schema_version": 1,
+      "selection": {
+        "mode": "delivery",
+        "exclude": [],
+        "excluded_paths": [],
+        "changed_files": [
+          "Cargo.lock",
+          "Cargo.toml",
+          "MODULE.bazel.lock",
+          "README.md",
+          "crates/kubernetes/src/lib.rs",
+          "crates/kubernetes/src/node.rs",
+          "crates/kubernetes/src/tests.rs",
+          "crates/node/BUILD.bazel",
+          "crates/node/Cargo.toml",
+          "crates/node/src/command.rs",
+          "crates/node/src/guard.rs",
+          "crates/node/src/lib.rs",
+          "crates/node/src/observation.rs",
+          "crates/store/BUILD.bazel",
+          "crates/store/Cargo.toml",
+          "crates/store/migrations/0016_execution_watchdogs.sql",
+          "crates/store/src/migrations.rs",
+          "crates/store/src/runtime/writers/executions.rs",
+          "crates/store/src/runtime/writers/executions/dispatch.rs",
+          "crates/store/src/runtime/writers/executions/dispatch/pods.rs",
+          "crates/store/src/runtime/writers/executions/dispatch/startup.rs",
+          "crates/store/src/runtime/writers/executions/dispatch/watchdogs.rs",
+          "crates/store/src/runtime/writers/mod.rs",
+          "crates/store/tests/contracts/plans/writers/executions/dispatch.rs",
+          "crates/store/tests/contracts/plans/writers/executions/dispatch/pods.rs",
+          "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs.rs",
+          "crates/store/tests/support/mod.rs",
+          "crates/watchdog/src/main.rs",
+          "crates/worker/BUILD.bazel",
+          "crates/worker/Cargo.toml",
+          "crates/worker/src/execution.rs",
+          "crates/worker/tests/execution_live.rs",
+          "crates/worker/tests/support/execution_faults.rs",
+          "deploy/testing/node-watchdog-rbac.yaml",
+          "docs/README.md",
+          "docs/en/04-implementation-plan.md",
+          "docs/en/05-verification.md",
+          "docs/en/29-execution-worker.md",
+          "docs/en/30-node-watchdog.md",
+          "docs/en/31-node-guarded-startup.md",
+          "docs/evidence/node-guarded-startup-2026-10-10.json",
+          "docs/evidence/node-guarded-startup-2026-10-10.log",
+          "docs/zh-CN/04-implementation-plan.md",
+          "docs/zh-CN/05-verification.md",
+          "docs/zh-CN/29-execution-worker.md",
+          "docs/zh-CN/30-node-watchdog.md",
+          "docs/zh-CN/31-node-guarded-startup.md",
+          "knowledge/glossary/business-glossary.yaml",
+          "knowledge/knowledge-map.yaml",
+          "knowledge/knowledge-map.yaml.previous",
+          "knowledge/topics/topic-875b9380866e9d56-49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a.yaml",
+          "knowledge/topics/topic-875b9380866e9d56-5eb0d731eadb186ea1f4ce92f51b2b5cb0a6d78b1a165fb8eec47922be7df9a2.yaml"
+        ],
+        "changed_lines": 7562,
+        "execution_context_digest": "sha256:46dc1f96f982866c52c83756c7f00c31adad7388d35b1862b651f98a5c6aebe9",
+        "empty_delivery": false
+      },
+      "run_id": "run-7tcWUR",
+      "scope": "delivery",
+      "profile": "full",
+      "evaluator_digest": "sha256:5dfafb2cac49f134c39953613f350b003982180ea9e51d54a907753e5c5083c1",
+      "environment_digest": "sha256:eece6de20aada4c45f4afcfb4c9d52ff2f200d7677e4e54af39981101a190f7e",
+      "snapshot": {
+        "verification_digest": "sha256:44eb320c90dd2a3ebfeb051de1706268f72b432699f5d0b9c3d9789fbc20395f",
+        "mode": "worktree",
+        "base": "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
+        "head": "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
+        "content_digest": "sha256:46dc1f96f982866c52c83756c7f00c31adad7388d35b1862b651f98a5c6aebe9"
+      },
+      "policy": {
+        "source": "qualitygate.yaml",
+        "config_digest": "sha256:e41d8bec8d00e40c13e91e92a62f053dce1b53f383f72bc30c1128233f919b10",
+        "rules_digest": "sha256:06d35ddf072f838422f9a4e2dbc6ac7f842c12163cc4a2dda18a15db4602cd13",
+        "task_contract_digest": null,
+        "trust": "local_candidate",
+        "changes": []
+      },
+      "plan": {
+        "execution_order": [
+          "line-ending"
+        ],
+        "required_checks": [
+          "line-ending"
+        ],
+        "pending_delivery_checks": [],
+        "acceptance": {}
+      },
+      "gate": {
+        "complete": true,
+        "decision": "pass",
+        "blockers": []
+      },
+      "checks": [
+        {
+          "id": "line-ending",
+          "rule_version": 1,
+          "required": true,
+          "severity": "error",
+          "applicability": "applicable",
+          "execution": {
+            "status": "completed",
+            "reason": null,
+            "argv": [],
+            "cwd": null,
+            "started_at_ms": null,
+            "ended_at_ms": null,
+            "duration_ms": null,
+            "exit_code": null,
+            "artifacts": []
+          },
+          "verdict": "pass",
+          "matched_entities": 51,
+          "diagnostics": [],
+          "metadata": {
+            "adapter_version": "0.5.7",
+            "delivery_filtered": 0,
+            "depends_on": [],
+            "rule_definition": {
+              "builtin": {
+                "defaults": {
+                  "depends_on": [],
+                  "enabled": true,
+                  "parameters": {},
+                  "required": true,
+                  "severity": "error",
+                  "source": null
+                },
+                "description": "Preserve line endings; new text files use LF",
+                "id": "line-ending",
+                "implementation": "line-ending",
+                "language": [],
+                "lifecycle_inputs": [
+                  "source-format-hygiene"
+                ],
+                "requires_capabilities": [
+                  "files"
+                ],
+                "standard_refs": [
+                  {
+                    "controls": [
+                      "formatting",
+                      "file-integrity"
+                    ],
+                    "source_id": "google-cpp"
+                  },
+                  {
+                    "controls": [
+                      "formatting",
+                      "source-file"
+                    ],
+                    "source_id": "google-java"
+                  },
+                  {
+                    "controls": [
+                      "coding-style",
+                      "static-gate"
+                    ],
+                    "source_id": "huawei-codearts"
+                  },
+                  {
+                    "controls": [
+                      "formatting",
+                      "reviewability"
+                    ],
+                    "source_id": "meta-velox"
+                  }
+                ],
+                "version": 1
+              },
+              "custom": null,
+              "origin": "skill:references/rules/core/line-ending.yaml",
+              "package": "core"
+            }
+          }
+        }
+      ],
+      "summary": {
+        "checks_total": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "incomplete": 0,
+        "diagnostics_total": 0,
+        "diagnostics_filtered": 0
+      },
+      "verification": {
+        "conclusion": "\u5728\u5df2\u9a8c\u8bc1\u5f62\u6001\u4e0b\u672a\u53d1\u73b0\u95ee\u9898 / No problems found in the verified shapes",
+        "verified_shapes": [
+          "line-ending: 51 matched entities; verdict Some(Pass)"
+        ],
+        "known_limits": [
+          "Results cover only the selected snapshot, policy, configured tools and observed inputs.",
+          "Warning findings remain review signals even when the blocking gate is satisfied.",
+          "Fixture regression can falsify known behavior; it cannot prove correctness on a real deployment.",
+          "Delivery scope selects changed lines and changed-file findings; unlocated command failures and incomplete evidence remain blocking. This is not repository-wide approval."
+        ],
+        "unverified_assumptions": [
+          "Unrepresented frameworks, runtime configuration delivery, reflection and production environments are not verified.",
+          "Custom rules and external tool versions require their own representative regression evidence."
+        ]
+      },
+      "context": {
+        "report_path": "/opt/workspace/agent-computer/.qualitygate/evidence/node-guarded-startup-push/run-7tcWUR/report.json",
+        "recheck": {
+          "argv": [
+            "qualitygate",
+            "--root",
+            "/opt/workspace/agent-computer",
+            "check",
+            "--worktree",
+            "--base",
+            "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
+            "--expect-base",
+            "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
+            "--snapshot-max-mib",
+            "256",
+            "--snapshot-max-file-mib",
+            "2",
+            "--snapshot-jobs",
+            "4",
+            "--snapshot-timeout-secs",
+            "120",
+            "--config",
+            "qualitygate.yaml",
+            "--profile",
+            "full",
+            "--format",
+            "json"
+          ]
+        },
+        "delivery_recheck": {
+          "argv": [
+            "qualitygate",
+            "--root",
+            "/opt/workspace/agent-computer",
+            "check",
+            "--worktree",
+            "--base",
+            "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
+            "--expect-base",
+            "9c965ca75fa4a4ab5ae67a0d3b80d6c5ea97f74c",
+            "--snapshot-max-mib",
+            "256",
+            "--snapshot-max-file-mib",
+            "2",
+            "--snapshot-jobs",
+            "4",
+            "--snapshot-timeout-secs",
+            "120",
+            "--config",
+            "qualitygate.yaml",
+            "--profile",
+            "full",
+            "--format",
+            "json"
+          ]
+        }
+      }
     }
   },
-  "remaining_finalization": [
-    "Bind the verified source/build inventory to the feature commit in the following evidence commit."
-  ],
+  "remaining_finalization": [],
   "cleanup": {
     "status": "complete",
     "vm_pid": 2822575,
@@ -934,7 +1198,14 @@
       "updated_at_ms": 1791537636135
     },
     "maps_validated": true,
-    "limit": "Existing service backlog cannot publish the current source; code/runtime verification is independent of this index."
+    "limit": "Existing service backlog cannot publish the current source; code/runtime verification is independent of this index.",
+    "feature_commit_update": {
+      "requested_commit": "fd672ef230f345947237af0915cd3b897a562b4b",
+      "error_kind": "qos_rejected",
+      "unfinished_tasks": 32,
+      "capacity": 32,
+      "result": "Current source remains unindexed; no queue bypass or competing worker was started."
+    }
   },
   "limits": [
     "No accepted execution completion, storage drain, writer release or durable fencing.",
