@@ -12,6 +12,8 @@ pub struct RuntimeObservation {
     pub cgroup_path: String,
     pub cgroup_inode: u64,
     pub workspace_inode: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workspace_mount: Option<agent_computer_fence::MountReference>,
     pub volume_path: String,
     pub runtime_processes: Vec<ProcessIdentity>,
 }
@@ -59,6 +61,7 @@ pub(crate) fn fields(
     container: &Value,
     sandbox: &Value,
     metadata: &Value,
+    fenced: bool,
 ) -> Result<RuntimeFields> {
     parse(
         &Identity {
@@ -72,6 +75,7 @@ pub(crate) fn fields(
         container,
         sandbox,
         metadata,
+        fenced,
     )
 }
 
@@ -102,6 +106,7 @@ fn parse(
     container: &Value,
     sandbox: &Value,
     metadata: &Value,
+    fenced: bool,
 ) -> Result<RuntimeFields> {
     let sid = sandbox_id(container)?;
     let labels = container
@@ -207,12 +212,18 @@ fn parse(
     let source = workspace[0]["source"]
         .as_str()
         .ok_or(Error::InvalidObservation)?;
-    if source
-        != format!(
+    let expected = if fenced {
+        format!(
+            "/var/lib/kubelet/pods/{}/volumes/kubernetes.io~csi/workspace/mount",
+            id.pod_uid()
+        )
+    } else {
+        format!(
             "/var/lib/kubelet/pods/{}/volume-subpaths/{volume_path}/sandbox/2",
             id.pod_uid()
         )
-    {
+    };
+    if source != expected {
         return Err(Error::IdentityMismatch);
     }
     let options = workspace[0]["options"]
@@ -367,11 +378,25 @@ mod tests {
         let sandbox = json!({"status":{"id":sid,"state":"SANDBOX_READY","metadata":{"uid":uid},"runtimeHandler":"runsc","labels":labels},"info":{"runtimeType":"io.containerd.runsc.v1","pid":42,"config":{"linux":{"cgroup_parent":format!("/kubepods.slice/{leaf}")}},"runtimeSpec":{"linux":{"cgroupsPath":format!("{leaf}:cri-containerd:{sid}")}}}});
         let metadata = json!({"ID":container_id,"Runtime":{"Name":"io.containerd.runsc.v1"}});
         assert_eq!(
-            parse(&id, &command, "pvc-id", &container, &sandbox, &metadata)
-                .unwrap()
-                .pid,
+            parse(
+                &id, &command, "pvc-id", &container, &sandbox, &metadata, false
+            )
+            .unwrap()
+            .pid,
             42
         );
+        assert!(
+            parse(
+                &id, &command, "pvc-id", &container, &sandbox, &metadata, true
+            )
+            .is_err()
+        );
+        let mut fenced = container.clone();
+        fenced["info"]["runtimeSpec"]["mounts"][0]["source"] = json!(format!(
+            "/var/lib/kubelet/pods/{uid}/volumes/kubernetes.io~csi/workspace/mount"
+        ));
+        assert!(parse(&id, &command, "pvc-id", &fenced, &sandbox, &metadata, true).is_ok());
+        assert!(parse(&id, &command, "pvc-id", &fenced, &sandbox, &metadata, false).is_err());
         for (pointer, value) in [
             ("/status/id", json!("c".repeat(64))),
             ("/status/labels/io.kubernetes.pod.uid", json!("replacement")),
@@ -399,16 +424,29 @@ mod tests {
             let mut changed = container.clone();
             *changed.pointer_mut(pointer).unwrap() = value;
             assert!(
-                parse(&id, &command, "pvc-id", &changed, &sandbox, &metadata).is_err(),
+                parse(
+                    &id, &command, "pvc-id", &changed, &sandbox, &metadata, false
+                )
+                .is_err(),
                 "{pointer}"
             );
         }
         let mut changed = sandbox.clone();
         changed["info"]["config"]["linux"]["cgroup_parent"] = json!("/kubepods.slice");
-        assert!(parse(&id, &command, "pvc-id", &container, &changed, &metadata).is_err());
+        assert!(
+            parse(
+                &id, &command, "pvc-id", &container, &changed, &metadata, false
+            )
+            .is_err()
+        );
         let mut changed = metadata.clone();
         changed["Runtime"]["Name"] = json!("io.containerd.runc.v2");
-        assert!(parse(&id, &command, "pvc-id", &container, &sandbox, &changed).is_err());
+        assert!(
+            parse(
+                &id, &command, "pvc-id", &container, &sandbox, &changed, false
+            )
+            .is_err()
+        );
     }
     #[test]
     fn process_identity_uses_start_ticks_and_rejects_dead_or_partial_records() {

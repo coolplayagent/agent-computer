@@ -127,7 +127,22 @@ impl Store {
             .await?
             .ok_or(Error::RuntimeAccessUnavailable)?;
         let runtime = &guard.evidence().runtime;
+        let pod_binding: serde_json::Value = serde_json::from_str(
+            plan.manifest["metadata"]["annotations"]["agent-computer.io/binding"]
+                .as_str()
+                .ok_or(Error::InvalidStoredData)?,
+        )
+        .map_err(|_| Error::InvalidStoredData)?;
+        let expected_mount = &pod_binding["workspace"]["fence"]["mount"];
+        let actual_mount = serde_json::to_value(&runtime.workspace_mount)
+            .map_err(|_| Error::InvalidRuntimeRequest)?;
         if dispatch.intent_digest != original.intent_digest
+            || expected_mount != &actual_mount
+            || (!actual_mount.is_null()
+                && (actual_mount["prepared"] != dispatch.binding["prepared"]
+                    || pod_binding["workspace"]["fence"]["node"]
+                        != serde_json::to_value(runtime.identity.node())
+                            .map_err(|_| Error::InvalidRuntimeRequest)?))
             || runtime.identity.namespace_uid() != plan.namespace_uid
             || runtime.identity.namespace() != plan.namespace
             || runtime.identity.pod_name() != plan.pod_name

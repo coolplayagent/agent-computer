@@ -1,0 +1,51 @@
+load("@crates//:defs.bzl", "all_crate_deps")
+load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+
+cargo_build_script(
+    name = "build_script",
+    srcs = ["build.rs"],
+    crate_name = "agent_computer_csi",
+    edition = "2024",
+    deps = all_crate_deps(build = True),
+    proc_macro_deps = all_crate_deps(build_proc_macro = True),
+)
+
+rust_library(
+    name = "csi",
+    srcs = glob(["src/**/*.rs"], exclude = ["src/main.rs"]),
+    crate_name = "agent_computer_csi",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    rustc_env = {"CARGO_PKG_VERSION": "0.1.0"},
+    visibility = ["//visibility:public"],
+    deps = [":build_script", "//crates/fence"] + all_crate_deps(normal = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+)
+
+rust_binary(
+    name = "agent-computer-csi",
+    srcs = ["src/main.rs"],
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    deps = [":csi"] + all_crate_deps(normal = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True),
+)
+
+rust_test(
+    name = "csi_contracts_test",
+    size = "small",
+    crate = ":csi",
+    deps = all_crate_deps(normal_dev = True),
+)
+
+rust_test(
+    name = "csi_live_test",
+    size = "medium",
+    srcs = ["tests/live.rs"],
+    edition = "2024",
+    tags = ["manual", "requires-kubernetes"],
+    rustc_flags = ["-Dwarnings"],
+    deps = [":csi", "//crates/fence"] + all_crate_deps(normal = True, normal_dev = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
+)

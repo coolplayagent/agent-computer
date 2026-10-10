@@ -18,6 +18,18 @@ pub fn compile_plan(
     storage: &StorageClassBinding,
     approved_image: &str,
 ) -> Result<StartupSandboxPlan> {
+    compile(inputs, client, storage, approved_image, None)
+}
+pub(super) fn compile(
+    inputs: &ExecutionRuntimeInputs,
+    client: &Client,
+    storage: &StorageClassBinding,
+    approved_image: &str,
+    fence: Option<(
+        agent_computer_fence::MountReference,
+        agent_computer_kubernetes::NodeIdentity,
+    )>,
+) -> Result<StartupSandboxPlan> {
     let volume = crate::compile_volume(&inputs.volume, client, storage)
         .map_err(|_| Error::ReferenceUnavailable)?;
     if inputs.target.namespace_uid != client.namespace_uid()
@@ -61,6 +73,13 @@ pub fn compile_plan(
         &inputs.prepared,
     )
     .map_err(|_| Error::ReferenceUnavailable)?;
+    let candidate = if let Some((reference, node)) = fence {
+        candidate
+            .with_fence(reference, node)
+            .map_err(|_| Error::ReferenceUnavailable)?
+    } else {
+        candidate
+    };
     StartupSandboxPlan::with_candidate(
         &definition,
         "sandbox",

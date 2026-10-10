@@ -6,6 +6,8 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+agent-computer-csi = { path = "../csi" }
+agent-computer-fence = { path = "../fence" }
 agent-computer-core = { path = "../core" }
 agent-computer-definitions = { path = "../definitions" }
 agent-computer-kubernetes = { path = "../kubernetes" }
@@ -19,7 +21,6 @@ serde.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]
-agent-computer-fence = { path = "../fence" }
 rustix.workspace = true
 agent-computer-test-support = { path = "../test-support" }
 tokio.workspace = true

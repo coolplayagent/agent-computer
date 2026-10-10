@@ -20,6 +20,7 @@ pub struct CandidateMount {
     candidate: String,
     generation: u64,
     prepared: Prepared,
+    fence: Option<(agent_computer_fence::MountReference, crate::NodeIdentity)>,
 }
 impl CandidateMount {
     pub fn new(
@@ -70,7 +71,23 @@ impl CandidateMount {
             candidate: request.candidate.clone(),
             generation: request.generation,
             prepared: prepared.clone(),
+            fence: None,
         })
+    }
+    /// Plan metadata only. Runtime admission must independently hold the live
+    /// fence and verify the actual CSI-published device/inode on this node.
+    pub fn with_fence(
+        mut self,
+        reference: agent_computer_fence::MountReference,
+        node: crate::NodeIdentity,
+    ) -> Result<Self> {
+        reference.validate().map_err(|_| Error::InvalidIdentity)?;
+        node.validate()?;
+        if reference.prepared != self.prepared || reference.boot_id != node.boot_id {
+            return Err(Error::IdentityMismatch);
+        }
+        self.fence = Some((reference, node));
+        Ok(self)
     }
     pub(crate) fn check_sandbox(
         &self,
@@ -96,11 +113,15 @@ impl CandidateMount {
     }
     pub(crate) fn binding(&self) -> Value {
         // Do not embed the input manifest or its objects in Pod annotations.
-        json!({"kind":"prepared_candidate","version":1,"organization":self.organization,"computer":self.computer,
+        let mut binding = json!({"kind":"prepared_candidate","version":1,"organization":self.organization,"computer":self.computer,
             "workspace":self.workspace,"candidate":self.candidate,"generation":self.generation,
             "namespace_uid":self.namespace_uid,"pvc_name":self.volume.name,"pv_uid":self.pv_uid,
             "volume_path":self.volume_path,"prepared":self.prepared,
-            "volume_binding":self.volume.pvc["metadata"]["annotations"]["agent-computer.io/volume-binding"]})
+            "volume_binding":self.volume.pvc["metadata"]["annotations"]["agent-computer.io/volume-binding"]});
+        if let Some((reference, node)) = &self.fence {
+            binding["fence"] = json!({"mount":reference,"node":node});
+        }
+        binding
     }
     pub(crate) fn mount(&self, pod: &mut Value) -> Result<()> {
         // fsGroup can recursively change the whole CSI volume, including private
@@ -125,6 +146,18 @@ impl CandidateMount {
             .find(|v| v["name"] == "workspace")
             .ok_or(Error::InvalidIdentity)?;
         *mount = json!({"name":"workspace","mountPath":"/workspace","subPath":self.prepared.path_ref,"readOnly":false});
+        if let Some((reference, node)) = &self.fence {
+            *mount = json!({"name":"workspace","mountPath":"/workspace","readOnly":false});
+            let volumes = pod["spec"]["volumes"]
+                .as_array_mut()
+                .ok_or(Error::InvalidIdentity)?;
+            let volume = volumes
+                .iter_mut()
+                .find(|v| v["name"] == "workspace")
+                .ok_or(Error::InvalidIdentity)?;
+            *volume = json!({"name":"workspace","csi":{"driver":"csi.agent-computer.io","readOnly":false,"volumeAttributes":{"agent-computer.io/mount-instance":reference.instance}}});
+            pod["spec"]["nodeName"] = json!(node.name);
+        }
         Ok(())
     }
 }

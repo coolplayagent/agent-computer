@@ -42,6 +42,7 @@
 38. [Workspace Artifact 与纯文件 checkpoint](zh-CN/38-workspace-artifact-checkpoints.md)
 39. [并行 Candidate 与 Artifact 继续编辑](zh-CN/39-artifact-candidate-continuation.md)
 40. [可撤销的 Candidate 文件系统](zh-CN/40-candidate-io-fence.md)
+41. [经 CSI 发布执行文件屏障](zh-CN/41-fenced-execution-csi.md)
 
 ## 02. English
 
@@ -85,6 +86,7 @@
 38. [Workspace artifacts and file-only checkpoints](en/38-workspace-artifact-checkpoints.md)
 39. [Parallel Candidates and Artifact continuation](en/39-artifact-candidate-continuation.md)
 40. [Revocable Candidate filesystem](en/40-candidate-io-fence.md)
+41. [Fenced execution mounts through CSI](en/41-fenced-execution-csi.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

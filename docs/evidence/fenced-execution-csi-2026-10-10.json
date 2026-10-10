@@ -1,0 +1,2590 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "Trusted inline CSI publication and runtime identity verification for per-execution Candidate FUSE mounts, with fail-closed cleanup and observation-only recovery",
+  "status": "passed_component_verification",
+  "source_commit": "819a4179a8ac5a51c570777abc2c9c6e5b419857",
+  "source_worktree_dirty_at_execution": true,
+  "source_binding_method": "All 313 source/build/schema/deployment inputs equal the tested feature commit. Five final VM executables equal local Bazel outputs; the OCI supervisor also matches. Subsequent changes are documentation and evidence only.",
+  "source_inputs_sha256": {
+    ".bazelrc": "9403ca738f67f182268008345fd809acedf0e77432427e60d826f1929152560b",
+    ".bazelversion": "14ebdd5f5d8dfccb0fc574ea9aabecc07d7cdd99d53e4fc01e58f9c3d23d18ef",
+    "BUILD.bazel": "384125baec4fe4d63c7b9e512f8ccfd58b31e7bdde6aff733471364cad47b858",
+    "Cargo.lock": "5014203ee33737a0a468dc6e3ae16293d9d1966e19ea9f00933c16c7c490944b",
+    "Cargo.toml": "5aa8a739ee7cf5aa0d91facffe6fcec5a386524185c912084a8dfe1420fbebf4",
+    "MODULE.bazel": "77feb0420ccdd9f7d726aff0481653db5757db7732fb395fb8b9584323de14cd",
+    "MODULE.bazel.lock": "5c63a872b6a8e533feaf0c60e2bd587222244852eaea206b909d63fda5b2f9ba",
+    "crates/cli/BUILD.bazel": "be0fbd3db600673cf409fa3b41d0b219765c990045fa1678b8425bc3336bd0a1",
+    "crates/cli/Cargo.toml": "f9f9ba4b01edcad44db66dfff0199468110315fe385c7b8eb7a671e8092280f6",
+    "crates/cli/src/main.rs": "82e446d645c8f740771d301750f8685789c4f0922d30e2d3b57e72210b6a81a1",
+    "crates/cli/src/validate.rs": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/core/BUILD.bazel": "1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/csi/BUILD.bazel": "fe1e5467745dc4e76d5b64ed563402c52746b3b4f6a4ca4a36094dbc7be8d158",
+    "crates/csi/Cargo.toml": "f7847ac1ae0f4286bd56518b9724db5204c2d9d4758a99a92b26355e8845a64d",
+    "crates/csi/build.rs": "21cca4eb7f50b06bb6423d5fac2f0d1abbef880acc753f8f8b8fd4623b57490c",
+    "crates/csi/src/lib.rs": "ec914d19bd04080bc0d0c2814d55824c3723cd62952456f53c3ec3ff0d845ff3",
+    "crates/csi/src/local.rs": "d0da92076cabe589150582761566b1f60a9ab0809bed310fadd113cfbc8a880c",
+    "crates/csi/src/main.rs": "350e652663e2f11fa175a290b683d79d336e5d6a5646a8fb669a7a5e75e04b3a",
+    "crates/csi/src/registry.rs": "e10a106576061dca0fc6eb4bcab4fb538d0c564a6339320fa88dd105b2c6b8ae",
+    "crates/csi/src/server.rs": "adb5e8fda846e14a6b82205c2e1b1f9efac0ab4ec016b967a5126dcb144c3a0b",
+    "crates/csi/src/tests.rs": "412d495cb4f95da024d05545bd106afdd185a59571779dfdbc14ca277b8474b9",
+    "crates/csi/src/wire.rs": "9a6cca774425814b067522228c4cf08fd04b2223febfd6620fe5aabc2b373490",
+    "crates/csi/tests/live.rs": "5f3e19c770b083ddf01014284de1cbd14bdc9329e3b8ea74d29332dfab0f9f52",
+    "crates/definitions/BUILD.bazel": "68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/fence/BUILD.bazel": "171f330a2a78bd98b911aabc0dd77c65c2b8d554c611e49f180d268cc60e26d4",
+    "crates/fence/Cargo.toml": "55adc683b4b372a58afdc9319e73e98877711f7cd2839953fba44392075e92b1",
+    "crates/fence/src/backend.rs": "bdc65a80b9f4d4a6e3a06e47a02c7b5545c2650f69e7bd920e42ce81bb7727af",
+    "crates/fence/src/filesystem.rs": "2aa6257f41a1afd99f5d74461ebc8b903479b33c9ae1b0d230aa079b4545054d",
+    "crates/fence/src/lib.rs": "c4b75f2a7cbc0a0d437017ec9eb5cae300b3f7ac10416cd41887d1b874634a3a",
+    "crates/fence/src/reference.rs": "b46f24ddd5c48ce2f3b91d639279ead54e36992ff41faca693cb82e3f26581fa",
+    "crates/fence/src/tests.rs": "d75713fe35ed0d9e1d9409a26e5440a42b7b80e413b302718ea2f98583247af6",
+    "crates/kubernetes/BUILD.bazel": "6f29f61cd3607cb8e31fc31aaba957261b03f4655a5698b931fc5cf1b840ff65",
+    "crates/kubernetes/Cargo.toml": "bfda92cd47e428c55e1158f5ec6a5d0aaad8b1dffb342a635fb3ba8199c9db87",
+    "crates/kubernetes/src/attach.rs": "b565d5a7328a98b67c3a22e969a3937e7ee7b86192432bb6b4d10adbe38962f0",
+    "crates/kubernetes/src/candidate.rs": "26198406950882039a90583e18200a733978e835ae498e27b43e9571bfba2f09",
+    "crates/kubernetes/src/client.rs": "e82218558dccd0a8f5954323203ae4112557a7dd9e5b545106625106b6c6d006",
+    "crates/kubernetes/src/lib.rs": "f7c277c42db1fc8483038c09f994204736f4a027a18c17a571d344235cb820f3",
+    "crates/kubernetes/src/node.rs": "9d2250843bfc2980a342424d19e054b045e87c503315d65fcb21e71e9831e79f",
+    "crates/kubernetes/src/plan.rs": "33ad87e18a933e582be1c1cdf720cda6a1c4af96e2a01dea43ec2d4aac164898",
+    "crates/kubernetes/src/startup_plan.rs": "eec5fc4f4378132b142aaaa2b9dada28e66854e77ac4698ffdc527eb9b572c29",
+    "crates/kubernetes/src/tests.rs": "7348bf0b8e34e4594427a531885b4198ad41e82adce3649f152d5c608447fa82",
+    "crates/kubernetes/src/tests/attach.rs": "ddf356c7a3138ed3ef64d21c9f88fcd25a37f2d09d6698ccb7fae2f9783a9d80",
+    "crates/kubernetes/src/tests/attach/candidate.rs": "9894529e882bbbc429db73f1fa099656d3a404a346fa3243c3b85541fa61474e",
+    "crates/kubernetes/src/verify.rs": "fdebabd72c4f598d7fceaea5e6c853fe983636955089951d5c28655f6f3ca48c",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/candidate_live.rs": "f60ddcbe6b2ef5528afa464d92cef53a1fbc09b7b3d0511e0633649cc86b10b9",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_image.py": "e71f5f1f42063121e9debd3a45338a901fb9ba8358c55bebd41165254a27a3ca",
+    "crates/kubernetes/tests/startup_live.rs": "0e570020fcd89f18b158ae92076743f389e2b1feb32fdf330133a6e087bfc476",
+    "crates/node/BUILD.bazel": "eaff082d54cc9c26704077c701f94d274b83737bc5f933fa582eea5a56a47ffb",
+    "crates/node/Cargo.toml": "00ead354f5aa85e138ee182202f3d28f8601e8e56e2705bc13dde66488c8656e",
+    "crates/node/src/command.rs": "6124ed2da0df6b3ad5c83041c22cc4ec1ed1966ce7ed9b8dbb9a40414bb02287",
+    "crates/node/src/guard.rs": "8f0ec82ae2b34f75251e8ef542a37605ca5127514b8ffec00dcab046ca5baaa0",
+    "crates/node/src/guard/tests.rs": "7d3061ca1f3ffbabcc4e5d19d1016212294755198f06164a9c92d8b29e3b8d14",
+    "crates/node/src/journals.rs": "7202d94b691253c663e3d20fad9e093f7d4c7d84ab496cca82f7d21cfad9ab61",
+    "crates/node/src/lib.rs": "eb4b293be9e7896650f00bd5771a4ce6b850cbf05f010c581b79185e8ce7755c",
+    "crates/node/src/observation.rs": "5695e7e94c1c3bca5fc784fc44b5389d1039b68e874fa2deb850fd369682be38",
+    "crates/objects/BUILD.bazel": "9a974b50b37251d57721ed8eb869eb1edf3881ade9589abdb2613f57ad3fb677",
+    "crates/objects/Cargo.toml": "b80333f178552f326dcc14bd245c4c28d9851cc7a6117eebcf4371d46d981c19",
+    "crates/objects/src/artifact.rs": "0c4bfd0353f154ba263beb854c9841ad38a5a496d07ddba5fb76f97ab08fdf10",
+    "crates/objects/src/lib.rs": "d01bb03f031e14f7452d5ca56eef5ca125ea1c1a59118d073c02959bb63646e4",
+    "crates/objects/src/s3.rs": "131a8767b828cc2b403d37010a4929d09e0cf60cca816af1a39ab3af08f3f1da",
+    "crates/objects/src/s3/tests.rs": "0728c81e4f6035fb7f9d3004175f0aa088838d513119aba82f462fccd7f8e826",
+    "crates/objects/src/s3/tests/http.rs": "20467764a93e667e52ee2acc88d140a6a0265dd911d590dc1df8652340051a19",
+    "crates/objects/src/spool.rs": "c12f4b6be6027d4aa7772ee8c3cc7430d7aacaa43769e163dbc754c9af91b3c2",
+    "crates/objects/src/tests.rs": "eef3deacfd222264078c7d190eb55f33726c2b4b184df8d3ce10b20bff789b03",
+    "crates/sandbox/BUILD.bazel": "79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "f9af73e96f4335bc488c77f42ebb5eafe0b10a2a6f21bd399bca7470450ccc31",
+    "crates/sandbox/src/lib.rs": "78a8c1b617eeb5a0b1fac02c35662d06e3396ac56ec18cde82cf4f14635ed8eb",
+    "crates/sandbox/src/main.rs": "71b39de404e0d4d10102ddad34ec82ef78e41c3c1dd580908293a4d6c60ffd90",
+    "crates/sandbox/src/output.rs": "39426995be26be24f6994ce08f596cbb366466944dad1db08bef224590808ac1",
+    "crates/sandbox/src/request.rs": "17372c71cfd625cb7475e7d5e5a132d1e92da295ec4a5fb473b2251210e34139",
+    "crates/sandbox/src/startup.rs": "a56e31761e62f0752fb7f5c559974937381d5432d8e73f8e05f0e76256eec425",
+    "crates/sandbox/src/supervisor.rs": "0cd50603ffddb8a6682431b3b1c014c6d6fd4fd3d59c1f4173d37a160b0c88d9",
+    "crates/sandbox/tests/component.py": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "crates/sandbox/tests/rootfs.py": "aaa8ca832027700e79aed142690de48d6a804e1d4773aff9e4aaf77f233b9249",
+    "crates/sandbox/tests/startup_component.py": "d1671c99de3dce9bbd2e96f2d14a863d7b68c590e71a71339a62abac6f99924e",
+    "crates/server/BUILD.bazel": "bc91246fe97d1016cd429e02906c35ca9c76371f7c61e34a8f9b3ff86e005eae",
+    "crates/server/Cargo.toml": "90e5c21c22c111d9c39916b57ab1dc34cb75e2a1a2bcbca02866b3efd91d80e6",
+    "crates/server/src/artifacts.rs": "cde55d7c4f5c2b5dafe4f72bc94e93f653245f35bbe80654b80c50748781744b",
+    "crates/server/src/candidate_worker.rs": "2e0a51eb3fd1738ff7946f52e51a376fbbdda8ded157f77ef4f85da80706b229",
+    "crates/server/src/computers.rs": "bdb00aa0a672a17f761b4533b593eae0dc5bd0debf9d9a804ffd615a339b0afd",
+    "crates/server/src/connections.rs": "f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "5ea6c6fb63565b39374f17680a528a2101ef7bc1b8553d41ebc52ece830b8061",
+    "crates/server/src/execution_worker.rs": "b146c327f492696410fcced90f3980ac74ccbcddcae6fef1f5e54c7a364c4f10",
+    "crates/server/src/executions.rs": "e9707f6789eccdd93b86059ce79498ca80046cf95be3d1121e2939091d84f4fa",
+    "crates/server/src/files.rs": "8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "356297613970cb5199da23e0e8c83c4a990bf0a1728589aca6cfe35b3262bb5d",
+    "crates/server/src/lib.rs": "1ff054fa92488fd8754a711f992b411e980bdc5ae86e3b58aa735b823198c1cb",
+    "crates/server/src/main.rs": "2a6e895eb3030910433d7e150a34039dc38290e04d4d44952e2b9b1b395ccd79",
+    "crates/server/src/operator.rs": "5cf96ee664a2ebc1a01347f6d4898a348eca701515cb669b7090334d34cbaac1",
+    "crates/server/src/plans.rs": "5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "aa66d1b82d36d14b7b41ff21fa100a5c941212062b7d28b06ec9fab922dda2d5",
+    "crates/server/src/volume_worker.rs": "11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/artifacts.rs": "d71326056171fe2957a347cfcf7aec82b8dc34918d7bd135c5bc25897bae5914",
+    "crates/server/tests/cases/authentication.rs": "3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "06081eb9037a213d52cd47fda2c1219f07903c8e2024c06f793456fc2cbf7a2d",
+    "crates/server/tests/cases/executions.rs": "e928ba895126a328f4b1755e5ea54765448b95e60711aa22380756c028a969ad",
+    "crates/server/tests/cases/files.rs": "5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/plans.rs": "836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "a0a3de8592d3acb5067c3406c7345474af0e5e45db87db07f78f5db70aed2cc4",
+    "crates/server/tests/cases/protocol.rs": "aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "f9db499e05c5ece7932d703f3f76da7d9f41ef8ca97cd378f3a411617edab92b",
+    "crates/server/tests/cases/stops.rs": "7170db01f43c09bad4fda41139527723ccf2063ab389b43789a55374038ac2e2",
+    "crates/server/tests/cases/writers.rs": "0e2cb5f7f8b4e31343104e48ee003eb4e9c7f89872b9d3409799d7b60be9e870",
+    "crates/server/tests/server_contracts.rs": "915f48d9887b69a3c46c1de7c1f94839037aa5128e39c718f86a609bc3ab077d",
+    "crates/server/tests/support/mod.rs": "872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/capture.rs": "3034604f06815f804c2667d4c6e9fc666cebf03666f4601df84499227272cbe7",
+    "crates/storage/src/directory.rs": "d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "e04cab8a0df0b3d73c886fafc8cf7aefcf7aa8143e523fe8bc5ee3316c2bf3cf",
+    "crates/storage/src/files/tests.rs": "3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "e7d3b93ee35f4053beb7afe29afcaac862941035eb2b9458ea1b19c7a113f9e0",
+    "crates/storage/src/main.rs": "1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "5811009e138349e69797abfeff027368125c34eacbe766186fa3674516490490",
+    "crates/storage/src/model.rs": "44b81794fb300f31fc5517b03943c725c74bcb7c7ab361ff17de32f6916ea4ff",
+    "crates/storage/src/quota.rs": "143d4dcc27dab0b13933738319026b8f16a6cc75c66c15023edd81050f7d6960",
+    "crates/storage/src/tests.rs": "faa36fcda4e703b561cda773649f49858454bd9ff31fb074487bc482d45b0c7d",
+    "crates/storage/src/tests/capture_tests.rs": "b8364dc42d5aa87736fbba118f0e9351609b476544fb90ae862f6f8717dd0f69",
+    "crates/store/BUILD.bazel": "edbd119391f0848cca08edbd03e55e908d933641ec3863905cc4e74f3b8869b7",
+    "crates/store/Cargo.toml": "033b75126cb7ff81ccda1def9e59a9b5659639fd8982d159dff1199708031620",
+    "crates/store/migrations/0001_declaration_registry.sql": "222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/migrations/0012_execution_admission.sql": "381d01c13cba7e165b08e06abbdd623a1464b4f1cc7da065b1cb913dd42c7b5d",
+    "crates/store/migrations/0013_execution_dispatch.sql": "48e374c04d996a56173f8f53ae2f275af862e4ca8aea4ae4884373135273ebbb",
+    "crates/store/migrations/0014_execution_startup.sql": "86cd2ca00cdb925053c9c33a6afc8b4490a82783ba7d48f421bb53b1b7b4eacc",
+    "crates/store/migrations/0015_execution_pods.sql": "c25255885da207c5002c6525f2607282874ed37975e2cb6258184dde878e6f45",
+    "crates/store/migrations/0016_execution_watchdogs.sql": "7e81722f0464dfd4479f0e0b6b5dbb92f7dadc1cd998192fe910aa3322eebf95",
+    "crates/store/migrations/0017_redundant_watchdogs.sql": "b44ba78c21c79662f75ab3b2bd4bb8fd5e07ba6448c8fa9ad1e103c5f6e2fa44",
+    "crates/store/migrations/0018_reaper_admission.sql": "ac948f8715ca66e003c27abaf4a272ce42d251cad66d40a0fbf2623fd79715d3",
+    "crates/store/migrations/0019_execution_outputs.sql": "0923ae3e25b1f60b4437a384918d936a181735ce0506ae82dcda9383e16a287b",
+    "crates/store/migrations/0020_undispatched_computer_stop.sql": "a2de59232588ac17051eb214b86c24e8de1db8bdfa7894504e12890fcc756777",
+    "crates/store/migrations/0021_workspace_artifacts.sql": "5387647cb2db65087c617b754d0e018fed8988bed4fbb9d5d750768c01fd3929",
+    "crates/store/migrations/0022_artifact_candidate_continuation.sql": "da505461d425af2cc795d940ddc5c896e7863bf2999dab97f67096555eda7940",
+    "crates/store/src/auth.rs": "91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "75b4ab29050f62a050f756e26711f59dafb0d727013328d64f00fcef57c17f31",
+    "crates/store/src/plans/access.rs": "3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/artifacts/mod.rs": "a7e7e0bd54b225f340cecacd5aee3f5ba6598f8c1f98edffc4bd7d3bbe8d8488",
+    "crates/store/src/runtime/artifacts/types.rs": "101c9832b0afdb6a375d75801a22aeafe4c720eb125a831a8a5adc42f2066ced",
+    "crates/store/src/runtime/artifacts/worker.rs": "640e1ad4bb863e3068c2e79c53c21d2e4923cbba4a40d38860db284a1587d0f4",
+    "crates/store/src/runtime/connections/mod.rs": "b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "a8b8975594b99cd2cd49f3bf6ca30c38db4f9a1b61925e9fe10ec1472746285e",
+    "crates/store/src/runtime/mod.rs": "e6a39f4737caf447ab14ae63317de0cfecb89006dd0d131676f7f9da78a2760e",
+    "crates/store/src/runtime/preparation.rs": "ff1a9812f2e7dfa7972759ee74fb4cc76c864f12dd60da3fa87c2cd8b362384c",
+    "crates/store/src/runtime/start/graph.rs": "a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "73ef5100fac69d68050247f68e1441c68a01379f9d6aee430d4eab60cda6436c",
+    "crates/store/src/runtime/start/stop.rs": "1daaa85b0169ce12f313486dd94ec9b3fc958658bd4dd1e5edb0bdbec94845ba",
+    "crates/store/src/runtime/start/types.rs": "a7dd1082aa3fdb5626aed1884cccc03d7be4357716ba171b5ac92faceddf00cc",
+    "crates/store/src/runtime/types.rs": "7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "54c27b52049550fb38d99f1d111de3ddb6e36a06ae5191f20e86f9eb2c1dd16d",
+    "crates/store/src/runtime/writers/executions.rs": "0e425a3b8252ebb6d7d5001a5f3f2a28228746398e4d5c4664f0a65740e77a8a",
+    "crates/store/src/runtime/writers/executions/dispatch.rs": "7d2e656e2cfd1d53e73ccb9abf62abd8b9475fee12144cad73f15e549a3a8442",
+    "crates/store/src/runtime/writers/executions/dispatch/inputs.rs": "0107de3175cfc993c629a65b151d0664285c64f92f65d419577e7dce041097ab",
+    "crates/store/src/runtime/writers/executions/dispatch/outputs.rs": "66830774ce9f3261cf6ebb684145bbf5be88c55e6672f58051b2c7c1c3f6a44e",
+    "crates/store/src/runtime/writers/executions/dispatch/pods.rs": "cf0a4782a4d2cb6f89147c0c226fa6265bafd13367df928ba1daa5e9b0c8b56d",
+    "crates/store/src/runtime/writers/executions/dispatch/pods/validation.rs": "47ab37bca8ff5276583f6917dd1b9a071f29eb91eea57a9d98e413c9bf7deeae",
+    "crates/store/src/runtime/writers/executions/dispatch/startup.rs": "5a9833f7eb2534144a960797a00e2c1df735c9d532aa9ba9b7dc3c6dffef8273",
+    "crates/store/src/runtime/writers/executions/dispatch/watchdogs.rs": "cf09b00663e3bf5930657d85a4910fde4276c31954a9d0aeb9902c43de44236a",
+    "crates/store/src/runtime/writers/files.rs": "59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "048049b55efaa32801bded5c2b02849fb725778ce223bb53813c18cf3f9a18fe",
+    "crates/store/src/runtime/writers/types.rs": "bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "9220b4e270d29e5c5e677bf059e2cd4968fa453e3569d51079c0cb3ef63c1777",
+    "crates/store/src/writes.rs": "6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "cd7101a8a982c22573d161e6fc288ecd2f8b5952c4e71b8d5684675fec0ecdd9",
+    "crates/store/tests/contracts/concurrency.rs": "4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/artifacts/continuation.rs": "627bb88c83b38d61a50ff2c594915cc4675af80d131b16e5680a137075a65f77",
+    "crates/store/tests/contracts/plans/artifacts/mod.rs": "700ebd9da799aaf88e9a09f23c42663c7abaecf3fc185ceeba6343f47c2ef19c",
+    "crates/store/tests/contracts/plans/artifacts/objects.rs": "b54267e3ff1586c7989a71a095eb33113e0f4703f3189e0548048388121671c0",
+    "crates/store/tests/contracts/plans/artifacts/recovery.rs": "10179830f87e03d20504e985d792fa275293088e9e6b6084306d328dd6cd2cdf",
+    "crates/store/tests/contracts/plans/connections.rs": "d0c0cd489c7d0c3006daea426b7c226afdcb4389eab5ac33d9df93f8200cad74",
+    "crates/store/tests/contracts/plans/mod.rs": "d2add7af4d009952a62448530cba2474cb9f595025e7c5bf9d2ded8a12b4fff5",
+    "crates/store/tests/contracts/plans/preparation.rs": "503fe52bcfc51939ea8c892c1dc6c1a87d549fb0b10916b423e98af611821957",
+    "crates/store/tests/contracts/plans/publication.rs": "fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "48d6d2dd60f107ea42bb251bc6d6ad08d06bc89e34cd29f2b67e8305fa7563b7",
+    "crates/store/tests/contracts/plans/starts.rs": "260932ae09984a0ad8dc06631e3d1bb00b5cf77b7b65cb82d04964eb79a59f9b",
+    "crates/store/tests/contracts/plans/writers/artifacts.rs": "42ecf0d43fae9bc9e57c1fb035401743d8bdb21dbae2d17253e1bd8ad6b5592a",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/executions.rs": "ff6f3cff7ee40625a440777ea139556edd0e75ae82acf02636d948794dbc6a29",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch.rs": "a039a219b5de1e25c284c0b6bc41dec71bb29ffe1cff23f7199145443844b1ff",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/inputs.rs": "cbd10111ed7bfb26549e868ffea12d11fe095e5f28e8f39f499a52e8c793f791",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/pods.rs": "2ed2953d67f57df568b7fe3b984669805ab1a223fc2fdecc36ce9cdaec174b3f",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/startup.rs": "0e569c246d2148b69830abf69436ee5e068b82e33d3333203946671d58d982b6",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs.rs": "128e6650df8f794037d31ff9586f1690701d527cab195de756d800cf9e908ba7",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs/outputs.rs": "eeb6034ce804a2c6bef8dc15a994fe3f9e3e542874d266072d720ec70e28a0c9",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "3579a75c06240fda0a53cce95e4eb94aaf0f865a23d89ff7c052dd3ce44486b6",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "004f0c88be7fc6a871e468796d63e2d00249c25aa20cb0183c4eb839c452aaef",
+    "crates/store/tests/contracts/plans/writers/stops.rs": "3e44f7aafd8ea3096a38417dddc1872624eaba254d4018f677d94e4e4feaef22",
+    "crates/store/tests/contracts/registry.rs": "99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/mod.rs": "52703314071c58c1dfbbad4807fd917780fd97d0703285f61d8249891c449a1a",
+    "crates/test-support/BUILD.bazel": "92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/watchdog/BUILD.bazel": "11d80c69145184e662ce21c884267ff4a0cd5b0c3af7d30fc936c7f629bea155",
+    "crates/watchdog/Cargo.toml": "ade61d1d3e47b7e512390b1f8a4f7f3b96b9b234f4aa7b24cf5847c6171fca1b",
+    "crates/watchdog/src/admission.rs": "b8e49afd678458ca35ecd44bce417d71e9aaddb4e4c7b177b0340407146f6931",
+    "crates/watchdog/src/admission/tests.rs": "a17fd6482b7bdcf7f2796eab0247008f8062997a50ea514c95a62a44012d7ecf",
+    "crates/watchdog/src/cgroup.rs": "878daa768c2d35333fde36eb4014c2af2df7420f96cc61676e5e8a41e3d1c536",
+    "crates/watchdog/src/journal.rs": "8812b4fd8e351407fb3b703c356840903e530feb58d11ab052012f083e3f4214",
+    "crates/watchdog/src/journal/tests.rs": "936193158c71b096f0eed1243799fbdcdf33ceaff83f68b09da3eb3b59ce8778",
+    "crates/watchdog/src/lib.rs": "8802010d69fc908bc4dfb6e899408434813de6f8a3cf4c55a8b39fec3ce9b996",
+    "crates/watchdog/src/main.rs": "4a6ecb5160a99d3ce96bfcb85aa36d1668fcac5b1fd1dd72e60cd6aa24d09fa9",
+    "crates/watchdog/src/reaper.rs": "072f723548eee4869acb713c913122d5f980c889378981a2dde0184e00166e2e",
+    "crates/watchdog/src/request.rs": "cb98e5d7b392695a82f80d6c0fe39b140baad48562627f80b0655646b164472f",
+    "crates/watchdog/src/service.rs": "0b4972ded707165a2dce9069fc83d989961d4f5c73a7a162910108ce8e48761b",
+    "crates/watchdog/tests/component.py": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef",
+    "crates/watchdog/tests/journal_component.py": "a11dd0c38f69792f26b937ff79903fbc04fb7e7aecbea5641b595de59039af3e",
+    "crates/watchdog/tests/reaper_component.py": "42ea60e1dcd8afade0345ac5a11a89442274fe7a5af8268f8bc427cff610ae91",
+    "crates/watchdog/tests/runsc_component.py": "94d7c6963920c1bde984a0383dd8ed6bfdb948bf07f526b011752bd13ec2f219",
+    "crates/worker/BUILD.bazel": "f6dd6eeedc92920b957663b95e892100aac36fbcdb79c3ecba8a7f13547b8ca0",
+    "crates/worker/Cargo.toml": "7fa8d2cbe1f58234b5fd23418e4cbed1241d9eff2cd629c4ec22db4314a142dc",
+    "crates/worker/src/artifacts.rs": "0f6c4ec9eba0b7100398963ceee5af046aac13183ad7ca89ef5b7d4dd5e2cb1b",
+    "crates/worker/src/candidate.rs": "b997cedc54fb15826259b1c0edd75f41eb808600a38a6443469648e266e42552",
+    "crates/worker/src/execution.rs": "1552ca5bb818c18cb19f883765a42d80d596d8848052812d8f6c0be53d8efaa3",
+    "crates/worker/src/execution/plan.rs": "767d35837e8dbd73f101205619eb6f6e7f8434a72c1b659918634e932ab4ca44",
+    "crates/worker/src/execution/storage.rs": "c1da75f0d944f45bffd5075cbdeb0025c5256ffa66377004a7c9a57634905675",
+    "crates/worker/src/files.rs": "a1992ef8741e7f15e256412f63d0d5c3a8ec41cc9109f9ac81d686d0b25d0b80",
+    "crates/worker/src/files/gateway.rs": "7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "5001bb4273052c8eb426c7d2884886c7d34836bda872f0064efd14b7ba732f55",
+    "crates/worker/tests/candidate_live.rs": "2dbf0c1f273a8c639916f0f17f9e8135dffe655ca812a4da80087326945056c4",
+    "crates/worker/tests/execution_live.rs": "1fd1e955caf5dfe79ca3e201e157613a5166e65e19a256fbf00734499c977410",
+    "crates/worker/tests/execution_node.py": "ecbb38ad691ccfaf529ac77d3f17e6b84de95123ddd9d47c67fccd160d439fa1",
+    "crates/worker/tests/live.rs": "131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/artifacts.rs": "03986497b5662a8faf7ef5c40b2174706f6f92e7a4f360a6305461a1bb4d017d",
+    "crates/worker/tests/support/continuation.rs": "ebd7ab4aebfffdc9a84ddb758e14f3d9555724a81f3e833ecbc10b3ec2b2ad28",
+    "crates/worker/tests/support/execution_faults.rs": "2c0686bde2d411612280ce91df908a8695e6d16c58e818ef8ba160fea28254e0",
+    "crates/worker/tests/support/execution_outputs.rs": "efcbbfa20ca8498a1ea7eb3aebec6f9eb16623164e8f1e58f00cad85cd3acbcd",
+    "crates/worker/tests/support/fence.rs": "7c3b98b2a47fdee784a0ba1444505318afa3a26aa65771c13583cc77da4d3df4",
+    "crates/worker/tests/support/file_http.rs": "c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6",
+    "deploy/agent-computer-csi-registrar.service": "ba33752c520b2f7ffe66f178cb8f1c689d2054b8c7f1cdd22ce7d2e1e01dd4fa",
+    "deploy/agent-computer-csi.service": "a08c7c824a1174d89e3efb006801026317814da6f04f0671b053fbd8a238084d",
+    "deploy/candidate-csi.yaml": "e83c02bc6ed2b5e6389af31df85b02e7ec01bb6d4a5482bd89c6bcdab2ac43ce",
+    "deploy/systemd/agent-computer-expiry-reaper.service": "4e018431f7f672f9f881dfa83ac61526dbb450928c9bc129d167929dc2f173c3",
+    "deploy/testing/juicefs-component-rbac.yaml": "81bff185f8625557153e5c0364927af206a1bedafcfd97e9bc9bd7c97c3d26cb",
+    "deploy/testing/kubernetes-component.yaml": "83e98fb7408add353cd76c2259293c5b4952c21f54220fe1811b40a3ede02d4d",
+    "deploy/testing/node-watchdog-rbac.yaml": "be5721aa7d3365ac5c077df841a4065480dddd41161ef9d6c35b14c5d74e2d29",
+    "deploy/testing/startup-attach-rbac.yaml": "da14e0e840f426a3a19583cbd7a4256988aad033ea5aeb9fb2122f3484e050aa",
+    "examples/BUILD.bazel": "88de21da53a1507ed9488c374d03b276659ffbc59012d2489f7c70e537ceb148",
+    "examples/research.computer.yaml": "283100d85dc61a493a984711a81b45aed75e7aaf386070618de2a489accb571b",
+    "rust-toolchain.toml": "559f488c181e0e9e77cf17c29de663977f036ec7ff2e2060585714bf53c52d62",
+    "schemas/BUILD.bazel": "f0db524a42721a2265c0c1dfbfef7e1d1581d4dfba341d6dfda5b43feed0ab8e",
+    "schemas/computer-set-v1alpha1.json": "9e8902763e2b1d216862492bc8592d3135f80f95c8b51361b96cbad5b9af38c3",
+    "schemas/openapi-v1alpha1.json": "0450295c934166aa495b5f77aa53d0f5864945185647354372af36839c40dc1c"
+  },
+  "checks": {
+    "cargo_workspace_tests": {
+      "passed": 370,
+      "postgresql_cases_included": 168,
+      "http_cases_included": 22,
+      "new_contract_cases": 4,
+      "ignored": 3,
+      "ignored_scope": "Existing root-only node watchdog suites. Real execution timer/reaper paths are exercised in the explicit VM fixture."
+    },
+    "cargo_clippy_workspace_all_targets_all_features": "passed with -D warnings",
+    "cargo_fmt": "passed",
+    "bazel_default_tests": {
+      "targets_passed": 13,
+      "executed": 10,
+      "cached": 3,
+      "lockfile_mode": "error",
+      "warning": "Some declared test sizes exceed observed runtime; no failed tests."
+    },
+    "documentation": {
+      "checks": {
+        "markdown_files": 104,
+        "local_links": 708,
+        "structured_examples": 48,
+        "yaml_files": 16,
+        "requirement_rows": 35,
+        "test_rows": 43
+      },
+      "glossary_terms": 52,
+      "errors": [],
+      "limits": "Documentation syntax, links, schema and traceability only; no runtime validation."
+    },
+    "map_validation": {
+      "codespec": true,
+      "knowledge": true
+    }
+  },
+  "feature_qualitygate": {
+    "run_id": "run-VsMDWh",
+    "scope": "delivery",
+    "profile": "full",
+    "snapshot": {
+      "verification_digest": "sha256:626806d091f57278cdff32d2ed20c3319a8223d8b90b3d54e5665eaf34296924",
+      "mode": "worktree",
+      "base": "78061ac94ebec2f31144a0aae602b2f27b839a2c",
+      "head": "819a4179a8ac5a51c570777abc2c9c6e5b419857",
+      "content_digest": "sha256:3fdfa139fcb123ec8816dc234fce2418fc857460728f1a72a8a811aeb4291b47"
+    },
+    "policy": {
+      "source": "qualitygate.yaml",
+      "config_digest": "sha256:e41d8bec8d00e40c13e91e92a62f053dce1b53f383f72bc30c1128233f919b10",
+      "rules_digest": "sha256:06d35ddf072f838422f9a4e2dbc6ac7f842c12163cc4a2dda18a15db4602cd13",
+      "task_contract_digest": null,
+      "trust": "local_candidate",
+      "changes": []
+    },
+    "plan": {
+      "execution_order": [
+        "line-ending"
+      ],
+      "required_checks": [
+        "line-ending"
+      ],
+      "pending_delivery_checks": [],
+      "acceptance": {}
+    },
+    "gate": {
+      "complete": true,
+      "decision": "pass",
+      "blockers": []
+    },
+    "verification": {
+      "conclusion": "在已验证形态下未发现问题 / No problems found in the verified shapes",
+      "verified_shapes": [
+        "line-ending: 48 matched entities; verdict Some(Pass)"
+      ],
+      "known_limits": [
+        "Results cover only the selected snapshot, policy, configured tools and observed inputs.",
+        "Warning findings remain review signals even when the blocking gate is satisfied.",
+        "Fixture regression can falsify known behavior; it cannot prove correctness on a real deployment.",
+        "Delivery scope selects changed lines and changed-file findings; unlocated command failures and incomplete evidence remain blocking. This is not repository-wide approval."
+      ],
+      "unverified_assumptions": [
+        "Unrepresented frameworks, runtime configuration delivery, reflection and production environments are not verified.",
+        "Custom rules and external tool versions require their own representative regression evidence."
+      ]
+    }
+  },
+  "qualitygate_limits": "Existing line-ending policy only. Unit, integration, documentation and live IO verification are separate. Final delivery snapshot is rechecked after evidence changes, with reports under ignored .qualitygate/evidence.",
+  "real_vm": {
+    "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+    "limits": [
+      "single VM; actual database grants, node watchdog/reaper admission and CSI mounts",
+      "raw process report is not accepted completion",
+      "API deletion is not physical fencing",
+      "multi-node fencing and accepted completion pending"
+    ],
+    "organization": "execution_probe_1791612093889824864",
+    "pv_uid": "dabd4179-ad89-4607-b720-cb9da8348676",
+    "pvc_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+    "results": [
+      {
+        "case": "normal",
+        "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+        "prepared": {
+          "data_inode": 103,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_f90a08c771a1acd1397b866a072f387a/candidates/candidate_0fbcdc4e6fa58038b191ae94b1d0ac6c/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:0f2893f86507b710e5e1b46d2739680bf15f622489ed5085b43bb261b99e4d7f",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "fresh_process_read_matches": true,
+          "initial_state": "verified",
+          "output_events": 2,
+          "recovered": {
+            "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+            "manifest_digest": "sha256:27812fbec885fb002543f21d7f15354615b069c9b210f213c67bcab243ffc1f3",
+            "observed_outcome": "succeeded",
+            "state": "verified",
+            "stderr": {
+              "eof": true,
+              "observed_bytes": 0,
+              "retained_bytes": 0,
+              "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "truncated": false
+            },
+            "stdout": {
+              "eof": true,
+              "observed_bytes": 4,
+              "retained_bytes": 4,
+              "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211",
+              "truncated": false
+            },
+            "verified_at_ms": 1791612103214
+          },
+          "recovery_retries": 2,
+          "startup_grants": 1
+        },
+        "output_manifest_digest": "sha256:27812fbec885fb002543f21d7f15354615b069c9b210f213c67bcab243ffc1f3",
+        "output_state": "verified",
+        "raw_process_outcome": "succeeded",
+        "raw_report_sha256": "e5f7d60429e9199b6862aa6442fee62ef099a7294daca9187b3e6b3a2556f657",
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:8d94115a3a3d51a2389cbd5df561065c2c691558a1c9e4f5b61bad65d808a4c4",
+            "candidate_id": "candidate_0fbcdc4e6fa58038b191ae94b1d0ac6c",
+            "computer_id": "res_a1b5724ab78d5a8911b8592927db09eb",
+            "created_at_ms": 1791612098710,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+            "generation": 1,
+            "input_digest": "sha256:cef041c0ca528bb4cae47e1654dac7349a8d6f145ec6944d38cdba2207e6ebb1",
+            "lease_id": "lease_6f4773353581120ef12dbf69c62427f3",
+            "queue_deadline_at_ms": 1791612128691,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_6d441c655db20093333ad8d6b012929b",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": null,
+          "io_fence": {
+            "accepted_mutating_requests": 11,
+            "instance": "099c29e5654309be541ead0f6047b6e596598da26b210b7d2527a2cc8d6283cd",
+            "prepared": {
+              "data_inode": 103,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_f90a08c771a1acd1397b866a072f387a/candidates/candidate_0fbcdc4e6fa58038b191ae94b1d0ac6c/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:0f2893f86507b710e5e1b46d2739680bf15f622489ed5085b43bb261b99e4d7f",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": false,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:8d94115a3a3d51a2389cbd5df561065c2c691558a1c9e4f5b61bad65d808a4c4",
+            "candidate_id": "candidate_0fbcdc4e6fa58038b191ae94b1d0ac6c",
+            "computer_id": "res_a1b5724ab78d5a8911b8592927db09eb",
+            "created_at_ms": 1791612098710,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+            "generation": 1,
+            "input_digest": "sha256:cef041c0ca528bb4cae47e1654dac7349a8d6f145ec6944d38cdba2207e6ebb1",
+            "lease_id": "lease_6f4773353581120ef12dbf69c62427f3",
+            "queue_deadline_at_ms": 1791612128691,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_6d441c655db20093333ad8d6b012929b",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-bafb80ee0afe3204c651dc0c9128df6c9863b0855e9320cf68e7",
+          "pod_uid": "a0879c50-fc0c-4293-a8ff-f20afb8985e6",
+          "plan_digest": "sha256:1f812a9d27d85adad43c258c8a43b1f11cf4a0c87b9d0d7d50eeda626a78bb6d",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "099c29e5654309be541ead0f6047b6e596598da26b210b7d2527a2cc8d6283cd"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:a5a1455d6d23d5c9cd5bf65dfc61a3a18fb4f892e881278dc7273f712194145b",
+          "runtime_identity": {
+            "container_id": "fc5a99f9e33e0c7e00495d8028412def9690ec7087d5dcdefad0ca8dc7088f4d",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-bafb80ee0afe3204c651dc0c9128df6c9863b0855e9320cf68e7",
+            "pod_uid": "a0879c50-fc0c-4293-a8ff-f20afb8985e6"
+          },
+          "workspace_inode": 103,
+          "front_device": 47,
+          "front_inode": 1,
+          "front_instance": "099c29e5654309be541ead0f6047b6e596598da26b210b7d2527a2cc8d6283cd",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 12641,
+          "deadline_boottime_ms": 1812780
+        }
+      },
+      {
+        "case": "command",
+        "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+        "prepared": {
+          "data_inode": 113,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_6986c167a6b02dfec3c33a042beee2c1/candidates/candidate_a9cd5bce0477831c48141e9fff8cb9d4/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:5e94c719c5e37dfb4fb6e549bcd49e099ba410c815df94f0bf6f0d0555c1015f",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "fresh_process_read_matches": true,
+          "initial_state": "verified",
+          "output_events": 2,
+          "recovered": {
+            "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+            "manifest_digest": "sha256:1ec5b773a01f701ba681e0b103d27ec06bcf1fda7c12a9a7e3dd6d65753d64e0",
+            "observed_outcome": "succeeded",
+            "state": "verified",
+            "stderr": {
+              "eof": true,
+              "observed_bytes": 0,
+              "retained_bytes": 0,
+              "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "truncated": false
+            },
+            "stdout": {
+              "eof": true,
+              "observed_bytes": 4,
+              "retained_bytes": 4,
+              "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211",
+              "truncated": false
+            },
+            "verified_at_ms": 1791612110320
+          },
+          "recovery_retries": 2,
+          "startup_grants": 1
+        },
+        "output_manifest_digest": "sha256:1ec5b773a01f701ba681e0b103d27ec06bcf1fda7c12a9a7e3dd6d65753d64e0",
+        "output_state": "verified",
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:c9da50cf7f02c57b9d77756cda90e2221c8561c80764c84499a62f7cacbdfd00",
+            "candidate_id": "candidate_a9cd5bce0477831c48141e9fff8cb9d4",
+            "computer_id": "res_43e0372ffbb313d0f3828626724e4ea8",
+            "created_at_ms": 1791612105565,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+            "generation": 1,
+            "input_digest": "sha256:b0e3cf7f4bf44b3c81824b345e6f2aac13fbd42db1641aa1a281220044e78778",
+            "lease_id": "lease_baa5598cf357f9dc756992151806dcfe",
+            "queue_deadline_at_ms": 1791612135555,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_4e93f6213ec1602f8d6ecadf76f62ba9",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": null,
+          "io_fence": {
+            "accepted_mutating_requests": 11,
+            "instance": "c88c05ac3d0177b6d024d7ed0c5aaad274989c2a20aed10078a68e2e5812aed9",
+            "prepared": {
+              "data_inode": 113,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_6986c167a6b02dfec3c33a042beee2c1/candidates/candidate_a9cd5bce0477831c48141e9fff8cb9d4/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:5e94c719c5e37dfb4fb6e549bcd49e099ba410c815df94f0bf6f0d0555c1015f",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": false,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:c9da50cf7f02c57b9d77756cda90e2221c8561c80764c84499a62f7cacbdfd00",
+            "candidate_id": "candidate_a9cd5bce0477831c48141e9fff8cb9d4",
+            "computer_id": "res_43e0372ffbb313d0f3828626724e4ea8",
+            "created_at_ms": 1791612105565,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+            "generation": 1,
+            "input_digest": "sha256:b0e3cf7f4bf44b3c81824b345e6f2aac13fbd42db1641aa1a281220044e78778",
+            "lease_id": "lease_baa5598cf357f9dc756992151806dcfe",
+            "queue_deadline_at_ms": 1791612135555,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_4e93f6213ec1602f8d6ecadf76f62ba9",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-675233fd36c584540f824eac517c21d5bf429594d75804b15fa2",
+          "pod_uid": "e7a39a39-9e06-4050-82f6-872f400441b5",
+          "plan_digest": "sha256:6e96ccd56f26b0998befc81818b1e19a264dded56692b204f343187c3af732f0",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "c88c05ac3d0177b6d024d7ed0c5aaad274989c2a20aed10078a68e2e5812aed9"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:9fff77731cec4cd9a2a613128ae73517d688a751b3ba515ee4a5d73e8b5ef2a3",
+          "runtime_identity": {
+            "container_id": "995ccf904d25ab683b75b52d61766b45bb250a4e4e018ee620c527f83fd100cb",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-675233fd36c584540f824eac517c21d5bf429594d75804b15fa2",
+            "pod_uid": "e7a39a39-9e06-4050-82f6-872f400441b5"
+          },
+          "workspace_inode": 113,
+          "front_device": 47,
+          "front_inode": 1,
+          "front_instance": "c88c05ac3d0177b6d024d7ed0c5aaad274989c2a20aed10078a68e2e5812aed9",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 12878,
+          "deadline_boottime_ms": 1819639
+        }
+      },
+      {
+        "case": "cancel",
+        "execution_id": "exec_d0a97f534a43ccf431136e31d8dd69f4",
+        "prepared": {
+          "data_inode": 123,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_a4037f57819bf72a37059b70c4125962/candidates/candidate_551365cb12fa8fad85d54b6acf402774/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:aad7fbd92026cd824e06403650f576c906c7986f959fa2e3f6787aebdae7856b",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "state": "absent"
+        },
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:882b68836a45ac9e4373bcb0847ceb4ad9db8d733c1c58f3d855da17c7106fdb",
+            "candidate_id": "candidate_551365cb12fa8fad85d54b6acf402774",
+            "computer_id": "res_343ccf09973b336753a8569fc404ebf7",
+            "created_at_ms": 1791612112697,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_d0a97f534a43ccf431136e31d8dd69f4",
+            "generation": 1,
+            "input_digest": "sha256:754b47857f055dc6734eb90132272c19d01af91b4eb32054e97bf8cd6f82ec90",
+            "lease_id": "lease_1c1abe22d795c02eb523830c35521035",
+            "queue_deadline_at_ms": 1791612142682,
+            "reason": "dispatch_unconfirmed",
+            "revision": 4,
+            "sandbox_id": "res_e9b0576240592079481cebf9c961ab80",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": "run",
+          "io_fence": {
+            "accepted_mutating_requests": 3,
+            "instance": "f17894fca67ef9edbc0ebc7f56bf0a39f43996846d71aaaf642ad94687080cac",
+            "prepared": {
+              "data_inode": 123,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_a4037f57819bf72a37059b70c4125962/candidates/candidate_551365cb12fa8fad85d54b6acf402774/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:aad7fbd92026cd824e06403650f576c906c7986f959fa2e3f6787aebdae7856b",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": false,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:882b68836a45ac9e4373bcb0847ceb4ad9db8d733c1c58f3d855da17c7106fdb",
+            "candidate_id": "candidate_551365cb12fa8fad85d54b6acf402774",
+            "computer_id": "res_343ccf09973b336753a8569fc404ebf7",
+            "created_at_ms": 1791612112697,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_d0a97f534a43ccf431136e31d8dd69f4",
+            "generation": 1,
+            "input_digest": "sha256:754b47857f055dc6734eb90132272c19d01af91b4eb32054e97bf8cd6f82ec90",
+            "lease_id": "lease_1c1abe22d795c02eb523830c35521035",
+            "queue_deadline_at_ms": 1791612142682,
+            "reason": "dispatch_unconfirmed",
+            "revision": 4,
+            "sandbox_id": "res_e9b0576240592079481cebf9c961ab80",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-ff10b36244a7319b2824dd4357cc6c88ff5b46097906554a3b22",
+          "pod_uid": "72c1e418-3bff-413a-8ade-fb2709763ab8",
+          "plan_digest": "sha256:70858f5c3d3406e944fe47c64463cefa4135c0a395c45202c94844206e406f0a",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "f17894fca67ef9edbc0ebc7f56bf0a39f43996846d71aaaf642ad94687080cac"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:5aa6a45d875e7b0ed18cfdeda9ead0bb68d821ff3ed908185700cf06cf6c6869",
+          "runtime_identity": {
+            "container_id": "c6fd9f1549f766df242402222cf5760840258cfbb5c5dc02d1e30fd829ac6889",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-ff10b36244a7319b2824dd4357cc6c88ff5b46097906554a3b22",
+            "pod_uid": "72c1e418-3bff-413a-8ade-fb2709763ab8"
+          },
+          "workspace_inode": 123,
+          "front_device": 47,
+          "front_inode": 1,
+          "front_instance": "f17894fca67ef9edbc0ebc7f56bf0a39f43996846d71aaaf642ad94687080cac",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 13115,
+          "deadline_boottime_ms": 1826766
+        }
+      },
+      {
+        "case": "lost",
+        "execution_id": "exec_4308e3e5c3178cf818e69902b333252a",
+        "prepared": {
+          "data_inode": 131,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_7156d5ad777a61efc0030cd3aa48009c/candidates/candidate_b5b009da62f0088ba85e5db4643c4036/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:81bfd2300435e4e3d493d4313aa4c9c0d936866cc94d2479fe0e9fcf1adeae37",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "state": "absent"
+        },
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:b728c05628acb1a7fcc41237d2e46e751ee75894ccd873db5bd4c45b894c711b",
+            "candidate_id": "candidate_b5b009da62f0088ba85e5db4643c4036",
+            "computer_id": "res_a7e70b26340df5ce8edce63c98f77045",
+            "created_at_ms": 1791612119358,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_4308e3e5c3178cf818e69902b333252a",
+            "generation": 1,
+            "input_digest": "sha256:f67db9d07f21b0e16187278d391c6820443235f833592cfb3b93b84fc1deff9c",
+            "lease_id": "lease_dc406805920b9e4b83f78d4847c9375d",
+            "queue_deadline_at_ms": 1791612149347,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_3a554bd488198acbd46d6493c4405822",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": "recovery",
+          "io_fence": null,
+          "node_error": null,
+          "output_unconfirmed": false,
+          "publication_revoked": false,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:b728c05628acb1a7fcc41237d2e46e751ee75894ccd873db5bd4c45b894c711b",
+            "candidate_id": "candidate_b5b009da62f0088ba85e5db4643c4036",
+            "computer_id": "res_a7e70b26340df5ce8edce63c98f77045",
+            "created_at_ms": 1791612119358,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_4308e3e5c3178cf818e69902b333252a",
+            "generation": 1,
+            "input_digest": "sha256:f67db9d07f21b0e16187278d391c6820443235f833592cfb3b93b84fc1deff9c",
+            "lease_id": "lease_dc406805920b9e4b83f78d4847c9375d",
+            "queue_deadline_at_ms": 1791612149347,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_3a554bd488198acbd46d6493c4405822",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": false,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-ed07e260eda84a8002cf03ddfb84bf49d5b94595d5aa672365d3",
+          "pod_uid": "f6320631-9c61-4abc-a8fe-37f4dee1a0bc",
+          "plan_digest": "sha256:eab49556182ed08c4ea87dc28fb129949287260e750bbebbdde6783d30c05169",
+          "workspace_volume": {
+            "name": "workspace",
+            "persistentVolumeClaim": {
+              "claimName": "acv-a473b6c739822f885581563dfab60ac626a9f38e8abca7f39157",
+              "readOnly": false
+            }
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false,
+            "subPath": "organization/execution_probe_1791612093889824864/workspace/res_7156d5ad777a61efc0030cd3aa48009c/candidates/candidate_b5b009da62f0088ba85e5db4643c4036/generation/1/data"
+          },
+          "node_name": null,
+          "fence_reference_matches_registration": false
+        }
+      },
+      {
+        "case": "rejected",
+        "execution_id": "exec_069e475aec50ec82b4a2fe2814d1375d",
+        "prepared": {
+          "data_inode": 138,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_1ddac550cdbfbb73ca03351ee151e422/candidates/candidate_c1ed8419d58a4f413e4452e54443ee93/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:08bff4c90ed6e5605a76ef5d12f359c685b944556d974f84c7e1f9675c72e2e2",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "state": "absent"
+        },
+        "outcome": {
+          "cleanup": "no_plan",
+          "execution": {
+            "binding_digest": "sha256:9befcaa9f0e3b12c56582383ba4a44467624778a7548a400ceb3b3c4ce83f95b",
+            "candidate_id": "candidate_c1ed8419d58a4f413e4452e54443ee93",
+            "computer_id": "res_5b465b94e2a2b13fbf938e4303ba2bef",
+            "created_at_ms": 1791612121642,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_069e475aec50ec82b4a2fe2814d1375d",
+            "generation": 1,
+            "input_digest": "sha256:aec465d6fad2d008433cc62cb2ecebe09a2e043313c5de9d4bd49b1b617b8e7d",
+            "lease_id": "lease_f5b36cec45980dc33a4271ce607e7677",
+            "queue_deadline_at_ms": 1791612151632,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_2fc5af2f6f4220c38bfd8c97747ba54f",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": "preparing",
+          "io_fence": {
+            "accepted_mutating_requests": 0,
+            "instance": "062ebbfac9b03dae335916186dd9fcabd5900591ebe216ebfa101411af47c15a",
+            "prepared": {
+              "data_inode": 138,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_1ddac550cdbfbb73ca03351ee151e422/candidates/candidate_c1ed8419d58a4f413e4452e54443ee93/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:08bff4c90ed6e5605a76ef5d12f359c685b944556d974f84c7e1f9675c72e2e2",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": false,
+          "publication_revoked": false,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:9befcaa9f0e3b12c56582383ba4a44467624778a7548a400ceb3b3c4ce83f95b",
+            "candidate_id": "candidate_c1ed8419d58a4f413e4452e54443ee93",
+            "computer_id": "res_5b465b94e2a2b13fbf938e4303ba2bef",
+            "created_at_ms": 1791612121642,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_069e475aec50ec82b4a2fe2814d1375d",
+            "generation": 1,
+            "input_digest": "sha256:aec465d6fad2d008433cc62cb2ecebe09a2e043313c5de9d4bd49b1b617b8e7d",
+            "lease_id": "lease_f5b36cec45980dc33a4271ce607e7677",
+            "queue_deadline_at_ms": 1791612151632,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_2fc5af2f6f4220c38bfd8c97747ba54f",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "no_plan",
+          "io_fence": null,
+          "publication_revoked": false,
+          "node_error": null
+        }
+      },
+      {
+        "case": "controller-kill",
+        "execution_id": "exec_4b03be138ad8c97f64ac06215901c784",
+        "prepared": {
+          "data_inode": 145,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_73450f5f6d16ac573d3de6568a3fd3fb/candidates/candidate_2f14d2e780bf2372eb9bf026ad2a838b/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:a6bc58728c4acff2a448d390aecf49250f32f9cecef4d6c81a61f643d4d89863",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "state": "absent"
+        },
+        "outcome": {
+          "api_delete_before_empty": false,
+          "cgroup_inode": 13788,
+          "controller_killed_boottime_ms": 1814288,
+          "controller_pid": 16452,
+          "controller_signal": 9,
+          "deadline_boottime_ms": 1839643,
+          "empty_observed_boottime_ms": 1839091,
+          "heartbeat_before_kill": null,
+          "pid1_state": null,
+          "post_kill_old_fd_write_errno": 107,
+          "state": {
+            "binding_digest": "sha256:755a3700d9a741d2b0dab4b542e9a67e3017877175ec0dcaf0592d903f07c7d1",
+            "candidate_id": "candidate_2f14d2e780bf2372eb9bf026ad2a838b",
+            "computer_id": "res_062395f48cca4c3ffb1997fe458709a2",
+            "created_at_ms": 1791612125574,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_4b03be138ad8c97f64ac06215901c784",
+            "generation": 1,
+            "input_digest": "sha256:4fafc1990fd557a0d26ae15e75a0bfe07b1dc95a9a499b585db202e2e309d096",
+            "lease_id": "lease_8e21f031ebca53b7127060828db90d26",
+            "queue_deadline_at_ms": 1791612155563,
+            "reason": "writer_unavailable",
+            "revision": 3,
+            "sandbox_id": "res_518892b106ec77ad946e5602dd9d4038",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          }
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:755a3700d9a741d2b0dab4b542e9a67e3017877175ec0dcaf0592d903f07c7d1",
+            "candidate_id": "candidate_2f14d2e780bf2372eb9bf026ad2a838b",
+            "computer_id": "res_062395f48cca4c3ffb1997fe458709a2",
+            "created_at_ms": 1791612125574,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_4b03be138ad8c97f64ac06215901c784",
+            "generation": 1,
+            "input_digest": "sha256:4fafc1990fd557a0d26ae15e75a0bfe07b1dc95a9a499b585db202e2e309d096",
+            "lease_id": "lease_8e21f031ebca53b7127060828db90d26",
+            "queue_deadline_at_ms": 1791612155563,
+            "reason": "writer_unavailable",
+            "revision": 3,
+            "sandbox_id": "res_518892b106ec77ad946e5602dd9d4038",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-c62d6bad2370eedecd302d432571680e9f7f5e9399139c3b4f25",
+          "pod_uid": "2d1cf72f-4bf8-40a4-b5a3-7bddec12a851",
+          "plan_digest": "sha256:dc7afae4146e4c8f4a7db292671d00fae3a4281df9dfefca10eace911a74dc44",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "9ddf93e7bc9c5a00d54f59e41d2ca1f3a7064ebac33e99defd90b1353239fbe5"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:48f2c7979bebfcb647c9ad69f7384ffe0d6a5e9f645260b3ca6da1f65bf42738",
+          "runtime_identity": {
+            "container_id": "f935f1d2ee827c45d21589792ca23fdd802131c4df415214adfc90cb0d5e6801",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-c62d6bad2370eedecd302d432571680e9f7f5e9399139c3b4f25",
+            "pod_uid": "2d1cf72f-4bf8-40a4-b5a3-7bddec12a851"
+          },
+          "workspace_inode": 145,
+          "front_device": 47,
+          "front_inode": 1,
+          "front_instance": "9ddf93e7bc9c5a00d54f59e41d2ca1f3a7064ebac33e99defd90b1353239fbe5",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 13788,
+          "deadline_boottime_ms": 1839643
+        }
+      },
+      {
+        "case": "pid1-stop",
+        "execution_id": "exec_e43b57e34cd85147a56edbccd30852b2",
+        "prepared": {
+          "data_inode": 153,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_b55846177d3acb3729c547171c60039c/candidates/candidate_10ea98e5f87d529f93d7cfbbcf7dbde4/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:492a50420296261cd5b83d8f0000bb6fd93f7d1fe81d821e2d2d416a5450ab35",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "state": "absent"
+        },
+        "outcome": {
+          "api_delete_before_empty": false,
+          "cgroup_inode": 14025,
+          "controller_killed_boottime_ms": 1846277,
+          "controller_pid": 17400,
+          "controller_signal": 9,
+          "deadline_boottime_ms": 1871656,
+          "empty_observed_boottime_ms": 1871672,
+          "heartbeat_before_kill": {
+            "after": 4,
+            "before": 0,
+            "observed_boottime_ms": 1846276
+          },
+          "pid1_state": "State:\tT (stopped)",
+          "post_kill_old_fd_write_errno": 107,
+          "state": {
+            "binding_digest": "sha256:a669d31fdfe4545bcf3faf302052bed0e51aae3385c223e339de30eb20878c25",
+            "candidate_id": "candidate_10ea98e5f87d529f93d7cfbbcf7dbde4",
+            "computer_id": "res_c3236ad9e967be6c61b009b6be6f0485",
+            "created_at_ms": 1791612157585,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_e43b57e34cd85147a56edbccd30852b2",
+            "generation": 1,
+            "input_digest": "sha256:63816c433d1158b32d3498eca927ce8b9a83228f29ddfed2beb6cea1576e9e25",
+            "lease_id": "lease_dd45473b2b4a1e1d5c9ea5ad6c14ec18",
+            "queue_deadline_at_ms": 1791612187576,
+            "reason": "writer_unavailable",
+            "revision": 3,
+            "sandbox_id": "res_31cc55f14dd9cb21eab7e82047cb71e1",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          }
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:a669d31fdfe4545bcf3faf302052bed0e51aae3385c223e339de30eb20878c25",
+            "candidate_id": "candidate_10ea98e5f87d529f93d7cfbbcf7dbde4",
+            "computer_id": "res_c3236ad9e967be6c61b009b6be6f0485",
+            "created_at_ms": 1791612157585,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_e43b57e34cd85147a56edbccd30852b2",
+            "generation": 1,
+            "input_digest": "sha256:63816c433d1158b32d3498eca927ce8b9a83228f29ddfed2beb6cea1576e9e25",
+            "lease_id": "lease_dd45473b2b4a1e1d5c9ea5ad6c14ec18",
+            "queue_deadline_at_ms": 1791612187576,
+            "reason": "writer_unavailable",
+            "revision": 3,
+            "sandbox_id": "res_31cc55f14dd9cb21eab7e82047cb71e1",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-f55255b344bb4c1edab17253b3df699b7b28e23004cb51071061",
+          "pod_uid": "28167b67-2719-43bb-a775-ac93f9d16ae0",
+          "plan_digest": "sha256:8bcfd97d395f32b67f1b3c75b5d9a9568be5daf12001997d58d31f5bb5da61fe",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "845c5eb8b43b8283f5f0a0cf734d81d55fcef5df061c2a79244663119e0815af"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:c3d6a2ae340027fe2b43614fd581a80ce59d58573bf0207fc6e6cec60536579a",
+          "runtime_identity": {
+            "container_id": "f4b0b16d7026ea9f6012fdb209a7eab4856f9abc814dee0d95919d477728984c",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-f55255b344bb4c1edab17253b3df699b7b28e23004cb51071061",
+            "pod_uid": "28167b67-2719-43bb-a775-ac93f9d16ae0"
+          },
+          "workspace_inode": 153,
+          "front_device": 48,
+          "front_inode": 1,
+          "front_instance": "845c5eb8b43b8283f5f0a0cf734d81d55fcef5df061c2a79244663119e0815af",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 14025,
+          "deadline_boottime_ms": 1871656
+        }
+      },
+      {
+        "case": "reaper-missing",
+        "execution_id": "exec_ba4760c3d4dfcef3f9ad20c48d48db3e",
+        "prepared": {
+          "data_inode": 163,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_259784b7d80408593bab2a3f6eff409e/candidates/candidate_07e27f91d6c9d2fb74e2ed94cca80b7e/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:0ed24963a44bfbf282c77d4547ca75efff774c4ee4c03c9277b8e5f6287392f6",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "state": "absent"
+        },
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:4d1982ae5bafc3a8a09ab5e7cb1a543cb77b991139bd92b649a76475e41a8761",
+            "candidate_id": "candidate_07e27f91d6c9d2fb74e2ed94cca80b7e",
+            "computer_id": "res_09f145807c1ddd4684bd8ac32a647b54",
+            "created_at_ms": 1791612190211,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_ba4760c3d4dfcef3f9ad20c48d48db3e",
+            "generation": 1,
+            "input_digest": "sha256:77b8fd561c414c68adda9c426cfcd63d32733b5b8abf42082c290b0d941eb4b3",
+            "lease_id": "lease_8e99a33e01d679e492c8f05deee0f814",
+            "queue_deadline_at_ms": 1791612220192,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_7ba95bf2163ed20025b89e15ca6c862a",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": "watchdog",
+          "io_fence": {
+            "accepted_mutating_requests": 0,
+            "instance": "8e2efa254b2050395fba55420a54474ebd5666a708d85cdb62165f2c2fd47536",
+            "prepared": {
+              "data_inode": 163,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_259784b7d80408593bab2a3f6eff409e/candidates/candidate_07e27f91d6c9d2fb74e2ed94cca80b7e/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:0ed24963a44bfbf282c77d4547ca75efff774c4ee4c03c9277b8e5f6287392f6",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": "ReaperUnavailable",
+          "output_unconfirmed": false,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:4d1982ae5bafc3a8a09ab5e7cb1a543cb77b991139bd92b649a76475e41a8761",
+            "candidate_id": "candidate_07e27f91d6c9d2fb74e2ed94cca80b7e",
+            "computer_id": "res_09f145807c1ddd4684bd8ac32a647b54",
+            "created_at_ms": 1791612190211,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_ba4760c3d4dfcef3f9ad20c48d48db3e",
+            "generation": 1,
+            "input_digest": "sha256:77b8fd561c414c68adda9c426cfcd63d32733b5b8abf42082c290b0d941eb4b3",
+            "lease_id": "lease_8e99a33e01d679e492c8f05deee0f814",
+            "queue_deadline_at_ms": 1791612220192,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_7ba95bf2163ed20025b89e15ca6c862a",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-8b76503c341ce64f16b05ab14c9ed714968b73ba3e508c6458f3",
+          "pod_uid": "bd5c374a-9aef-45fc-8b16-1ac69c66f4c9",
+          "plan_digest": "sha256:041149da9265b5ac11d3f59153c19ace6116b2da5467bdf9d794f1697263a66c",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "8e2efa254b2050395fba55420a54474ebd5666a708d85cdb62165f2c2fd47536"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        }
+      },
+      {
+        "case": "output-store-failure",
+        "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+        "prepared": {
+          "data_inode": 170,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_b074c86f8be27db99de0a043b6a49ce7/candidates/candidate_18e3d1c9b9f307ecb9aab0d453b040e6/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:a8d9369273c7e61b8d36a8f8bc7290ae68673f4f2f2edd79d557d9ee400ebac3",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "fresh_process_read_matches": true,
+          "initial_state": "pending",
+          "output_events": 2,
+          "recovered": {
+            "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+            "manifest_digest": "sha256:9fb58587c31a176110c151d1871151ab98cdda08e75bf6782f6ca7a9c5e9b53d",
+            "observed_outcome": "succeeded",
+            "state": "verified",
+            "stderr": {
+              "eof": true,
+              "observed_bytes": 0,
+              "retained_bytes": 0,
+              "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "truncated": false
+            },
+            "stdout": {
+              "eof": true,
+              "observed_bytes": 4,
+              "retained_bytes": 4,
+              "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211",
+              "truncated": false
+            },
+            "verified_at_ms": 1791612201470
+          },
+          "recovery_retries": 2,
+          "startup_grants": 1
+        },
+        "raw_process_outcome": "succeeded",
+        "raw_report_sha256": "21f89ff04fe548592460acdf69f07e141d44cb56ac7eb7c477e9c6ec2ecb2b83",
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:e61725845fa4381352cc5294dedeff289b1bedb81fd0f5dc6321972ffdadc3aa",
+            "candidate_id": "candidate_18e3d1c9b9f307ecb9aab0d453b040e6",
+            "computer_id": "res_6ce1f97cb4ddd2f536827dccb936e73c",
+            "created_at_ms": 1791612196742,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+            "generation": 1,
+            "input_digest": "sha256:9904ba9631f03747627b45b527c6033c88c01f56ccb63edaaf2512b188b317fd",
+            "lease_id": "lease_efc5e2bfde5cd8c0a50eb51b57b192cd",
+            "queue_deadline_at_ms": 1791612226733,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_8c9454e8ad8aed4bc38d8fee78b6d5e5",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": null,
+          "io_fence": {
+            "accepted_mutating_requests": 11,
+            "instance": "106aaabe3b827d4aae67e2272327ad999756ae31217273e259f4a01683cad627",
+            "prepared": {
+              "data_inode": 170,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_b074c86f8be27db99de0a043b6a49ce7/candidates/candidate_18e3d1c9b9f307ecb9aab0d453b040e6/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:a8d9369273c7e61b8d36a8f8bc7290ae68673f4f2f2edd79d557d9ee400ebac3",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": true,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:e61725845fa4381352cc5294dedeff289b1bedb81fd0f5dc6321972ffdadc3aa",
+            "candidate_id": "candidate_18e3d1c9b9f307ecb9aab0d453b040e6",
+            "computer_id": "res_6ce1f97cb4ddd2f536827dccb936e73c",
+            "created_at_ms": 1791612196742,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+            "generation": 1,
+            "input_digest": "sha256:9904ba9631f03747627b45b527c6033c88c01f56ccb63edaaf2512b188b317fd",
+            "lease_id": "lease_efc5e2bfde5cd8c0a50eb51b57b192cd",
+            "queue_deadline_at_ms": 1791612226733,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_8c9454e8ad8aed4bc38d8fee78b6d5e5",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-77a45e5e7e4c53dfbb1716b9ac9f74b0f71a845e7da992dbcb29",
+          "pod_uid": "779e9a82-36f2-4ad1-9bff-7e1afc548ba3",
+          "plan_digest": "sha256:cbca1fd295c75cbe358ad082e7d5de70af48b3fefd87822b8b7565aa22892e98",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "106aaabe3b827d4aae67e2272327ad999756ae31217273e259f4a01683cad627"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:4f00871588409e0ab027b9c723f90310972efac10274a82328b2843d76c8ff6a",
+          "runtime_identity": {
+            "container_id": "299e3af1c48e5895fee9527d85ea45f3c6ad496fd48f4331ae74e68dc17ad1f8",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-77a45e5e7e4c53dfbb1716b9ac9f74b0f71a845e7da992dbcb29",
+            "pod_uid": "779e9a82-36f2-4ad1-9bff-7e1afc548ba3"
+          },
+          "workspace_inode": 170,
+          "front_device": 50,
+          "front_inode": 1,
+          "front_instance": "106aaabe3b827d4aae67e2272327ad999756ae31217273e259f4a01683cad627",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 14559,
+          "deadline_boottime_ms": 1910822
+        }
+      },
+      {
+        "case": "output-db-failure",
+        "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+        "prepared": {
+          "data_inode": 180,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_3da8b96cbc618d49ae7f7e305f8189fd/candidates/candidate_1b6322a9da29ed188f558c186cc201c0/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:0d3d7ae5ce1e3f2ce8bf1132f6f92e0f919dbd3746801191e807e2fcfba4bf64",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "fresh_process_read_matches": true,
+          "initial_state": "pending",
+          "output_events": 2,
+          "recovered": {
+            "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+            "manifest_digest": "sha256:5e1b522ad5c7a42cacb943ff325b1ad5b3a03a3067bb67615fd3c742e8f6a8ad",
+            "observed_outcome": "succeeded",
+            "state": "verified",
+            "stderr": {
+              "eof": true,
+              "observed_bytes": 0,
+              "retained_bytes": 0,
+              "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "truncated": false
+            },
+            "stdout": {
+              "eof": true,
+              "observed_bytes": 4,
+              "retained_bytes": 4,
+              "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211",
+              "truncated": false
+            },
+            "verified_at_ms": 1791612208373
+          },
+          "recovery_retries": 2,
+          "startup_grants": 1
+        },
+        "raw_process_outcome": "succeeded",
+        "raw_report_sha256": "b156d00ed8706f1766eaa53ee416347eca2fad7c4eb24d94f24e1b38bfc473ed",
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:27b69be1a4567e944787fc7066137f2d93ee81f50ba8122f5649dce28c9f9831",
+            "candidate_id": "candidate_1b6322a9da29ed188f558c186cc201c0",
+            "computer_id": "res_8984981c4f27734325d0b2166b39723f",
+            "created_at_ms": 1791612203730,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+            "generation": 1,
+            "input_digest": "sha256:798e1deeb0e4280132cf6c1a2a8486f80d827ced13e98c4faa0c2379e98a67b1",
+            "lease_id": "lease_44c64df037fe46e34f3007cee808da33",
+            "queue_deadline_at_ms": 1791612233719,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_35f1fb83d6eed1556f234b09cc483e11",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": null,
+          "io_fence": {
+            "accepted_mutating_requests": 11,
+            "instance": "9a20dceb2c7f5f1b5c92ce2847917f056a2032ca4ceddd49b54a0b83e2e0cae0",
+            "prepared": {
+              "data_inode": 180,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_3da8b96cbc618d49ae7f7e305f8189fd/candidates/candidate_1b6322a9da29ed188f558c186cc201c0/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:0d3d7ae5ce1e3f2ce8bf1132f6f92e0f919dbd3746801191e807e2fcfba4bf64",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": true,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:27b69be1a4567e944787fc7066137f2d93ee81f50ba8122f5649dce28c9f9831",
+            "candidate_id": "candidate_1b6322a9da29ed188f558c186cc201c0",
+            "computer_id": "res_8984981c4f27734325d0b2166b39723f",
+            "created_at_ms": 1791612203730,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+            "generation": 1,
+            "input_digest": "sha256:798e1deeb0e4280132cf6c1a2a8486f80d827ced13e98c4faa0c2379e98a67b1",
+            "lease_id": "lease_44c64df037fe46e34f3007cee808da33",
+            "queue_deadline_at_ms": 1791612233719,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_35f1fb83d6eed1556f234b09cc483e11",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-ab364a7d1af3d721ef4fe15ee4552515c97ec61eb50515ffa45a",
+          "pod_uid": "6f7d83fa-8d5c-403e-81d7-3e34b1085455",
+          "plan_digest": "sha256:8ff8ab4b1b0c18ea01dbc98b31b5e147572e397d9ba9a5ea89e6ca58299a80c8",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "9a20dceb2c7f5f1b5c92ce2847917f056a2032ca4ceddd49b54a0b83e2e0cae0"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:e7aa21f13d45506d83f74ecef0c59131b379ce4985ba6f3f114c5630494d3859",
+          "runtime_identity": {
+            "container_id": "6b7ff91be3c8a6284681e0a3fab9743b91e0748f40de6972533ac24242266b47",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-ab364a7d1af3d721ef4fe15ee4552515c97ec61eb50515ffa45a",
+            "pod_uid": "6f7d83fa-8d5c-403e-81d7-3e34b1085455"
+          },
+          "workspace_inode": 180,
+          "front_device": 50,
+          "front_inode": 1,
+          "front_instance": "9a20dceb2c7f5f1b5c92ce2847917f056a2032ca4ceddd49b54a0b83e2e0cae0",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 14796,
+          "deadline_boottime_ms": 1917809
+        }
+      },
+      {
+        "case": "output-truncated",
+        "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+        "prepared": {
+          "data_inode": 190,
+          "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+          "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+          "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_c8054299cceeee253814d3a7c78beb4e/candidates/candidate_70520a9dce91016a82765aaaa86e8e5b/generation/1/data",
+          "quota_bytes": 10737418240,
+          "request_digest": "sha256:9ea5621f0e61f33d0331b994b241128b07e7813dde2639efd7ef6ee5c0a6df54",
+          "version": 1,
+          "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+        },
+        "outputs": {
+          "fresh_process_read_matches": true,
+          "initial_state": "verified",
+          "output_events": 2,
+          "recovered": {
+            "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+            "manifest_digest": "sha256:b612b53edc12156f2f4a320a903f923e16cfef3329573f22914c79504878a95b",
+            "observed_outcome": "succeeded",
+            "state": "verified",
+            "stderr": {
+              "eof": true,
+              "observed_bytes": 5000,
+              "retained_bytes": 4096,
+              "sha256": "sha256:303cad2cadff9d212d037b5464b63177a659fab11bdb9dc2da47dc09564bc199",
+              "truncated": true
+            },
+            "stdout": {
+              "eof": true,
+              "observed_bytes": 5000,
+              "retained_bytes": 4096,
+              "sha256": "sha256:a2e659dacb4691e887ac0139f8893d04764ee197d70fb73d3190d56113d18e3e",
+              "truncated": true
+            },
+            "verified_at_ms": 1791612215518
+          },
+          "recovery_retries": 2,
+          "startup_grants": 1
+        },
+        "output_manifest_digest": "sha256:b612b53edc12156f2f4a320a903f923e16cfef3329573f22914c79504878a95b",
+        "output_state": "verified",
+        "raw_process_outcome": "succeeded",
+        "raw_report_sha256": "23dae80864ddc2e5ec88d108d7ffa9297950bbd3f722c40702b8eb12cc73fb77",
+        "outcome": {
+          "cleanup": "delete_requested",
+          "execution": {
+            "binding_digest": "sha256:fc53487d464e1e745476ab35889cec7080b06ac15b0f9599bfdb2bf7dccac8c4",
+            "candidate_id": "candidate_70520a9dce91016a82765aaaa86e8e5b",
+            "computer_id": "res_b72052111ce645d72433f8fbcd784b33",
+            "created_at_ms": 1791612210601,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+            "generation": 1,
+            "input_digest": "sha256:1c5e98bc679b8a79a67f49ad17ac7b829dd79e4d6ce7e6d6099e90e430968ba4",
+            "lease_id": "lease_bcbb8240a0cfc97afba19d21c603cd4e",
+            "queue_deadline_at_ms": 1791612240592,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_be3f3839f819ee873bcdb89ea073293a",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "interrupted_at": null,
+          "io_fence": {
+            "accepted_mutating_requests": 3,
+            "instance": "819145fab4b3680f40d1392e8e33bf2efb438577e4dc323d0e32ff6644ccc35b",
+            "prepared": {
+              "data_inode": 190,
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_c8054299cceeee253814d3a7c78beb4e/candidates/candidate_70520a9dce91016a82765aaaa86e8e5b/generation/1/data",
+              "quota_bytes": 10737418240,
+              "request_digest": "sha256:9ea5621f0e61f33d0331b994b241128b07e7813dde2639efd7ef6ee5c0a6df54",
+              "version": 1,
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada"
+            },
+            "version": 1
+          },
+          "node_error": null,
+          "output_unconfirmed": false,
+          "publication_revoked": true,
+          "watchdog_journals": null
+        },
+        "recovery": {
+          "execution": {
+            "binding_digest": "sha256:fc53487d464e1e745476ab35889cec7080b06ac15b0f9599bfdb2bf7dccac8c4",
+            "candidate_id": "candidate_70520a9dce91016a82765aaaa86e8e5b",
+            "computer_id": "res_b72052111ce645d72433f8fbcd784b33",
+            "created_at_ms": 1791612210601,
+            "dispatch_started": true,
+            "epoch": 1,
+            "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+            "generation": 1,
+            "input_digest": "sha256:1c5e98bc679b8a79a67f49ad17ac7b829dd79e4d6ce7e6d6099e90e430968ba4",
+            "lease_id": "lease_bcbb8240a0cfc97afba19d21c603cd4e",
+            "queue_deadline_at_ms": 1791612240592,
+            "reason": "dispatch_unconfirmed",
+            "revision": 3,
+            "sandbox_id": "res_be3f3839f819ee873bcdb89ea073293a",
+            "sandbox_revision": 1,
+            "state": "Unknown"
+          },
+          "cleanup": "delete_requested",
+          "io_fence": null,
+          "publication_revoked": true,
+          "node_error": null
+        },
+        "pod": {
+          "namespace": "ac-kube-component",
+          "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+          "pod_name": "ac-0132b61816b4112d65920ed7b803fb49eae0e1a98f5aa4ef793b",
+          "pod_uid": "02f85fd3-d7f5-439a-870f-08d99e3d5646",
+          "plan_digest": "sha256:a82a889e0977ac992406134a6c58237767b594a4e9f3cb85633959ee9d321954",
+          "workspace_volume": {
+            "csi": {
+              "driver": "csi.agent-computer.io",
+              "readOnly": false,
+              "volumeAttributes": {
+                "agent-computer.io/mount-instance": "819145fab4b3680f40d1392e8e33bf2efb438577e4dc323d0e32ff6644ccc35b"
+              }
+            },
+            "name": "workspace"
+          },
+          "workspace_mount": {
+            "mountPath": "/workspace",
+            "name": "workspace",
+            "readOnly": false
+          },
+          "node_name": "ac-component-node",
+          "fence_reference_matches_registration": true
+        },
+        "watchdog": {
+          "evidence_digest": "sha256:2948a5686ac179aeae418a200de7a90d6c39cfa4e6813b051c118b2313ebf0b4",
+          "runtime_identity": {
+            "container_id": "5b88e8480a6334197cc4296d3218d51899e157dc4edf256854caeb3a8d9853b8",
+            "namespace": "ac-kube-component",
+            "namespace_uid": "1261245f-d1d7-4a40-8a02-e286078576eb",
+            "node": {
+              "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+              "name": "ac-component-node",
+              "uid": "82544ab9-9d9d-412d-8853-0c9bcc58904a"
+            },
+            "pod_name": "ac-0132b61816b4112d65920ed7b803fb49eae0e1a98f5aa4ef793b",
+            "pod_uid": "02f85fd3-d7f5-439a-870f-08d99e3d5646"
+          },
+          "workspace_inode": 190,
+          "front_device": 50,
+          "front_inode": 1,
+          "front_instance": "819145fab4b3680f40d1392e8e33bf2efb438577e4dc323d0e32ff6644ccc35b",
+          "reference_matches_pod_journal": true,
+          "cgroup_inode": 15033,
+          "deadline_boottime_ms": 1924682
+        }
+      }
+    ],
+    "volume_path": "pvc-a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+    "writer_drains": 0,
+    "database_counts": {
+      "execution_requests": 11,
+      "execution_dispatch_intents": 11,
+      "execution_pod_plans": 10,
+      "execution_pod_observations": 10,
+      "execution_watchdog_arms": 8,
+      "execution_startup_grants": 8,
+      "candidate_writer_leases": 11,
+      "candidate_writer_drains": 0,
+      "candidate_writer_completions": 0,
+      "execution_output_intents": 5,
+      "execution_outputs": 5
+    },
+    "database_states": [
+      {
+        "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "a0879c50-fc0c-4293-a8ff-f20afb8985e6",
+        "grant_digest": "sha256:ad35b57184a602a656dc96806090508c203daed809f14082548983b5b2498e1a",
+        "arm_digest": "sha256:a5a1455d6d23d5c9cd5bf65dfc61a3a18fb4f892e881278dc7273f712194145b"
+      },
+      {
+        "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "e7a39a39-9e06-4050-82f6-872f400441b5",
+        "grant_digest": "sha256:07468850790fb22972798d982e3b171315562d8d92ae6b6280204efae47cb6d3",
+        "arm_digest": "sha256:9fff77731cec4cd9a2a613128ae73517d688a751b3ba515ee4a5d73e8b5ef2a3"
+      },
+      {
+        "execution_id": "exec_069e475aec50ec82b4a2fe2814d1375d",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": null,
+        "grant_digest": null,
+        "arm_digest": null
+      },
+      {
+        "execution_id": "exec_d0a97f534a43ccf431136e31d8dd69f4",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "72c1e418-3bff-413a-8ade-fb2709763ab8",
+        "grant_digest": "sha256:c677bb3c917a75f596e536602eff22893f80615a598b9035a29acab4dd2c1429",
+        "arm_digest": "sha256:5aa6a45d875e7b0ed18cfdeda9ead0bb68d821ff3ed908185700cf06cf6c6869"
+      },
+      {
+        "execution_id": "exec_4308e3e5c3178cf818e69902b333252a",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "f6320631-9c61-4abc-a8fe-37f4dee1a0bc",
+        "grant_digest": null,
+        "arm_digest": null
+      },
+      {
+        "execution_id": "exec_4b03be138ad8c97f64ac06215901c784",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "2d1cf72f-4bf8-40a4-b5a3-7bddec12a851",
+        "grant_digest": "sha256:3356bc0b2475eeafbc8bbd955146b7bcf22bb8536f293b9a03824c2c884c44d1",
+        "arm_digest": "sha256:48f2c7979bebfcb647c9ad69f7384ffe0d6a5e9f645260b3ca6da1f65bf42738"
+      },
+      {
+        "execution_id": "exec_e43b57e34cd85147a56edbccd30852b2",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "28167b67-2719-43bb-a775-ac93f9d16ae0",
+        "grant_digest": "sha256:85edaa18fb14e1bc8beefaa94b634ce8c1054d29faddf9653e7478f312acbdb0",
+        "arm_digest": "sha256:c3d6a2ae340027fe2b43614fd581a80ce59d58573bf0207fc6e6cec60536579a"
+      },
+      {
+        "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "6f7d83fa-8d5c-403e-81d7-3e34b1085455",
+        "grant_digest": "sha256:f48c3e06fd4d267b31a11b24400732c94992b3de515944910064a889b87f0157",
+        "arm_digest": "sha256:e7aa21f13d45506d83f74ecef0c59131b379ce4985ba6f3f114c5630494d3859"
+      },
+      {
+        "execution_id": "exec_ba4760c3d4dfcef3f9ad20c48d48db3e",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "bd5c374a-9aef-45fc-8b16-1ac69c66f4c9",
+        "grant_digest": null,
+        "arm_digest": null
+      },
+      {
+        "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "779e9a82-36f2-4ad1-9bff-7e1afc548ba3",
+        "grant_digest": "sha256:7c7fe71d4876fcff9c29783c22274212c3905b28a2c654029aa2097abd842626",
+        "arm_digest": "sha256:4f00871588409e0ab027b9c723f90310972efac10274a82328b2843d76c8ff6a"
+      },
+      {
+        "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+        "execution_state": "Unknown",
+        "writer_state": "Draining",
+        "epoch": 1,
+        "pod_uid": "02f85fd3-d7f5-439a-870f-08d99e3d5646",
+        "grant_digest": "sha256:27c0a8ef554cffb3430659fd9c6dc585011683102df9a72856cc9a06dd7cbfbf",
+        "arm_digest": "sha256:2948a5686ac179aeae418a200de7a90d6c39cfa4e6813b051c118b2313ebf0b4"
+      }
+    ],
+    "database_durability": {
+      "fsync": "on",
+      "synchronous_commit": "on",
+      "full_page_writes": "on"
+    },
+    "independent_s3_readback": {
+      "implementation": "Python urllib + hashlib/hmac, no proxy or local spool reads",
+      "references_verified": 20,
+      "objects": [
+        {
+          "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+          "index": 0,
+          "bytes": 675,
+          "sha256": "sha256:319c13959b60f15f9e56f8ea3a126547119e3a5624eca5c04d6cd167b5f5d480"
+        },
+        {
+          "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+          "index": 1,
+          "bytes": 4,
+          "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+        },
+        {
+          "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+          "index": 2,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_355cf7a6fd749b2688fe731df9676f2b",
+          "index": 3,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+          "index": 0,
+          "bytes": 675,
+          "sha256": "sha256:0f2fe83396b036ac7aaa0ce1cf11c365256224e915fdbafa3d6cb654f2706bc4"
+        },
+        {
+          "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+          "index": 1,
+          "bytes": 4,
+          "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+        },
+        {
+          "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+          "index": 2,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+          "index": 3,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+          "index": 0,
+          "bytes": 33430,
+          "sha256": "sha256:057907407f5a8d5e685fa99387566df5bc7b9a213393e92e99dd04674734366a"
+        },
+        {
+          "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+          "index": 1,
+          "bytes": 4096,
+          "sha256": "sha256:a2e659dacb4691e887ac0139f8893d04764ee197d70fb73d3190d56113d18e3e"
+        },
+        {
+          "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+          "index": 2,
+          "bytes": 4096,
+          "sha256": "sha256:303cad2cadff9d212d037b5464b63177a659fab11bdb9dc2da47dc09564bc199"
+        },
+        {
+          "execution_id": "exec_9569732f5bcf0881b862c9e3a50c32f7",
+          "index": 3,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+          "index": 0,
+          "bytes": 675,
+          "sha256": "sha256:629d9c050c4d5d916ebb6e7d4113eab8fd9190797a4152eb40357b4ee6b7a7ab"
+        },
+        {
+          "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+          "index": 1,
+          "bytes": 4,
+          "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+        },
+        {
+          "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+          "index": 2,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+          "index": 3,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+          "index": 0,
+          "bytes": 675,
+          "sha256": "sha256:9f107a0af8b4ace4c0b325eb4efb8c563632635e61ee31f523c0c608f63d32ef"
+        },
+        {
+          "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+          "index": 1,
+          "bytes": 4,
+          "sha256": "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211"
+        },
+        {
+          "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+          "index": 2,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "execution_id": "exec_d71e1029b5974baea0296d496dbac15b",
+          "index": 3,
+          "bytes": 0,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    "final_run_api_pods_remaining": 0,
+    "other_fixture_pods_remaining": 1,
+    "environment": {
+      "kernel": "6.8.0-142-generic",
+      "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+      "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+      "juicefs": "juicefs version 1.4.1+2026-07-30.0b90c7d",
+      "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+      "seaweedfs": "version 30GB 4.48 530be3e37337488ecc34d58441e0bc476e121c93 linux amd64"
+    },
+    "remote_binaries": {
+      "execution_worker_live_test": "5b65b9a3d04bf85bc0033c01cf6af21131e9e4eb5d009a9e6cd377cd196cb5fd",
+      "agent-computer-server": "e693be599baaf06286533fc3ecd35eabb459d23644c6148635891a092b8b65f3",
+      "agent-computer-watchdog": "8537f32abaada4555f56a088aa8bedd61c3f07deb397b44cb32cd8bb78b8ec46",
+      "k3s": "92b94582eb7b34a8cf532e6006842b9ed215a6783cf56a3dd6271fd35243b2c0",
+      "runsc": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a",
+      "juicefs": "1e111b642668992e04d62377e218a24e263f76af12370facb9097353e5b8d208",
+      "agent-computer-csi": "d61914475d6812945c7b9e0f9d4a89f8ff244376363dc36de015f3bc4786b5d7",
+      "csi_live_test": "4329975aaca68b1ee5330d8eed4f4e269c82c05436479ff5369378213355fd0a",
+      "csi-node-driver-registrar": "0593b7ad7c5262e6b13c8a90c7e42a6fe11cf8bb4d1949b7506a13d159d0a3f6"
+    },
+    "reaper_service": "active",
+    "fixture_storage": {
+      "transport": "explicit isolated-VM HTTP",
+      "s3_bucket": "fixture bucket shared with JuiceFS; separate execution-outputs/v1 namespace",
+      "spool_separate_from_watchdog": true
+    },
+    "csi_rpc": {
+      "cleanup_idempotent": true,
+      "driver": "csi.agent-computer.io",
+      "foreign_mount_retained": true,
+      "foreign_target_denied": true,
+      "instance": "099c29e5654309be541ead0f6047b6e596598da26b210b7d2527a2cc8d6283cd",
+      "non_root_denied": true,
+      "replacement_pod_denied": true,
+      "revoked_republish_denied": true,
+      "unregistered_instance_denied": true
+    },
+    "mount_registrations": [
+      {
+        "case": "normal",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "099c29e5654309be541ead0f6047b6e596598da26b210b7d2527a2cc8d6283cd",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_49d2091b1aafe1c4ce43dd0f743b1ff9",
+            "device": 47,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:0f2893f86507b710e5e1b46d2739680bf15f622489ed5085b43bb261b99e4d7f",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_f90a08c771a1acd1397b866a072f387a/candidates/candidate_0fbcdc4e6fa58038b191ae94b1d0ac6c/generation/1/data",
+              "data_inode": 103,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-bafb80ee0afe3204c651dc0c9128df6c9863b0855e9320cf68e7",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-a1d9bc2017bc1a37dd1c0755b03a14b12a1553a699187359a4a5e435f0f3f1c5",
+          "target": "/var/lib/kubelet/pods/a0879c50-fc0c-4293-a8ff-f20afb8985e6/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "a0879c50-fc0c-4293-a8ff-f20afb8985e6"
+        },
+        "revoked": true
+      },
+      {
+        "case": "command",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "c88c05ac3d0177b6d024d7ed0c5aaad274989c2a20aed10078a68e2e5812aed9",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_cc2a1ba95b1f1b2b0024d9ef9d15c211",
+            "device": 47,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:5e94c719c5e37dfb4fb6e549bcd49e099ba410c815df94f0bf6f0d0555c1015f",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_6986c167a6b02dfec3c33a042beee2c1/candidates/candidate_a9cd5bce0477831c48141e9fff8cb9d4/generation/1/data",
+              "data_inode": 113,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-675233fd36c584540f824eac517c21d5bf429594d75804b15fa2",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-29252f646c8920ff185e000ab3e0eace74b15e8dd0f4eddc559b43456e25afa4",
+          "target": "/var/lib/kubelet/pods/e7a39a39-9e06-4050-82f6-872f400441b5/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "e7a39a39-9e06-4050-82f6-872f400441b5"
+        },
+        "revoked": true
+      },
+      {
+        "case": "cancel",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "f17894fca67ef9edbc0ebc7f56bf0a39f43996846d71aaaf642ad94687080cac",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_d0a97f534a43ccf431136e31d8dd69f4",
+            "device": 47,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:aad7fbd92026cd824e06403650f576c906c7986f959fa2e3f6787aebdae7856b",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_a4037f57819bf72a37059b70c4125962/candidates/candidate_551365cb12fa8fad85d54b6acf402774/generation/1/data",
+              "data_inode": 123,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-ff10b36244a7319b2824dd4357cc6c88ff5b46097906554a3b22",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-86d29531e1029d3ac03993140f61a36d41c3ec2e646895eaf4c042a730d02aae",
+          "target": "/var/lib/kubelet/pods/72c1e418-3bff-413a-8ade-fb2709763ab8/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "72c1e418-3bff-413a-8ade-fb2709763ab8"
+        },
+        "revoked": true
+      },
+      {
+        "case": "controller-kill",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "9ddf93e7bc9c5a00d54f59e41d2ca1f3a7064ebac33e99defd90b1353239fbe5",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_4b03be138ad8c97f64ac06215901c784",
+            "device": 47,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:a6bc58728c4acff2a448d390aecf49250f32f9cecef4d6c81a61f643d4d89863",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_73450f5f6d16ac573d3de6568a3fd3fb/candidates/candidate_2f14d2e780bf2372eb9bf026ad2a838b/generation/1/data",
+              "data_inode": 145,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-c62d6bad2370eedecd302d432571680e9f7f5e9399139c3b4f25",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-363e0d55dd5c49d34413a687f24dadebc6fd94dd5fc806230751ad850c7ea809",
+          "target": "/var/lib/kubelet/pods/2d1cf72f-4bf8-40a4-b5a3-7bddec12a851/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "2d1cf72f-4bf8-40a4-b5a3-7bddec12a851"
+        },
+        "revoked": true
+      },
+      {
+        "case": "pid1-stop",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "845c5eb8b43b8283f5f0a0cf734d81d55fcef5df061c2a79244663119e0815af",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_e43b57e34cd85147a56edbccd30852b2",
+            "device": 48,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:492a50420296261cd5b83d8f0000bb6fd93f7d1fe81d821e2d2d416a5450ab35",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_b55846177d3acb3729c547171c60039c/candidates/candidate_10ea98e5f87d529f93d7cfbbcf7dbde4/generation/1/data",
+              "data_inode": 153,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-f55255b344bb4c1edab17253b3df699b7b28e23004cb51071061",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-38a6fd3bb81dcba3a6e16f070fe9ae00825067f2bb0c2fc894848bba034c69d9",
+          "target": "/var/lib/kubelet/pods/28167b67-2719-43bb-a775-ac93f9d16ae0/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "28167b67-2719-43bb-a775-ac93f9d16ae0"
+        },
+        "revoked": true
+      },
+      {
+        "case": "reaper-missing",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "8e2efa254b2050395fba55420a54474ebd5666a708d85cdb62165f2c2fd47536",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_ba4760c3d4dfcef3f9ad20c48d48db3e",
+            "device": 50,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:0ed24963a44bfbf282c77d4547ca75efff774c4ee4c03c9277b8e5f6287392f6",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_259784b7d80408593bab2a3f6eff409e/candidates/candidate_07e27f91d6c9d2fb74e2ed94cca80b7e/generation/1/data",
+              "data_inode": 163,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-8b76503c341ce64f16b05ab14c9ed714968b73ba3e508c6458f3",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-6b7b922a6bf50ccbadbe2d28df01e9f7dde4e2dcd63b772283f9297e42f0001d",
+          "target": "/var/lib/kubelet/pods/bd5c374a-9aef-45fc-8b16-1ac69c66f4c9/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "bd5c374a-9aef-45fc-8b16-1ac69c66f4c9"
+        },
+        "revoked": true
+      },
+      {
+        "case": "output-store-failure",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "106aaabe3b827d4aae67e2272327ad999756ae31217273e259f4a01683cad627",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_d71e1029b5974baea0296d496dbac15b",
+            "device": 50,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:a8d9369273c7e61b8d36a8f8bc7290ae68673f4f2f2edd79d557d9ee400ebac3",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_b074c86f8be27db99de0a043b6a49ce7/candidates/candidate_18e3d1c9b9f307ecb9aab0d453b040e6/generation/1/data",
+              "data_inode": 170,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-77a45e5e7e4c53dfbb1716b9ac9f74b0f71a845e7da992dbcb29",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-b1f9c35a595b0daced806b832f3dd70ba39495fd62ab4c60e23d450c0c04fa74",
+          "target": "/var/lib/kubelet/pods/779e9a82-36f2-4ad1-9bff-7e1afc548ba3/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "779e9a82-36f2-4ad1-9bff-7e1afc548ba3"
+        },
+        "revoked": true
+      },
+      {
+        "case": "output-db-failure",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "9a20dceb2c7f5f1b5c92ce2847917f056a2032ca4ceddd49b54a0b83e2e0cae0",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_355cf7a6fd749b2688fe731df9676f2b",
+            "device": 50,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:0d3d7ae5ce1e3f2ce8bf1132f6f92e0f919dbd3746801191e807e2fcfba4bf64",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_3da8b96cbc618d49ae7f7e305f8189fd/candidates/candidate_1b6322a9da29ed188f558c186cc201c0/generation/1/data",
+              "data_inode": 180,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-ab364a7d1af3d721ef4fe15ee4552515c97ec61eb50515ffa45a",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-00e64c74e3207e83b8f84587b1c8a4a176185fe6062b1653512de799d4b139fd",
+          "target": "/var/lib/kubelet/pods/6f7d83fa-8d5c-403e-81d7-3e34b1085455/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "6f7d83fa-8d5c-403e-81d7-3e34b1085455"
+        },
+        "revoked": true
+      },
+      {
+        "case": "output-truncated",
+        "registration": {
+          "reference": {
+            "version": 1,
+            "instance": "819145fab4b3680f40d1392e8e33bf2efb438577e4dc323d0e32ff6644ccc35b",
+            "path": "/var/lib/agent-computer-csi/mounts/exec_9569732f5bcf0881b862c9e3a50c32f7",
+            "device": 50,
+            "inode": 1,
+            "boot_id": "e47de4ce-3b8d-4dbf-bef5-1ca6aa3a20e6",
+            "mount_namespace": 4026531841,
+            "prepared": {
+              "version": 1,
+              "request_digest": "sha256:9ea5621f0e61f33d0331b994b241128b07e7813dde2639efd7ef6ee5c0a6df54",
+              "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+              "volume_uid": "a5d60803-7bbb-4212-85ef-cbe5b19b9ada",
+              "path_ref": "organization/execution_probe_1791612093889824864/workspace/res_c8054299cceeee253814d3a7c78beb4e/candidates/candidate_70520a9dce91016a82765aaaa86e8e5b/generation/1/data",
+              "data_inode": 190,
+              "manifest_digest": "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f",
+              "quota_bytes": 10737418240
+            }
+          },
+          "pod": {
+            "namespace": "ac-kube-component",
+            "name": "ac-0132b61816b4112d65920ed7b803fb49eae0e1a98f5aa4ef793b",
+            "node": "ac-component-node"
+          }
+        },
+        "claim": {
+          "volume": "csi-a32a376648a05fc564eca0beb8b6454dc456bb8f409639f9d09317366e7eabb2",
+          "target": "/var/lib/kubelet/pods/02f85fd3-d7f5-439a-870f-08d99e3d5646/volumes/kubernetes.io~csi/workspace/mount",
+          "uid": "02f85fd3-d7f5-439a-870f-08d99e3d5646"
+        },
+        "revoked": true
+      }
+    ],
+    "independent_candidate_readback": {
+      "distinct_client_pid": true,
+      "read_only": true,
+      "cache_size": 0,
+      "reads": [
+        {
+          "case": "normal",
+          "bytes": 9,
+          "sha256": "255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+        },
+        {
+          "case": "command",
+          "bytes": 9,
+          "sha256": "255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+        },
+        {
+          "case": "output-store-failure",
+          "bytes": 9,
+          "sha256": "255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+        },
+        {
+          "case": "output-db-failure",
+          "bytes": 9,
+          "sha256": "255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+        },
+        {
+          "case": "output-truncated",
+          "bytes": 9,
+          "sha256": "255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"
+        }
+      ]
+    },
+    "candidate_mount_configuration": {
+      "filesystem_uuid": "14bfac58-f744-4e30-8110-a8c0e3172465",
+      "storage": "s3",
+      "writeback": false,
+      "fuse_writeback": false
+    },
+    "csi_deployment": {
+      "node": [
+        {
+          "name": "csi.juicefs.com",
+          "nodeID": "ac-component-node",
+          "topologyKeys": null
+        },
+        {
+          "allocatable": {
+            "count": 32
+          },
+          "name": "csi.agent-computer.io",
+          "nodeID": "ac-component-node",
+          "topologyKeys": null
+        }
+      ],
+      "namespace_labels": {
+        "kubernetes.io/metadata.name": "ac-kube-component",
+        "pod-security.kubernetes.io/enforce": "restricted",
+        "pod-security.kubernetes.io/enforce-version": "latest"
+      },
+      "publisher_service": "[Unit]\nDescription=Agent Computer trusted Candidate CSI publisher\nAfter=ac-k3s.service\nRequires=ac-k3s.service\nWants=agent-computer-csi-registrar.service\n\n[Service]\nType=simple\nUser=root\nGroup=root\n# Set NODE_NAME to the exact Kubernetes node name in this operator-owned file.\nEnvironmentFile=/etc/agent-computer/csi.env\nExecStartPre=/usr/bin/install -d -m 0700 /var/lib/agent-computer-csi\nExecStartPre=/usr/bin/install -d -m 0755 /var/lib/kubelet/plugins/csi.agent-computer.io /var/lib/kubelet/plugins_registry\nExecStart=/usr/local/bin/agent-computer-csi ${NODE_NAME}\nRestart=on-failure\nRestartSec=2\nUMask=0077\nNoNewPrivileges=true\nPrivateMounts=no\n# Do not add filesystem sandbox directives creating a separate mount namespace:\n# publication must be visible to Kubelet and the local execution controller.\nRestrictAddressFamilies=AF_UNIX\nLimitNOFILE=8192\n\n[Install]\nWantedBy=multi-user.target\n",
+      "registrar_service": "[Unit]\nDescription=Agent Computer CSI registration using upstream node-driver-registrar\nAfter=agent-computer-csi.service\nRequires=agent-computer-csi.service\nPartOf=agent-computer-csi.service\n\n[Service]\nType=simple\nUser=root\nGroup=root\n# Install an operator-verified upstream registrar; the component evidence pins\n# the tested image digest and extracted executable checksum.\nExecStart=/usr/local/bin/csi-node-driver-registrar --csi-address=/var/lib/kubelet/plugins/csi.agent-computer.io/csi.sock --kubelet-registration-path=/var/lib/kubelet/plugins/csi.agent-computer.io/csi.sock --plugin-registration-path=/var/lib/kubelet/plugins_registry\nRestart=on-failure\nRestartSec=2\nUMask=0077\nNoNewPrivileges=true\nRestrictAddressFamilies=AF_UNIX\n\n[Install]\nWantedBy=multi-user.target\n"
+    },
+    "active_publication": {
+      "exact_retry_retained_mount": true,
+      "instance": "f17894fca67ef9edbc0ebc7f56bf0a39f43996846d71aaaf642ad94687080cac",
+      "publisher_restart_retained_mount": true,
+      "replacement_uid_denied": true
+    },
+    "raw_report_sha256": "e7ef93b4d07b8525276cb989f9d82d042523f2a1988600e9300fdd34999c54c5"
+  },
+  "supervisor_image": {
+    "image": "registry.invalid/agent-computer/startup-component@sha256:a7f66fdc6db3b33991d03f0d6ddc8979ccc9e979fa7668021e355a93630e30f3",
+    "supervisor_sha256": "1203773564c686870a248733b927319b0a4fdbf0443b95ad69e6e56b417866da",
+    "archive_sha256": "9d24d2a1330ed572f7fbb22bca6cc56b76390463b3eb325717f8c6db53808d78"
+  },
+  "registrar": {
+    "image": "mirror.gcr.io/rancher/mirrored-sig-storage-csi-node-driver-registrar@sha256:4da2674bae016b1011c2042cb719cffd9a80d34f3cf933c705b425054f86cea9",
+    "binary_sha256": "0593b7ad7c5262e6b13c8a90c7e42a6fe11cf8bb4d1949b7506a13d159d0a3f6"
+  },
+  "cleanup": {
+    "vm_pid": 456282,
+    "qemu_process_stopped": true,
+    "shutdown": "guest poweroff exceeded 20 seconds; SIGTERM sent only to verified task-owned QEMU after evidence collection",
+    "removed_owned_files": [
+      "disk.qcow2",
+      "seed.iso",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "known_hosts",
+      "user-data",
+      "meta-data",
+      "serial.log",
+      "qemu.log",
+      "vm.json"
+    ],
+    "private_vm_disk_and_ephemeral_credentials_removed": true,
+    "public_download_cache_retained": true,
+    "unrelated_resources_modified": false
+  },
+  "verified_behaviors": [
+    "Actual restricted gVisor Pods use inline CSI, with no hostPath or direct backing subPath. Live node guards and database startup admission match the complete front-mount reference and prepared Candidate.",
+    "Same UID/volume/target retry leaves the mount unchanged. A fully consistent replacement UID/target request is rejected by the original durable claim. Publisher restart preserves the same active mount.",
+    "Nine actual CSI registrations match final-run Pod UIDs and are durably revoked. Recovery provides no IO seal and does not recreate any mount or grant.",
+    "Controller SIGKILL disconnects FUSE. An already-open descriptor rejects a new write with EIO/ENOTCONN while stopped PID 1 remains for the original independent cgroup deadline. This observation is not a drain receipt.",
+    "Kubelet unpublish and explicit duplicate cleanup work with dead source mounts. A foreign replacement bind is retained and rejected; revoked/foreign/replacement requests fail. UID/GID 1000 with no supplementary groups cannot connect to the CSI endpoint.",
+    "A separate read-only JuiceFS process with zero data cache reads five expected Candidate files. Independent Python signed S3 GETs revalidate twenty references from five output manifests.",
+    "All eleven executions remain Unknown with Draining leases; no candidate writer drain or completion rows are produced."
+  ],
+  "experiment_notes": [
+    "No registered repo-sandbox targets were available; the verified test environment was a task-owned QEMU VM (4 vCPU, 6 GiB RAM, 24 GiB sparse overlay).",
+    "Public crates.io TLS downloads failed. Cargo/Bazel used public mirror archives verified against official locked SHA-256 values through task-local distdirs; TLS and dependency checks were retained.",
+    "An initial direct Rust plugin-registration service received Kubelet PROTOCOL_ERROR. It was replaced by the upstream node-driver-registrar; the final qualified flow uses the standard separate registration and CSI sockets.",
+    "Actual fuser direct root mounts report type fuse. Publication checks use that observed type together with device/root/source identity. Both before and after attachment the clone is made private, since a shared host parent otherwise introduces a new peer group.",
+    "The previous PID-1-stop fixture required writes after controller death. It now first proves the stopped-init writer is active, then verifies old-FD write rejection after controller death while retaining the original cgroup deadline assertion.",
+    "Earlier failing development cases were left conservative. The final run uses a new organization and exact execution/instance test selectors; one earlier Error Pod was still present before the disposable VM was reclaimed.",
+    "VM collection independently checked final executable hashes, records, raw storage reads and absence of final-run Pods. Private overlay, SSH keys and VM cloud-init files were removed after collection."
+  ],
+  "reproduction": [
+    "cargo test --offline --workspace with AGENT_COMPUTER_PG_BIN, AGENT_COMPUTER_PG_SHARE and LD_LIBRARY_PATH pointing to private PostgreSQL 18.",
+    "cargo clippy --offline --workspace --all-targets --all-features -- -D warnings; cargo fmt --all -- --check.",
+    "bazel test //... --lockfile_mode=error --repo_env=CARGO_NET_OFFLINE=true with corresponding PostgreSQL --test_env values.",
+    "Deploy the trusted root CSI publisher and upstream registrar in the host mount namespace, apply deploy/candidate-csi.yaml, and verify CSINode registration.",
+    "Build execution_worker_live_test, csi_live_test, server and watchdog. In a disposable real K3s/gVisor/JuiceFS/S3 VM, add csi_test_binary to the private execution test config and run with AGENT_COMPUTER_EXECUTION_TEST_CONFIG. The active CSI retry/restart test runs during cancellation.",
+    "After execution, run csi_live_test --exact real_csi_cleanup_replay_and_peer_boundary --nocapture with AGENT_COMPUTER_CSI_DISPOSABLE_TEST=1 and AGENT_COMPUTER_CSI_TEST_INSTANCE naming the normal execution mount."
+  ],
+  "knowledge_index_gap": {
+    "last_indexed_commit": "abcde858628989b946fef6c35c26675a60e5bd7a",
+    "active_task_state": "retrying",
+    "last_error": "durable delta file 'crates/core/tests/core_contracts.rs' owned fact surface cannot fit one frozen writer quantum for scope 'git_snapshot:735d6f8acfe53d08'",
+    "update_result": "{\"error_kind\":\"qos_rejected\",\"message\":\"code index task queue for repository 'repo:5f506fd4da6e1c49' has 32 unfinished tasks (capacity 32); retry after queued work completes\"}",
+    "consequence": "Repository maps validate; current code was read directly. No fresh GraphRAG claim."
+  },
+  "limits": [
+    "Computer ready remains false; T01-T43 remain not_run. Public execution capability and accepted completion remain pending.",
+    "The mount-local barrier does not revoke trusted direct backing writers, legacy direct mounts or process/network effects. It is not a multi-node or power-loss fence.",
+    "Serialized references, output reports and observed empty cgroups cannot recreate live seal authority or release a lease. Controller loss may leave in-flight backing IO unresolved.",
+    "Only the qualified Linux host mount namespace, K3s/containerd/runsc stack, fixed Kubelet path and documented basic filesystem operations are covered. No general App checkpoint, HA or broad application filesystem compatibility is claimed.",
+    "Durable registry tombstones and private state are retained without automatic reclamation. Production installation and backing store qualification remain operator responsibilities.",
+    "The live fixture uses isolated-VM HTTP for its S3 endpoint, not a production TLS qualification."
+  ]
+}

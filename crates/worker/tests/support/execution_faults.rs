@@ -2,7 +2,7 @@
 use super::*;
 use agent_computer_watchdog::boottime_ms;
 use std::{
-    io::{Read, Seek},
+    io::{Read, Seek, Write},
     os::unix::fs::MetadataExt,
     path::Path,
     process::{Command, Stdio},
@@ -78,6 +78,33 @@ pub async fn kill_controller(
     } else {
         None
     };
+    let mut heartbeat_before_kill = None;
+    if stopped.is_some() {
+        let before = fs::metadata(data.join("ticks.txt"))
+            .map(|m| m.len())
+            .unwrap_or(0);
+        let limit = tokio::time::Instant::now() + Duration::from_secs(3);
+        let after = loop {
+            let after = fs::metadata(data.join("ticks.txt"))
+                .map(|m| m.len())
+                .unwrap_or(0);
+            if after > before {
+                break after;
+            }
+            assert!(
+                tokio::time::Instant::now() < limit,
+                "writer did not run while PID 1 was stopped"
+            );
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        };
+        heartbeat_before_kill =
+            Some(json!({"before":before,"after":after,"observed_boottime_ms":boottime_ms()}));
+    }
+    let front = Path::new(field(&runtime["workspace_mount"], "path"));
+    let mut old_fd = fs::OpenOptions::new()
+        .append(true)
+        .open(front.join("started.txt"))
+        .unwrap();
     let killed_at = boottime_ms();
     let controller_pid = controller.id();
     controller.kill().unwrap();
@@ -88,29 +115,23 @@ pub async fn kill_controller(
         .as_u64()
         .unwrap();
     assert!(killed_at < deadline);
-    let mut heartbeat_after_kill = None;
+    // A disconnected FUSE connection denies new IO even on an old descriptor.
+    // This is not a successful seal: in-flight backing IO remains unconfirmed.
+    let write_error = old_fd
+        .write_all(b"forbidden-after-controller-death")
+        .unwrap_err()
+        .raw_os_error()
+        .unwrap();
+    assert!(
+        matches!(write_error, 5 | 107),
+        "unexpected post-kill errno: {write_error}"
+    );
+    assert_eq!(fs::read(data.join("started.txt")).unwrap(), b"started");
     if stopped.is_some() {
-        let before = fs::metadata(data.join("ticks.txt"))
-            .map(|m| m.len())
-            .unwrap_or(0);
-        // Independent JuiceFS clients may briefly cache file attributes. Wait
-        // for an observed new write, always within the original node deadline.
-        let observation_limit = (boottime_ms() + 5000).min(deadline);
-        let after = loop {
-            let after = fs::metadata(data.join("ticks.txt"))
-                .map(|m| m.len())
-                .unwrap_or(0);
-            if after > before {
-                break after;
-            }
-            assert!(
-                boottime_ms() < observation_limit,
-                "writer must still run after controller death and PID 1 stop"
-            );
-            tokio::time::sleep(Duration::from_millis(50)).await;
-        };
-        heartbeat_after_kill =
-            Some(json!({"before":before,"after":after,"observed_boottime_ms":boottime_ms()}));
+        assert!(
+            read_events(&mut events).lines().any(|s| s == "populated 1"),
+            "stopped PID 1 still needs the independent timer"
+        );
     }
     let empty_at = loop {
         if read_events(&mut events).lines().any(|s| s == "populated 0") {
@@ -155,7 +176,7 @@ pub async fn kill_controller(
         );
         tokio::time::sleep(Duration::from_millis(20)).await;
     };
-    json!({"controller_pid":controller_pid,"controller_signal":9,"controller_killed_boottime_ms":killed_at,"pid1_state":stopped,"heartbeat_after_kill":heartbeat_after_kill,"cgroup_inode":runtime["cgroup_inode"],"deadline_boottime_ms":deadline,"empty_observed_boottime_ms":empty_at,"api_delete_before_empty":false,"state":state})
+    json!({"controller_pid":controller_pid,"controller_signal":9,"controller_killed_boottime_ms":killed_at,"pid1_state":stopped,"heartbeat_before_kill":heartbeat_before_kill,"post_kill_old_fd_write_errno":write_error,"cgroup_inode":runtime["cgroup_inode"],"deadline_boottime_ms":deadline,"empty_observed_boottime_ms":empty_at,"api_delete_before_empty":false,"state":state})
 }
 
 fn read_events(file: &mut fs::File) -> String {

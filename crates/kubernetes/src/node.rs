@@ -12,7 +12,7 @@ pub struct NodeIdentity {
 }
 
 impl NodeIdentity {
-    fn validate(&self) -> Result<()> {
+    pub(crate) fn validate(&self) -> Result<()> {
         if self.name.len() > 253
             || !self.name.split('.').all(plan::dns_label)
             || !plan::opaque(&self.uid)
