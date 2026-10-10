@@ -24,6 +24,7 @@ Run as root on the configured node with the original spool. The command first lo
 | State | Meaning |
 | --- | --- |
 | `recorded` | A bounded, identity-matching local report was read; its observation is `EmptyObserved` or `Unknown` |
+| `recovered` | A matching report from the persistent expiry service exists; the original guard report is absent |
 | `unconfirmed` | The original intent is valid but no final report exists; a `.pending` file does not count |
 | `unavailable` | The local record, permissions, digest or binding cannot be verified |
 | `legacy_unjournaled` | The historical arm did not contain a journal reference |
@@ -38,7 +39,7 @@ Use the existing private `node.spool` configuration from [31](31-node-guarded-st
 
 The CLI also supports trusted standalone `agent-computer-watchdog --request PATH --journal EXISTING_PRIVATE_DIRECTORY`; omitting `--journal` preserves the original standalone probe protocol. Production node startup always requests journals and rejects a watchdog that cannot return the matching reference. Update the configured watchdog binary hash when installing this version.
 
-Journals survive controller/child exit, including partial setup failures. Do not remove active or unresolved journals. Automated retention, quotas, off-node replication and a persistent node supervisor are still pending. Reading an old boot's report is historical evidence; device/path changes can make it unavailable, and no old PID is used for recovery actions.
+Journals survive controller/child exit, including partial setup failures. Do not remove active or unresolved journals. Automated retention, quotas and off-node replication remain pending; the optional persistent expiry service is delivered in [34](34-node-expiry-reaper.md). Reading an old boot's report is historical evidence; device/path changes can make it unavailable, and no old PID is used for recovery actions.
 
 ## 33.4 Verification boundary
 
@@ -56,3 +57,5 @@ python3 crates/watchdog/tests/component.py \
 The journal probe covers normal persistence, closed/full output pipes, report publication failure, duplicate intent and nonprivate directory rejection. These component tests do not rerun the full Kubernetes/CSI/Candidate worker path, certify storage drainage, or establish durable fencing. Execution remains Unknown, writer remains Draining, and T01–T43 remain `not_run`.
 
 The 2026-10-10 [source-bound record](../evidence/watchdog-journals-2026-10-10.json) and [raw logs](../evidence/watchdog-journals-2026-10-10.log) record 310 passing default tests (including 136 PostgreSQL cases) and 22 root VM component scenarios: four redundant guard faults, six journal IO cases and twelve kernel regressions. The initial directory-permission failure and its explicit `0700` fix are retained. Final VM binaries matched local Bazel hashes, and the owned VM, private key and writable disk were removed.
+
+The persistent expiry service and separate recovery reports are described in [34](34-node-expiry-reaper.md).

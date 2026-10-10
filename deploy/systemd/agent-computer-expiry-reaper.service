@@ -1,0 +1,27 @@
+[Unit]
+Description=Agent Computer node expiry recovery
+After=local-fs.target
+RequiresMountsFor=/var/lib/agent-computer/watchdogs
+StartLimitIntervalSec=0
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/usr/local/bin/agent-computer-watchdog --reap --spool /var/lib/agent-computer/watchdogs
+User=root
+Group=root
+UMask=0077
+StateDirectory=agent-computer/watchdogs
+StateDirectoryMode=0700
+Restart=always
+RestartSec=250ms
+WatchdogSec=10s
+WatchdogSignal=SIGKILL
+TimeoutStopSec=3s
+KillMode=control-group
+NoNewPrivileges=yes
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

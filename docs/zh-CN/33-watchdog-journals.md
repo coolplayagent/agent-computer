@@ -24,6 +24,7 @@ agent-computer-server execution-recover-once \
 | 状态 | 含义 |
 | --- | --- |
 | `recorded` | 已读取有界且身份一致的本地报告；报告观察值为 `EmptyObserved` 或 `Unknown` |
+| `recovered` | 原守卫报告缺失，但常驻到期回收服务提供了匹配报告 |
 | `unconfirmed` | 原意图有效，但不存在最终报告；`.pending` 文件不算完成 |
 | `unavailable` | 本地记录、权限、摘要或身份绑定无法验证 |
 | `legacy_unjournaled` | 历史布防记录没有日志引用 |
@@ -38,7 +39,7 @@ agent-computer-server execution-recover-once \
 
 独立可信调用也支持 `agent-computer-watchdog --request PATH --journal EXISTING_PRIVATE_DIRECTORY`。省略 `--journal` 保留旧组件探针协议；生产节点启动始终要求日志及匹配引用。安装新版时同步更新配置中的 watchdog 二进制摘要。
 
-日志在控制器/子进程退出和部分准备失败后保留。不要删除活跃或未决日志。自动保留策略、配额、跨节点复制及持久节点监督仍待实现。旧 boot 的报告仅是历史证据；设备/路径变化可能使其不可用，恢复动作不会使用旧 PID。
+日志在控制器/子进程退出和部分准备失败后保留。不要删除活跃或未决日志。自动保留策略、配额和跨节点复制仍待实现；可选常驻到期回收服务见[34](34-node-expiry-reaper.md)。旧 boot 的报告仅是历史证据；设备/路径变化可能使其不可用，恢复动作不会使用旧 PID。
 
 ## 33.4 验证边界
 
@@ -56,3 +57,5 @@ python3 crates/watchdog/tests/component.py \
 日志探针覆盖正常持久化、关闭/写满的回执管道、报告发布失败、重复意图及非私有目录拒绝。这些组件测试不等于重跑完整 Kubernetes/CSI/Candidate worker 链路，不证明存储排空或持久 fencing。执行继续为 Unknown，writer 继续为 Draining，T01–T43 保持 `not_run`。
 
 2026-10-10 的[源码绑定记录](../evidence/watchdog-journals-2026-10-10.json)和[原始日志](../evidence/watchdog-journals-2026-10-10.log)记录了 310 项默认测试通过（含 136 项 PostgreSQL 测试），以及 22 个 root VM 组件场景：4 个双守卫故障、6 个日志 IO 场景和 12 个内核回归。初次目录权限失败及显式 `0700` 修复均已保留。最终 VM 二进制与本地 Bazel 哈希一致，测试 VM、私钥和可写磁盘已清理。
+
+常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。

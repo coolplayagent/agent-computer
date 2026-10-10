@@ -35,8 +35,10 @@ The final source in `6cf9b82` passed all 307 default Bazel cases across ten targ
 
 ## 32.4 Remaining boundaries
 
-This tolerates one watchdog process failure. It does not provide a persistent node service, automatic restart, multi-node routing, storage drainage or durable fencing. Both guards share a host and failure domains: a host failure, frozen parent cgroup, operator killing both, or correlated binary/kernel failure can defeat both timers. Independent sessions do not isolate service cgroup teardown. Operators must keep both guards outside the workload and controller teardown groups. A stopped guard needs trusted cleanup; a detached waiter does not resume or replace it.
+The guard pair alone tolerates one watchdog process failure. The separate expiry service in [34](34-node-expiry-reaper.md) adds restart recovery; multi-node routing, storage drainage and durable fencing remain pending. Both guards share a host and failure domains: a host failure, frozen parent cgroup, operator killing both, or correlated binary/kernel failure can defeat both timers. Independent sessions do not isolate service cgroup teardown. Operators must keep both guards outside the workload and controller teardown groups. A stopped guard needs trusted cleanup; a detached waiter does not resume or replace it.
 
 `EmptyObserved` remains a point-in-time observation. It cannot prevent later process admission or certify asynchronous storage completion. Execution stays Unknown and its writer stays Draining; public execution capabilities and T01–T43 acceptance remain unchanged.
 
 Node-local intent/report journals and read-only recovery observations are now delivered in [33](33-watchdog-journals.md). They preserve the remaining fencing and writer-release boundaries.
+
+The persistent expiry service and separate recovery reports are described in [34](34-node-expiry-reaper.md).

@@ -3,13 +3,18 @@ use agent_computer_watchdog::{
     write_frame,
 };
 use std::{fs::File, io::Read, process::ExitCode};
+mod service;
 
 fn main() -> ExitCode {
     // Rust's default ignored SIGPIPE allows a lost acknowledgement reader to
     // enter the immediate-kill path instead of terminating this process.
     match execute() {
         Ok(true) => ExitCode::SUCCESS,
-        Ok(false) | Err(_) => ExitCode::from(2),
+        Ok(false) => ExitCode::from(2),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::from(2)
+        }
     }
 }
 
@@ -21,6 +26,10 @@ fn execute() -> Result<bool, Error> {
         rustix::process::setsid().map_err(|_| Error::Setup)?;
     }
     let args: Vec<_> = std::env::args_os().collect();
+    if args.len() == 4 && (args[1] == "--reap" || args[1] == "--reap-once") && args[2] == "--spool"
+    {
+        return service::run(std::path::Path::new(&args[3]), args[1] == "--reap-once");
+    }
     if !matches!(args.len(), 3 | 5)
         || args[1] != "--request"
         || (args.len() == 5 && args[3] != "--journal")

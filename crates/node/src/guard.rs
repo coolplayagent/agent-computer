@@ -216,7 +216,13 @@ fn launch_one(
     }
     let durable = agent_computer_watchdog::journal::Journal::read(spool, reference)
         .map_err(|_| Error::InvalidObservation)?;
-    if durable.intent.request != *request || durable.intent.watchdog_pid != child.process().id() {
+    if durable.intent.request != *request
+        || durable.intent.watchdog_pid != child.process().id()
+        || durable
+            .enrollment
+            .as_ref()
+            .is_none_or(|v| v.cgroup_device != armed.cgroup_device)
+    {
         return Err(Error::IdentityMismatch);
     }
     child.require_running()?;

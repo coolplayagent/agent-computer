@@ -4,6 +4,7 @@
 
 mod cgroup;
 pub mod journal;
+pub mod reaper;
 mod request;
 
 pub use request::{MAX_BUDGET_MS, MAX_REQUEST_BYTES, Request};
@@ -29,6 +30,7 @@ pub enum Error {
     JournalUnavailable,
     UntrustedJournal,
     InvalidJournal,
+    ReaperAlreadyRunning,
 }
 
 impl std::fmt::Display for Error {
@@ -49,6 +51,7 @@ pub enum Trigger {
     Deadline,
     ReceiptUnavailable,
     TimerFailure,
+    Recovery,
 }
 
 #[derive(Debug, Eq, PartialEq, Deserialize, Serialize)]
@@ -101,7 +104,7 @@ pub fn run_journaled(
     if &request != journal.request() {
         return Err(Error::InvalidJournal);
     }
-    let report = run_inner(request, output, Some(journal.reference()))?;
+    let report = run_inner(request, output, Some(&journal))?;
     journal.complete(&report)?;
     Ok(report)
 }
@@ -109,7 +112,7 @@ pub fn run_journaled(
 fn run_inner(
     request: Request,
     output: &impl AsFd,
-    journal: Option<&journal::Reference>,
+    journal: Option<&journal::Journal>,
 ) -> Result<Report> {
     if !rustix::process::geteuid().is_root() {
         return Err(Error::RootRequired);
@@ -123,6 +126,12 @@ fn run_inner(
         .trim_end_matches('\n');
     request.check_node(boot_id.trim_end(), boottime_ms(), own)?;
     let group = cgroup::Cgroup::open(&request)?;
+    // Only validated kernel identities are enrolled. This IO precedes timer
+    // arming/authorization and consumes the original, unrenewable budget.
+    if let Some(journal) = journal {
+        journal.enroll(group.device)?;
+    }
+    let journal = journal.map(journal::Journal::reference);
     let timer = timer(request.deadline_boottime_ms)?;
     let armed_boottime_ms = boottime_ms();
     let armed = Armed {

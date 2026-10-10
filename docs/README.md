@@ -35,6 +35,7 @@
 31. [节点布防后的执行启动](zh-CN/31-node-guarded-startup.md)
 32. [冗余节点 watchdog](zh-CN/32-redundant-node-watchdogs.md)
 33. [持久化 watchdog 观察](zh-CN/33-watchdog-journals.md)
+34. [节点常驻到期回收](zh-CN/34-node-expiry-reaper.md)
 
 ## 02. English
 
@@ -71,6 +72,7 @@
 31. [Node-guarded execution startup](en/31-node-guarded-startup.md)
 32. [Redundant node watchdogs](en/32-redundant-node-watchdogs.md)
 33. [Durable watchdog observations](en/33-watchdog-journals.md)
+34. [Persistent node expiry recovery](en/34-node-expiry-reaper.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
