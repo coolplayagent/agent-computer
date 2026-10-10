@@ -6,6 +6,7 @@ pub(super) fn request(input: &CommitArtifact) -> CheckpointStop {
         request_id: input.request_id.clone(),
         expected_revision: input.expected_revision,
         publish_current: input.publish_current,
+        cancel_running: false,
     }
 }
 pub(super) async fn start(

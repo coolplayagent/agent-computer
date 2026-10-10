@@ -16,9 +16,14 @@ pub struct CheckpointStop {
     pub expected_revision: i64,
     /// Advance the Workspace head by CAS, or retain a fixed branch checkpoint.
     pub publish_current: bool,
+    /// Explicitly request cancellation and wait for existing physical drain
+    /// proofs before capture. False retains the already-drained operation.
+    #[serde(default)]
+    pub cancel_running: bool,
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ArtifactState {
+    Draining,
     Capturing,
     Committed,
     Conflict,
@@ -42,6 +47,10 @@ pub struct ArtifactCommit {
     pub stop_after_commit: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stop_receipt: Option<super::super::ComputerStopReceipt>,
+    #[serde(default)]
+    pub cancel_running: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub drain_reason: Option<String>,
 }
 /// Only a trusted claimed worker may capture/publish the sealed Candidate.
 pub struct ArtifactLease {

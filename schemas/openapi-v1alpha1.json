@@ -3693,7 +3693,7 @@
     "/v1alpha1/artifacts/{id}/manifest": {
       "get": {
         "operationId": "getArtifactManifest",
-        "description": "Fixed relative manifest; null while Capturing. Requires runtime.read and current Workspace read permission.",
+        "description": "Fixed relative manifest; null while Draining or Capturing. Requires runtime.read and current Workspace read permission.",
         "security": [
           {
             "serviceBearer": []
@@ -3772,7 +3772,7 @@
             }
           },
           "200": {
-            "description": "Fixed relative manifest; null while Capturing. Requires runtime.read and current Workspace read permission.",
+            "description": "Fixed relative manifest; null while Draining or Capturing. Requires runtime.read and current Workspace read permission.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3975,7 +3975,7 @@
     "/v1alpha1/computers/{id}/checkpoint-stop": {
       "post": {
         "operationId": "checkpointStopComputer",
-        "description": "Requires current Computer read/modify/manage and Workspace read/modify/publish grants with matching credential scopes. Atomically seals an already drained Candidate and admits durable Artifact work. A trusted artifact-worker captures and verifies S3 content, then publishes the fixed version and records the Computer stop in one transaction. Declared Apps, active human input, another principal's live connection, unreleased writers and unresolved execution history block this normal stop; force is unsupported. publish_current chooses head CAS or a retained branch checkpoint. A CAS conflict still saves the fixed checkpoint and stops without overwriting the shared head. Repeating the same key/input returns current work and may refresh the original principal's credential; it does not reopen mutation. A 202 response does not mean stopped: inspect stop_receipt in Artifact metadata or Computer runtime.",
+        "description": "Requires current Computer read/modify/manage and Workspace read/modify/publish grants with matching credential scopes. By default atomically seals an already drained Candidate. With cancel_running=true, first durably enters Draining, rejects new modifications and requests cancellation; captures only after every execution and IO drain is proved. Unknown remains blocked. A trusted artifact-worker captures and verifies S3 content, then publishes the fixed version and records the Computer stop in one transaction. Declared Apps, active human input, another principal's live connection, unresolved execution history block completion; force is unsupported. publish_current chooses head CAS or a retained branch checkpoint. A CAS conflict still saves the fixed checkpoint and stops without overwriting the shared head. Repeating the same key/input returns current work and may refresh the original principal's credential; it does not reopen mutation. A 202 response does not mean stopped: inspect stop_receipt in Artifact metadata or Computer runtime.",
         "security": [
           {
             "serviceBearer": []
@@ -5259,6 +5259,7 @@
               "Queued",
               "Preparing",
               "Prepared",
+              "Draining",
               "Sealing",
               "Sealed",
               "Cancelled",
@@ -6271,7 +6272,7 @@
       "ArtifactCommit": {
         "type": "object",
         "additionalProperties": false,
-        "description": "Immutable publication identity and current status. Conflict preserves a fixed input version but leaves the default Workspace pointer unchanged. Capturing is sealed and may require the same-key retry with renewed publisher credentials plus a trusted operator retry.",
+        "description": "Immutable publication identity and current status. Conflict preserves a fixed input version but leaves the default Workspace pointer unchanged. Capturing is sealed and may require the same-key retry with renewed publisher credentials plus a trusted operator retry. Opt-in checkpoint cancellation stays Draining until all writers have durable drain evidence; it cannot publish from Draining.",
         "required": [
           "commit_id",
           "workspace_id",
@@ -6286,7 +6287,8 @@
           "input_revision",
           "manifest_digest",
           "published_at_ms",
-          "stop_after_commit"
+          "stop_after_commit",
+          "cancel_running"
         ],
         "properties": {
           "commit_id": {
@@ -6316,6 +6318,7 @@
           },
           "state": {
             "enum": [
+              "Draining",
               "Capturing",
               "Committed",
               "Conflict"
@@ -6362,6 +6365,18 @@
           },
           "stop_receipt": {
             "$ref": "#/components/schemas/ComputerStopReceipt"
+          },
+          "cancel_running": {
+            "type": "boolean",
+            "default": false
+          },
+          "drain_reason": {
+            "type": "string",
+            "enum": [
+              "drain_pending",
+              "recovery_blocked"
+            ],
+            "description": "Present while Draining; recovery_blocked means an execution remains Unknown."
           }
         }
       },
@@ -6427,7 +6442,7 @@
       "WorkspaceCheckpoint": {
         "type": "object",
         "additionalProperties": false,
-        "description": "File-only Computer checkpoint: no declared Apps and no dispatched process executions. App/profile capture and general process fencing are pending.",
+        "description": "File-only Computer checkpoint: no declared Apps, and every dispatched execution must have accepted completion plus process and IO drain evidence. Unknown blocks capture. App/profile capture and general process fencing are pending.",
         "required": [
           "artifact_id",
           "input_revision",
@@ -6488,6 +6503,11 @@
           },
           "publish_current": {
             "type": "boolean"
+          },
+          "cancel_running": {
+            "type": "boolean",
+            "default": false,
+            "description": "Explicitly request cancellation of queued/running Candidate executions. Durably enters Draining and rejects new writes before waiting for existing process and IO drain evidence. Unknown blocks capture; no Apps or other active use allowed."
           }
         }
       }

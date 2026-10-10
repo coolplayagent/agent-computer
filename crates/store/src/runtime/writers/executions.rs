@@ -198,12 +198,17 @@ async fn reconcile(
     let epoch = row.try_get("epoch")?;
     let owner = authority::row(tx, org, &lease).await?;
     let now = transactions::now(tx).await?;
+    let authorized = if state == "CancelRequested" {
+        authority::cancellation_active(tx, org, &owner).await?
+    } else {
+        authority::active(tx, org, &owner).await?
+    };
     if owner.try_get::<i64, _>("epoch")? != epoch
         || !(owner.try_get::<String, _>("state")? == "Held"
             || (state == "CancelRequested" && owner.try_get::<String, _>("state")? == "Draining"))
         || now >= row.try_get::<i64, _>("queue_deadline_at_ms")?
         || now >= owner.try_get::<i64, _>("expires_at_ms")?
-        || !authority::active(tx, org, &owner).await?
+        || !authorized
     {
         if state == "Queued" {
             cancel_reserved(tx, org, &lease, epoch, "writer_unavailable", seq).await?;

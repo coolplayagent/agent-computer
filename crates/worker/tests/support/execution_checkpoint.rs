@@ -1,6 +1,6 @@
 //! File-only lifecycle after real accepted gVisor execution completion.
 use super::*;
-use agent_computer_store::runtime::artifacts::CheckpointStop;
+use agent_computer_store::runtime::artifacts::{ArtifactCommit, CheckpointStop};
 use sqlx::Row;
 use std::os::unix::fs::MetadataExt;
 
@@ -14,7 +14,7 @@ pub struct Context<'a> {
     pub local: &'a Value,
     pub normal: &'a Value,
 }
-pub async fn verify(c: Context<'_>) -> Value {
+pub async fn begin(c: &Context<'_>, cancel_running: bool) -> ArtifactCommit {
     let source=sqlx::query("SELECT r.computer_id,r.workspace_id,r.request_id FROM execution_requests e JOIN candidate_writer_leases l USING(organization,lease_id) JOIN runtime_start_requests r ON r.organization=l.organization AND r.request_id=l.request_id WHERE e.organization=$1 AND e.execution_id=$2")
         .bind(c.org.as_str()).bind(c.normal["execution_id"].as_str().unwrap()).fetch_one(c.pool).await.unwrap();
     let computer: String = source.try_get("computer_id").unwrap();
@@ -44,20 +44,35 @@ pub async fn verify(c: Context<'_>) -> Value {
     }
     let current = c.store.computer_runtime(c.token, &computer).await.unwrap();
     let request = CheckpointStop {
+        cancel_running,
         request_id: source.try_get("request_id").unwrap(),
         expected_revision: current.revision,
         publish_current: true,
     };
-    let admitted = c
-        .store
+    c.store
         .checkpoint_stop_computer(
             c.token,
-            &key("after-execution-checkpoint"),
+            &key(if cancel_running {
+                "cancel-execution-checkpoint"
+            } else {
+                "after-execution-checkpoint"
+            }),
             &computer,
             &request,
         )
         .await
-        .unwrap();
+        .unwrap()
+}
+pub async fn verify(c: Context<'_>) -> Value {
+    let cancelling = c.normal["case"] == "cancel";
+    let admitted = if cancelling {
+        let id: String = sqlx::query_scalar("SELECT a.commit_id FROM execution_requests e JOIN candidate_writer_leases l USING(organization,lease_id) JOIN artifact_commits a ON a.organization=l.organization AND a.request_id=l.request_id WHERE e.organization=$1 AND e.execution_id=$2")
+            .bind(c.org.as_str()).bind(c.normal["execution_id"].as_str().unwrap()).fetch_one(c.pool).await.unwrap();
+        c.store.workspace_artifact(c.token, &id).await.unwrap()
+    } else {
+        begin(&c, false).await
+    };
+    let computer = admitted.computer_id.clone();
     assert!(admitted.stop_after_commit && admitted.stop_receipt.is_none());
     let spool = PathBuf::from(field(c.config, "output_spool")).join(&admitted.commit_id);
     fs::create_dir(&spool).unwrap();
@@ -88,7 +103,11 @@ pub async fn verify(c: Context<'_>) -> Value {
         .store
         .admit_computer_start(
             c.token,
-            &key("restart-after-execution-checkpoint"),
+            &key(if cancelling {
+                "restart-after-cancel"
+            } else {
+                "restart-after-execution-checkpoint"
+            }),
             &computer,
             &StartRequest {
                 expected_revision: stopped.control_revision,
@@ -130,18 +149,25 @@ pub async fn verify(c: Context<'_>) -> Value {
         PathBuf::from(field(c.local, "mount_root")).join(field(&c.local["target"], "volume_path"));
     let original = root.join(field(&c.normal["prepared"], "path_ref"));
     let restored = root.join(field(&prepared, "path_ref"));
-    for (path, bytes) in [
-        ("output.txt", b"persisted".as_slice()),
-        ("after-execution.txt", b"next-writer"),
-        ("queue-concurrent.txt", b"concurrent"),
-        ("queue-started.txt", b"active"),
-    ] {
-        assert_eq!(fs::read(restored.join(path)).unwrap(), bytes);
+    let expected: &[(&str, &[u8])] = if cancelling {
+        &[("started.txt", b"started")]
+    } else {
+        &[
+            ("output.txt", b"persisted".as_slice()),
+            ("after-execution.txt", b"next-writer"),
+            ("queue-concurrent.txt", b"concurrent"),
+            ("queue-started.txt", b"active"),
+        ]
+    };
+    for (path, bytes) in expected {
+        assert_eq!(fs::read(restored.join(path)).unwrap(), *bytes);
         assert_ne!(
             restored.join(path).metadata().unwrap().ino(),
             original.join(path).metadata().unwrap().ino()
         );
     }
+    assert!(!restored.join("late.txt").exists());
+    assert_eq!(committed.cancel_running, cancelling);
     assert!(
         !c.store
             .computer_runtime(c.token, &computer)
@@ -149,5 +175,5 @@ pub async fn verify(c: Context<'_>) -> Value {
             .unwrap()
             .ready
     );
-    json!({"commit":committed,"durable":durable,"new_start":next,"restored":prepared,"fresh_cache":true,"independent_inodes":true,"files_preserved":["output.txt","after-execution.txt","queue-concurrent.txt","queue-started.txt"]})
+    json!({"commit":committed,"durable":durable,"new_start":next,"restored":prepared,"fresh_cache":true,"independent_inodes":true,"files_preserved":expected.iter().map(|(path,_)| *path).collect::<Vec<_>>(),"late_file_absent":true})
 }

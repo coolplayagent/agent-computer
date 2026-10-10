@@ -15,7 +15,7 @@ fn decode<T: serde::de::DeserializeOwned>(v: serde_json::Value) -> Result<T> {
     serde_json::from_value(v).map_err(|_| Error::InvalidStoredData)
 }
 async fn row(tx: &mut Transaction<'_, Postgres>, org: &str, id: &str) -> Result<PgRow> {
-    sqlx::query("SELECT a.*,r.computer_id,r.candidate_id,r.generation,r.snapshot_digest,s.receipt AS stop_receipt FROM artifact_commits a JOIN runtime_start_requests r USING(organization,request_id) LEFT JOIN runtime_stops s USING(organization,request_id) WHERE a.organization=$1 AND a.commit_id=$2")
+    sqlx::query("SELECT a.*,r.computer_id,r.candidate_id,r.generation,r.snapshot_digest,s.receipt AS stop_receipt,CASE WHEN a.state='Draining' THEN CASE WHEN EXISTS (SELECT 1 FROM execution_requests e JOIN candidate_writer_leases l USING(organization,lease_id) WHERE l.organization=a.organization AND l.request_id=a.request_id AND e.state='Unknown') THEN 'recovery_blocked' ELSE 'drain_pending' END END AS drain_reason FROM artifact_commits a JOIN runtime_start_requests r USING(organization,request_id) LEFT JOIN runtime_stops s USING(organization,request_id) WHERE a.organization=$1 AND a.commit_id=$2")
         .bind(org).bind(id).fetch_optional(&mut **tx).await?.ok_or(Error::RuntimeAccessUnavailable)
 }
 fn view(row: &PgRow) -> Result<ArtifactCommit> {
@@ -41,6 +41,8 @@ fn view(row: &PgRow) -> Result<ArtifactCommit> {
             .transpose()?,
         published_at_ms: row.try_get("published_at_ms")?,
         stop_after_commit: row.try_get("stop_after_commit")?,
+        cancel_running: row.try_get("cancel_running")?,
+        drain_reason: row.try_get("drain_reason")?,
         stop_receipt: if row.try_get("stop_after_commit")? {
             row.try_get::<Option<serde_json::Value>, _>("stop_receipt")?
                 .map(decode)
@@ -117,7 +119,10 @@ impl Store {
             }],
         )
         .await?;
-        let result = if record.try_get::<String, _>("state")? == "Capturing" {
+        let result = if matches!(
+            record.try_get::<String, _>("state")?.as_str(),
+            "Draining" | "Capturing"
+        ) {
             None
         } else {
             Some(decode::<Bundle>(record.try_get("capture")?)?.manifest)

@@ -1,5 +1,7 @@
 //! Durable Candidate modification ownership. Expiry revokes admission, not IO.
 mod authority;
+mod checkpoint;
+pub(super) use checkpoint::request_checkpoint_drain;
 mod executions;
 mod files;
 mod types;

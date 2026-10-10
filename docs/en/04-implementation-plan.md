@@ -29,3 +29,5 @@ Commit reviewable, buildable capability increments. A stage may span several com
 ## 04.3 Completion criteria
 
 The full target remains the [product requirements](../../codespec/requirements/agent-computer.md), [D13 delivery sequence](../../codespec/design/agent-computer.md), and [acceptance gates](../../codespec/test/agent-computer.md). Pure-function tests establish local rules, not database durability, process termination, network isolation, or real browser/human workflows. Each runtime acceptance item needs a pinned commit, versions, environment, expected/observed results, and evidence. Blocked or unexecuted items remain visible.
+
+Explicit cancellation and durable Draining are implemented; original process/IO drain proof remains required and Unknown blocks capture.  [47 Explicit execution cancellation](47-checkpoint-stop-drain.md).

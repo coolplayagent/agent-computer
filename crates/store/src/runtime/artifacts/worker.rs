@@ -3,11 +3,16 @@ use super::*;
 async fn authority(tx: &mut Transaction<'_, Postgres>, record: &PgRow) -> Result<()> {
     let org: String = record.try_get("organization")?;
     let request: String = record.try_get("request_id")?;
+    let draining = record.try_get::<String, _>("state")? == "Draining";
     let revision = decode::<CommitArtifact>(record.try_get("input")?)?
         .expected_revision
-        .checked_add(1)
+        .checked_add(if !draining && record.try_get("cancel_running")? {
+            2
+        } else {
+            1
+        })
         .ok_or(Error::CounterExhausted)?;
-    let active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM runtime_start_requests r JOIN runtime_controls c ON c.organization=r.organization AND c.computer_id=r.computer_id AND c.active_request=r.request_id AND c.generation=r.generation WHERE r.organization=$1 AND r.request_id=$2 AND r.state='Sealing' AND c.revision=$3)").bind(&org).bind(&request).bind(revision).fetch_one(&mut **tx).await?;
+    let active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM runtime_start_requests r JOIN runtime_controls c ON c.organization=r.organization AND c.computer_id=r.computer_id AND c.active_request=r.request_id AND c.generation=r.generation WHERE r.organization=$1 AND r.request_id=$2 AND r.state=$4 AND c.revision=$3)").bind(&org).bind(&request).bind(revision).bind(if draining { "Draining" } else { "Sealing" }).fetch_one(&mut **tx).await?;
     if !active {
         return Err(Error::RuntimeConflict);
     }
@@ -29,7 +34,11 @@ async fn authority(tx: &mut Transaction<'_, Postgres>, record: &PgRow) -> Result
         require_in(tx, &identity, &need).await?;
     }
     if record.try_get("stop_after_commit")? {
-        admission::available(tx, &org, &request, &principal).await?;
+        if draining {
+            admission::eligible(tx, &org, &request, &principal).await?;
+        } else {
+            admission::available(tx, &org, &request, &principal).await?;
+        }
     }
     super::super::start::graph::validate_catalogs(tx, &org, &request).await
 }
@@ -71,8 +80,37 @@ impl Store {
         owner: &crate::reconciliation::WorkerId,
     ) -> Result<Option<ArtifactLease>> {
         let mut tx = self.pool.begin().await?;
-        Self::lock_stream(&mut tx, org.as_str()).await?;
-        let record = row(&mut tx, org.as_str(), id).await?;
+        let seq = Self::lock_stream(&mut tx, org.as_str()).await?;
+        let mut record = row(&mut tx, org.as_str(), id).await?;
+        if record.try_get::<String, _>("state")? == "Draining" {
+            authority(&mut tx, &record).await?;
+            let request: String = record.try_get("request_id")?;
+            let seq = super::super::writers::request_checkpoint_drain(
+                &mut tx,
+                org.as_str(),
+                &request,
+                seq,
+            )
+            .await?;
+            let drained: bool = sqlx::query_scalar("SELECT artifact_candidate_drained($1,$2)")
+                .bind(org.as_str())
+                .bind(&request)
+                .fetch_one(&mut *tx)
+                .await?;
+            authority(&mut tx, &record).await?;
+            if !drained {
+                tx.commit().await?;
+                return Ok(None);
+            }
+            sqlx::query("UPDATE artifact_commits SET state='Capturing' WHERE organization=$1 AND commit_id=$2")
+                .bind(org.as_str()).bind(id).execute(&mut *tx).await?;
+            sqlx::query("UPDATE runtime_start_requests SET state='Sealing' WHERE organization=$1 AND request_id=$2")
+                .bind(org.as_str()).bind(&request).execute(&mut *tx).await?;
+            sqlx::query("UPDATE runtime_controls SET revision=revision+1 WHERE organization=$1 AND active_request=$2")
+                .bind(org.as_str()).bind(&request).execute(&mut *tx).await?;
+            transactions::emit(&mut tx, org.as_str(), seq, "artifact.sealing", serde_json::json!({"commit_id":id,"request_id":request,"stop_after_commit":true,"cancel_running":true,"writer_drain_confirmed":true})).await?;
+            record = row(&mut tx, org.as_str(), id).await?;
+        }
         let now = transactions::now(&mut tx).await?;
         if record.try_get::<String, _>("state")? != "Capturing"
             || record
@@ -232,7 +270,11 @@ impl Store {
                     request_id: input.request_id.clone(),
                     expected_revision: input
                         .expected_revision
-                        .checked_add(2)
+                        .checked_add(if record.try_get("cancel_running")? {
+                            3
+                        } else {
+                            2
+                        })
                         .ok_or(Error::CounterExhausted)?,
                 },
                 committed_seq,

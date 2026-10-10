@@ -18,7 +18,7 @@ rust_test(
     size = "large",
     srcs = glob(["tests/**/*.rs"]),
     crate_root = "tests/postgres_contracts.rs",
-    compile_data = ["//examples:research.computer.yaml", "migrations/0011_candidate_file_completions.sql", "migrations/0012_execution_admission.sql", "migrations/0013_execution_dispatch.sql", "migrations/0021_workspace_artifacts.sql"],
+    compile_data = ["//examples:research.computer.yaml", "migrations/0011_candidate_file_completions.sql", "migrations/0012_execution_admission.sql", "migrations/0013_execution_dispatch.sql", "migrations/0021_workspace_artifacts.sql", "migrations/0026_checkpoint_stop_worker.sql"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     tags = ["requires-postgresql"],
