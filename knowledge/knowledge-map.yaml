@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 53
-updated_at: unix:1791576929
+map_version: 54
+updated_at: unix:1791595694
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -120,6 +120,13 @@ topics:
   - volume-provisioning-guide
   ref: topics/topic-875b9380866e9d56-49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a.yaml
   digest: 49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a
+- id: execution
+  title: execution
+  description: Added by CLI source registration.
+  source_ids:
+  - redundant-node-watchdogs
+  ref: topics/topic-a402c4336ebfd782-52577676d97eaa06b9f062fd93b5c269dceb21c8037545445cd043e8347a539e.yaml
+  digest: 52577676d97eaa06b9f062fd93b5c269dceb21c8037545445cd043e8347a539e
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -143,12 +150,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 37
+  omitted_through: 38
   recent:
-  - version: 38
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-preparation-worker' to topic 'development'.
   - version: 39
     action: source.update
     actor: cli
@@ -209,3 +212,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'node-guarded-startup-guide' to topic 'development'.
+  - version: 54
+    action: source.add
+    actor: cli
+    summary: Added source 'redundant-node-watchdogs' to topic 'execution'.

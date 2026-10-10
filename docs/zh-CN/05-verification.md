@@ -61,3 +61,5 @@
 新增九项默认契约覆盖节点/进程身份、有界宿主命令、持久布防元数据、WAL 恢复不重建活句柄及迁移 16。控制器/PID 1 真实故障测试另作为组件证据，不释放 writer lease，也不改变 T01–T43。
 
 子进程回收修复后的最终工作树通过全部 303 项默认 Cargo/Bazel 测试及七个节点布防启动 VM 场景。[组件证据](../evidence/node-guarded-startup-2026-10-10.json)保留精确源码与二进制摘要、完整 VM 回读、相同未变更 watchdog 二进制的十二个内核探针及早期失败。取证后已停止本次 VM 并移除十个私有文件。这仍属于组件验证；T01–T43 保持 `not_run`。
+
+新增四项默认测试覆盖 watchdog 退出/暂停检测、分离生命周期、双进程 SQL 证据与迁移 17 兼容性。root 专用双进程故障 fixture 单独验证，见 [32 冗余节点 watchdog](32-redundant-node-watchdogs.md)。

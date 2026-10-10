@@ -31,7 +31,15 @@ async fn fixture() -> (
             .fetch_one(&db.pool)
             .await
             .unwrap();
-    let evidence = json!({"runtime":{"identity":{"pod_uid":"pod-one","node":{"uid":"node-one","boot_id":"boot-one"},"container_id":"a".repeat(64)},"cgroup_inode":123,"cgroup_path":"fixture-only"},"armed":{"version":1,"event":"armed","request":{"execution_id":queued.execution_id,"boot_id":"boot-one","cgroup_inode":123,"cgroup_path":"fixture-only"}}});
+    let mut evidence = json!({"runtime":{"identity":{"pod_uid":"pod-one","node":{"uid":"node-one","boot_id":"boot-one"},"container_id":"a".repeat(64)},"cgroup_inode":123,"cgroup_path":"fixture-only"},"armed":{"version":1,"event":"armed","request":{"execution_id":queued.execution_id,"boot_id":"boot-one","cgroup_inode":123,"cgroup_path":"fixture-only"}}});
+    evidence["version"] = json!(2);
+    evidence["armed"]["request"]["deadline_boottime_ms"] = json!(30000);
+    evidence["armed"]["cgroup_device"] = json!(42);
+    evidence["armed"]["armed_boottime_ms"] = json!(1000);
+    evidence["backup_armed"] = evidence["armed"].clone();
+    evidence["backup_armed"]["armed_boottime_ms"] = json!(1100);
+    evidence["observed_boottime_ms"] = json!(1200);
+    evidence["watchdog_pids"] = json!([100, 101]);
     (db, attempt, plan, evidence, now)
 }
 
@@ -199,4 +207,79 @@ async fn migration_sixteen_retains_history_without_inventing_a_watchdog() {
             .await,
         Err(Error::RuntimeAccessUnavailable)
     ));
+}
+
+#[tokio::test]
+async fn redundant_watchdogs_require_matching_timers_and_distinct_live_process_evidence() {
+    let (db, attempt, plan, evidence, now) = fixture().await;
+    for (pointer, value) in [
+        ("/version", json!(1)),
+        ("/backup_armed", Value::Null),
+        ("/backup_armed/event", json!("empty_observed")),
+        ("/backup_armed/request/deadline_boottime_ms", json!(30001)),
+        ("/backup_armed/request/cgroup_inode", json!(124)),
+        ("/backup_armed/cgroup_device", json!(43)),
+        ("/backup_armed/armed_boottime_ms", json!(1201)),
+        ("/armed/armed_boottime_ms", Value::Null),
+        ("/observed_boottime_ms", json!(30000)),
+        ("/observed_boottime_ms", Value::Null),
+        ("/watchdog_pids", json!([100, 100])),
+        ("/watchdog_pids", json!([100, "100"])),
+        ("/watchdog_pids", json!([100, 4294967296u64])),
+        ("/watchdog_pids", json!([100, 0])),
+        ("/watchdog_pids", json!([100])),
+        ("/watchdog_pids", Value::Null),
+    ] {
+        let mut bad = evidence.clone();
+        *bad.pointer_mut(pointer).unwrap() = value;
+        assert!(
+            insert(&db, &attempt, &plan, &bad, now, now + 5000)
+                .await
+                .is_err(),
+            "{pointer}"
+        );
+    }
+    assert_eq!(count(&db, "execution_watchdog_arms").await, 0);
+    insert(&db, &attempt, &plan, &evidence, now, now + 5000)
+        .await
+        .unwrap();
+}
+
+#[tokio::test]
+async fn migration_seventeen_preserves_single_guard_history_but_denies_new_grants() {
+    let (db, attempt, plan, mut evidence, now) = fixture().await;
+    db.remove_redundant_watchdogs().await;
+    for field in ["version", "backup_armed", "watchdog_pids"] {
+        evidence.as_object_mut().unwrap().remove(field);
+    }
+    insert(&db, &attempt, &plan, &evidence, now, now + 5000)
+        .await
+        .unwrap();
+    let id = &attempt.intent().execution.execution_id;
+    let before = db
+        .store
+        .candidate_execution_watchdog(&org("acme"), id)
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(db.store.ready().await.is_err());
+    db.store.migrate().await.unwrap();
+    db.store.ready().await.unwrap();
+    let after = db
+        .store
+        .candidate_execution_watchdog(&org("acme"), id)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(before.evidence_digest, after.evidence_digest);
+    assert_eq!(before.evidence, after.evidence);
+    let error=sqlx::query("INSERT INTO execution_startup_grants (organization,execution_id,pod_uid,challenge,grant_body,grant_digest,granted_at_ms) SELECT organization,execution_id,'pod-one',$1,'{\"version\":1,\"lease_budget_ms\":1000}'::jsonb,$2,floor(extract(epoch from clock_timestamp())*1000) FROM execution_requests")
+        .bind(serde_json::to_value(pods::challenge(&attempt)).unwrap()).bind(format!("sha256:{}","a".repeat(64))).execute(&db.pool).await.unwrap_err();
+    assert!(
+        error
+            .to_string()
+            .contains("redundant watchdog is not armed")
+    );
+    assert_eq!(count(&db, "execution_startup_grants").await, 0);
+    assert_eq!(count(&db, "candidate_writer_drains").await, 0);
 }
