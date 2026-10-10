@@ -3,7 +3,7 @@ mod completion;
 mod inputs;
 pub use completion::ExecutionCompletion;
 mod outputs;
-pub use outputs::{ExecutionOutput, OutputState};
+pub use outputs::{ExecutionOutput, ExecutionOutputDownload, OutputState, OutputStream};
 mod pods;
 mod startup;
 mod watchdogs;

@@ -22,6 +22,8 @@ use std::{
 };
 #[path = "support/execution_faults.rs"]
 mod faults;
+#[path = "support/output_http.rs"]
+mod output_http;
 #[path = "support/execution_outputs.rs"]
 mod outputs;
 

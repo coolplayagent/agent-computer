@@ -14,7 +14,7 @@ use axum::{
 };
 use serde_json::{Value, json};
 
-async fn setup() -> (Service, String, String, Value) {
+pub(super) async fn setup() -> (Service, String, String, Value) {
     let s = Service::new().await;
     let token = s
         .issue("alice", &ServiceScope::ALL)

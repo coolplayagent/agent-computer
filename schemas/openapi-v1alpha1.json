@@ -3790,6 +3790,187 @@
           }
         }
       }
+    },
+    "/v1alpha1/executions/{id}/output/{stream}": {
+      "get": {
+        "operationId": "downloadCandidateExecutionOutput",
+        "description": "Requires configured output gateway, original valid submission credential with runtime.connect and runtime.read scopes, and current Computer connect/read plus original Workspace read grants. No active connection, current Candidate, writer lease or modify grant is needed for historical output. Current authority is checked before and after the bounded S3 GET, including error responses. Publication must be verified; each read rechecks the immutable object size and SHA-256. Maximum retained stream size is the admitted command limit (at most 1 MiB). No object key, URL, supervisor report or diagnostics are exposed. No ranges, offsets or live tailing.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "name": "stream",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "stdout",
+                "stderr"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID or stream. Only stdout/stderr are supported; Range and query parameters are rejected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Immutable output binding changed during verification.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Output gateway unconfigured (outputs_unavailable), four download slots occupied (output_io_busy), publication pending or object unavailable/unverified (execution_output_unavailable), or database unavailable. No partial bytes are returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Fully verified retained stdout or stderr bytes, including an empty stream. Download does not assert execution success or writer release.",
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment named stdout.bin or stderr.bin.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "const": "nosniff"
+                }
+              },
+              "Accept-Ranges": {
+                "schema": {
+                  "const": "none"
+                }
+              },
+              "X-Output-Sha256": {
+                "description": "SHA-256 of the returned retained bytes.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              },
+              "X-Output-Manifest-Digest": {
+                "description": "Immutable output manifest digest; matches GET /output.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              },
+              "X-Output-Observed-Bytes": {
+                "description": "Total observed stream length, including discarded bytes.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "X-Output-Truncated": {
+                "description": "Whether observed bytes exceed retained bytes.",
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "X-Output-Eof": {
+                "description": "Whether the supervisor observed EOF for this stream.",
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "Content-Length": {
+                "description": "Exact verified retained stream length.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1048576
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

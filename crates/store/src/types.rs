@@ -58,6 +58,7 @@ pub struct EventPage {
 
 #[derive(Debug)]
 pub enum Error {
+    ExecutionOutputUnavailable,
     FileUnavailable,
     WriterLeaseBusy,
     WriterLeaseConflict,
@@ -106,6 +107,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Do not expose SQL parameters, connection strings or stored input.
         f.write_str(match self {
+            Self::ExecutionOutputUnavailable => "verified execution output is unavailable",
             Self::FileUnavailable => "bounded file is unavailable",
             Self::WriterLeaseBusy => "candidate writer ownership has not been released",
             Self::WriterLeaseConflict => {

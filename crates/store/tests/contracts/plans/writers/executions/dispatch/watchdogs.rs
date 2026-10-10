@@ -23,6 +23,19 @@ async fn fixture_with_fence(
     Value,
     i64,
 ) {
+    let (db, attempt, plan, evidence, now, _) = fixture_with_token(fenced).await;
+    (db, attempt, plan, evidence, now)
+}
+async fn fixture_with_token(
+    fenced: bool,
+) -> (
+    Database,
+    ExecutionDispatchAttempt,
+    ExecutionPodPlan,
+    Value,
+    i64,
+    String,
+) {
     let (db, token, computer, acquire_input) = setup().await;
     let lease = acquire(&db, &token, &computer, &acquire_input).await;
     let input = submission(&db, &lease).await;
@@ -81,7 +94,7 @@ async fn fixture_with_fence(
     evidence["armed"]["journal"] = first.clone();
     evidence["backup_armed"]["journal"] = second.clone();
     evidence["reaper"] = json!({"version":1,"instance":"a".repeat(64),"nonce":"b".repeat(64),"request":evidence["armed"]["request"],"journals":[first,second],"cgroup_device":42,"pid":102,"spool_device":7,"spool_inode":8,"observed_boottime_ms":1190});
-    (db, attempt, plan, evidence, now)
+    (db, attempt, plan, evidence, now, token)
 }
 
 async fn insert(

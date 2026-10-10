@@ -1,6 +1,7 @@
 //! Synthetic SQL fixtures check bindings only; no S3 receipt or live guard is invented.
 use super::*;
 mod completions;
+mod downloads;
 
 async fn output_fixture() -> (Database, ExecutionDispatchAttempt, Value, i64) {
     output_fixture_with_fence(false).await
@@ -8,7 +9,13 @@ async fn output_fixture() -> (Database, ExecutionDispatchAttempt, Value, i64) {
 async fn output_fixture_with_fence(
     fenced: bool,
 ) -> (Database, ExecutionDispatchAttempt, Value, i64) {
-    let (db, attempt, plan, evidence, now) = fixture_with_fence(fenced).await;
+    let (db, attempt, manifest, now, _) = output_fixture_with_token(fenced).await;
+    (db, attempt, manifest, now)
+}
+async fn output_fixture_with_token(
+    fenced: bool,
+) -> (Database, ExecutionDispatchAttempt, Value, i64, String) {
+    let (db, attempt, plan, evidence, now, token) = fixture_with_token(fenced).await;
     insert(&db, &attempt, &plan, &evidence, now, now + 10000)
         .await
         .unwrap();
@@ -25,7 +32,7 @@ async fn output_fixture_with_fence(
     let stream =
         json!({"sha256":hash,"retained_bytes":0,"observed_bytes":0,"truncated":false,"eof":true});
     let manifest = json!({"version":1,"organization":"acme","execution_id":d.execution.execution_id,"pod_uid":"pod-one","dispatch_digest":d.intent_digest,"grant_digest":grant,"arm_digest":arm,"objects":[object.clone(),object.clone(),object.clone(),object],"summary":{"observed_outcome":"succeeded","stdout":stream.clone(),"stderr":stream,"supervisor_stderr_bytes":0}});
-    (db, attempt, manifest, now)
+    (db, attempt, manifest, now, token)
 }
 fn hash(manifest: &Value) -> String {
     // The storage reader canonicalizes into its typed manifest; JSON order is

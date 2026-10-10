@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 64
-updated_at: unix:1791619269
+map_version: 65
+updated_at: unix:1791620641
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -130,13 +130,14 @@ topics:
   - accepted-execution-completion
   - candidate-io-fence
   - durable-execution-outputs
+  - execution-output-downloads
   - fenced-execution-csi
   - node-expiry-reaper
   - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-b1cd5c049621ae084afc079304bf6eb04b9d9285ecda922e10301ffcbb1c2f4b.yaml
-  digest: b1cd5c049621ae084afc079304bf6eb04b9d9285ecda922e10301ffcbb1c2f4b
+  ref: topics/topic-a402c4336ebfd782-359f9c3426d8242e2de9c977805802fc77ad6791a686de8f653771a496d44fe7.yaml
+  digest: 359f9c3426d8242e2de9c977805802fc77ad6791a686de8f653771a496d44fe7
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -160,12 +161,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 48
+  omitted_through: 49
   recent:
-  - version: 49
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-pod-mounts' to topic 'development'.
   - version: 50
     action: source.add
     actor: cli
@@ -226,3 +223,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'accepted-execution-completion' to topic 'execution'.
+  - version: 65
+    action: source.add
+    actor: cli
+    summary: Added source 'execution-output-downloads' to topic 'execution'.

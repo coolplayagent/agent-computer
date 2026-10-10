@@ -114,6 +114,7 @@ pub async fn verify(
             );
         }
     }
+    let http = output_http::verify(config, private, token, id, &report, &recovered).await;
     let pool = sqlx::PgPool::connect(
         fs::read_to_string(field(config, "database_url_file"))
             .unwrap()
@@ -133,5 +134,5 @@ pub async fn verify(
     .await
     .unwrap();
     assert_eq!(grants, 1);
-    json!({"initial_state":before.state,"recovered":recovered,"fresh_process_read_matches":true,"recovery_retries":2,"output_events":events,"startup_grants":grants})
+    json!({"http_downloads":http,"initial_state":before.state,"recovered":recovered,"fresh_process_read_matches":true,"recovery_retries":2,"output_events":events,"startup_grants":grants})
 }
