@@ -129,12 +129,98 @@ async fn execution_http_queue_retry_query_and_cancel_do_not_dispatch() {
         0
     );
 }
+
 #[tokio::test]
-async fn execution_http_rejects_background_forgery_unbounded_body_and_browser_origin() {
+async fn execution_http_defaults_background_and_retains_status_and_cancel_after_disconnect() {
+    let (s, token, computer, mut input) = setup().await;
+    input.as_object_mut().unwrap().remove("lifetime");
+    let path = format!("/v1alpha1/computers/{computer}/executions");
+    let (code, queued) = s
+        .send(req(
+            &token,
+            "POST",
+            &path,
+            Some("background"),
+            input.clone(),
+        ))
+        .await;
+    assert_eq!(code, StatusCode::ACCEPTED, "{queued}");
+    assert_eq!(queued["lifetime"], "background");
+    let session = input["lease"]["connection_session_id"].as_str().unwrap();
+    let (code, closed) = s
+        .send(req(
+            &token,
+            "DELETE",
+            &format!("/v1alpha1/connection-sessions/{session}"),
+            None,
+            Value::Null,
+        ))
+        .await;
+    assert_eq!(code, StatusCode::OK, "{closed}");
+    assert_eq!(closed["state"], "Closed");
+    let id = queued["execution_id"].as_str().unwrap();
+    let get = format!("/v1alpha1/executions/{id}");
+    assert_eq!(
+        s.send(req(&token, "GET", &get, None, Value::Null)).await,
+        (StatusCode::OK, queued.clone())
+    );
+    input["lifetime"] = json!("background");
+    assert_eq!(
+        s.send(req(
+            &token,
+            "POST",
+            &path,
+            Some("background"),
+            input.clone()
+        ))
+        .await,
+        (StatusCode::ACCEPTED, queued.clone())
+    );
+    input["lifetime"] = json!("connection");
+    assert_eq!(
+        s.send(req(
+            &token,
+            "POST",
+            &path,
+            Some("background"),
+            input.clone()
+        ))
+        .await
+        .0,
+        StatusCode::CONFLICT
+    );
+    assert_ne!(
+        s.send(req(&token, "POST", &path, Some("new-on-closed"), input))
+            .await
+            .0,
+        StatusCode::ACCEPTED
+    );
+    let (code, cancelled) = s
+        .send(req(
+            &token,
+            "POST",
+            &format!("{get}/cancel"),
+            Some("cancel-background"),
+            json!({"expected_revision":1}),
+        ))
+        .await;
+    assert_eq!(code, StatusCode::OK, "{cancelled}");
+    assert_eq!(cancelled["state"], "Cancelled");
+    assert_eq!(cancelled["lifetime"], "background");
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM execution_dispatch_intents")
+            .fetch_one(&s.database.pool)
+            .await
+            .unwrap(),
+        0
+    );
+}
+#[tokio::test]
+async fn execution_http_rejects_unknown_lifetime_forgery_unbounded_body_and_browser_origin() {
     let (s, token, computer, input) = setup().await;
     let path = format!("/v1alpha1/computers/{computer}/executions");
     for (field, value) in [
-        ("lifetime", json!("background")),
+        ("lifetime", json!("unbounded")),
         ("process_stopped", json!(true)),
         ("lease_budget_ms", json!(30000)),
     ] {

@@ -20,6 +20,8 @@ use std::{
     path::PathBuf,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+#[path = "support/execution_background.rs"]
+mod background;
 #[path = "support/execution_checkpoint.rs"]
 mod checkpoint;
 #[path = "support/execution_faults.rs"]
@@ -405,6 +407,8 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .unwrap();
         let script = if name == "command" {
             "printf active > queue-started.txt; /bin/sync queue-started.txt; /bin/sleep 5; printf persisted > output.txt; /bin/sync output.txt; printf done"
+        } else if name == "output-completion-retry" {
+            "printf started > background-started.txt; /bin/sync background-started.txt; /bin/sleep 2; printf persisted > output.txt; /bin/sync output.txt; printf done"
         } else if name == "output-failed" {
             "printf persisted > output.txt; /bin/sync output.txt; exit 7"
         } else if name == "output-timeout" {
@@ -436,7 +440,14 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                         expected_revision: lease.revision,
                     },
                     sandbox_id: sandbox.clone(),
-                    lifetime: ExecutionLifetime::Connection,
+                    lifetime: if matches!(
+                        name,
+                        "output-truncated" | "output-completion-retry" | "cancel"
+                    ) {
+                        ExecutionLifetime::Background
+                    } else {
+                        ExecutionLifetime::Connection
+                    },
                     command: ExecutionCommand {
                         argv: vec!["/bin/sh".into(), "-c".into(), script.into()],
                         cwd: String::new(),
@@ -457,6 +468,11 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         .await
         .unwrap();
         let data = root.join(field(&prepared, "path_ref"));
+        let mut background_evidence = Value::Null;
+        if name == "output-truncated" {
+            background_evidence =
+                background::close(&store, &org, token, &lease, &queued, "before_dispatch").await;
+        }
         let _reaper_pause = (name == "reaper-missing").then(ReaperPause::begin);
         if name == "output-db-failure" {
             sqlx::raw_sql("CREATE FUNCTION reject_output_publication() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.kind='execution.output_verified' THEN RAISE EXCEPTION 'fixture output acknowledgement failure'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_output_publication BEFORE INSERT ON events FOR EACH ROW EXECUTE FUNCTION reject_output_publication();").execute(&pool).await.unwrap();
@@ -468,14 +484,23 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         }
         let outcome = match name {
             "output-revoked" | "output-unknown" => {
-                let running = execution::execute_once(
-                    &store,
-                    &client,
-                    &org,
-                    &queued.execution_id,
-                    queued.revision,
-                    make_config(),
-                );
+                let running = async {
+                    let result = execution::execute_once(
+                        &store,
+                        &client,
+                        &org,
+                        &queued.execution_id,
+                        queued.revision,
+                        make_config(),
+                    )
+                    .await;
+                    if fs::read(data.join("started.txt")).ok().as_deref()
+                        != Some(b"started".as_slice())
+                    {
+                        eprintln!("{name}: execution ended before authority marker: {result:?}");
+                    }
+                    result
+                };
                 let lower = async {
                     let until = tokio::time::Instant::now() + Duration::from_secs(20);
                     while fs::read(data.join("started.txt")).ok().as_deref()
@@ -661,6 +686,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                             tokio::time::sleep(Duration::from_millis(50)).await;
                         }
                     }
+                    let detached =
+                        background::close(&store, &org, token, &lease, &queued, "before_cancel")
+                            .await;
                     let live = json!({"case":"cancel","execution_id":queued.execution_id,"prepared":prepared});
                     let pending = checkpoint::begin(
                         &checkpoint::Context {
@@ -691,8 +719,10 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                             .unwrap()
                             .is_none()
                     );
+                    detached
                 };
-                let (result, ()) = tokio::join!(running, cancellation);
+                let (result, detached) = tokio::join!(running, cancellation);
+                background_evidence = detached;
                 let result = result.unwrap();
                 assert!(result.observation.is_none());
                 assert!(!data.join("late.txt").exists());
@@ -747,16 +777,39 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 serde_json::to_value(result).unwrap()
             }
             _ => {
-                let result = execution::execute_once(
+                let running = execution::execute_once(
                     &store,
                     &client,
                     &org,
                     &queued.execution_id,
                     queued.revision,
                     make_config(),
-                )
-                .await
-                .unwrap();
+                );
+                let result = if name == "output-completion-retry" {
+                    let disconnect = async {
+                        let until = tokio::time::Instant::now() + Duration::from_secs(20);
+                        while fs::read(data.join("background-started.txt"))
+                            .ok()
+                            .as_deref()
+                            != Some(b"started".as_slice())
+                        {
+                            assert!(
+                                tokio::time::Instant::now() < until,
+                                "background marker deadline"
+                            );
+                            tokio::time::sleep(Duration::from_millis(25)).await;
+                        }
+                        assert!(!data.join("output.txt").exists());
+                        background::close(&store, &org, token, &lease, &queued, "after_startup")
+                            .await
+                    };
+                    let (result, detached) = tokio::join!(running, disconnect);
+                    background_evidence = detached;
+                    result.unwrap()
+                } else {
+                    running.await.unwrap()
+                };
+
                 let report: Value = serde_json::from_slice(
                     result
                         .observation
@@ -994,7 +1047,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             assert_eq!(after.revision, next.revision);
             assert_eq!(after.state, WriterLeaseState::Released);
         }
-        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"outputs":output_evidence,"next_writer":next_writer,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
+        results.push(json!({"case":name,"background":background_evidence,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"outputs":output_evidence,"next_writer":next_writer,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
     }
     let drains: i64 =
         sqlx::query_scalar("SELECT count(*) FROM candidate_writer_drains WHERE organization=$1")

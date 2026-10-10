@@ -196,7 +196,7 @@ async fn capabilities(State(state): State<ServiceState>) -> Json<serde_json::Val
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane", "computer.stop_before_user_dispatch":"control-plane",
             "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"sealed-file-candidates",
-            "execution.admission":"connection-queued", "execution.outputs":"bounded-durable-observations", "execution.output_downloads":if state.outputs.is_some(){"bounded-verified-streams"}else{"unsupported"}, "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
+            "execution.admission":"bounded-queued", "execution.outputs":"bounded-durable-observations", "execution.output_downloads":if state.outputs.is_some(){"bounded-verified-streams"}else{"unsupported"}, "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
     )
 }

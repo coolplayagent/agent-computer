@@ -1,10 +1,12 @@
 # 23. Durable execution admission
 
-## 23.1 Delivered behavior
+[48 Bounded background execution](48-background-execution.md) adds a default background lifetime while preserving the original fixed deadlines and identity requirements.
+
+## 23.1 Migration 12 behavior (historical)
 
 Migration 12 and the authenticated HTTP API persist a connection-scoped command queue on a Prepared Candidate. Submission reserves the current writer epoch against competing file dispatch, fixes all inputs and records an event/Outbox entry in one transaction. No runtime dispatcher is connected yet: capabilities report `execution.admission: connection-queued` and `execution: unsupported`; queue-only records have `dispatch_started: false`. [24 Dispatch journal](24-execution-dispatch.md) subsequently adds trusted dispatch intents and unresolved post-dispatch states.
 
-This increment supports an explicit `lifetime: connection`. Closing the original connection, losing authorization, changing the current Candidate, or reaching the fixed queue deadline cancels an undispatched reservation when it is queried/reconciled or its writer is released. Background execution requires an independent execution lifetime/lease and remains pending. An HTTP disconnect by itself does not close a ConnectionSession or undo a committed admission; retry with the same key and input.
+This increment supports an explicit `lifetime: connection`. Closing the original connection, losing authorization, changing the current Candidate, or reaching the fixed queue deadline cancels an undispatched reservation when it is queried/reconciled or its writer is released. Migration 28 adds bounded background reservations as described in chapter 48; longer independent execution budgets remain pending. An HTTP disconnect by itself does not close a ConnectionSession or undo a committed admission; retry with the same key and input.
 
 ## 23.2 HTTP contract
 
@@ -39,7 +41,7 @@ Requests require uncompressed JSON of at most 64 KiB; unknown/duplicate fields f
 }
 ```
 
-Command validation shares the [22 supervisor](22-sandbox-supervisor.md) implementation: absolute executable, explicit interpreter, at most 128 arguments/32 KiB, normalized relative cwd, timeout 1–3600 seconds, TERM grace 0–5000 ms and retained output 0–1 MiB per stream. Timeout must also fit the pinned Computer start budget. The API cannot supply a lease budget, process-stopped flag, arbitrary environment, stdin reference or background lifetime. Cwd confinement is validated syntactically here; actual descriptor/mount enforcement belongs to runtime dispatch.
+Command validation shares the [22 supervisor](22-sandbox-supervisor.md) implementation: absolute executable, explicit interpreter, at most 128 arguments/32 KiB, normalized relative cwd, timeout 1–3600 seconds, TERM grace 0–5000 ms and retained output 0–1 MiB per stream. Timeout must also fit the pinned Computer start budget. The API cannot supply a lease budget, process-stopped flag, arbitrary environment or stdin reference. Cwd confinement is validated syntactically here; actual descriptor/mount enforcement belongs to runtime dispatch.
 
 ## 23.3 Binding, reservation and cancellation
 
@@ -53,8 +55,8 @@ Migration 12 permits only Queued → Cancelled, retains immutable input/binding/
 
 ## 23.4 Verification and remaining work
 
-Eleven new real PostgreSQL cases cover WAL recovery, exact retries, pinned binding, immutable rows, old-generation/foreign-Sandbox rejection, original credential isolation, revocation/connection closure, queue deadline, file-dispatch races, admission and cancellation rollback, and migration 12. Two HTTP cases cover queue/query/cancel/retry and malformed/background/oversized/browser requests. These tests use synthetic preparation receipts and establish control-state behavior only.
+Eleven new real PostgreSQL cases cover WAL recovery, exact retries, pinned binding, immutable rows, old-generation/foreign-Sandbox rejection, original credential isolation, revocation/connection closure, queue deadline, file-dispatch races, admission and cancellation rollback, and migration 12. Two HTTP cases cover queue/query/cancel/retry and malformed/unknown-lifetime/oversized/browser requests. These tests use synthetic preparation receipts and establish control-state behavior only.
 
 At this increment, the default workspace had 242 tests, including 104 PostgreSQL and 19 HTTP cases. Cargo tests, fmt, Clippy, Bazel build/test, OpenAPI meta-schema/local references and bilingual documentation checks pass. Existing full Qualitygate covers line endings only; it does not establish runtime acceptance. T01–T43 remain `not_run`.
 
-Runtime Pod/Candidate mount binding, external watchdog/fencing, actual dispatch, durable output objects, accepted completion, background lifetimes and physical Unknown reconciliation remain required. The standalone supervisor's JSON report cannot authorize a process or release this lease.
+Later chapters deliver guarded Pod/Candidate mounts, node watchdogs, dispatch, durable output, accepted completion and bounded background lifetimes. Physical Unknown recovery, cross-node fencing and longer execution budgets remain pending. The standalone supervisor's JSON report cannot authorize a process or release this lease.
