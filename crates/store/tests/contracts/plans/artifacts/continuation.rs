@@ -109,7 +109,7 @@ async fn migration_twenty_two_preserves_history_and_releases_branch_checkpoint()
     assert!(before["start"].get("input_artifact_id").is_none());
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
-    let after:Value=sqlx::query_scalar("SELECT jsonb_build_object('start',r.receipt,'input',to_jsonb(i),'artifact',to_jsonb(a)-'stop_after_commit') FROM runtime_start_requests r JOIN runtime_start_inputs i USING(organization,request_id) JOIN artifact_commits a USING(organization,request_id)").fetch_one(&db.pool).await.unwrap();
+    let after:Value=sqlx::query_scalar("SELECT jsonb_build_object('start',r.receipt,'input',to_jsonb(i),'artifact',to_jsonb(a)-ARRAY['stop_after_commit','cancel_running']) FROM runtime_start_requests r JOIN runtime_start_inputs i USING(organization,request_id) JOIN artifact_commits a USING(organization,request_id)").fetch_one(&db.pool).await.unwrap();
     assert_eq!(before, after);
     assert!(
         !db.store

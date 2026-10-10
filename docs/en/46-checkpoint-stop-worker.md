@@ -50,3 +50,5 @@ The disposable VM fixture runs the real daemon after failed S3/publication attem
 These are single-node component results. Active process draining, force-stop, App/browser checkpoints, full lifecycle scheduling, cross-node fencing, GC and product certification remain incomplete. Computer `ready=false`, public execution remains unsupported, and T01–T43 remain `not_run`.
 
 The validation record also retains intermittent startup/watchdog refusals from earlier runs: no startup grant or user mutation was accepted. Their exact transient causes were not exposed. The final run used a fresh private watchdog spool after confirming every retained old deadline had expired. A completed component run does not establish startup reliability or throughput.
+
+[47 Explicit execution cancellation](47-checkpoint-stop-drain.md) extends this endpoint. This chapter describes the default `cancel_running=false` mode.

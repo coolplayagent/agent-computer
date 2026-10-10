@@ -101,3 +101,5 @@
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 
 Both language groups use matching numbers and topics and are updated with the implementation. Detailed specifications remain in `codespec/`; `relay-knowledge` manages the knowledge navigation maps.
+
+- [47 检查点停止的显式执行取消](zh-CN/47-checkpoint-stop-drain.md) · [English](en/47-checkpoint-stop-drain.md)

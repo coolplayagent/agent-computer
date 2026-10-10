@@ -13,6 +13,7 @@ use agent_computer_store::{
 mod checkpoint;
 mod checkpoint_authority;
 mod continuation;
+mod drain;
 mod objects;
 mod recovery;
 use objects::Objects;

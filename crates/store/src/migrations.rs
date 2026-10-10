@@ -209,6 +209,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    27,
+                    Cow::Borrowed("checkpoint stop drain"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0027_checkpoint_stop_drain.sql")),
+                    false,
+                ),
             ])
         })
     }

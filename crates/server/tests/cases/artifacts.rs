@@ -10,13 +10,17 @@ use axum::http::StatusCode;
 use serde_json::{Value, json};
 #[tokio::test]
 async fn artifact_http_authority_strict_input_and_durable_sealing() {
-    check_admission(false).await;
+    check_admission(false, false).await;
 }
 #[tokio::test]
 async fn checkpoint_stop_http_authority_strict_input_and_durable_acceptance() {
-    check_admission(true).await;
+    check_admission(true, false).await;
 }
-async fn check_admission(checkpoint: bool) {
+#[tokio::test]
+async fn checkpoint_stop_http_opt_in_drain_preserves_authority_and_strict_input() {
+    check_admission(true, true).await;
+}
+async fn check_admission(checkpoint: bool, cancel_running: bool) {
     let s = Service::new().await;
     let org = OrganizationId::new("acme").unwrap();
     let principal = PrincipalId::new("alice").unwrap();
@@ -39,11 +43,14 @@ async fn check_admission(checkpoint: bool) {
         .await
         .unwrap();
     let current = s.store.computer_runtime(token, &computer).await.unwrap();
-    let body = if checkpoint {
+    let mut body = if checkpoint {
         json!({"request_id":start.request_id,"expected_revision":current.revision,"publish_current":true})
     } else {
         json!({"request_id":start.request_id,"expected_revision":current.revision,"base_revision":start.input_revision,"base_manifest":start.input_manifest_digest,"publish_current":true})
     };
+    if cancel_running {
+        body["cancel_running"] = json!(true);
+    }
     let path = if checkpoint {
         format!("/v1alpha1/computers/{computer}/checkpoint-stop")
     } else {
@@ -188,7 +195,15 @@ async fn check_admission(checkpoint: bool) {
         .send(req(token, "POST", &path, Some("artifact"), body.clone()))
         .await;
     assert_eq!(code, StatusCode::ACCEPTED, "{admitted}");
-    assert_eq!(admitted["state"], "Capturing");
+    assert_eq!(
+        admitted["state"],
+        if cancel_running {
+            "Draining"
+        } else {
+            "Capturing"
+        }
+    );
+    assert_eq!(admitted["cancel_running"], cancel_running);
     assert_eq!(admitted["stop_after_commit"], checkpoint);
     assert!(admitted.get("stop_receipt").is_none());
     assert_eq!(
@@ -222,9 +237,26 @@ async fn check_admission(checkpoint: bool) {
             .await
             .unwrap()
             .start_state,
-        Some(StartState::Sealing)
+        Some(if cancel_running {
+            StartState::Draining
+        } else {
+            StartState::Sealing
+        })
     );
-    assert_eq!(sqlx::query_scalar::<_,i64>("SELECT count(*) FROM events e JOIN outbox o USING(organization,sequence) WHERE kind='artifact.sealing'").fetch_one(&s.database.pool).await.unwrap(),1);
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT count(*) FROM events e JOIN outbox o USING(organization,sequence) WHERE kind=$1"
+        )
+        .bind(if cancel_running {
+            "computer.drain_requested"
+        } else {
+            "artifact.sealing"
+        })
+        .fetch_one(&s.database.pool)
+        .await
+        .unwrap(),
+        1
+    );
     s.store
         .set_runtime_grant(
             RuntimeGrant {

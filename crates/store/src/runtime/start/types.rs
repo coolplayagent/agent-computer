@@ -25,6 +25,7 @@ pub enum StartState {
     Queued,
     Preparing,
     Prepared,
+    Draining,
     Sealing,
     Sealed,
     Cancelled,

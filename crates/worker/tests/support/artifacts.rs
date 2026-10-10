@@ -148,6 +148,7 @@ pub async fn verify(c: Context<'_>) -> Value {
     }
     let current = c.store.computer_runtime(c.token, c.computer).await.unwrap();
     let input = CheckpointStop {
+        cancel_running: false,
         request_id: start.request_id.clone(),
         expected_revision: current.revision,
         publish_current: true,

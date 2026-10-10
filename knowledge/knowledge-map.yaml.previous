@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 67
-updated_at: unix:1791624158
+map_version: 68
+updated_at: unix:1791626830
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -158,9 +158,10 @@ topics:
   title: runtime
   description: Added by CLI source registration.
   source_ids:
+  - checkpoint-stop-worker
   - continuous-candidate-preparation
-  ref: topics/topic-d92c6a81b2ff5009-cfcc638a470a83d9aa64bcf6b33f10b7ea781288be46d84c4568c67d1ed2a677.yaml
-  digest: cfcc638a470a83d9aa64bcf6b33f10b7ea781288be46d84c4568c67d1ed2a677
+  ref: topics/topic-d92c6a81b2ff5009-9e416d81d4736bb1a68f9327f1db58e83090f1a990a35f910b304d7b00c50379.yaml
+  digest: 9e416d81d4736bb1a68f9327f1db58e83090f1a990a35f910b304d7b00c50379
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -169,12 +170,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 51
+  omitted_through: 52
   recent:
-  - version: 52
-    action: source.add
-    actor: cli
-    summary: Added source 'node-cgroup-watchdog' to topic 'development'.
   - version: 53
     action: source.add
     actor: cli
@@ -235,3 +232,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'continuous-candidate-preparation' to topic 'runtime'.
+  - version: 68
+    action: source.add
+    actor: cli
+    summary: Added source 'checkpoint-stop-worker' to topic 'runtime'.

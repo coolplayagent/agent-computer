@@ -191,10 +191,10 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "output-unknown",
         "output-completion-retry",
     ];
-    // Stopping retains the old Candidate reservation. The restoration needs
-    // one additional generation; keep the platform's admission limits intact.
+    // Stopping retains old Candidate reservations. The two restorations need
+    // one additional generation each; keep platform admission limits intact.
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":(names.len() as u64 + 1) * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":(names.len() as u64 + 2) * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
     for name in names {
         document["spec"]["workspaces"]
             .as_array_mut()
@@ -478,7 +478,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 );
                 let lower = async {
                     let until = tokio::time::Instant::now() + Duration::from_secs(20);
-                    while !data.join("started.txt").exists() {
+                    while fs::read(data.join("started.txt")).ok().as_deref()
+                        != Some(b"started".as_slice())
+                    {
                         assert!(tokio::time::Instant::now() < until, "authority barrier");
                         tokio::time::sleep(Duration::from_millis(50)).await;
                     }
@@ -659,17 +661,36 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                             tokio::time::sleep(Duration::from_millis(50)).await;
                         }
                     }
-                    store
-                        .cancel_candidate_execution(
+                    let live = json!({"case":"cancel","execution_id":queued.execution_id,"prepared":prepared});
+                    let pending = checkpoint::begin(
+                        &checkpoint::Context {
+                            store: &store,
+                            pool: &pool,
+                            org: &org,
+                            actor: &actor,
                             token,
-                            &key("cancel-running"),
-                            &queued.execution_id,
-                            &CancelExecution {
-                                expected_revision: 2,
-                            },
-                        )
-                        .await
-                        .unwrap();
+                            config: &config,
+                            local: &local,
+                            normal: &live,
+                        },
+                        true,
+                    )
+                    .await;
+                    assert_eq!(
+                        pending.state,
+                        agent_computer_store::runtime::artifacts::ArtifactState::Draining
+                    );
+                    assert!(
+                        store
+                            .claim_artifact(
+                                &org,
+                                &pending.commit_id,
+                                &WorkerId::new("before-drain").unwrap()
+                            )
+                            .await
+                            .unwrap()
+                            .is_none()
+                    );
                 };
                 let (result, ()) = tokio::join!(running, cancellation);
                 let result = result.unwrap();
@@ -993,7 +1014,18 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         normal: results.iter().find(|v| v["case"] == "normal").unwrap(),
     })
     .await;
-    let evidence = json!({"checkpoint_stop":checkpoint,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
+    let cancelled_checkpoint = checkpoint::verify(checkpoint::Context {
+        store: &store,
+        pool: &pool,
+        org: &org,
+        actor: &actor,
+        token,
+        config: &config,
+        local: &local,
+        normal: results.iter().find(|v| v["case"] == "cancel").unwrap(),
+    })
+    .await;
+    let evidence = json!({"cancelled_checkpoint_stop":cancelled_checkpoint,"checkpoint_stop":checkpoint,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

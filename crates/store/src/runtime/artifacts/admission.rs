@@ -6,6 +6,7 @@ struct Admission<'a> {
     workspace: &'a str,
     input: &'a CommitArtifact,
     stop: bool,
+    cancel_running: bool,
 }
 
 pub(super) async fn available(
@@ -14,7 +15,31 @@ pub(super) async fn available(
     request: &str,
     principal: &str,
 ) -> Result<()> {
-    let allowed: bool = sqlx::query_scalar("SELECT checkpoint_stop_available($1,$2,$3)")
+    check_stop(tx, org, request, principal, false).await
+}
+
+pub(super) async fn eligible(
+    tx: &mut Transaction<'_, Postgres>,
+    org: &str,
+    request: &str,
+    principal: &str,
+) -> Result<()> {
+    check_stop(tx, org, request, principal, true).await
+}
+
+async fn check_stop(
+    tx: &mut Transaction<'_, Postgres>,
+    org: &str,
+    request: &str,
+    principal: &str,
+    pending_drain: bool,
+) -> Result<()> {
+    let query = if pending_drain {
+        "SELECT checkpoint_stop_eligible($1,$2,$3)"
+    } else {
+        "SELECT checkpoint_stop_available($1,$2,$3)"
+    };
+    let allowed: bool = sqlx::query_scalar(query)
         .bind(org)
         .bind(request)
         .bind(principal)
@@ -56,6 +81,7 @@ impl Store {
                 workspace,
                 input,
                 stop: false,
+                cancel_running: false,
             },
         )
         .await?;
@@ -110,6 +136,7 @@ impl Store {
                 workspace: &workspace,
                 input: &input,
                 stop: true,
+                cancel_running: request.cancel_running,
             },
         )
         .await?;
@@ -130,6 +157,7 @@ async fn admit(
         workspace,
         input,
         stop,
+        cancel_running,
     } = admission;
     if ComputerId::new(&input.request_id).is_err()
         || ComputerId::new(workspace).is_err()
@@ -168,11 +196,18 @@ async fn admit(
             "runtime.artifact-commit.v1",
         )
     };
-    let hash = digest(domain, &(workspace, input))?;
+    let hash = if cancel_running {
+        digest(domain, &(workspace, input, "cancel_running"))?
+    } else {
+        // Preserve the previously admitted operation's canonical hash.
+        digest(domain, &(workspace, input))?
+    };
     if let Some(id) = transactions::retry::<String>(tx, identity, op, key, &hash).await? {
         let existing = row(tx, org, &id).await?;
-        if existing.try_get::<String, _>("state")? == "Capturing"
-            && existing.try_get::<String, _>("credential_id")? != crate::auth::token_id(token)?
+        if matches!(
+            existing.try_get::<String, _>("state")?.as_str(),
+            "Draining" | "Capturing"
+        ) && existing.try_get::<String, _>("credential_id")? != crate::auth::token_id(token)?
         {
             sqlx::query("UPDATE artifact_commits SET credential_id=$3,lease_epoch=lease_epoch+1,lease_owner=NULL,lease_until_ms=NULL WHERE organization=$1 AND commit_id=$2").bind(org).bind(&id).bind(crate::auth::token_id(token)?).execute(&mut **tx).await?;
             transactions::emit(
@@ -207,20 +242,32 @@ async fn admit(
         .bind(&input.request_id)
         .fetch_one(&mut **tx)
         .await?;
-    if !clean {
+    if !clean && !cancel_running {
         return Err(Error::WriterLeaseBusy);
     }
     super::start::graph::validate_catalogs(tx, org, &input.request_id).await?;
     if stop {
-        available(tx, org, &input.request_id, identity.principal().as_str()).await?;
+        check_stop(
+            tx,
+            org,
+            &input.request_id,
+            identity.principal().as_str(),
+            cancel_running,
+        )
+        .await?;
     }
     let id = random_id("artifact")?;
-    sqlx::query("INSERT INTO artifact_commits (organization,commit_id,request_id,workspace_id,principal,credential_id,input,stop_after_commit) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)").bind(org).bind(&id).bind(&input.request_id).bind(workspace).bind(identity.principal().as_str()).bind(crate::auth::token_id(token)?).bind(serde_json::to_value(input).map_err(|_|Error::InvalidRuntimeRequest)?).bind(stop).execute(&mut **tx).await?;
+    sqlx::query("INSERT INTO artifact_commits (organization,commit_id,request_id,workspace_id,principal,credential_id,input,stop_after_commit,cancel_running,state) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)").bind(org).bind(&id).bind(&input.request_id).bind(workspace).bind(identity.principal().as_str()).bind(crate::auth::token_id(token)?).bind(serde_json::to_value(input).map_err(|_|Error::InvalidRuntimeRequest)?).bind(stop).bind(cancel_running).bind(if cancel_running { "Draining" } else { "Capturing" }).execute(&mut **tx).await?;
     sqlx::query(
-        "UPDATE runtime_start_requests SET state='Sealing' WHERE organization=$1 AND request_id=$2",
+        "UPDATE runtime_start_requests SET state=$3 WHERE organization=$1 AND request_id=$2",
     )
     .bind(org)
     .bind(&input.request_id)
+    .bind(if cancel_running {
+        "Draining"
+    } else {
+        "Sealing"
+    })
     .execute(&mut **tx)
     .await?;
     sqlx::query(
@@ -230,7 +277,10 @@ async fn admit(
     .bind(&computer)
     .execute(&mut **tx)
     .await?;
-    transactions::emit(tx,org,seq,"artifact.sealing",serde_json::json!({"commit_id":id,"workspace_id":workspace,"request_id":input.request_id,"base_revision":input.base_revision,"publish_current":input.publish_current,"stop_after_commit":stop})).await?;
+    let seq = transactions::emit(tx,org,seq,if cancel_running { "computer.drain_requested" } else { "artifact.sealing" },serde_json::json!({"commit_id":id,"workspace_id":workspace,"request_id":input.request_id,"base_revision":input.base_revision,"publish_current":input.publish_current,"stop_after_commit":stop,"cancel_running":cancel_running})).await?;
+    if cancel_running {
+        super::super::writers::request_checkpoint_drain(tx, org, &input.request_id, seq).await?;
+    }
     transactions::save_receipt(tx, identity, op, key, &hash, &id).await?;
     let result = view(&row(tx, org, &id).await?)?;
     authorize_in(tx, token, &permissions).await?;

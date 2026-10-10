@@ -2,7 +2,11 @@ use super::checkpoint::{request, start};
 use super::*;
 use agent_computer_store::runtime::connections::*;
 
-async fn session(db: &Database, computer: &str, actor: &str) -> (String, ConnectionSession) {
+pub(super) async fn session(
+    db: &Database,
+    computer: &str,
+    actor: &str,
+) -> (String, ConnectionSession) {
     let token = super::super::runtime::runtime_token(db, "acme", actor, &ServiceScope::ALL).await;
     db.store
         .set_runtime_grant(

@@ -29,3 +29,5 @@
 ## 04.3 完成条件
 
 完整目标以[产品需求](../../codespec/requirements/agent-computer.md)、[D13 交付顺序](../../codespec/design/agent-computer.md)及[验收门槛](../../codespec/test/agent-computer.md)为准。纯函数单元测试证明局部规则，不证明数据库耐久、进程停止、网络隔离或真实浏览器/人的完整操作闭环。每项运行验收必须保存固定提交、版本、环境、预期/实测结果和证据；未执行或阻断项继续保留。
+
+显式执行取消与持久 Draining 已交付，仍需原 worker 的进程/I/O 排空证明，Unknown 阻塞捕获； [47 显式执行取消](47-checkpoint-stop-drain.md).
