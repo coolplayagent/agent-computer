@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 73
-updated_at: unix:1791657680
+map_version: 74
+updated_at: unix:1791660972
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -82,6 +82,13 @@ topics:
   - repository-business-glossary
   ref: topics/topic-17438b0266842113-79d9f29ebf10de1411c359a80aa9f343853d255098085e63fdc9e5c6c43d1adc.yaml
   digest: 79d9f29ebf10de1411c359a80aa9f343853d255098085e63fdc9e5c6c43d1adc
+- id: cli
+  title: cli
+  description: Added by CLI source registration.
+  source_ids:
+  - authenticated-execution-cli
+  ref: topics/topic-99bb88401742848e-c922fb6aa152badc0b239e87fc8f29212eef62b3aa9113cab8af0e8200ae083d.yaml
+  digest: c922fb6aa152badc0b239e87fc8f29212eef62b3aa9113cab8af0e8200ae083d
 - id: deployment
   title: deployment
   description: Added by CLI source registration.
@@ -175,12 +182,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 57
+  omitted_through: 58
   recent:
-  - version: 58
-    action: source.add
-    actor: cli
-    summary: Added source 'durable-execution-outputs' to topic 'execution'.
   - version: 59
     action: source.add
     actor: cli
@@ -241,3 +244,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'durable-drain-recovery' to topic 'execution'.
+  - version: 74
+    action: source.add
+    actor: cli
+    summary: Added source 'authenticated-execution-cli' to topic 'cli'.

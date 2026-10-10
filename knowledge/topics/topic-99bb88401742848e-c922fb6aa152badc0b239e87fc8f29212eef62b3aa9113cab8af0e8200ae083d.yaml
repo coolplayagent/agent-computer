@@ -1,0 +1,21 @@
+schema_version: 4
+topic:
+  id: cli
+  title: cli
+  description: Added by CLI source registration.
+sources:
+- id: authenticated-execution-cli
+  topic: cli
+  kind: doc
+  uri: docs/zh-CN/52-authenticated-execution-cli.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Authenticated Computer connection, writer and execution CLI with explicit retries and verified output downloads
+route:
+  topic: cli
+  source_order:
+  - authenticated-execution-cli
+  fallback: bounded-search

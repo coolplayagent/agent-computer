@@ -28,7 +28,7 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 
 安装 Bazelisk 的环境会读取 `.bazelversion`。Rustup 会读取 `rust-toolchain.toml`。工具下载受限时使用组织提供的 HTTPS 代理或经过校验的镜像；不要修改固定版本来掩盖下载失败。
 
-CLI JSON 输出位于 stdout，诊断位于 stderr；不支持的命令/参数返回退出码 2。运行能力尚未交付，不应将版本命令成功当作运行服务健康。
+远程 CLI 结果位于 stdout，诊断位于 stderr；不支持的命令/参数返回退出码 2。版本查询成功不等于服务健康，远程命令使用单独配置的控制服务和 worker。
 
 服务启动、凭据管理、HTTP 路由与 OpenAPI 见 [09 控制服务](09-control-service.md)。
 
@@ -43,3 +43,5 @@ PostgreSQL 集成测试要求本机安装服务端/客户端二进制并以非 r
 受限 Kubernetes 库与显式真实组件测试入口见 [12 Kubernetes 适配器](12-kubernetes-adapter.md)。
 
 单次认领的 JuiceFS worker 与显式 PostgreSQL/CSI 目标见 [13 卷供应](13-volume-provisioning.md)。
+
+已交付[认证执行 CLI](52-authenticated-execution-cli.md)，接入现有 Computer、连接、写租约和执行 API，使用显式 JSON 请求/幂等键并校验输出下载；外部 workflow/生态适配仍待实现。
