@@ -81,7 +81,7 @@ impl Client {
     }
 }
 
-fn runtime(
+pub(crate) fn runtime(
     plan: &EphemeralSandboxPlan,
     pod_uid: &str,
     node: &NodeIdentity,

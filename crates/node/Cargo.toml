@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+agent-computer-browser = { path = "../browser" }
 agent-computer-fence = { path = "../fence" }
 agent-computer-kubernetes = { path = "../kubernetes" }
 agent-computer-watchdog = { path = "../watchdog" }
@@ -17,3 +18,14 @@ tempfile.workspace = true
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+agent-computer-definitions = { path = "../definitions" }
+tokio.workspace = true
+
+[features]
+live-test = []
+
+[[test]]
+name = "browser_live"
+required-features = ["live-test"]

@@ -130,8 +130,10 @@ fn matches_spec(expected: &Value, actual: &Value, path: &str) -> bool {
                 | "/hostIPC"
                 | "/shareProcessNamespace"
                 | "/containers/*/securityContext/privileged"
+                | "/initContainers/*/securityContext/privileged"
                 | "/containers/*/tty"
                 | "/containers/*/volumeMounts/*/readOnly"
+                | "/initContainers/*/volumeMounts/*/readOnly"
                 | "/volumes/*/persistentVolumeClaim/readOnly"
         ),
         _ => expected == actual,
@@ -148,9 +150,15 @@ fn allowed_default(path: &str, value: &Value) -> bool {
         "/nodeName" => value
             .as_str()
             .is_some_and(|s| !s.is_empty() && s.len() <= 253),
-        "/containers/*/terminationMessagePath" => value == "/dev/termination-log",
-        "/containers/*/terminationMessagePolicy" => value == "File",
-        "/containers/*/volumeMounts/*/readOnly" => value == false,
+        "/containers/*/terminationMessagePath" | "/initContainers/*/terminationMessagePath" => {
+            value == "/dev/termination-log"
+        }
+        "/containers/*/terminationMessagePolicy" | "/initContainers/*/terminationMessagePolicy" => {
+            value == "File"
+        }
+        "/containers/*/volumeMounts/*/readOnly" | "/initContainers/*/volumeMounts/*/readOnly" => {
+            value == false
+        }
         "/tolerations" => value.as_array().is_some_and(|items| {
             items.len() <= 2
                 && items.iter().all(|v| {

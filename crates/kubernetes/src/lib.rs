@@ -6,6 +6,10 @@
 #![forbid(unsafe_code)]
 
 mod attach;
+mod browser;
+pub use browser::{BROWSER_ENTRYPOINT, BrowserPlan, BrowserRuntimeIdentity};
+mod browser_attach;
+pub use browser_attach::{BrowserChannel, BrowserTransport};
 mod candidate;
 mod client;
 mod node;

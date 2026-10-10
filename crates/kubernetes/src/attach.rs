@@ -19,7 +19,7 @@ const FRAME_LIMIT: usize = 65536;
 const CHALLENGE_LIMIT: usize = 4096;
 const DIAGNOSTIC_LIMIT: usize = 65536;
 const MAX_FRAMES: usize = 4096;
-type Socket = WebSocketStream<reqwest::Upgraded>;
+pub(crate) type Socket = WebSocketStream<reqwest::Upgraded>;
 
 mod running;
 pub use running::{ExecutionChannel, ExecutionEvent, OutputChunkObservation};
@@ -100,7 +100,7 @@ fn line(bytes: &[u8]) -> Result<Option<&[u8]>> {
         Ok(None)
     }
 }
-async fn next(
+pub(crate) async fn next(
     socket: &mut Socket,
     frames: &mut usize,
     deadline: Instant,
@@ -131,7 +131,7 @@ async fn next(
         }
     }
 }
-async fn send(socket: &mut Socket, bytes: Vec<u8>, deadline: Instant) -> Result<()> {
+pub(crate) async fn send(socket: &mut Socket, bytes: Vec<u8>, deadline: Instant) -> Result<()> {
     timeout_at(deadline, socket.send(Message::Binary(bytes.into())))
         .await
         .map_err(|_| Error::Transport)?
@@ -168,9 +168,51 @@ impl Client {
             return Err(Error::IdentityMismatch);
         }
         self.running(plan, &observed.uid).await?;
+        let mut socket = self.open_attach(&plan.pod).await?;
+        let mut hello = vec![0];
+        serde_json::to_writer(
+            &mut hello,
+            &StartupHello::for_bootstrap(&plan.bootstrap).map_err(|_| Error::InvalidCommand)?,
+        )
+        .map_err(|_| Error::InvalidCommand)?;
+        hello.push(b'\n');
+        send(&mut socket, hello, deadline).await?;
+        let mut buffer = Vec::new();
+        let mut frames = 0;
+        let challenge = loop {
+            let frame = next(&mut socket, &mut frames, deadline, MAX_FRAMES)
+                .await?
+                .ok_or(Error::InvalidResponse)?;
+            if frame[0] != 1 {
+                return Err(Error::InvalidResponse);
+            }
+            append(&mut buffer, &frame[1..], CHALLENGE_LIMIT)?;
+            if let Some(bytes) = line(&buffer)? {
+                break StartupChallenge::parse(bytes).map_err(|_| Error::InvalidResponse)?;
+            }
+        };
+        if !challenge
+            .matches(&plan.bootstrap)
+            .map_err(|_| Error::InvalidResponse)?
+        {
+            return Err(Error::IdentityMismatch);
+        }
+        self.running(plan, &observed.uid).await?;
+        Ok(StartupChannel {
+            client: self,
+            plan,
+            pod_uid: observed.uid.clone(),
+            socket,
+            challenge,
+            created,
+            frames,
+        })
+    }
+    /// Caller supplies the overall deadline and exact Pod identity readback.
+    pub(crate) async fn open_attach(&self, plan: &crate::EphemeralSandboxPlan) -> Result<Socket> {
         let mut url = self
             .endpoint
-            .join(&format!("{}/attach", self.pod_path(&plan.pod, true)))
+            .join(&format!("{}/attach", self.pod_path(plan, true)))
             .map_err(|_| Error::InvalidConfiguration)?;
         url.query_pairs_mut().extend_pairs([
             ("container", "sandbox"),
@@ -217,45 +259,7 @@ impl Client {
             .max_write_buffer_size(8192)
             .max_message_size(Some(FRAME_LIMIT))
             .max_frame_size(Some(FRAME_LIMIT));
-        let mut socket = Socket::from_raw_socket(upgraded, Role::Client, Some(config)).await;
-        let mut hello = vec![0];
-        serde_json::to_writer(
-            &mut hello,
-            &StartupHello::for_bootstrap(&plan.bootstrap).map_err(|_| Error::InvalidCommand)?,
-        )
-        .map_err(|_| Error::InvalidCommand)?;
-        hello.push(b'\n');
-        send(&mut socket, hello, deadline).await?;
-        let mut buffer = Vec::new();
-        let mut frames = 0;
-        let challenge = loop {
-            let frame = next(&mut socket, &mut frames, deadline, MAX_FRAMES)
-                .await?
-                .ok_or(Error::InvalidResponse)?;
-            if frame[0] != 1 {
-                return Err(Error::InvalidResponse);
-            }
-            append(&mut buffer, &frame[1..], CHALLENGE_LIMIT)?;
-            if let Some(bytes) = line(&buffer)? {
-                break StartupChallenge::parse(bytes).map_err(|_| Error::InvalidResponse)?;
-            }
-        };
-        if !challenge
-            .matches(&plan.bootstrap)
-            .map_err(|_| Error::InvalidResponse)?
-        {
-            return Err(Error::IdentityMismatch);
-        }
-        self.running(plan, &observed.uid).await?;
-        Ok(StartupChannel {
-            client: self,
-            plan,
-            pod_uid: observed.uid.clone(),
-            socket,
-            challenge,
-            created,
-            frames,
-        })
+        Ok(Socket::from_raw_socket(upgraded, Role::Client, Some(config)).await)
     }
     async fn running(&self, plan: &StartupSandboxPlan, uid: &str) -> Result<()> {
         let current = self

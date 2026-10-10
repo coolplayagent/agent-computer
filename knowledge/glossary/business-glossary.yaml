@@ -19,6 +19,24 @@ terms:
       - relation: represented_by
         target_kind: file
         target: docs/zh-CN/54-app-admission.md
+  - id: browser-runtime
+    domain: agent-infrastructure
+    canonical_name: BrowserRuntime
+    definition: 以批准镜像和私有内存 profile 独立启动 Browser Pod，经 Rust 私有协议核对回调，以真实 CRI、原 cgroup/pidfd 和冗余 watchdog 保护进程；停止凭据仅证明原进程域停止，不构成 Candidate IO seal、GUI 授权或 profile checkpoint。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/browser/src/session.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/kubernetes/src/browser.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/node/src/browser.rs
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/56-browser-runtime.md
   - id: browser-driver
     domain: agent-infrastructure
     canonical_name: BrowserDriver

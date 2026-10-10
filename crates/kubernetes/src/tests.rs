@@ -12,7 +12,7 @@ use std::{
 
 mod attach;
 
-fn identity() -> InstanceIdentity {
+pub(super) fn identity() -> InstanceIdentity {
     InstanceIdentity {
         organization: "org_a".into(),
         computer: "computer_a".into(),
@@ -23,7 +23,7 @@ fn identity() -> InstanceIdentity {
     }
 }
 
-fn definition(mount: bool) -> agent_computer_definitions::ValidatedDefinition {
+pub(super) fn definition(mount: bool) -> agent_computer_definitions::ValidatedDefinition {
     let mut value = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet",
         "metadata":{"name":"test"},"spec":{"sandboxes":[{"name":"sandbox","runtimeClass":"gvisor",
             "image":format!("docker.io/library/busybox@sha256:{}", "a".repeat(64)),

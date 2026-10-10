@@ -1,0 +1,48 @@
+# Additional privileges for the disposable Browser component probe only.
+# Apply kubernetes-component.yaml first; no exec, Secret or wildcard permission.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ac-browser-attach
+  namespace: ac-kube-component
+rules:
+  - apiGroups: [""]
+    resources: [pods/attach]
+    verbs: [get, create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ac-browser-attach
+  namespace: ac-kube-component
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ac-browser-attach
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ac-browser-node
+rules:
+  - apiGroups: [""]
+    resources: [nodes]
+    resourceNames: [ac-component-node]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ac-browser-node
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ac-browser-node
+subjects:
+  - kind: ServiceAccount
+    name: ac-adapter
+    namespace: ac-kube-component

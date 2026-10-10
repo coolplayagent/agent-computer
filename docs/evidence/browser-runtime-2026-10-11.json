@@ -1,0 +1,3261 @@
+{
+  "schema_version": 1,
+  "component": "browser-pod-node-runtime",
+  "status": "component_contracts_passed",
+  "recorded_at": "2026-10-10T22:39:35.912043+00:00",
+  "base_commit": "09201ddce0d1e8a0ddc99e8ccb9a73931b569118",
+  "source_manifest_sha256": {
+    "Cargo.lock": "c69f25717d0e58e13250925bd93fb6b7dffddc4517621b956c0a26dce0440d5a",
+    "Cargo.toml": "cab66f83028d2831d13d7b7bc0fc772dadfe0ab91756001e34499ffedcc6f156",
+    "crates/browser/BUILD.bazel": "6fec214d6fa8c6a61e0722c505f832e13657e1766b9b0b77446aabace52634e2",
+    "crates/browser/Cargo.toml": "b7d200e581068fc4e3c954316483e07887030dcf84464f6334861b6cb2aafb1a",
+    "crates/browser/src/binding.rs": "334ef25a3f617338134bd632cd33e122f08c10d5da4a162ccfdd290f0dcde484",
+    "crates/browser/src/contracts.rs": "bf06cb759dff54253c5c5c5d7f2e545ee1cfcf29bc7f9ebd108ff112f6f09346",
+    "crates/browser/src/lib.rs": "ceae25147056c47c5e293b25f0f8acff257da796dbcb44d8c2fcbb89aee9806a",
+    "crates/browser/src/observation.rs": "251a05a783ec91506c05a783540f14f0f815d8343cb9de9f9a43264b8aa624bf",
+    "crates/browser/src/session.rs": "8a12c2645f31f237b68b493d06e96b27763819ef3abb81ee379f4270a6c5dbac",
+    "crates/browser/src/tests.rs": "8be922adffd6ca680c10da718de3a9bb6750e3fd5cfc4c92161cf057ff882768",
+    "crates/kubernetes/BUILD.bazel": "79de238305a3fd09cb64d64407cb3821d8b9d25684f4ca6bbb2e3dd30fff3204",
+    "crates/kubernetes/Cargo.toml": "00e2cf2628fe98c30e291e8ce92450d09d3d3bbb3e35f0cf6562319b3cf862f4",
+    "crates/kubernetes/src/attach/running.rs": "0d7ecaad89e53c229a204500fd5acdf62c188ebdd0d93ac39e394719d7ab30f5",
+    "crates/kubernetes/src/attach.rs": "e736c49a3131e12849f57fca6dfc18b236a01105c133144f923982c9c1a84eda",
+    "crates/kubernetes/src/browser.rs": "b60829117fa664e42f06990efbe73bfe578d95b30ac239122e89fd50a01149eb",
+    "crates/kubernetes/src/browser_attach.rs": "0e26e2b8158ca906bdf065cb68533ac73c0141efd0617130a0ec1cb1d82e7944",
+    "crates/kubernetes/src/candidate.rs": "26198406950882039a90583e18200a733978e835ae498e27b43e9571bfba2f09",
+    "crates/kubernetes/src/client.rs": "e82218558dccd0a8f5954323203ae4112557a7dd9e5b545106625106b6c6d006",
+    "crates/kubernetes/src/lib.rs": "b3ad28dd002e70bbbf388bbcf95c0719bb67a8452ed98f9630ee6ccb85afd0b1",
+    "crates/kubernetes/src/node.rs": "4193db93fe5817a26ffdaa930028fb5ac191794b53d9e67c8ce04fa4708e71d3",
+    "crates/kubernetes/src/plan.rs": "06e71ea37c5f627e4308bca65b85bb2754b40e30c43bc9d857e55d141137eff5",
+    "crates/kubernetes/src/startup_plan.rs": "eec5fc4f4378132b142aaaa2b9dada28e66854e77ac4698ffdc527eb9b572c29",
+    "crates/kubernetes/src/tests/attach/candidate.rs": "9894529e882bbbc429db73f1fa099656d3a404a346fa3243c3b85541fa61474e",
+    "crates/kubernetes/src/tests/attach/renewal.rs": "6d18ba9fdd8e847bbe40b5c38de63b10f01acba3895629ba726b9753f1007a03",
+    "crates/kubernetes/src/tests/attach/streaming.rs": "031f3871c54f07e600fa0811ff91762da11d82ecfb91189130526e50c186ebdd",
+    "crates/kubernetes/src/tests/attach.rs": "a7cd2371f0205260d1f9b647887bce50811efdb6e6ec14d19ae17642873e5212",
+    "crates/kubernetes/src/tests.rs": "f3382af21f7927363e0acf4836a99911bab52539459fe5e0e91047f7ecac7e3b",
+    "crates/kubernetes/src/verify.rs": "1b8838a1660d4e05f08f1bd092e5eae1a2f6dc502a65637ad2829742e1d61d12",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/candidate_live.rs": "c3214645c4db6b1846b430f350afca679761b9357e530cc928db471eae5a9e1a",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_image.py": "e71f5f1f42063121e9debd3a45338a901fb9ba8358c55bebd41165254a27a3ca",
+    "crates/kubernetes/tests/startup_live.rs": "65278bbfc18e9904e667f717a9615bda8f96086f311961b7e2835cc0bfa72653",
+    "crates/node/BUILD.bazel": "835a54dc9e181b2ada9a430c15c5367d474b6bef80dd91b6b186725fbc5e13d9",
+    "crates/node/Cargo.toml": "9a59e5cfb4f16d7cd9672cad12e6015a564fa0e032e181ebdc1c2b18026969aa",
+    "crates/node/src/browser.rs": "3fdd89ee4fb01334e79bd3cd3288a0c69095485c267bfd66d39f1a83d2ebdcc8",
+    "crates/node/src/command.rs": "36379db1cd89b4eef78f5635df9c585fbf8bf67a0ad55e1dacc6845189905c13",
+    "crates/node/src/drain/tests.rs": "cc5af31e8e6e49ce0699925bba423ebd3891090252c2e46c02f29c3e07589184",
+    "crates/node/src/drain.rs": "e2cddb707902ec15739aa625dd5382a6e0d3cde9b5697334ebb3fae7dada3391",
+    "crates/node/src/guard/tests.rs": "81c53cd7ced5a491f88c93d26ce4cca4087e1467d8ac4533a5c9b478e3ed1d0d",
+    "crates/node/src/guard.rs": "98fcf65b0f347fa1e41420c4b38f0539245af31ba3e9631ee760256575ff05a6",
+    "crates/node/src/journals.rs": "8688e0dde6425026457c05c6c822dfc26ef30862c9bd7725fe3899da072eb5a3",
+    "crates/node/src/lib.rs": "d66917b1ac93344c1aaadb0ae54f1dcbbf1581a699f99cd97baec403dc8be477",
+    "crates/node/src/observation.rs": "b6343c4e1f62a448ce7175b17b6df5714ed1fcc14c68f2d07fb8a8dc963dd30d",
+    "crates/node/src/runtime.rs": "c29306e8c6bd80223506b10d8fa4436bef901e4d0ceff536a850ec684b2d2810",
+    "crates/node/src/termination.rs": "e0789b93bbac569a202753aec1a797a891cb1f6324afd580e601af20505464ca",
+    "crates/node/tests/browser_image.py": "b9c448c6e6906d3c970e36a2450250528cc3b8d589012499dabdcef27ecbaf70",
+    "crates/node/tests/browser_live.rs": "c4d9774204c352f39ebdf365256ee8e5f3858f6ac5cda69ffac0f0d2120bf70c",
+    "deploy/testing/browser-component-rbac.yaml": "e40aaf1b8369cfa34fc7c8ccc0b5f34bf5a5d8a6b1be61fe556665e34a8a71d1",
+    "packages/browser-driver/src/worker.ts": "4c90d6abfc9f0a20f190afa1b1253ba1037a76723890214e269bd6b7a8cc78c3"
+  },
+  "tests": {
+    "bazel_targets": [
+      {
+        "target": "crates/browser/browser_contracts_test",
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "88100d1cb8b43d834e861ebc0a6181a4f282674e64eb3a20aff2433c9b9000db"
+      },
+      {
+        "target": "crates/cli/cli_contracts_test",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "8b579fdc2c6642addbe707a05a88c8cef61d3e5ac681387700de1bd7ae18ba6c"
+      },
+      {
+        "target": "crates/cli/remote_contracts_test",
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "0f9fb71c0f6bc442603bfc8f5503d36e5221309fbe698fe63384a6a7c3ea0142"
+      },
+      {
+        "target": "crates/cli/remote_service_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "d1d7f24e87a82b6fa4a197b7f93bf5c6d482a1c1171aacb302fc0402427627f5"
+      },
+      {
+        "target": "crates/core/core_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "46ee77c20f534dd5553533dfc8cad2f94fd9ba3e22c506879358c5afbec5dc86"
+      },
+      {
+        "target": "crates/csi/csi_contracts_test",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fba239b1728eee4fc1ca0b0cb86e9e0a2b5bf6b38a6623bf5763b9f63a73f8ea"
+      },
+      {
+        "target": "crates/definitions/definitions_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "bbfb55fb6285eedc0f7f04b9a00a5f8ef3273212a6071ebee120c428c3b04ac5"
+      },
+      {
+        "target": "crates/fence/fence_contracts_test",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "c278d7a6f52048f49e2d52ca6e8a5f725d2d7291d984f4e0718dfc1616fa4471"
+      },
+      {
+        "target": "crates/kubernetes/kubernetes_contracts_test",
+        "passed": 46,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "201566fee6b1e05eed73e85c87f8a856bcbd8675ded324d10282258db30dfccc"
+      },
+      {
+        "target": "crates/node/node_contracts_test",
+        "passed": 17,
+        "failed": 0,
+        "ignored": 3,
+        "language": "rust",
+        "log_sha256": "467a42d2f1ab44e94af310a4bbec557b34b95b14a922d05e261e92ee5381aec0"
+      },
+      {
+        "target": "crates/objects/objects_contracts_test",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "3d1ff00bc47c73358f2212f9245b7f5168a2701a138a2689324dd713a1664dbf"
+      },
+      {
+        "target": "crates/sandbox/sandbox_contracts_test",
+        "passed": 27,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "d4051ea45146b1ff73a5bb8efd7011fd45f97f3df5dcdf0e8dc5812bbe55ea25"
+      },
+      {
+        "target": "crates/server/server_contracts_test",
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "0e2a5cf40636fa97109d47aae5c3423fd800136f7818dbe4411d638489c4047c"
+      },
+      {
+        "target": "crates/server/server_unit_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "369d97c3404152250321d4e4c777c0cb85966153d0c5559066b8206f592a8812"
+      },
+      {
+        "target": "crates/storage/storage_contracts_test",
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "0ac59470e4efcb0f846a6ba041d671adb98eed4b8067f041bfabb46a3e620680"
+      },
+      {
+        "target": "crates/store/postgres_contracts_test",
+        "passed": 239,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "522b2465b18a0b2f6d573524bd8d44beaf44a935392e35a39ec1a09a0f3875d3"
+      },
+      {
+        "target": "crates/watchdog/watchdog_contracts_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "189e3e9e6a0c3ad629810327f6c5bcf7c2cbf6b25ff0003ea2defefe0d49862f"
+      },
+      {
+        "target": "crates/worker/worker_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "11af2472242161964adac27a0a32c7efe0d06983ef4257639175add04b152b58"
+      },
+      {
+        "target": "packages/browser-driver/bridge_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "da04a73dd4ac8a0452cbd4c51f97acb72cdf611d5e5dbd68aac7430f8042ea6f"
+      },
+      {
+        "target": "packages/browser-driver/unit_test",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "be7035de494056bd8375e7edd756a8725a855f774f8349b250fd3860d19bcad8"
+      }
+    ],
+    "rust_passed": 515,
+    "typescript_unit_passed": 19,
+    "default_ignored": 4,
+    "additional_privileged_node_tests_passed": 3,
+    "real_browser_kubernetes_cases": 4,
+    "full_bazel_log_sha256": "fbf89341b47ea4c9604b935717dee82d6d224abffda4a0414c6f860993985e45",
+    "clippy_all_workspace_all_targets_all_features_warnings_denied": "passed",
+    "clippy_log_sha256": "9e846a59dd0dad24ebf6e1a17bd58d08f020d1ed92b61d1f7df9b9674daab11e",
+    "fmt": "passed",
+    "browser_live_log_sha256": "c59b221fb05fc6ba50c3872dbd851c70f02c69f9cdc423c3b1f88f76fb3f6260",
+    "node_privileged_log_sha256": "74f50a78876e733a68ef889e24b47208ef6730359cd1a34dde58a18b25efd5dc"
+  },
+  "runtime_evidence": {
+    "results": {
+      "limitations": [
+        "fixture callback authority; no database admission or production App dispatch",
+        "private volatile profile; no encrypted checkpoint/restore",
+        "one disposable K3s node"
+      ],
+      "results": [
+        {
+          "action": {
+            "receipt": {
+              "action_id": "new_page",
+              "app_generation": 1,
+              "app_instance_id": "browser_32088_1474543_normal",
+              "control_epoch": 1,
+              "input_digest": "sha256:a0b997fcca8553b359cfe077726ec55b67143f359714aaa352e14d87a7995b27",
+              "outcome": "delivered",
+              "page_id": "page_48a6218f0ede4e0abf7fdc3c21ef6fbd"
+            },
+            "recorded": true
+          },
+          "arm": {
+            "armed": {
+              "armed_boottime_ms": 1478088,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-HXwVuG",
+                "inode": 844980,
+                "intent_digest": "sha256:41e0788c1aa461ecc6c207f020d2ff205e1b7055d59eed8b21a4d64233262b37"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19282,
+                "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                "deadline_boottime_ms": 1501367,
+                "execution_id": "browser_32088_1474543_normal",
+                "version": 1
+              },
+              "version": 1
+            },
+            "backup_armed": {
+              "armed_boottime_ms": 1478112,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-AgMQor",
+                "inode": 844983,
+                "intent_digest": "sha256:d6dd775c0bf4516b1f73e55a67e317f7c155595fa680bc165614339b6345697e"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19282,
+                "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                "deadline_boottime_ms": 1501367,
+                "execution_id": "browser_32088_1474543_normal",
+                "version": 1
+              },
+              "version": 1
+            },
+            "observed_boottime_ms": 1478128,
+            "reaper": {
+              "cgroup_device": 28,
+              "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+              "journals": [
+                {
+                  "device": 64769,
+                  "id": "journal-HXwVuG",
+                  "inode": 844980,
+                  "intent_digest": "sha256:41e0788c1aa461ecc6c207f020d2ff205e1b7055d59eed8b21a4d64233262b37"
+                },
+                {
+                  "device": 64769,
+                  "id": "journal-AgMQor",
+                  "inode": 844983,
+                  "intent_digest": "sha256:d6dd775c0bf4516b1f73e55a67e317f7c155595fa680bc165614339b6345697e"
+                }
+              ],
+              "nonce": "a6119ac983e94b840d182ffb34638874934afadc75560eba22098229ca4aa475",
+              "observed_boottime_ms": 1478126,
+              "pid": 4267,
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19282,
+                "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                "deadline_boottime_ms": 1501367,
+                "execution_id": "browser_32088_1474543_normal",
+                "version": 1
+              },
+              "spool_device": 64769,
+              "spool_inode": 825343,
+              "version": 1
+            },
+            "runtime": {
+              "binding": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "runtime_ms": 60000,
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                },
+                "viewport": {
+                  "height": 600,
+                  "width": 800
+                }
+              },
+              "cgroup_inode": 19282,
+              "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+              "identity": {
+                "container_id": "bb324a6f8396564476cac63c7642cbcedd7080843cea9600695a7d72cd013a8c",
+                "namespace": "ac-kube-component",
+                "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                "node": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "name": "ac-component-node",
+                  "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                },
+                "pod_name": "ac-33c4fad00e816323a37b96d8d391331f1e0d5afbd3241d74775b",
+                "pod_uid": "1c020736-a728-41e8-89cd-2302db0f4b7a"
+              },
+              "kind": "browser",
+              "profile": {
+                "device": 45,
+                "filesystem": 16914836,
+                "inode": 2,
+                "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/volume-subpaths/browser-profile/sandbox/2"
+              },
+              "runtime_processes": [
+                {
+                  "pid": 32227,
+                  "role": "gofer",
+                  "start_ticks": 147501
+                },
+                {
+                  "pid": 32229,
+                  "role": "sentry",
+                  "start_ticks": 147501
+                },
+                {
+                  "pid": 32492,
+                  "role": "gofer",
+                  "start_ticks": 147598
+                }
+              ],
+              "sandbox_id": "c7443b9c84e8c152c6e279b52e81c77b05832093d7a4bbbc024d7f64a40e0c88",
+              "sentry_pid": 32229,
+              "sentry_start_ticks": 147501
+            },
+            "version": 2,
+            "watchdog_pids": [
+              32730,
+              32731
+            ]
+          },
+          "callbacks": [
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "begin": {
+                "action": {
+                  "kind": "create_page"
+                },
+                "action_id": "new_page",
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "control_epoch": 1,
+                "input_digest": "sha256:a0b997fcca8553b359cfe077726ec55b67143f359714aaa352e14d87a7995b27",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "complete": {
+                "action_id": "new_page",
+                "app_generation": 1,
+                "app_instance_id": "browser_32088_1474543_normal",
+                "control_epoch": 1,
+                "input_digest": "sha256:a0b997fcca8553b359cfe077726ec55b67143f359714aaa352e14d87a7995b27",
+                "outcome": "delivered",
+                "page_id": "page_48a6218f0ede4e0abf7fdc3c21ef6fbd"
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1474543_normal",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            }
+          ],
+          "case": "normal",
+          "close": {
+            "driver_state": "closed",
+            "physical_termination": false
+          },
+          "launch": {
+            "browser_version": "156.0.8078.4",
+            "driver_state": "open"
+          },
+          "launch_ok": true,
+          "observation": {
+            "scope": {
+              "app_generation": 1,
+              "app_instance_id": "browser_32088_1474543_normal",
+              "computer_generation": 1,
+              "computer_id": "fixture_computer",
+              "organization_id": "fixture_org",
+              "profile_owner_id": "fixture_owner"
+            },
+            "screenshot_sha256": "sha256:a4f2105ecdefec94c5fe749c1dc5f2fb9dd74b9832cba0afcd3434f38c0380d0",
+            "viewport": {
+              "height": 600,
+              "width": 800
+            }
+          },
+          "physical_stop": {
+            "arm": {
+              "armed": {
+                "armed_boottime_ms": 1478088,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-HXwVuG",
+                  "inode": 844980,
+                  "intent_digest": "sha256:41e0788c1aa461ecc6c207f020d2ff205e1b7055d59eed8b21a4d64233262b37"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19282,
+                  "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                  "deadline_boottime_ms": 1501367,
+                  "execution_id": "browser_32088_1474543_normal",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "backup_armed": {
+                "armed_boottime_ms": 1478112,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-AgMQor",
+                  "inode": 844983,
+                  "intent_digest": "sha256:d6dd775c0bf4516b1f73e55a67e317f7c155595fa680bc165614339b6345697e"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19282,
+                  "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                  "deadline_boottime_ms": 1501367,
+                  "execution_id": "browser_32088_1474543_normal",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "observed_boottime_ms": 1478128,
+              "reaper": {
+                "cgroup_device": 28,
+                "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+                "journals": [
+                  {
+                    "device": 64769,
+                    "id": "journal-HXwVuG",
+                    "inode": 844980,
+                    "intent_digest": "sha256:41e0788c1aa461ecc6c207f020d2ff205e1b7055d59eed8b21a4d64233262b37"
+                  },
+                  {
+                    "device": 64769,
+                    "id": "journal-AgMQor",
+                    "inode": 844983,
+                    "intent_digest": "sha256:d6dd775c0bf4516b1f73e55a67e317f7c155595fa680bc165614339b6345697e"
+                  }
+                ],
+                "nonce": "a6119ac983e94b840d182ffb34638874934afadc75560eba22098229ca4aa475",
+                "observed_boottime_ms": 1478126,
+                "pid": 4267,
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19282,
+                  "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                  "deadline_boottime_ms": 1501367,
+                  "execution_id": "browser_32088_1474543_normal",
+                  "version": 1
+                },
+                "spool_device": 64769,
+                "spool_inode": 825343,
+                "version": 1
+              },
+              "runtime": {
+                "binding": {
+                  "actor": {
+                    "connection_session_id": "fixture_connection",
+                    "principal_id": "fixture_owner"
+                  },
+                  "runtime_ms": 60000,
+                  "scope": {
+                    "app_generation": 1,
+                    "app_instance_id": "browser_32088_1474543_normal",
+                    "computer_generation": 1,
+                    "computer_id": "fixture_computer",
+                    "organization_id": "fixture_org",
+                    "profile_owner_id": "fixture_owner"
+                  },
+                  "viewport": {
+                    "height": 600,
+                    "width": 800
+                  }
+                },
+                "cgroup_inode": 19282,
+                "cgroup_path": "kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+                "identity": {
+                  "container_id": "bb324a6f8396564476cac63c7642cbcedd7080843cea9600695a7d72cd013a8c",
+                  "namespace": "ac-kube-component",
+                  "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                  "node": {
+                    "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                    "name": "ac-component-node",
+                    "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                  },
+                  "pod_name": "ac-33c4fad00e816323a37b96d8d391331f1e0d5afbd3241d74775b",
+                  "pod_uid": "1c020736-a728-41e8-89cd-2302db0f4b7a"
+                },
+                "kind": "browser",
+                "profile": {
+                  "device": 45,
+                  "filesystem": 16914836,
+                  "inode": 2,
+                  "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/volume-subpaths/browser-profile/sandbox/2"
+                },
+                "runtime_processes": [
+                  {
+                    "pid": 32227,
+                    "role": "gofer",
+                    "start_ticks": 147501
+                  },
+                  {
+                    "pid": 32229,
+                    "role": "sentry",
+                    "start_ticks": 147501
+                  },
+                  {
+                    "pid": 32492,
+                    "role": "gofer",
+                    "start_ticks": 147598
+                  }
+                ],
+                "sandbox_id": "c7443b9c84e8c152c6e279b52e81c77b05832093d7a4bbbc024d7f64a40e0c88",
+                "sentry_pid": 32229,
+                "sentry_start_ticks": 147501
+              },
+              "version": 2,
+              "watchdog_pids": [
+                32730,
+                32731
+              ]
+            },
+            "domain": "empty",
+            "kind": "browser_process_stop",
+            "observed_boottime_ms": 1479216,
+            "version": 1
+          }
+        },
+        {
+          "action": {
+            "receipt": {
+              "action_id": "new_page",
+              "app_generation": 1,
+              "app_instance_id": "browser_32088_1481360_completion-lost",
+              "control_epoch": 1,
+              "input_digest": "sha256:d24595721641385825312901a0d8eb71025c65ad60df8539948093d43478cf43",
+              "outcome": "unknown",
+              "page_id": "page_5e49b03acb984facaf31e91a4f3e0ee2"
+            },
+            "recorded": false
+          },
+          "arm": {
+            "armed": {
+              "armed_boottime_ms": 1485147,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-LrRfGK",
+                "inode": 844824,
+                "intent_digest": "sha256:5e9347818b0776651d72eea2a3c7fda38c4250f3da63f8cf8f496ddc44366160"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19598,
+                "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                "deadline_boottime_ms": 1508375,
+                "execution_id": "browser_32088_1481360_completion-lost",
+                "version": 1
+              },
+              "version": 1
+            },
+            "backup_armed": {
+              "armed_boottime_ms": 1485173,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-tycguO",
+                "inode": 844864,
+                "intent_digest": "sha256:bdd5e17e003949dbf6735a2cef46602d0eedd5d3a16625b50bfd5e44fbc9872b"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19598,
+                "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                "deadline_boottime_ms": 1508375,
+                "execution_id": "browser_32088_1481360_completion-lost",
+                "version": 1
+              },
+              "version": 1
+            },
+            "observed_boottime_ms": 1485188,
+            "reaper": {
+              "cgroup_device": 28,
+              "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+              "journals": [
+                {
+                  "device": 64769,
+                  "id": "journal-LrRfGK",
+                  "inode": 844824,
+                  "intent_digest": "sha256:5e9347818b0776651d72eea2a3c7fda38c4250f3da63f8cf8f496ddc44366160"
+                },
+                {
+                  "device": 64769,
+                  "id": "journal-tycguO",
+                  "inode": 844864,
+                  "intent_digest": "sha256:bdd5e17e003949dbf6735a2cef46602d0eedd5d3a16625b50bfd5e44fbc9872b"
+                }
+              ],
+              "nonce": "d4aa7e3080f1bd02d11152d8d200bd3aabfd329ca4115f30106c63759443c596",
+              "observed_boottime_ms": 1485187,
+              "pid": 4267,
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19598,
+                "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                "deadline_boottime_ms": 1508375,
+                "execution_id": "browser_32088_1481360_completion-lost",
+                "version": 1
+              },
+              "spool_device": 64769,
+              "spool_inode": 825343,
+              "version": 1
+            },
+            "runtime": {
+              "binding": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "runtime_ms": 60000,
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                },
+                "viewport": {
+                  "height": 600,
+                  "width": 800
+                }
+              },
+              "cgroup_inode": 19598,
+              "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+              "identity": {
+                "container_id": "1be9179421c539fe6b0d94cb9700d1351edc30ad83b20386d6e45a8de1ea2db2",
+                "namespace": "ac-kube-component",
+                "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                "node": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "name": "ac-component-node",
+                  "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                },
+                "pod_name": "ac-24f6cea08e33f5077b4738123ad74fce8eb19fc5b677e00229e1",
+                "pod_uid": "0b675241-857b-480a-a130-8532aee3c266"
+              },
+              "kind": "browser",
+              "profile": {
+                "device": 47,
+                "filesystem": 16914836,
+                "inode": 2,
+                "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/volume-subpaths/browser-profile/sandbox/2"
+              },
+              "runtime_processes": [
+                {
+                  "pid": 33208,
+                  "role": "gofer",
+                  "start_ticks": 148184
+                },
+                {
+                  "pid": 33209,
+                  "role": "sentry",
+                  "start_ticks": 148184
+                },
+                {
+                  "pid": 33488,
+                  "role": "gofer",
+                  "start_ticks": 148302
+                }
+              ],
+              "sandbox_id": "9d4e3c393177c3aa9513350ebc7d2a2cd3dda802aff3126d84b1d82eb820963e",
+              "sentry_pid": 33209,
+              "sentry_start_ticks": 148184
+            },
+            "version": 2,
+            "watchdog_pids": [
+              33721,
+              33722
+            ]
+          },
+          "callbacks": [
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "begin": {
+                "action": {
+                  "kind": "create_page"
+                },
+                "action_id": "new_page",
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "control_epoch": 1,
+                "input_digest": "sha256:d24595721641385825312901a0d8eb71025c65ad60df8539948093d43478cf43",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "complete": {
+                "action_id": "new_page",
+                "app_generation": 1,
+                "app_instance_id": "browser_32088_1481360_completion-lost",
+                "control_epoch": 1,
+                "input_digest": "sha256:d24595721641385825312901a0d8eb71025c65ad60df8539948093d43478cf43",
+                "outcome": "delivered",
+                "page_id": "page_5e49b03acb984facaf31e91a4f3e0ee2"
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1481360_completion-lost",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            }
+          ],
+          "case": "completion-lost",
+          "close": {
+            "driver_state": "closed",
+            "physical_termination": false
+          },
+          "launch": {
+            "browser_version": "156.0.8078.4",
+            "driver_state": "open"
+          },
+          "launch_ok": true,
+          "observation": {
+            "scope": {
+              "app_generation": 1,
+              "app_instance_id": "browser_32088_1481360_completion-lost",
+              "computer_generation": 1,
+              "computer_id": "fixture_computer",
+              "organization_id": "fixture_org",
+              "profile_owner_id": "fixture_owner"
+            },
+            "screenshot_sha256": "sha256:a4f2105ecdefec94c5fe749c1dc5f2fb9dd74b9832cba0afcd3434f38c0380d0",
+            "viewport": {
+              "height": 600,
+              "width": 800
+            }
+          },
+          "physical_stop": {
+            "arm": {
+              "armed": {
+                "armed_boottime_ms": 1485147,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-LrRfGK",
+                  "inode": 844824,
+                  "intent_digest": "sha256:5e9347818b0776651d72eea2a3c7fda38c4250f3da63f8cf8f496ddc44366160"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19598,
+                  "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                  "deadline_boottime_ms": 1508375,
+                  "execution_id": "browser_32088_1481360_completion-lost",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "backup_armed": {
+                "armed_boottime_ms": 1485173,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-tycguO",
+                  "inode": 844864,
+                  "intent_digest": "sha256:bdd5e17e003949dbf6735a2cef46602d0eedd5d3a16625b50bfd5e44fbc9872b"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19598,
+                  "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                  "deadline_boottime_ms": 1508375,
+                  "execution_id": "browser_32088_1481360_completion-lost",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "observed_boottime_ms": 1485188,
+              "reaper": {
+                "cgroup_device": 28,
+                "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+                "journals": [
+                  {
+                    "device": 64769,
+                    "id": "journal-LrRfGK",
+                    "inode": 844824,
+                    "intent_digest": "sha256:5e9347818b0776651d72eea2a3c7fda38c4250f3da63f8cf8f496ddc44366160"
+                  },
+                  {
+                    "device": 64769,
+                    "id": "journal-tycguO",
+                    "inode": 844864,
+                    "intent_digest": "sha256:bdd5e17e003949dbf6735a2cef46602d0eedd5d3a16625b50bfd5e44fbc9872b"
+                  }
+                ],
+                "nonce": "d4aa7e3080f1bd02d11152d8d200bd3aabfd329ca4115f30106c63759443c596",
+                "observed_boottime_ms": 1485187,
+                "pid": 4267,
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19598,
+                  "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                  "deadline_boottime_ms": 1508375,
+                  "execution_id": "browser_32088_1481360_completion-lost",
+                  "version": 1
+                },
+                "spool_device": 64769,
+                "spool_inode": 825343,
+                "version": 1
+              },
+              "runtime": {
+                "binding": {
+                  "actor": {
+                    "connection_session_id": "fixture_connection",
+                    "principal_id": "fixture_owner"
+                  },
+                  "runtime_ms": 60000,
+                  "scope": {
+                    "app_generation": 1,
+                    "app_instance_id": "browser_32088_1481360_completion-lost",
+                    "computer_generation": 1,
+                    "computer_id": "fixture_computer",
+                    "organization_id": "fixture_org",
+                    "profile_owner_id": "fixture_owner"
+                  },
+                  "viewport": {
+                    "height": 600,
+                    "width": 800
+                  }
+                },
+                "cgroup_inode": 19598,
+                "cgroup_path": "kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+                "identity": {
+                  "container_id": "1be9179421c539fe6b0d94cb9700d1351edc30ad83b20386d6e45a8de1ea2db2",
+                  "namespace": "ac-kube-component",
+                  "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                  "node": {
+                    "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                    "name": "ac-component-node",
+                    "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                  },
+                  "pod_name": "ac-24f6cea08e33f5077b4738123ad74fce8eb19fc5b677e00229e1",
+                  "pod_uid": "0b675241-857b-480a-a130-8532aee3c266"
+                },
+                "kind": "browser",
+                "profile": {
+                  "device": 47,
+                  "filesystem": 16914836,
+                  "inode": 2,
+                  "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/volume-subpaths/browser-profile/sandbox/2"
+                },
+                "runtime_processes": [
+                  {
+                    "pid": 33208,
+                    "role": "gofer",
+                    "start_ticks": 148184
+                  },
+                  {
+                    "pid": 33209,
+                    "role": "sentry",
+                    "start_ticks": 148184
+                  },
+                  {
+                    "pid": 33488,
+                    "role": "gofer",
+                    "start_ticks": 148302
+                  }
+                ],
+                "sandbox_id": "9d4e3c393177c3aa9513350ebc7d2a2cd3dda802aff3126d84b1d82eb820963e",
+                "sentry_pid": 33209,
+                "sentry_start_ticks": 148184
+              },
+              "version": 2,
+              "watchdog_pids": [
+                33721,
+                33722
+              ]
+            },
+            "domain": "empty",
+            "kind": "browser_process_stop",
+            "observed_boottime_ms": 1486232,
+            "version": 1
+          }
+        },
+        {
+          "arm": {
+            "armed": {
+              "armed_boottime_ms": 1492100,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-Oc86gx",
+                "inode": 844856,
+                "intent_digest": "sha256:0877eaf3d7b11c0455dd389ece1991ae762b943a3f3b2aee0e4ed2ab418fdd88"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19914,
+                "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                "deadline_boottime_ms": 1515388,
+                "execution_id": "browser_32088_1488325_launch-denied",
+                "version": 1
+              },
+              "version": 1
+            },
+            "backup_armed": {
+              "armed_boottime_ms": 1492127,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-CU6ETk",
+                "inode": 844945,
+                "intent_digest": "sha256:f9c57d5fbfce81aa724e0561ec1c9be79448ad70a7c1a05a7dd9fe9aea3fde47"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19914,
+                "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                "deadline_boottime_ms": 1515388,
+                "execution_id": "browser_32088_1488325_launch-denied",
+                "version": 1
+              },
+              "version": 1
+            },
+            "observed_boottime_ms": 1492150,
+            "reaper": {
+              "cgroup_device": 28,
+              "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+              "journals": [
+                {
+                  "device": 64769,
+                  "id": "journal-Oc86gx",
+                  "inode": 844856,
+                  "intent_digest": "sha256:0877eaf3d7b11c0455dd389ece1991ae762b943a3f3b2aee0e4ed2ab418fdd88"
+                },
+                {
+                  "device": 64769,
+                  "id": "journal-CU6ETk",
+                  "inode": 844945,
+                  "intent_digest": "sha256:f9c57d5fbfce81aa724e0561ec1c9be79448ad70a7c1a05a7dd9fe9aea3fde47"
+                }
+              ],
+              "nonce": "6575e2db726437fb019a905362c0bb32ac4b67475333ea045743fedaed2c5ad3",
+              "observed_boottime_ms": 1492148,
+              "pid": 4267,
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 19914,
+                "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                "deadline_boottime_ms": 1515388,
+                "execution_id": "browser_32088_1488325_launch-denied",
+                "version": 1
+              },
+              "spool_device": 64769,
+              "spool_inode": 825343,
+              "version": 1
+            },
+            "runtime": {
+              "binding": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "runtime_ms": 60000,
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1488325_launch-denied",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                },
+                "viewport": {
+                  "height": 600,
+                  "width": 800
+                }
+              },
+              "cgroup_inode": 19914,
+              "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+              "identity": {
+                "container_id": "ebf6d32d6250c262d1a49b78a63535007b2d9e96fff647bf94f87b3662fc29eb",
+                "namespace": "ac-kube-component",
+                "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                "node": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "name": "ac-component-node",
+                  "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                },
+                "pod_name": "ac-a184fc0bc1e63e6638ec1c8ce4f7a0a1fd8bd5a4598115cdd98c",
+                "pod_uid": "f548fa66-6afe-479c-b81e-5db88c343e8d"
+              },
+              "kind": "browser",
+              "profile": {
+                "device": 45,
+                "filesystem": 16914836,
+                "inode": 2,
+                "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/volume-subpaths/browser-profile/sandbox/2"
+              },
+              "runtime_processes": [
+                {
+                  "pid": 34174,
+                  "role": "gofer",
+                  "start_ticks": 148876
+                },
+                {
+                  "pid": 34175,
+                  "role": "sentry",
+                  "start_ticks": 148876
+                },
+                {
+                  "pid": 34446,
+                  "role": "gofer",
+                  "start_ticks": 149005
+                }
+              ],
+              "sandbox_id": "da307243fe354fe228eff713c0a5912ff6500eec094504c1c07dbde3fae6e9db",
+              "sentry_pid": 34175,
+              "sentry_start_ticks": 148876
+            },
+            "version": 2,
+            "watchdog_pids": [
+              34679,
+              34680
+            ]
+          },
+          "callbacks": [
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1488325_launch-denied",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            }
+          ],
+          "case": "launch-denied",
+          "launch": {
+            "code": "authority_unavailable"
+          },
+          "launch_ok": false,
+          "physical_stop": {
+            "arm": {
+              "armed": {
+                "armed_boottime_ms": 1492100,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-Oc86gx",
+                  "inode": 844856,
+                  "intent_digest": "sha256:0877eaf3d7b11c0455dd389ece1991ae762b943a3f3b2aee0e4ed2ab418fdd88"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19914,
+                  "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                  "deadline_boottime_ms": 1515388,
+                  "execution_id": "browser_32088_1488325_launch-denied",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "backup_armed": {
+                "armed_boottime_ms": 1492127,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-CU6ETk",
+                  "inode": 844945,
+                  "intent_digest": "sha256:f9c57d5fbfce81aa724e0561ec1c9be79448ad70a7c1a05a7dd9fe9aea3fde47"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19914,
+                  "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                  "deadline_boottime_ms": 1515388,
+                  "execution_id": "browser_32088_1488325_launch-denied",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "observed_boottime_ms": 1492150,
+              "reaper": {
+                "cgroup_device": 28,
+                "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+                "journals": [
+                  {
+                    "device": 64769,
+                    "id": "journal-Oc86gx",
+                    "inode": 844856,
+                    "intent_digest": "sha256:0877eaf3d7b11c0455dd389ece1991ae762b943a3f3b2aee0e4ed2ab418fdd88"
+                  },
+                  {
+                    "device": 64769,
+                    "id": "journal-CU6ETk",
+                    "inode": 844945,
+                    "intent_digest": "sha256:f9c57d5fbfce81aa724e0561ec1c9be79448ad70a7c1a05a7dd9fe9aea3fde47"
+                  }
+                ],
+                "nonce": "6575e2db726437fb019a905362c0bb32ac4b67475333ea045743fedaed2c5ad3",
+                "observed_boottime_ms": 1492148,
+                "pid": 4267,
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 19914,
+                  "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                  "deadline_boottime_ms": 1515388,
+                  "execution_id": "browser_32088_1488325_launch-denied",
+                  "version": 1
+                },
+                "spool_device": 64769,
+                "spool_inode": 825343,
+                "version": 1
+              },
+              "runtime": {
+                "binding": {
+                  "actor": {
+                    "connection_session_id": "fixture_connection",
+                    "principal_id": "fixture_owner"
+                  },
+                  "runtime_ms": 60000,
+                  "scope": {
+                    "app_generation": 1,
+                    "app_instance_id": "browser_32088_1488325_launch-denied",
+                    "computer_generation": 1,
+                    "computer_id": "fixture_computer",
+                    "organization_id": "fixture_org",
+                    "profile_owner_id": "fixture_owner"
+                  },
+                  "viewport": {
+                    "height": 600,
+                    "width": 800
+                  }
+                },
+                "cgroup_inode": 19914,
+                "cgroup_path": "kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+                "identity": {
+                  "container_id": "ebf6d32d6250c262d1a49b78a63535007b2d9e96fff647bf94f87b3662fc29eb",
+                  "namespace": "ac-kube-component",
+                  "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                  "node": {
+                    "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                    "name": "ac-component-node",
+                    "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                  },
+                  "pod_name": "ac-a184fc0bc1e63e6638ec1c8ce4f7a0a1fd8bd5a4598115cdd98c",
+                  "pod_uid": "f548fa66-6afe-479c-b81e-5db88c343e8d"
+                },
+                "kind": "browser",
+                "profile": {
+                  "device": 45,
+                  "filesystem": 16914836,
+                  "inode": 2,
+                  "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/volume-subpaths/browser-profile/sandbox/2"
+                },
+                "runtime_processes": [
+                  {
+                    "pid": 34174,
+                    "role": "gofer",
+                    "start_ticks": 148876
+                  },
+                  {
+                    "pid": 34175,
+                    "role": "sentry",
+                    "start_ticks": 148876
+                  },
+                  {
+                    "pid": 34446,
+                    "role": "gofer",
+                    "start_ticks": 149005
+                  }
+                ],
+                "sandbox_id": "da307243fe354fe228eff713c0a5912ff6500eec094504c1c07dbde3fae6e9db",
+                "sentry_pid": 34175,
+                "sentry_start_ticks": 148876
+              },
+              "version": 2,
+              "watchdog_pids": [
+                34679,
+                34680
+              ]
+            },
+            "domain": "empty",
+            "kind": "browser_process_stop",
+            "observed_boottime_ms": 1492213,
+            "version": 1
+          }
+        },
+        {
+          "action": {
+            "receipt": {
+              "action_id": "new_page",
+              "app_generation": 1,
+              "app_instance_id": "browser_32088_1494341_deadline",
+              "control_epoch": 1,
+              "input_digest": "sha256:1e48c1c75feb0841b4f18b7abef234fc39e20d6954b08d527a1e99c16f8d564e",
+              "outcome": "delivered",
+              "page_id": "page_8703095cb6434d9fa742de2a85f154bb"
+            },
+            "recorded": true
+          },
+          "arm": {
+            "armed": {
+              "armed_boottime_ms": 1498214,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-aXrwol",
+                "inode": 844887,
+                "intent_digest": "sha256:c6d416ad9a3bf14fbf24a7fd320088163556436ad0a4c185c6c30afa477fca85"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 20230,
+                "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                "deadline_boottime_ms": 1521422,
+                "execution_id": "browser_32088_1494341_deadline",
+                "version": 1
+              },
+              "version": 1
+            },
+            "backup_armed": {
+              "armed_boottime_ms": 1498243,
+              "cgroup_device": 28,
+              "event": "armed",
+              "journal": {
+                "device": 64769,
+                "id": "journal-1pk99J",
+                "inode": 844942,
+                "intent_digest": "sha256:94963132af56cb3d1a29b8ad84965d4ba8e2e269849390b136cfab30a1878b24"
+              },
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 20230,
+                "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                "deadline_boottime_ms": 1521422,
+                "execution_id": "browser_32088_1494341_deadline",
+                "version": 1
+              },
+              "version": 1
+            },
+            "observed_boottime_ms": 1498254,
+            "reaper": {
+              "cgroup_device": 28,
+              "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+              "journals": [
+                {
+                  "device": 64769,
+                  "id": "journal-aXrwol",
+                  "inode": 844887,
+                  "intent_digest": "sha256:c6d416ad9a3bf14fbf24a7fd320088163556436ad0a4c185c6c30afa477fca85"
+                },
+                {
+                  "device": 64769,
+                  "id": "journal-1pk99J",
+                  "inode": 844942,
+                  "intent_digest": "sha256:94963132af56cb3d1a29b8ad84965d4ba8e2e269849390b136cfab30a1878b24"
+                }
+              ],
+              "nonce": "e3c701e4ba4d569486107f7469297b8c8f27ed6f74cdeb0fc584d3be30a73690",
+              "observed_boottime_ms": 1498252,
+              "pid": 4267,
+              "request": {
+                "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                "cgroup_inode": 20230,
+                "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                "deadline_boottime_ms": 1521422,
+                "execution_id": "browser_32088_1494341_deadline",
+                "version": 1
+              },
+              "spool_device": 64769,
+              "spool_inode": 825343,
+              "version": 1
+            },
+            "runtime": {
+              "binding": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "runtime_ms": 60000,
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                },
+                "viewport": {
+                  "height": 600,
+                  "width": 800
+                }
+              },
+              "cgroup_inode": 20230,
+              "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+              "identity": {
+                "container_id": "e232678c3a7542fc4e6f171abca21b823233eefbd7aefbfdbafdeb22ca62e61a",
+                "namespace": "ac-kube-component",
+                "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                "node": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "name": "ac-component-node",
+                  "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                },
+                "pod_name": "ac-f0e881cc5c07f3178e0605a2370c4e72785360c8ac5690979d5e",
+                "pod_uid": "aa8ef827-93b0-4771-b11c-35e0b8454085"
+              },
+              "kind": "browser",
+              "profile": {
+                "device": 47,
+                "filesystem": 16914836,
+                "inode": 2,
+                "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/volume-subpaths/browser-profile/sandbox/2"
+              },
+              "runtime_processes": [
+                {
+                  "pid": 35288,
+                  "role": "gofer",
+                  "start_ticks": 149481
+                },
+                {
+                  "pid": 35289,
+                  "role": "sentry",
+                  "start_ticks": 149481
+                },
+                {
+                  "pid": 35563,
+                  "role": "gofer",
+                  "start_ticks": 149606
+                }
+              ],
+              "sandbox_id": "1745f577d4c0e5a0bd8def5d56d396fc38dee29b86e690a265fa26b11a91178e",
+              "sentry_pid": 35289,
+              "sentry_start_ticks": 149481
+            },
+            "version": 2,
+            "watchdog_pids": [
+              35736,
+              35737
+            ]
+          },
+          "callbacks": [
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "observe",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "begin": {
+                "action": {
+                  "kind": "create_page"
+                },
+                "action_id": "new_page",
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "control_epoch": 1,
+                "input_digest": "sha256:1e48c1c75feb0841b4f18b7abef234fc39e20d6954b08d527a1e99c16f8d564e",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            },
+            {
+              "complete": {
+                "action_id": "new_page",
+                "app_generation": 1,
+                "app_instance_id": "browser_32088_1494341_deadline",
+                "control_epoch": 1,
+                "input_digest": "sha256:1e48c1c75feb0841b4f18b7abef234fc39e20d6954b08d527a1e99c16f8d564e",
+                "outcome": "delivered",
+                "page_id": "page_8703095cb6434d9fa742de2a85f154bb"
+              }
+            },
+            {
+              "authorize": {
+                "actor": {
+                  "connection_session_id": "fixture_connection",
+                  "principal_id": "fixture_owner"
+                },
+                "permission": "control",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "browser_32088_1494341_deadline",
+                  "computer_generation": 1,
+                  "computer_id": "fixture_computer",
+                  "organization_id": "fixture_org",
+                  "profile_owner_id": "fixture_owner"
+                }
+              }
+            }
+          ],
+          "case": "deadline",
+          "launch": {
+            "browser_version": "156.0.8078.4",
+            "driver_state": "open"
+          },
+          "launch_ok": true,
+          "observation": {
+            "scope": {
+              "app_generation": 1,
+              "app_instance_id": "browser_32088_1494341_deadline",
+              "computer_generation": 1,
+              "computer_id": "fixture_computer",
+              "organization_id": "fixture_org",
+              "profile_owner_id": "fixture_owner"
+            },
+            "screenshot_sha256": "sha256:a4f2105ecdefec94c5fe749c1dc5f2fb9dd74b9832cba0afcd3434f38c0380d0",
+            "viewport": {
+              "height": 600,
+              "width": 800
+            }
+          },
+          "physical_stop": {
+            "arm": {
+              "armed": {
+                "armed_boottime_ms": 1498214,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-aXrwol",
+                  "inode": 844887,
+                  "intent_digest": "sha256:c6d416ad9a3bf14fbf24a7fd320088163556436ad0a4c185c6c30afa477fca85"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 20230,
+                  "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                  "deadline_boottime_ms": 1521422,
+                  "execution_id": "browser_32088_1494341_deadline",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "backup_armed": {
+                "armed_boottime_ms": 1498243,
+                "cgroup_device": 28,
+                "event": "armed",
+                "journal": {
+                  "device": 64769,
+                  "id": "journal-1pk99J",
+                  "inode": 844942,
+                  "intent_digest": "sha256:94963132af56cb3d1a29b8ad84965d4ba8e2e269849390b136cfab30a1878b24"
+                },
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 20230,
+                  "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                  "deadline_boottime_ms": 1521422,
+                  "execution_id": "browser_32088_1494341_deadline",
+                  "version": 1
+                },
+                "version": 1
+              },
+              "observed_boottime_ms": 1498254,
+              "reaper": {
+                "cgroup_device": 28,
+                "instance": "496edafbc88d6e36f03b464c647278e06bc38747f4a0ff8ccef876ff217a4e6c",
+                "journals": [
+                  {
+                    "device": 64769,
+                    "id": "journal-aXrwol",
+                    "inode": 844887,
+                    "intent_digest": "sha256:c6d416ad9a3bf14fbf24a7fd320088163556436ad0a4c185c6c30afa477fca85"
+                  },
+                  {
+                    "device": 64769,
+                    "id": "journal-1pk99J",
+                    "inode": 844942,
+                    "intent_digest": "sha256:94963132af56cb3d1a29b8ad84965d4ba8e2e269849390b136cfab30a1878b24"
+                  }
+                ],
+                "nonce": "e3c701e4ba4d569486107f7469297b8c8f27ed6f74cdeb0fc584d3be30a73690",
+                "observed_boottime_ms": 1498252,
+                "pid": 4267,
+                "request": {
+                  "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                  "cgroup_inode": 20230,
+                  "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                  "deadline_boottime_ms": 1521422,
+                  "execution_id": "browser_32088_1494341_deadline",
+                  "version": 1
+                },
+                "spool_device": 64769,
+                "spool_inode": 825343,
+                "version": 1
+              },
+              "runtime": {
+                "binding": {
+                  "actor": {
+                    "connection_session_id": "fixture_connection",
+                    "principal_id": "fixture_owner"
+                  },
+                  "runtime_ms": 60000,
+                  "scope": {
+                    "app_generation": 1,
+                    "app_instance_id": "browser_32088_1494341_deadline",
+                    "computer_generation": 1,
+                    "computer_id": "fixture_computer",
+                    "organization_id": "fixture_org",
+                    "profile_owner_id": "fixture_owner"
+                  },
+                  "viewport": {
+                    "height": 600,
+                    "width": 800
+                  }
+                },
+                "cgroup_inode": 20230,
+                "cgroup_path": "kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+                "identity": {
+                  "container_id": "e232678c3a7542fc4e6f171abca21b823233eefbd7aefbfdbafdeb22ca62e61a",
+                  "namespace": "ac-kube-component",
+                  "namespace_uid": "7400823c-4ee9-4215-a0c6-8554dfc1d26e",
+                  "node": {
+                    "boot_id": "7628e7e4-5e0d-41f0-8ee2-f6cab29d89bd",
+                    "name": "ac-component-node",
+                    "uid": "15676966-27e6-482c-8103-bfa5229443bd"
+                  },
+                  "pod_name": "ac-f0e881cc5c07f3178e0605a2370c4e72785360c8ac5690979d5e",
+                  "pod_uid": "aa8ef827-93b0-4771-b11c-35e0b8454085"
+                },
+                "kind": "browser",
+                "profile": {
+                  "device": 47,
+                  "filesystem": 16914836,
+                  "inode": 2,
+                  "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/volume-subpaths/browser-profile/sandbox/2"
+                },
+                "runtime_processes": [
+                  {
+                    "pid": 35288,
+                    "role": "gofer",
+                    "start_ticks": 149481
+                  },
+                  {
+                    "pid": 35289,
+                    "role": "sentry",
+                    "start_ticks": 149481
+                  },
+                  {
+                    "pid": 35563,
+                    "role": "gofer",
+                    "start_ticks": 149606
+                  }
+                ],
+                "sandbox_id": "1745f577d4c0e5a0bd8def5d56d396fc38dee29b86e690a265fa26b11a91178e",
+                "sentry_pid": 35289,
+                "sentry_start_ticks": 149481
+              },
+              "version": 2,
+              "watchdog_pids": [
+                35736,
+                35737
+              ]
+            },
+            "domain": "empty",
+            "kind": "browser_process_stop",
+            "observed_boottime_ms": 1521561,
+            "version": 1
+          }
+        }
+      ]
+    },
+    "independent_inspection": {
+      "cases": [
+        {
+          "pod_name": "ac-33c4fad00e816323a37b96d8d391331f1e0d5afbd3241d74775b",
+          "pod_uid": "1c020736-a728-41e8-89cd-2302db0f4b7a",
+          "container_id": "bb324a6f8396564476cac63c7642cbcedd7080843cea9600695a7d72cd013a8c",
+          "sandbox_id": "c7443b9c84e8c152c6e279b52e81c77b05832093d7a4bbbc024d7f64a40e0c88",
+          "node": "ac-component-node",
+          "init": [
+            {
+              "allocatedResources": {
+                "cpu": "3",
+                "memory": "4Gi"
+              },
+              "containerID": "containerd://2329a00656e36207aeffa0adf1632a5d407108328372fb5c1834ffc196ee6f7b",
+              "image": "sha256:978744da4e673dcc1e624b305df6ac8536a2fc966dd2fa3de5ae39137b051a21",
+              "imageID": "registry.invalid/agent-computer/browser-component@sha256:f876c2430bc7dc37ffe530389218c39af6ffd2873e205a3b8855d16e20032cf8",
+              "lastState": {},
+              "name": "prepare-profile",
+              "ready": true,
+              "resources": {
+                "limits": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                },
+                "requests": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                }
+              },
+              "restartCount": 0,
+              "started": false,
+              "state": {
+                "terminated": {
+                  "containerID": "containerd://2329a00656e36207aeffa0adf1632a5d407108328372fb5c1834ffc196ee6f7b",
+                  "exitCode": 0,
+                  "finishedAt": "2026-10-10T22:37:20Z",
+                  "reason": "Completed",
+                  "startedAt": "2026-10-10T22:37:20Z"
+                }
+              },
+              "user": {
+                "linux": {
+                  "gid": 1000,
+                  "supplementalGroups": [
+                    1000
+                  ],
+                  "uid": 1000
+                }
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/browser-volume",
+                  "name": "browser-profile"
+                }
+              ]
+            }
+          ],
+          "runtime_type": "io.containerd.runsc.v1",
+          "root_readonly": true,
+          "process": {
+            "apparmorProfile": "cri-containerd.apparmor.d",
+            "args": [
+              "/usr/local/bin/node",
+              "/opt/agent-computer/browser-driver/worker.js",
+              "--stdio-binding-json",
+              "{\"scope\":{\"organization_id\":\"fixture_org\",\"computer_id\":\"fixture_computer\",\"computer_generation\":1,\"app_instance_id\":\"browser_32088_1474543_normal\",\"app_generation\":1,\"profile_owner_id\":\"fixture_owner\"},\"actor\":{\"principal_id\":\"fixture_owner\",\"connection_session_id\":\"fixture_connection\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":60000}"
+            ],
+            "capabilities": {},
+            "cwd": "/",
+            "env": [
+              "PATH=/usr/local/bin:/usr/bin:/bin",
+              "HOSTNAME=ac-33c4fad00e816323a37b96d8d391331f1e0d5afbd3241d74775b",
+              "HOME=/home/worker",
+              "LANG=C.UTF-8",
+              "PLAYWRIGHT_BROWSERS_PATH=/browsers",
+              "KUBERNETES_PORT_443_TCP_PROTO=tcp",
+              "KUBERNETES_PORT_443_TCP_PORT=443",
+              "KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1",
+              "KUBERNETES_SERVICE_HOST=10.43.0.1",
+              "KUBERNETES_SERVICE_PORT=443",
+              "KUBERNETES_SERVICE_PORT_HTTPS=443",
+              "KUBERNETES_PORT=tcp://10.43.0.1:443",
+              "KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443"
+            ],
+            "noNewPrivileges": true,
+            "oomScoreAdj": -997,
+            "user": {
+              "additionalGids": [
+                1000
+              ],
+              "gid": 1000,
+              "uid": 1000
+            }
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "proc",
+              "type": "proc"
+            },
+            {
+              "destination": "/dev",
+              "options": [
+                "nosuid",
+                "strictatime",
+                "mode=755",
+                "size=65536k"
+              ],
+              "source": "tmpfs",
+              "type": "tmpfs"
+            },
+            {
+              "destination": "/dev/pts",
+              "options": [
+                "nosuid",
+                "noexec",
+                "newinstance",
+                "ptmxmode=0666",
+                "mode=0620",
+                "gid=5"
+              ],
+              "source": "devpts",
+              "type": "devpts"
+            },
+            {
+              "destination": "/dev/mqueue",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "mqueue",
+              "type": "mqueue"
+            },
+            {
+              "destination": "/sys",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "ro"
+              ],
+              "source": "sysfs",
+              "type": "sysfs"
+            },
+            {
+              "destination": "/sys/fs/cgroup",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "relatime",
+                "ro"
+              ],
+              "source": "cgroup",
+              "type": "cgroup"
+            },
+            {
+              "destination": "/tmp",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/volumes/kubernetes.io~empty-dir/tmp",
+              "type": "bind"
+            },
+            {
+              "destination": "/browser-state",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/volume-subpaths/browser-profile/sandbox/2",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/shm",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/volumes/kubernetes.io~empty-dir/shm",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hosts",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/etc-hosts",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/termination-log",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/1c020736-a728-41e8-89cd-2302db0f4b7a/containers/sandbox/011a0d67",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hostname",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/c7443b9c84e8c152c6e279b52e81c77b05832093d7a4bbbc024d7f64a40e0c88/hostname",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/resolv.conf",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/c7443b9c84e8c152c6e279b52e81c77b05832093d7a4bbbc024d7f64a40e0c88/resolv.conf",
+              "type": "bind"
+            }
+          ],
+          "cgroup": "/sys/fs/cgroup/kubepods.slice/kubepods-pod1c020736_a728_41e8_89cd_2302db0f4b7a.slice",
+          "limits": {
+            "cpu.max": "300000 100000",
+            "memory.max": "4294967296",
+            "pids.max": "max",
+            "cgroup.events": "populated 1\nfrozen 0"
+          },
+          "profile_stat": {
+            "uid": 1000,
+            "gid": 1000,
+            "mode": "0o700",
+            "inode": 2,
+            "device": 45
+          },
+          "profile_filesystem": "tmpfs"
+        },
+        {
+          "pod_name": "ac-24f6cea08e33f5077b4738123ad74fce8eb19fc5b677e00229e1",
+          "pod_uid": "0b675241-857b-480a-a130-8532aee3c266",
+          "container_id": "1be9179421c539fe6b0d94cb9700d1351edc30ad83b20386d6e45a8de1ea2db2",
+          "sandbox_id": "9d4e3c393177c3aa9513350ebc7d2a2cd3dda802aff3126d84b1d82eb820963e",
+          "node": "ac-component-node",
+          "init": [
+            {
+              "allocatedResources": {
+                "cpu": "3",
+                "memory": "4Gi"
+              },
+              "containerID": "containerd://d26923e1ebfd03b395d2403de38b7e3b7d0b53c5c500e35da6b8ef0e8bae09aa",
+              "image": "sha256:978744da4e673dcc1e624b305df6ac8536a2fc966dd2fa3de5ae39137b051a21",
+              "imageID": "registry.invalid/agent-computer/browser-component@sha256:f876c2430bc7dc37ffe530389218c39af6ffd2873e205a3b8855d16e20032cf8",
+              "lastState": {},
+              "name": "prepare-profile",
+              "ready": true,
+              "resources": {
+                "limits": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                },
+                "requests": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                }
+              },
+              "restartCount": 0,
+              "started": false,
+              "state": {
+                "terminated": {
+                  "containerID": "containerd://d26923e1ebfd03b395d2403de38b7e3b7d0b53c5c500e35da6b8ef0e8bae09aa",
+                  "exitCode": 0,
+                  "finishedAt": "2026-10-10T22:37:27Z",
+                  "reason": "Completed",
+                  "startedAt": "2026-10-10T22:37:27Z"
+                }
+              },
+              "user": {
+                "linux": {
+                  "gid": 1000,
+                  "supplementalGroups": [
+                    1000
+                  ],
+                  "uid": 1000
+                }
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/browser-volume",
+                  "name": "browser-profile"
+                }
+              ]
+            }
+          ],
+          "runtime_type": "io.containerd.runsc.v1",
+          "root_readonly": true,
+          "process": {
+            "apparmorProfile": "cri-containerd.apparmor.d",
+            "args": [
+              "/usr/local/bin/node",
+              "/opt/agent-computer/browser-driver/worker.js",
+              "--stdio-binding-json",
+              "{\"scope\":{\"organization_id\":\"fixture_org\",\"computer_id\":\"fixture_computer\",\"computer_generation\":1,\"app_instance_id\":\"browser_32088_1481360_completion-lost\",\"app_generation\":1,\"profile_owner_id\":\"fixture_owner\"},\"actor\":{\"principal_id\":\"fixture_owner\",\"connection_session_id\":\"fixture_connection\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":60000}"
+            ],
+            "capabilities": {},
+            "cwd": "/",
+            "env": [
+              "PATH=/usr/local/bin:/usr/bin:/bin",
+              "HOSTNAME=ac-24f6cea08e33f5077b4738123ad74fce8eb19fc5b677e00229e1",
+              "HOME=/home/worker",
+              "LANG=C.UTF-8",
+              "PLAYWRIGHT_BROWSERS_PATH=/browsers",
+              "KUBERNETES_SERVICE_PORT_HTTPS=443",
+              "KUBERNETES_PORT=tcp://10.43.0.1:443",
+              "KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443",
+              "KUBERNETES_PORT_443_TCP_PROTO=tcp",
+              "KUBERNETES_PORT_443_TCP_PORT=443",
+              "KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1",
+              "KUBERNETES_SERVICE_HOST=10.43.0.1",
+              "KUBERNETES_SERVICE_PORT=443"
+            ],
+            "noNewPrivileges": true,
+            "oomScoreAdj": -997,
+            "user": {
+              "additionalGids": [
+                1000
+              ],
+              "gid": 1000,
+              "uid": 1000
+            }
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "proc",
+              "type": "proc"
+            },
+            {
+              "destination": "/dev",
+              "options": [
+                "nosuid",
+                "strictatime",
+                "mode=755",
+                "size=65536k"
+              ],
+              "source": "tmpfs",
+              "type": "tmpfs"
+            },
+            {
+              "destination": "/dev/pts",
+              "options": [
+                "nosuid",
+                "noexec",
+                "newinstance",
+                "ptmxmode=0666",
+                "mode=0620",
+                "gid=5"
+              ],
+              "source": "devpts",
+              "type": "devpts"
+            },
+            {
+              "destination": "/dev/mqueue",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "mqueue",
+              "type": "mqueue"
+            },
+            {
+              "destination": "/sys",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "ro"
+              ],
+              "source": "sysfs",
+              "type": "sysfs"
+            },
+            {
+              "destination": "/sys/fs/cgroup",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "relatime",
+                "ro"
+              ],
+              "source": "cgroup",
+              "type": "cgroup"
+            },
+            {
+              "destination": "/tmp",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/volumes/kubernetes.io~empty-dir/tmp",
+              "type": "bind"
+            },
+            {
+              "destination": "/browser-state",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/volume-subpaths/browser-profile/sandbox/2",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/shm",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/volumes/kubernetes.io~empty-dir/shm",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hosts",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/etc-hosts",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/termination-log",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/0b675241-857b-480a-a130-8532aee3c266/containers/sandbox/18626142",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hostname",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/9d4e3c393177c3aa9513350ebc7d2a2cd3dda802aff3126d84b1d82eb820963e/hostname",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/resolv.conf",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/9d4e3c393177c3aa9513350ebc7d2a2cd3dda802aff3126d84b1d82eb820963e/resolv.conf",
+              "type": "bind"
+            }
+          ],
+          "cgroup": "/sys/fs/cgroup/kubepods.slice/kubepods-pod0b675241_857b_480a_a130_8532aee3c266.slice",
+          "limits": {
+            "cpu.max": "300000 100000",
+            "memory.max": "4294967296",
+            "pids.max": "max",
+            "cgroup.events": "populated 1\nfrozen 0"
+          },
+          "profile_stat": {
+            "uid": 1000,
+            "gid": 1000,
+            "mode": "0o700",
+            "inode": 2,
+            "device": 47
+          },
+          "profile_filesystem": "tmpfs"
+        },
+        {
+          "pod_name": "ac-a184fc0bc1e63e6638ec1c8ce4f7a0a1fd8bd5a4598115cdd98c",
+          "pod_uid": "f548fa66-6afe-479c-b81e-5db88c343e8d",
+          "container_id": "ebf6d32d6250c262d1a49b78a63535007b2d9e96fff647bf94f87b3662fc29eb",
+          "sandbox_id": "da307243fe354fe228eff713c0a5912ff6500eec094504c1c07dbde3fae6e9db",
+          "node": "ac-component-node",
+          "init": [
+            {
+              "allocatedResources": {
+                "cpu": "3",
+                "memory": "4Gi"
+              },
+              "containerID": "containerd://95ff03b0f0311eecc9f537414c07331e1e5531781d1f0242b3d24598e11ba50a",
+              "image": "sha256:978744da4e673dcc1e624b305df6ac8536a2fc966dd2fa3de5ae39137b051a21",
+              "imageID": "registry.invalid/agent-computer/browser-component@sha256:f876c2430bc7dc37ffe530389218c39af6ffd2873e205a3b8855d16e20032cf8",
+              "lastState": {},
+              "name": "prepare-profile",
+              "ready": true,
+              "resources": {
+                "limits": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                },
+                "requests": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                }
+              },
+              "restartCount": 0,
+              "started": false,
+              "state": {
+                "terminated": {
+                  "containerID": "containerd://95ff03b0f0311eecc9f537414c07331e1e5531781d1f0242b3d24598e11ba50a",
+                  "exitCode": 0,
+                  "finishedAt": "2026-10-10T22:37:34Z",
+                  "reason": "Completed",
+                  "startedAt": "2026-10-10T22:37:34Z"
+                }
+              },
+              "user": {
+                "linux": {
+                  "gid": 1000,
+                  "supplementalGroups": [
+                    1000
+                  ],
+                  "uid": 1000
+                }
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/browser-volume",
+                  "name": "browser-profile"
+                }
+              ]
+            }
+          ],
+          "runtime_type": "io.containerd.runsc.v1",
+          "root_readonly": true,
+          "process": {
+            "apparmorProfile": "cri-containerd.apparmor.d",
+            "args": [
+              "/usr/local/bin/node",
+              "/opt/agent-computer/browser-driver/worker.js",
+              "--stdio-binding-json",
+              "{\"scope\":{\"organization_id\":\"fixture_org\",\"computer_id\":\"fixture_computer\",\"computer_generation\":1,\"app_instance_id\":\"browser_32088_1488325_launch-denied\",\"app_generation\":1,\"profile_owner_id\":\"fixture_owner\"},\"actor\":{\"principal_id\":\"fixture_owner\",\"connection_session_id\":\"fixture_connection\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":60000}"
+            ],
+            "capabilities": {},
+            "cwd": "/",
+            "env": [
+              "PATH=/usr/local/bin:/usr/bin:/bin",
+              "HOSTNAME=ac-a184fc0bc1e63e6638ec1c8ce4f7a0a1fd8bd5a4598115cdd98c",
+              "HOME=/home/worker",
+              "LANG=C.UTF-8",
+              "PLAYWRIGHT_BROWSERS_PATH=/browsers",
+              "KUBERNETES_PORT_443_TCP_PORT=443",
+              "KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1",
+              "KUBERNETES_SERVICE_HOST=10.43.0.1",
+              "KUBERNETES_SERVICE_PORT=443",
+              "KUBERNETES_SERVICE_PORT_HTTPS=443",
+              "KUBERNETES_PORT=tcp://10.43.0.1:443",
+              "KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443",
+              "KUBERNETES_PORT_443_TCP_PROTO=tcp"
+            ],
+            "noNewPrivileges": true,
+            "oomScoreAdj": -997,
+            "user": {
+              "additionalGids": [
+                1000
+              ],
+              "gid": 1000,
+              "uid": 1000
+            }
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "proc",
+              "type": "proc"
+            },
+            {
+              "destination": "/dev",
+              "options": [
+                "nosuid",
+                "strictatime",
+                "mode=755",
+                "size=65536k"
+              ],
+              "source": "tmpfs",
+              "type": "tmpfs"
+            },
+            {
+              "destination": "/dev/pts",
+              "options": [
+                "nosuid",
+                "noexec",
+                "newinstance",
+                "ptmxmode=0666",
+                "mode=0620",
+                "gid=5"
+              ],
+              "source": "devpts",
+              "type": "devpts"
+            },
+            {
+              "destination": "/dev/mqueue",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "mqueue",
+              "type": "mqueue"
+            },
+            {
+              "destination": "/sys",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "ro"
+              ],
+              "source": "sysfs",
+              "type": "sysfs"
+            },
+            {
+              "destination": "/sys/fs/cgroup",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "relatime",
+                "ro"
+              ],
+              "source": "cgroup",
+              "type": "cgroup"
+            },
+            {
+              "destination": "/tmp",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/volumes/kubernetes.io~empty-dir/tmp",
+              "type": "bind"
+            },
+            {
+              "destination": "/browser-state",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/volume-subpaths/browser-profile/sandbox/2",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/shm",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/volumes/kubernetes.io~empty-dir/shm",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hosts",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/etc-hosts",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/termination-log",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/f548fa66-6afe-479c-b81e-5db88c343e8d/containers/sandbox/d65c2e5d",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hostname",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/da307243fe354fe228eff713c0a5912ff6500eec094504c1c07dbde3fae6e9db/hostname",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/resolv.conf",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/da307243fe354fe228eff713c0a5912ff6500eec094504c1c07dbde3fae6e9db/resolv.conf",
+              "type": "bind"
+            }
+          ],
+          "cgroup": "/sys/fs/cgroup/kubepods.slice/kubepods-podf548fa66_6afe_479c_b81e_5db88c343e8d.slice",
+          "limits": {
+            "cpu.max": "300000 100000",
+            "memory.max": "4294967296",
+            "pids.max": "max",
+            "cgroup.events": "populated 1\nfrozen 0"
+          },
+          "profile_stat": {
+            "uid": 1000,
+            "gid": 1000,
+            "mode": "0o700",
+            "inode": 2,
+            "device": 45
+          },
+          "profile_filesystem": "tmpfs"
+        },
+        {
+          "pod_name": "ac-f0e881cc5c07f3178e0605a2370c4e72785360c8ac5690979d5e",
+          "pod_uid": "aa8ef827-93b0-4771-b11c-35e0b8454085",
+          "container_id": "e232678c3a7542fc4e6f171abca21b823233eefbd7aefbfdbafdeb22ca62e61a",
+          "sandbox_id": "1745f577d4c0e5a0bd8def5d56d396fc38dee29b86e690a265fa26b11a91178e",
+          "node": "ac-component-node",
+          "init": [
+            {
+              "allocatedResources": {
+                "cpu": "3",
+                "memory": "4Gi"
+              },
+              "containerID": "containerd://fcda0b1ec9f802237b0a855bae52b9fac1c80e1a210ecf5686b08260e0ab4b13",
+              "image": "sha256:978744da4e673dcc1e624b305df6ac8536a2fc966dd2fa3de5ae39137b051a21",
+              "imageID": "registry.invalid/agent-computer/browser-component@sha256:f876c2430bc7dc37ffe530389218c39af6ffd2873e205a3b8855d16e20032cf8",
+              "lastState": {},
+              "name": "prepare-profile",
+              "ready": true,
+              "resources": {
+                "limits": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                },
+                "requests": {
+                  "cpu": "3",
+                  "memory": "4Gi"
+                }
+              },
+              "restartCount": 0,
+              "started": false,
+              "state": {
+                "terminated": {
+                  "containerID": "containerd://fcda0b1ec9f802237b0a855bae52b9fac1c80e1a210ecf5686b08260e0ab4b13",
+                  "exitCode": 0,
+                  "finishedAt": "2026-10-10T22:37:40Z",
+                  "reason": "Completed",
+                  "startedAt": "2026-10-10T22:37:40Z"
+                }
+              },
+              "user": {
+                "linux": {
+                  "gid": 1000,
+                  "supplementalGroups": [
+                    1000
+                  ],
+                  "uid": 1000
+                }
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/browser-volume",
+                  "name": "browser-profile"
+                }
+              ]
+            }
+          ],
+          "runtime_type": "io.containerd.runsc.v1",
+          "root_readonly": true,
+          "process": {
+            "apparmorProfile": "cri-containerd.apparmor.d",
+            "args": [
+              "/usr/local/bin/node",
+              "/opt/agent-computer/browser-driver/worker.js",
+              "--stdio-binding-json",
+              "{\"scope\":{\"organization_id\":\"fixture_org\",\"computer_id\":\"fixture_computer\",\"computer_generation\":1,\"app_instance_id\":\"browser_32088_1494341_deadline\",\"app_generation\":1,\"profile_owner_id\":\"fixture_owner\"},\"actor\":{\"principal_id\":\"fixture_owner\",\"connection_session_id\":\"fixture_connection\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":60000}"
+            ],
+            "capabilities": {},
+            "cwd": "/",
+            "env": [
+              "PATH=/usr/local/bin:/usr/bin:/bin",
+              "HOSTNAME=ac-f0e881cc5c07f3178e0605a2370c4e72785360c8ac5690979d5e",
+              "HOME=/home/worker",
+              "LANG=C.UTF-8",
+              "PLAYWRIGHT_BROWSERS_PATH=/browsers",
+              "KUBERNETES_PORT_443_TCP_PROTO=tcp",
+              "KUBERNETES_PORT_443_TCP_PORT=443",
+              "KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1",
+              "KUBERNETES_SERVICE_HOST=10.43.0.1",
+              "KUBERNETES_SERVICE_PORT=443",
+              "KUBERNETES_SERVICE_PORT_HTTPS=443",
+              "KUBERNETES_PORT=tcp://10.43.0.1:443",
+              "KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443"
+            ],
+            "noNewPrivileges": true,
+            "oomScoreAdj": -997,
+            "user": {
+              "additionalGids": [
+                1000
+              ],
+              "gid": 1000,
+              "uid": 1000
+            }
+          },
+          "mounts": [
+            {
+              "destination": "/proc",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "proc",
+              "type": "proc"
+            },
+            {
+              "destination": "/dev",
+              "options": [
+                "nosuid",
+                "strictatime",
+                "mode=755",
+                "size=65536k"
+              ],
+              "source": "tmpfs",
+              "type": "tmpfs"
+            },
+            {
+              "destination": "/dev/pts",
+              "options": [
+                "nosuid",
+                "noexec",
+                "newinstance",
+                "ptmxmode=0666",
+                "mode=0620",
+                "gid=5"
+              ],
+              "source": "devpts",
+              "type": "devpts"
+            },
+            {
+              "destination": "/dev/mqueue",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev"
+              ],
+              "source": "mqueue",
+              "type": "mqueue"
+            },
+            {
+              "destination": "/sys",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "ro"
+              ],
+              "source": "sysfs",
+              "type": "sysfs"
+            },
+            {
+              "destination": "/sys/fs/cgroup",
+              "options": [
+                "nosuid",
+                "noexec",
+                "nodev",
+                "relatime",
+                "ro"
+              ],
+              "source": "cgroup",
+              "type": "cgroup"
+            },
+            {
+              "destination": "/tmp",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/volumes/kubernetes.io~empty-dir/tmp",
+              "type": "bind"
+            },
+            {
+              "destination": "/browser-state",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/volume-subpaths/browser-profile/sandbox/2",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/shm",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/volumes/kubernetes.io~empty-dir/shm",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hosts",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/etc-hosts",
+              "type": "bind"
+            },
+            {
+              "destination": "/dev/termination-log",
+              "options": [
+                "rbind",
+                "rprivate",
+                "rw"
+              ],
+              "source": "/var/lib/kubelet/pods/aa8ef827-93b0-4771-b11c-35e0b8454085/containers/sandbox/8a54631f",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/hostname",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/1745f577d4c0e5a0bd8def5d56d396fc38dee29b86e690a265fa26b11a91178e/hostname",
+              "type": "bind"
+            },
+            {
+              "destination": "/etc/resolv.conf",
+              "options": [
+                "rbind",
+                "rprivate",
+                "ro"
+              ],
+              "source": "/var/lib/rancher/k3s/agent/containerd/io.containerd.grpc.v1.cri/sandboxes/1745f577d4c0e5a0bd8def5d56d396fc38dee29b86e690a265fa26b11a91178e/resolv.conf",
+              "type": "bind"
+            }
+          ],
+          "cgroup": "/sys/fs/cgroup/kubepods.slice/kubepods-podaa8ef827_93b0_4771_b11c_35e0b8454085.slice",
+          "limits": {
+            "cpu.max": "300000 100000",
+            "memory.max": "4294967296",
+            "pids.max": "max",
+            "cgroup.events": "populated 1\nfrozen 0"
+          },
+          "profile_stat": {
+            "uid": 1000,
+            "gid": 1000,
+            "mode": "0o700",
+            "inode": 2,
+            "device": 47
+          },
+          "profile_filesystem": "tmpfs"
+        }
+      ],
+      "complete": true
+    },
+    "physical_process_readback": [
+      {
+        "original": {
+          "pid": 32227,
+          "role": "gofer",
+          "start_ticks": 147501
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 32229,
+          "role": "sentry",
+          "start_ticks": 147501
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 32492,
+          "role": "gofer",
+          "start_ticks": 147598
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 33208,
+          "role": "gofer",
+          "start_ticks": 148184
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 33209,
+          "role": "sentry",
+          "start_ticks": 148184
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 33488,
+          "role": "gofer",
+          "start_ticks": 148302
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 34174,
+          "role": "gofer",
+          "start_ticks": 148876
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 34175,
+          "role": "sentry",
+          "start_ticks": 148876
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 34446,
+          "role": "gofer",
+          "start_ticks": 149005
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 35288,
+          "role": "gofer",
+          "start_ticks": 149481
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 35289,
+          "role": "sentry",
+          "start_ticks": 149481
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      },
+      {
+        "original": {
+          "pid": 35563,
+          "role": "gofer",
+          "start_ticks": 149606
+        },
+        "same_start_time": false,
+        "observed_state": "absent"
+      }
+    ],
+    "binaries": {
+      "/home/ac-test/browser_live-8f20ec4743b3ff9c": "22040e6cc0d8339603fd831b2091ac836547f370a5325ae0ffbfd659f2a51c15",
+      "/home/ac-test/agent_computer_node-bb09d552f6d87839": "402d3d86ffe3795ad57822422514e3866a44057ae2ba4c313465747e381f96bb",
+      "/usr/local/bin/agent-computer-watchdog": "c76dfc6eb2ec597181094b93b56e2475860c32555d3f8bb0b4b757d5a9d663ea",
+      "/usr/local/bin/k3s": "92b94582eb7b34a8cf532e6006842b9ed215a6783cf56a3dd6271fd35243b2c0",
+      "/usr/local/bin/runsc": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a"
+    },
+    "compiled_driver_sha256": {
+      "authority.js": "439d5d30ce9b3fdceb340d3b70f4cb7a909f32240a358b0f8df300d4733047a9",
+      "bridge-protocol.js": "961de6c59856182a3d6ba8ce1e6b657821a2b718755990695351409165440a86",
+      "bridge.js": "a153913b2d1eb8ff958c9bda45d1d02ff5c8da6115a068d6d13b9a3430754cee",
+      "contracts.js": "c1d71c8449db4566be6cdd68f6b04d97192aa9ec121c5a5e1598ade26d32fcab",
+      "driver.js": "fc36f46dfdc9f4aea9f22f668fb3a6dfef78cbbd89df5649eae40d2831920584",
+      "index.js": "0bddf1f236217446941c64f23d09383ce7bac94fc014bcb10b1cb8e10a9a4ab7",
+      "observation.js": "50855e895d8b0ca68c9f02fe5bd7b5dd4609cd08a35fd8f90346778aece13b82",
+      "validation.js": "7b77cefde2a19a100b07e2d5426957f6a6e30136a607293ac1fd6179d1d2fc00",
+      "worker.js": "ce4fb02455cd17b7682c6110059457b2c854267db6f4240950954bb65d1498da"
+    },
+    "image": {
+      "image": "registry.invalid/agent-computer/browser-component@sha256:f876c2430bc7dc37ffe530389218c39af6ffd2873e205a3b8855d16e20032cf8",
+      "worker_sha256": "ce4fb02455cd17b7682c6110059457b2c854267db6f4240950954bb65d1498da",
+      "archive_sha256": "e0de1300045d5076d143f50d38f24e8660040fbb1909297869faf888c22704bc"
+    },
+    "versions": {
+      "kernel": "6.8.0-142-generic",
+      "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+      "gvisor": "runsc version release-20261005.0\nspec: 1.2.1",
+      "node": "v22.22.1"
+    },
+    "remaining_pods": []
+  },
+  "cleanup": {
+    "owned_vm_stopped": true,
+    "pid": 206320,
+    "private_vm_files_removed": [
+      "component-evidence.json",
+      "csi-image-digests.json",
+      "public-csi-mount-image.sha256",
+      "qemu.log",
+      "known_hosts",
+      "juicefs-csi-driver-release.json",
+      "serial.log",
+      "id_ed25519",
+      "csi-common.go",
+      "public-csi-images.tar",
+      "seaweedfs-binary.tar.gz",
+      "csi-config-example.yaml",
+      "id_ed25519.pub",
+      "SHA256SUMS",
+      "vm.json",
+      "write-probe.json",
+      "seed.iso",
+      "meta-data",
+      "juicefs-binary.tar.gz",
+      "juicefs-release.json",
+      "user-data",
+      "csi-k8s.yaml",
+      "public-csi-images.sha256",
+      "noble-server-cloudimg-amd64.img",
+      "mirror.gcr.io-busybox.json",
+      "volume-observation.json",
+      "recorded-juicefs-component.json",
+      "gvisor-x86_64.tar.bz2",
+      "disk.qcow2",
+      "csi-rendered.yaml",
+      "csi-mirror-digests.json",
+      "write-log.txt",
+      "k3s",
+      "recorded-juicefs-component.log",
+      "csi-controller.go",
+      "seaweedfs-release.json",
+      "helm-release.json",
+      "public-csi-mount-image.tar",
+      "volume-files-evidence.json",
+      "k3s-release.json",
+      "mount-image.json",
+      "read-probe.json",
+      "gvisor-release.json",
+      "live-bazel.log"
+    ],
+    "source": "Original process identities checked stopped before VM shutdown; private disk, cloud-init material and SSH credentials removed."
+  },
+  "scope": "Actual separate Browser Pods, non-root private init, Chromium sandbox, Rust v5 attach, exact node/CRI/profile admission, redundant watchdogs and process-only stop receipts. Callback authority/journal are fixtures, not PostgreSQL acceptance.",
+  "qualitygate": "Final unfiltered full snapshot gate uses existing line-ending policy; separate behavior evidence above. Reports are archived outside source tree.",
+  "corrections": [
+    "Reject extra fields on empty create_page variants.",
+    "Accept only known init defaults and emit canonical binary memory quantities before exact readback.",
+    "Test image must use the compiled CommonJS module format; Kubernetes attach requires scoped get/create privileges.",
+    "Fixture cleanup uses UID-preconditioned immediate API deletion only after live process-stop proof; asynchronous kubelet cleanup is not fencing.",
+    "Expiry test retains its idle transport so EOF cannot cause earlier natural shutdown."
+  ],
+  "known_limits": [
+    "No production App dispatch/controller, PostgreSQL GUI authority or durable action-journal callback adapter; public readiness remains unsupported.",
+    "Volatile profile only; no encrypted checkpoint/restore or reservation-release integration.",
+    "One disposable K3s node; no multi-node recovery or production deployment certification.",
+    "Deny-all NetworkPolicy readback, not a packet-level policy test.",
+    "Historical process-stop receipts cannot recreate live guards, prove Candidate IO sealing or authorize effects."
+  ]
+}

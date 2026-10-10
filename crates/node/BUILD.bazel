@@ -8,7 +8,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/fence", "//crates/kubernetes", "//crates/watchdog"] + all_crate_deps(normal = True),
+    deps = ["//crates/browser", "//crates/fence", "//crates/kubernetes", "//crates/watchdog"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -16,4 +16,15 @@ rust_test(
     name = "node_contracts_test",
     size = "small",
     crate = ":node",
+)
+
+rust_test(
+    name = "browser_live_test",
+    size = "large",
+    srcs = ["tests/browser_live.rs"],
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    tags = ["manual", "requires-root", "requires-kubernetes"],
+    deps = [":node", "//crates/browser", "//crates/definitions", "//crates/kubernetes", "//crates/watchdog"] + all_crate_deps(normal = True, normal_dev = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
 )
