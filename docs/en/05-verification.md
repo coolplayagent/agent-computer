@@ -65,3 +65,5 @@ Four additional default tests cover watchdog exit/stop detection, detached lifet
 Node-local intent/report journals and read-only recovery observations are now delivered in [33](33-watchdog-journals.md). They preserve the remaining fencing and writer-release boundaries.
 
 The persistent expiry service and separate recovery reports are described in [34](34-node-expiry-reaper.md).
+
+Four additional contract tests and expanded runtime/host fault assertions cover the CSI publication boundary. The explicit eleven-scenario execution fixture now uses the FUSE front mount; active retry and publisher restart retain its identity, replacement Pod UIDs are rejected, and controller death denies old-FD writes without claiming drain. See [41 Fenced execution CSI](41-fenced-execution-csi.md). Accepted completion and full runtime acceptance remain pending.

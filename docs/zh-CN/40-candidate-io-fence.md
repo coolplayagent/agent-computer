@@ -1,6 +1,6 @@
 # 40. 可撤销的 Candidate 文件系统
 
-`agent-computer-fence` 在现有合格 JuiceFS 卷的单个 Prepared Candidate 目录前增加受信 Linux FUSE 挂载，提供该挂载实例的内容与目录变更排空屏障。执行 worker 尚未接入此挂载：进程执行仍保持 `Unknown`，写租约仍保持 `Draining`，Computer `ready` 仍为 false。
+`agent-computer-fence` 在现有合格 JuiceFS 卷的单个 Prepared Candidate 目录前增加受信 Linux FUSE 挂载，提供该挂载实例的内容与目录变更排空屏障。[执行 CSI 集成](41-fenced-execution-csi.md)已将实际 Pod I/O 接入此挂载；进程执行仍保持 `Unknown`，写租约仍保持 `Draining`，Computer `ready` 仍为 false。
 
 ## 为什么需要额外边界
 
@@ -22,7 +22,7 @@
 
 操作者打开现有合格 `MountedVolume`，取得 `candidate_directory(&prepared)`，再把验证后的句柄交给 `agent_computer_fence::mount`。挂载点必须为空、使用绝对路径、归 root 所有；祖先目录也必须归 root 所有且不可由组或其他用户写入。底层描述符和路径必须对工作负载不可见。获得独占写准入的工作负载只能接收此 FUSE 挂载。封存一个挂载不会撤销同一目录的其他挂载、既有直接 CSI 访问或受信代码直接发出的底层写入。
 
-本次没有新增公共挂载接口、daemon、持久登记、数据库完成转换或部署开关。后续集成必须把挂载实例绑定到执行的 Candidate、lease、Pod 身份，拒绝直接底层挂载，结合进程 fencing，并通过持久协调处理适配器丢失。封存成功本身不授权新 writer，也不证明网络或进程副作用结束。通用应用兼容性还需要解决未支持的文件系统操作。
+最初的文件系统组件没有新增公共挂载接口或数据库完成转换。第 41 节已增加私有节点发布与执行/Pod 身份绑定；活体 I/O 证明与进程 fencing、受认可完成的组合仍待实现。封存成功本身不授权新 writer，也不证明网络或进程副作用结束。通用应用兼容性还需要解决未支持的文件系统操作。
 
 ## 验证
 

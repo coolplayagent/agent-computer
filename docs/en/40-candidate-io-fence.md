@@ -1,6 +1,6 @@
 # 40. Revocable Candidate filesystem
 
-`agent-computer-fence` adds a trusted Linux FUSE mount in front of one prepared Candidate directory on the existing qualified JuiceFS volume. It provides a mount-local content and namespace drain barrier. The execution worker does not use this mount yet: process executions still remain `Unknown`, their writer leases remain `Draining`, and Computer `ready` remains false.
+`agent-computer-fence` adds a trusted Linux FUSE mount in front of one prepared Candidate directory on the existing qualified JuiceFS volume. It provides a mount-local content and namespace drain barrier. The [execution CSI integration](41-fenced-execution-csi.md) now routes actual Pod IO through this mount. Process executions still remain `Unknown`, their writer leases remain `Draining`, and Computer `ready` remains false.
 
 ## Why the extra boundary is needed
 
@@ -22,7 +22,7 @@ The pinned `fuser` dependency uses direct I/O and does not negotiate writeback c
 
 The operator opens the existing qualified `MountedVolume`, obtains `candidate_directory(&prepared)`, and passes that verified handle to `agent_computer_fence::mount`. The mountpoint must be empty, absolute, owned by root, and reached only through root-owned ancestors that are not group/world writable. The backing descriptor and path must remain inaccessible to workloads. Only this FUSE mount may be exposed to a workload with exclusive writer admission. Sealing one mount does not revoke another mount of the same directory, legacy direct CSI access, or writes made directly by trusted code.
 
-No public mount endpoint, daemon, durable enrollment, database completion transition or deployment switch is introduced here. The next integration must bind this mount instance to the execution's Candidate/lease/Pod identity, reject direct backing mounts, combine its proof with process fencing and handle adapter loss through durable reconciliation. Successful sealing alone does not authorize a new writer or claim that network/process effects have ended. Unsupported filesystem operations must be resolved before general application compatibility can be claimed.
+The original filesystem component did not introduce a public mount endpoint or database completion transition. Section 41 adds private node publication and execution/Pod binding. Combining the live IO proof with process fencing and accepted completion remains outstanding. Successful sealing alone does not authorize a new writer or claim that network/process effects have ended. Unsupported filesystem operations must be resolved before general application compatibility can be claimed.
 
 ## Verification
 

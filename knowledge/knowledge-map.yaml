@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 62
-updated_at: unix:1791608744
+map_version: 63
+updated_at: unix:1791612137
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -129,12 +129,13 @@ topics:
   source_ids:
   - candidate-io-fence
   - durable-execution-outputs
+  - fenced-execution-csi
   - node-expiry-reaper
   - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-94e569cf5723d8459a2842f05e990f42cc1b29b885c5a320236e8ec7721033e8.yaml
-  digest: 94e569cf5723d8459a2842f05e990f42cc1b29b885c5a320236e8ec7721033e8
+  ref: topics/topic-a402c4336ebfd782-e5a8e486b35a712b7bc0ae31a6e9029a69187842850c6c1aa6b54dbc429443eb.yaml
+  digest: e5a8e486b35a712b7bc0ae31a6e9029a69187842850c6c1aa6b54dbc429443eb
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -158,12 +159,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 46
+  omitted_through: 47
   recent:
-  - version: 47
-    action: source.add
-    actor: cli
-    summary: Added source 'execution-startup-authorization' to topic 'development'.
   - version: 48
     action: source.add
     actor: cli
@@ -224,3 +221,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'candidate-io-fence' to topic 'execution'.
+  - version: 63
+    action: source.add
+    actor: cli
+    summary: Added source 'fenced-execution-csi' to topic 'execution'.
