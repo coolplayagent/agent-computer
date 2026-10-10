@@ -7,10 +7,10 @@ use super::*;
 use crate::plans::types::{digest, random_id};
 use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
 pub use executions::{
-    CancelExecution, ExecutionCommand, ExecutionDispatchAttempt, ExecutionDispatchIntent,
-    ExecutionLifetime, ExecutionOutput, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRequest,
-    ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionState,
-    ExecutionWatchdogArm, OutputState, SubmitExecution,
+    CancelExecution, ExecutionCommand, ExecutionCompletion, ExecutionDispatchAttempt,
+    ExecutionDispatchIntent, ExecutionLifetime, ExecutionOutput, ExecutionPodAttempt,
+    ExecutionPodPlan, ExecutionRequest, ExecutionRuntimeInputs, ExecutionStartupAttempt,
+    ExecutionStartupGrant, ExecutionState, ExecutionWatchdogArm, OutputState, SubmitExecution,
 };
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;
@@ -155,6 +155,8 @@ async fn drain(
         Some("no_dispatch")
     } else if sqlx::query_scalar::<_,bool>("SELECT EXISTS(SELECT 1 FROM candidate_writer_completions WHERE organization=$1 AND lease_id=$2 AND epoch=$3 AND observed->>'drain_confirmed'='true')").bind(org).bind(id).bind(epoch).fetch_one(&mut **tx).await? {
         Some("bounded_file_drained")
+    } else if sqlx::query_scalar::<_,bool>("SELECT EXISTS(SELECT 1 FROM execution_completions WHERE organization=$1 AND lease_id=$2 AND epoch=$3)").bind(org).bind(id).bind(epoch).fetch_one(&mut **tx).await? {
+        Some("execution_drained")
     } else { None };
     if let Some(proof) = proof {
         seq = executions::cancel_reserved(tx, org, id, epoch, "writer_unavailable", seq).await?;

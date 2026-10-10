@@ -5314,7 +5314,8 @@
             "enum": [
               "no_dispatch",
               "bounded_file_drained",
-              null
+              null,
+              "execution_drained"
             ]
           },
           "file_edit": {
@@ -5632,7 +5633,9 @@
               "Cancelled",
               "Dispatching",
               "CancelRequested",
-              "Unknown"
+              "Unknown",
+              "Succeeded",
+              "Failed"
             ]
           },
           "reason": {
@@ -5642,7 +5645,10 @@
               "user_requested",
               "writer_unavailable",
               "dispatch_committed",
-              "dispatch_unconfirmed"
+              "dispatch_unconfirmed",
+              "completed",
+              "completed_cancelled",
+              "completion_unconfirmed"
             ]
           },
           "input_digest": {
@@ -5658,7 +5664,7 @@
             "description": "True after the durable dispatch intent commits; does not assert that a process started or stopped."
           }
         },
-        "description": "Current metadata only, bound to the original credential. No command bytes/storage paths, process-success status or fencing claim. Queue deadline is fixed at admission and never extended by retry or lease renewal.",
+        "description": "Current execution metadata bound to the original credential. Succeeded/Failed require a live kernel and Candidate IO seal, verified output and current authority; dispatched Cancelled requires the seal and an explicit cancellation request. Unknown preserves uncertainty even when physical writes are sealed. Queue deadline is fixed at admission and never extended by retry or lease renewal.",
         "allOf": [
           {
             "if": {
@@ -5667,6 +5673,13 @@
                   "enum": [
                     "Queued",
                     "Cancelled"
+                  ]
+                },
+                "reason": {
+                  "enum": [
+                    "awaiting_runtime_dispatch",
+                    "user_requested",
+                    "writer_unavailable"
                   ]
                 }
               }

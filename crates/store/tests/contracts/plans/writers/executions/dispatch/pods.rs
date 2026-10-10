@@ -4,7 +4,7 @@ use agent_computer_sandbox::StartupChallenge;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
-fn manifest(attempt: &ExecutionDispatchAttempt) -> Value {
+pub(super) fn manifest(attempt: &ExecutionDispatchAttempt) -> Value {
     let dispatch = attempt.intent();
     let execution = &dispatch.execution;
     let key = format!(

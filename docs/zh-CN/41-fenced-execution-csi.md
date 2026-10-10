@@ -2,7 +2,7 @@
 
 单次执行 worker 已把 [Candidate FUSE 边界](40-candidate-io-fence.md)接入真实 gVisor Pod。生产派发使用 `csi.agent-computer.io` inline 卷，启动授权前验证前置文件系统。工作负载命名空间继续采用 PodSecurity `restricted`；Pod 不接收 hostPath 或底层 JuiceFS 目录。
 
-执行完成仍采用保守状态：`Unknown` 执行和 `Draining` 写租约尚未解除。本次集成没有把进程终止、持久输出与活体 I/O 屏障合成为受认可的完成事务。Computer `ready` 仍为 false，T01–T43 仍为 `not_run`。
+本节及对应日期的证据描述接受执行完成之前的 CSI 集成。[第 42 节](42-accepted-execution-completion.md)新增活的进程/I/O 封闭证明、持久结果与原子写租约释放。缺少证明时，下述保守恢复边界仍适用。Computer `ready` 仍为 false，T01–T43 仍为 `not_run`。
 
 ## 发布与启动
 
@@ -36,4 +36,4 @@ CSI 卸载先持久撤销，再解除目标挂载。它无需失联的 FUSE 源�
 
 随后设置 `AGENT_COMPUTER_CSI_DISPOSABLE_TEST=1`，并把已结束 normal 执行的实例填入 `AGENT_COMPUTER_CSI_TEST_INSTANCE`，运行 `csi_live_test --exact real_csi_cleanup_replay_and_peer_boundary --nocapture`。它通过真实 Unix gRPC 验证重复清理、撤销后重放、错误身份、特意替换的外来 bind 挂载，以及 UID/GID 1000、无附加组客户端的拒绝。仅在明确的一次性宿主环境运行。独立新客户端 JuiceFS 与签名 S3 回读另行取证，不以控制器报告替代。
 
-这属于单节点组件验证，不构成多节点 fencing、断电恢复、通用应用文件系统或完整 Computer 验收。登记表保留/回收和受认可执行完成仍需继续实现。
+这属于单节点组件验证，不构成多节点 fencing、断电恢复、通用应用文件系统或完整 Computer 验收。登记表保留/回收仍需继续实现；受认可执行完成见第 42 节。

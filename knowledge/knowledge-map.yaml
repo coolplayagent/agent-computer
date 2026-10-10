@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 63
-updated_at: unix:1791612137
+map_version: 64
+updated_at: unix:1791619269
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -127,6 +127,7 @@ topics:
   title: execution
   description: Added by CLI source registration.
   source_ids:
+  - accepted-execution-completion
   - candidate-io-fence
   - durable-execution-outputs
   - fenced-execution-csi
@@ -134,8 +135,8 @@ topics:
   - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-e5a8e486b35a712b7bc0ae31a6e9029a69187842850c6c1aa6b54dbc429443eb.yaml
-  digest: e5a8e486b35a712b7bc0ae31a6e9029a69187842850c6c1aa6b54dbc429443eb
+  ref: topics/topic-a402c4336ebfd782-b1cd5c049621ae084afc079304bf6eb04b9d9285ecda922e10301ffcbb1c2f4b.yaml
+  digest: b1cd5c049621ae084afc079304bf6eb04b9d9285ecda922e10301ffcbb1c2f4b
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -159,12 +160,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 47
+  omitted_through: 48
   recent:
-  - version: 48
-    action: source.add
-    actor: cli
-    summary: Added source 'kubernetes-startup-attach' to topic 'development'.
   - version: 49
     action: source.add
     actor: cli
@@ -225,3 +222,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'fenced-execution-csi' to topic 'execution'.
+  - version: 64
+    action: source.add
+    actor: cli
+    summary: Added source 'accepted-execution-completion' to topic 'execution'.

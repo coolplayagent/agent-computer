@@ -12,7 +12,7 @@ agent-computer-watchdog = { path = "../watchdog" }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
-rustix.workspace = true
+rustix = { workspace = true, features = ["event"] }
 tempfile.workspace = true
 
 [lints]

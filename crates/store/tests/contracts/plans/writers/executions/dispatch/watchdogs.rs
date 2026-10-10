@@ -11,12 +11,44 @@ async fn fixture() -> (
     Value,
     i64,
 ) {
+    fixture_with_fence(false).await
+}
+
+async fn fixture_with_fence(
+    fenced: bool,
+) -> (
+    Database,
+    ExecutionDispatchAttempt,
+    ExecutionPodPlan,
+    Value,
+    i64,
+) {
     let (db, token, computer, acquire_input) = setup().await;
     let lease = acquire(&db, &token, &computer, &acquire_input).await;
     let input = submission(&db, &lease).await;
     let queued = submit(&db, &token, &computer, &input).await;
     let attempt = begin(&db, &queued).await;
-    let plan = pods::register(&db, &attempt).await;
+    let mount = json!({"version":1,"instance":"c".repeat(64),"prepared":attempt.intent().binding["prepared"],"boot_id":"boot-one","inode":1});
+    let plan = if fenced {
+        // Serialized routing metadata only. This never constructs a node guard.
+        let mut manifest = pods::manifest(&attempt);
+        let mut binding: Value = serde_json::from_str(
+            manifest["metadata"]["annotations"]["agent-computer.io/binding"]
+                .as_str()
+                .unwrap(),
+        )
+        .unwrap();
+        binding["workspace"]["fence"] =
+            json!({"mount":mount,"node":{"uid":"node-one","boot_id":"boot-one"}});
+        manifest["metadata"]["annotations"]["agent-computer.io/binding"] =
+            json!(binding.to_string());
+        db.store
+            .register_candidate_execution_pod(&attempt, "namespace-uid", &manifest)
+            .await
+            .unwrap()
+    } else {
+        pods::register(&db, &attempt).await
+    };
     let plan = db
         .store
         .record_candidate_execution_pod(
@@ -34,6 +66,9 @@ async fn fixture() -> (
             .unwrap();
     let mut evidence = json!({"runtime":{"identity":{"pod_uid":"pod-one","node":{"uid":"node-one","boot_id":"boot-one"},"container_id":"a".repeat(64)},"cgroup_inode":123,"cgroup_path":"fixture-only"},"armed":{"version":1,"event":"armed","request":{"execution_id":queued.execution_id,"boot_id":"boot-one","cgroup_inode":123,"cgroup_path":"fixture-only"}}});
     evidence["version"] = json!(2);
+    if fenced {
+        evidence["runtime"]["workspace_mount"] = mount;
+    }
     evidence["armed"]["request"]["deadline_boottime_ms"] = json!(30000);
     evidence["armed"]["cgroup_device"] = json!(42);
     evidence["armed"]["armed_boottime_ms"] = json!(1000);

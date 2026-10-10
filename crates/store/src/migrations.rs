@@ -177,6 +177,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    23,
+                    Cow::Borrowed("accepted execution completion"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0023_execution_completions.sql")),
+                    false,
+                ),
             ])
         })
     }

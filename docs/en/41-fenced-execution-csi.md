@@ -2,7 +2,7 @@
 
 The single-execution worker now publishes the [Candidate FUSE boundary](40-candidate-io-fence.md) to actual gVisor Pods. Production dispatch uses an inline `csi.agent-computer.io` volume and verifies the front filesystem before issuing a startup grant. The workload namespace remains under PodSecurity `restricted`; the Pod receives neither a hostPath nor the backing JuiceFS directory.
 
-Execution completion is still conservative: `Unknown` executions and `Draining` writer leases remain unresolved. This integration does not combine process termination, durable output and the live IO barrier into an accepted completion transaction. Computer `ready` remains false and T01–T43 remain `not_run`.
+This section and its dated evidence describe the CSI integration before accepted completion. [Section 42](42-accepted-execution-completion.md) adds the live process/IO seal, durable outcome and atomic writer release. The conservative recovery limits below still apply when that proof is missing. Computer `ready` remains false and T01–T43 remain `not_run`.
 
 ## Publication and startup
 
@@ -36,4 +36,4 @@ The [component record](../evidence/fenced-execution-csi-2026-10-10.json) and [lo
 
 After that fixture, run `csi_live_test --exact real_csi_cleanup_replay_and_peer_boundary --nocapture` with `AGENT_COMPUTER_CSI_DISPOSABLE_TEST=1` and `AGENT_COMPUTER_CSI_TEST_INSTANCE` set to the completed normal execution's instance. It exercises real Unix gRPC, repeated cleanup, revoked replay, wrong identities, a deliberately replaced foreign bind mount and a UID/GID 1000 client with no supplementary groups. Run only in an explicitly disposable host environment. Independent fresh-client JuiceFS and signed S3 reads are separate evidence from the controller's reports.
 
-This is single-node component qualification, not multi-node fencing, power-loss recovery, a general application filesystem or complete Computer acceptance. Registry retention/reclamation and accepted execution completion still require further work.
+This is single-node component qualification, not multi-node fencing, power-loss recovery, a general application filesystem or complete Computer acceptance. Registry retention/reclamation still requires further work; accepted completion is described in section 42.

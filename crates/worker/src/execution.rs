@@ -1,4 +1,4 @@
-//! Trusted single-execution controller. Local reports never release writer leases.
+//! Trusted single-execution controller. Completion requires live kernel and IO seals.
 mod plan;
 mod storage;
 use agent_computer_core::identity::OrganizationId;
@@ -49,6 +49,7 @@ pub enum Cleanup {
 /// The raw observation is deliberately omitted from JSON/operator command output.
 #[derive(Debug, Serialize)]
 pub struct WorkResult {
+    pub completion: Option<ExecutionCompletion>,
     pub io_fence: Option<agent_computer_fence::Evidence>,
     pub publication_revoked: bool,
     pub output: Option<ExecutionOutput>,
@@ -121,6 +122,7 @@ pub async fn execute_once(
     let mut observed = None;
     let mut node_error = None;
     let mut fence = None;
+    let mut node_guard = None;
     let mut registered = false;
     let run=tokio::time::timeout(budget, async {
         let inputs=store.candidate_execution_runtime_inputs(org,id).await?;
@@ -169,17 +171,18 @@ pub async fn execute_once(
         let candidate=agent_computer_node::CandidateIdentity{data_inode:inputs.prepared.data_inode,volume_path:inputs.target.volume_path.clone()};
         phase=Phase::Watchdog;
         let live_fence=fence.clone();
-        let mut guard=tokio::task::spawn_blocking(move || agent_computer_node::arm_fenced(&config.node,runtime,&execution,&command,&candidate,guard_deadline,&live_fence))
-            .await.map_err(|_|Error::RuntimeAccessUnavailable)?.map_err(|error|{node_error=Some(error);Error::ReferenceUnavailable})?;
+        node_guard=Some(tokio::task::spawn_blocking(move || agent_computer_node::arm_fenced(&config.node,runtime,&execution,&command,&candidate,guard_deadline,&live_fence))
+            .await.map_err(|_|Error::RuntimeAccessUnavailable)?.map_err(|error|{node_error=Some(error);Error::ReferenceUnavailable})?);
+        let guard=node_guard.as_mut().ok_or(Error::InvalidStoredData)?;
         phase=Phase::WatchdogRegistration;
-        store.register_candidate_execution_watchdog(&attempt,&mut guard).await?;
+        store.register_candidate_execution_watchdog(&attempt,guard).await?;
         // Re-read API identity after host arming, before spending the grant.
         phase=Phase::NodeBinding;
         let actual=backend(client.observe_runtime(plan.pod_plan(),channel.pod_uid(),guard.evidence().runtime.identity.node()).await)?;
         if actual!=guard.evidence().runtime.identity {return Err(Error::RuntimeConflict)}
         phase=Phase::Authorize;
         let current=active(store,org,id).await?;
-        let grant=store.authorize_guarded_candidate_execution_startup(org,id,current.revision,channel.pod_uid(),channel.challenge(),&mut guard).await?;
+        let grant=store.authorize_guarded_candidate_execution_startup(org,id,current.revision,channel.pod_uid(),channel.challenge(),guard).await?;
         grant.remaining_budget_ms()?;
         attempt.remaining_budget_ms()?;
         guard.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?;
@@ -198,28 +201,33 @@ pub async fn execute_once(
     }
     let observation = run.ok().and_then(std::result::Result::ok);
     let interrupted_at = observation.is_none().then_some(phase);
-    // Try to lower database authority first, but a database outage must not skip
-    // best-effort conditional deletion of an already planned/observed instance.
-    let state = unknown(store, org, id).await;
     let publication_revoked = if registered {
         revoke(fence.as_ref().expect("registered live mount").instance()).await
     } else {
         false
     };
-    let cleanup = match (&plan, &journal) {
-        (Some(plan), Some(journal)) => {
-            cleanup(
-                store,
-                client,
-                org,
-                id,
-                plan,
-                journal,
-                observed.as_ref().map(PodObservation::uid),
-            )
-            .await
+    // Kill/observe the original pinned process domain before API cleanup can
+    // remove its paths. New IO is already closed; watchdog deadlines stay armed.
+    let sealed = if let (Some(guard), Some(fence)) = (node_guard, fence.as_ref()) {
+        let fence = fence.clone();
+        match tokio::time::timeout(
+            Duration::from_secs(12),
+            tokio::task::spawn_blocking(move || guard.seal(&fence)),
+        )
+        .await
+        {
+            Ok(Ok(Ok(sealed))) => Some(sealed),
+            Ok(Ok(Err(error))) => {
+                node_error = Some(error);
+                None
+            }
+            _ => {
+                node_error = Some(agent_computer_node::Error::TerminationUnconfirmed);
+                None
+            }
         }
-        _ => Cleanup::NoPlan,
+    } else {
+        None
     };
     let (output, output_unconfirmed) = if let Some(observation) = &observation {
         match tokio::time::timeout(
@@ -239,7 +247,52 @@ pub async fn execute_once(
     } else {
         (None, false)
     };
-    let io_fence = if let Some(fence) = fence {
+    let completion = if let Some(sealed) = &sealed {
+        tokio::time::timeout(Duration::from_secs(5), async {
+            // The same immutable seal makes ambiguous commit responses safe to
+            // retry. No process, grant, or side effect is dispatched again.
+            for _ in 0..2 {
+                if let Ok(receipt) = store.finish_candidate_execution(&attempt, sealed).await {
+                    return Some(receipt);
+                }
+            }
+            None
+        })
+        .await
+        .ok()
+        .flatten()
+    } else {
+        None
+    };
+    let state = if completion.is_some() {
+        tokio::time::timeout(
+            Duration::from_secs(5),
+            store.reconcile_candidate_execution(org, id),
+        )
+        .await
+        .unwrap_or(Err(Error::RuntimeAccessUnavailable))
+    } else {
+        unknown(store, org, id).await
+    };
+    // Database unavailability must never suppress conditional external cleanup.
+    let cleanup = match (&plan, &journal) {
+        (Some(plan), Some(journal)) => {
+            cleanup(
+                store,
+                client,
+                org,
+                id,
+                plan,
+                journal,
+                observed.as_ref().map(PodObservation::uid),
+            )
+            .await
+        }
+        _ => Cleanup::NoPlan,
+    };
+    let io_fence = if let Some(sealed) = &sealed {
+        Some(sealed.evidence().io.clone())
+    } else if let Some(fence) = fence {
         match tokio::time::timeout(
             Duration::from_secs(5),
             tokio::task::spawn_blocking(move || {
@@ -255,6 +308,7 @@ pub async fn execute_once(
         None
     };
     Ok(WorkResult {
+        completion,
         io_fence,
         publication_revoked,
         output,
@@ -383,6 +437,7 @@ pub async fn recover_once(
             (None, None)
         };
     Ok(WorkResult {
+        completion: store.candidate_execution_completion(org, id).await?,
         io_fence: None,
         publication_revoked,
         output: None,
