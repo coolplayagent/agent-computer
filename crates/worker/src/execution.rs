@@ -13,6 +13,8 @@ use std::time::Duration;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Configuration {
+    pub outputs: agent_computer_objects::Configuration,
+    pub output_spool: std::path::PathBuf,
     pub approved_supervisor_image: String,
     pub storage: agent_computer_kubernetes::volume::StorageClassBinding,
     pub candidate: crate::candidate::Configuration,
@@ -43,10 +45,12 @@ pub enum Cleanup {
     Unconfirmed,
 }
 
-/// Operator metadata plus bounded, private raw bytes for a future collector.
+/// Operator metadata plus bounded, private raw bytes collected into durable objects.
 /// The raw observation is deliberately omitted from JSON/operator command output.
 #[derive(Debug, Serialize)]
 pub struct WorkResult {
+    pub output: Option<ExecutionOutput>,
+    pub output_unconfirmed: bool,
     pub execution: ExecutionRequest,
     pub interrupted_at: Option<Phase>,
     pub cleanup: Cleanup,
@@ -99,6 +103,10 @@ pub async fn execute_once(
     expected_revision: i64,
     config: Configuration,
 ) -> Result<WorkResult> {
+    let output_client = agent_computer_objects::Client::new(&config.outputs)
+        .map_err(|_| Error::ReferenceUnavailable)?;
+    let output_spool = agent_computer_objects::Spool::open(&config.output_spool)
+        .map_err(|_| Error::ReferenceUnavailable)?;
     let attempt = store
         .begin_candidate_execution_dispatch(org, id, expected_revision)
         .await?;
@@ -195,7 +203,27 @@ pub async fn execute_once(
         }
         _ => Cleanup::NoPlan,
     };
+    let (output, output_unconfirmed) = if let Some(observation) = &observation {
+        match tokio::time::timeout(
+            Duration::from_secs(30),
+            store.collect_candidate_execution_output(
+                &attempt,
+                observation,
+                &output_client,
+                &output_spool,
+            ),
+        )
+        .await
+        {
+            Ok(Ok(output)) => (Some(output), false),
+            _ => (None, true),
+        }
+    } else {
+        (None, false)
+    };
     Ok(WorkResult {
+        output,
+        output_unconfirmed,
         execution: state?,
         interrupted_at,
         cleanup,
@@ -300,6 +328,8 @@ pub async fn recover_once(
             (None, None)
         };
     Ok(WorkResult {
+        output: None,
+        output_unconfirmed: false,
         execution: state,
         interrupted_at: Some(Phase::Recovery),
         cleanup,

@@ -116,3 +116,37 @@ pub(crate) async fn cancel(
 ) -> Response {
     handle(state, context, path, request, Operation::Cancel).await
 }
+
+pub(crate) async fn output(
+    State(state): State<ServiceState>,
+    Extension(context): Extension<RequestContext>,
+    path: Result<Path<String>, PathRejection>,
+    request: Request,
+) -> Response {
+    let token = match requests::authorize(
+        &state,
+        &context,
+        request.headers(),
+        ServiceScope::RuntimeConnect,
+    )
+    .await
+    {
+        Ok(t) => t,
+        Err(e) => return e,
+    };
+    let id = match path {
+        Ok(Path(id)) if ComputerId::new(&id).is_ok() => id,
+        _ => {
+            return context.error(
+                StatusCode::BAD_REQUEST,
+                "invalid_request",
+                "Invalid execution ID.",
+                false,
+            );
+        }
+    };
+    match state.store.candidate_execution_output(&token, &id).await {
+        Ok(output) => (StatusCode::OK, Json(output)).into_response(),
+        Err(e) => context.store_error(e),
+    }
+}

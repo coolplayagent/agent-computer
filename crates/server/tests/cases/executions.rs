@@ -87,6 +87,17 @@ async fn execution_http_queue_retry_query_and_cancel_do_not_dispatch() {
         (StatusCode::OK, queued.clone())
     );
     let other = s.issue("alice", &ServiceScope::ALL).await;
+    let output = format!("{get}/output");
+    assert_eq!(
+        s.send(req(&token, "GET", &output, None, Value::Null)).await,
+        (StatusCode::OK, Value::Null)
+    );
+    assert_eq!(
+        s.send(req(other.expose_token(), "GET", &output, None, Value::Null))
+            .await
+            .0,
+        StatusCode::NOT_FOUND
+    );
     assert_eq!(
         s.send(req(other.expose_token(), "GET", &get, None, Value::Null))
             .await

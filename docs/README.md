@@ -37,6 +37,7 @@
 33. [持久化 watchdog 观察](zh-CN/33-watchdog-journals.md)
 34. [节点常驻到期回收](zh-CN/34-node-expiry-reaper.md)
 35. [到期回收服务的启动准入](zh-CN/35-reaper-startup-admission.md)
+36. [有界执行输出持久化](zh-CN/36-durable-execution-outputs.md)
 
 ## 02. English
 
@@ -75,6 +76,7 @@
 33. [Durable watchdog observations](en/33-watchdog-journals.md)
 34. [Persistent node expiry recovery](en/34-node-expiry-reaper.md)
 35. [Reaper availability in startup admission](en/35-reaper-startup-admission.md)
+36. [Durable bounded execution outputs](en/36-durable-execution-outputs.md)
 
 两组文档使用相同序号和主题，随实现同步更新。详细设计和需求追踪继续保留在 `codespec/`，知识导航由 `relay-knowledge` 管理。
 

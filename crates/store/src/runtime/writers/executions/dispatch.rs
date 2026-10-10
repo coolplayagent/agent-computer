@@ -1,5 +1,7 @@
 //! Trusted worker journal API. No Kubernetes mutation or process launch here.
 mod inputs;
+mod outputs;
+pub use outputs::{ExecutionOutput, OutputState};
 mod pods;
 mod startup;
 mod watchdogs;

@@ -128,7 +128,8 @@ impl StartupGrant {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StartupReport {
     pub version: u32,
     pub challenge_digest: String,

@@ -22,6 +22,8 @@ use std::{
 };
 #[path = "support/execution_faults.rs"]
 mod faults;
+#[path = "support/execution_outputs.rs"]
+mod outputs;
 
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
@@ -89,6 +91,19 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         .await
         .unwrap();
     let token = credential.expose_token();
+    // Keep the platform's eight-Candidate per-principal ceiling intact.
+    // Additional output scenarios use a separately authorized fixture caller.
+    let output_actor = PrincipalId::new("output-operator").unwrap();
+    let output_credential = store
+        .issue_credential(IssueCredential {
+            organization: &org,
+            principal: &output_actor,
+            kind: PrincipalKind::Human,
+            scopes: &ServiceScope::ALL,
+            lifetime: Duration::from_secs(1800),
+        })
+        .await
+        .unwrap();
     for kind in [
         DefinitionKind::Declaration,
         DefinitionKind::Volume,
@@ -119,19 +134,21 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .register_catalog_reference(&org, kind, name)
             .await
             .unwrap();
-        store
-            .set_definition_grant(
-                DefinitionGrant {
-                    organization: &org,
-                    principal: &actor,
-                    kind,
-                    name,
-                    permission: DefinitionPermission::Reference,
-                },
-                true,
-            )
-            .await
-            .unwrap();
+        for principal in [&actor, &output_actor] {
+            store
+                .set_definition_grant(
+                    DefinitionGrant {
+                        organization: &org,
+                        principal,
+                        kind,
+                        name,
+                        permission: DefinitionPermission::Reference,
+                    },
+                    true,
+                )
+                .await
+                .unwrap();
+        }
         catalog.push(format!("id:{id}"));
     }
     let kube = &config["kubernetes"];
@@ -159,6 +176,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "controller-kill",
         "pid1-stop",
         "reaper-missing",
+        "output-store-failure",
+        "output-db-failure",
+        "output-truncated",
     ];
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
         "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":names.len() as u64 * 10737418240u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
@@ -266,28 +286,40 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             _ => continue,
         };
         for permission in permissions {
-            store
-                .set_runtime_grant(
-                    RuntimeGrant {
-                        organization: &org,
-                        principal: &actor,
-                        kind,
-                        resource_id: &resource.resource_id,
-                        permission: *permission,
-                        max_runtime_seconds: (*permission == RuntimePermission::Activate)
-                            .then_some(600),
-                    },
-                    true,
-                )
-                .await
-                .unwrap();
+            for principal in [&actor, &output_actor] {
+                store
+                    .set_runtime_grant(
+                        RuntimeGrant {
+                            organization: &org,
+                            principal,
+                            kind,
+                            resource_id: &resource.resource_id,
+                            permission: *permission,
+                            max_runtime_seconds: (*permission == RuntimePermission::Activate)
+                                .then_some(600),
+                        },
+                        true,
+                    )
+                    .await
+                    .unwrap();
+            }
         }
     }
-    let worker = json!({"approved_supervisor_image":image,"storage":storage,"candidate":local,"node":config["node"]});
-    let make_config =
-        || serde_json::from_value::<execution::Configuration>(worker.clone()).unwrap();
+    let worker = json!({"approved_supervisor_image":image,"storage":storage,"candidate":local,"node":config["node"],"outputs":config["outputs"],"output_spool":config["output_spool"]});
     let mut results = vec![];
     for name in names {
+        let token = if name.starts_with("output-") {
+            output_credential.expose_token()
+        } else {
+            token
+        };
+        let mut case_worker = worker.clone();
+        if name == "output-store-failure" {
+            case_worker["outputs"]["credentials_file"] =
+                config["rejected_output_credentials_file"].clone();
+        }
+        let make_config =
+            || serde_json::from_value::<execution::Configuration>(case_worker.clone()).unwrap();
         let computer = &declaration
             .resources
             .iter()
@@ -356,7 +388,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             )
             .await
             .unwrap();
-        let script = if name == "pid1-stop" {
+        let script = if name == "output-truncated" {
+            "i=0; while [ \"$i\" -lt 5000 ]; do printf x; printf y >&2; i=$((i+1)); done; printf persisted > output.txt; /bin/sync output.txt"
+        } else if name == "pid1-stop" {
             "kill -STOP 1; /bin/cat /proc/1/status > pid1-status.txt; /bin/sync pid1-status.txt; printf started > started.txt; /bin/sync started.txt; while :; do printf tick >> ticks.txt; /bin/sync ticks.txt; /bin/sleep 0.1; done"
         } else if name == "controller-kill" {
             "printf started > started.txt; /bin/sync started.txt; /bin/sleep 35; printf unexpected > late.txt"
@@ -401,6 +435,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         .unwrap();
         let data = root.join(field(&prepared, "path_ref"));
         let _reaper_pause = (name == "reaper-missing").then(ReaperPause::begin);
+        if name == "output-db-failure" {
+            sqlx::raw_sql("CREATE FUNCTION reject_output_publication() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.kind='execution.output_verified' THEN RAISE EXCEPTION 'fixture output acknowledgement failure'; END IF; RETURN NEW; END; $$; CREATE TRIGGER reject_output_publication BEFORE INSERT ON events FOR EACH ROW EXECUTE FUNCTION reject_output_publication();").execute(&pool).await.unwrap();
+        }
         let outcome = match name {
             "reaper-missing" => {
                 let result = execution::execute_once(
@@ -632,6 +669,21 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 result
             }
         };
+        if name == "output-db-failure" {
+            sqlx::raw_sql("DROP TRIGGER reject_output_publication ON events; DROP FUNCTION reject_output_publication();").execute(&pool).await.unwrap();
+        }
+        let private = json!({"api_url":"https://127.0.0.1:1","ca_file":"/unavailable-kubernetes-ca","token_file":"/unavailable-kubernetes-token","deployment":deployment,"execution":worker});
+        let output_evidence = outputs::verify(
+            &config,
+            &private,
+            &store,
+            token,
+            &org,
+            &queued.execution_id,
+            name,
+            &outcome,
+        )
+        .await;
         assert!(matches!(
             store
                 .reconcile_candidate_writer(&org, &lease.lease_id)
@@ -668,7 +720,14 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 .is_some(),
             matches!(
                 name,
-                "normal" | "command" | "cancel" | "controller-kill" | "pid1-stop"
+                "normal"
+                    | "command"
+                    | "cancel"
+                    | "controller-kill"
+                    | "pid1-stop"
+                    | "output-store-failure"
+                    | "output-db-failure"
+                    | "output-truncated"
             )
         );
         let recovery = execution::recover_once(
@@ -690,10 +749,17 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             watchdog.is_some(),
             matches!(
                 name,
-                "normal" | "command" | "cancel" | "controller-kill" | "pid1-stop"
+                "normal"
+                    | "command"
+                    | "cancel"
+                    | "controller-kill"
+                    | "pid1-stop"
+                    | "output-store-failure"
+                    | "output-db-failure"
+                    | "output-truncated"
             )
         );
-        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
+        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"outputs":output_evidence,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
     }
     let drains: i64 =
         sqlx::query_scalar("SELECT count(*) FROM candidate_writer_drains WHERE organization=$1")

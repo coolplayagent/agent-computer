@@ -9,7 +9,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/core", "//crates/definitions", "//crates/store", "//crates/worker"] + all_crate_deps(normal = True),
+    deps = ["//crates/core", "//crates/definitions", "//crates/store", "//crates/worker", "//crates/objects"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -19,7 +19,7 @@ rust_binary(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = [":server", "//crates/core", "//crates/store", "//crates/kubernetes", "//crates/worker"] + all_crate_deps(normal = True),
+    deps = [":server", "//crates/core", "//crates/store", "//crates/kubernetes", "//crates/worker", "//crates/objects"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -33,6 +33,6 @@ rust_test(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     tags = ["requires-postgresql"],
-    deps = [":server", "//crates/core", "//crates/definitions", "//crates/store", "//crates/worker", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
+    deps = [":server", "//crates/core", "//crates/definitions", "//crates/store", "//crates/worker", "//crates/objects", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
     proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
 )

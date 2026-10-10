@@ -4,7 +4,7 @@ use rustix::{
     fs::{self, Mode, OFlags, ResolveFlags},
     process::{self, DumpableBehavior, Pid, Signal, WaitOptions, WaitStatus},
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     os::unix::process::CommandExt,
     process::{Command, Stdio},
@@ -13,7 +13,7 @@ use std::{
 };
 use tokio::signal::unix::{SignalKind, signal};
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Outcome {
     Succeeded,
@@ -27,7 +27,8 @@ pub enum Outcome {
 }
 
 /// Local observation only: never a database completion receipt or writer drain proof.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Report {
     pub version: u32,
     pub execution_id: String,

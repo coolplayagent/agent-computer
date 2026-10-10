@@ -1,0 +1,132 @@
+CARGO WORKSPACE RESULT LINES
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+test result: ok. 7 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.39s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.11s
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.05s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 141 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.81s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+CLIPPY FINAL
+    Checking agent-computer-worker v0.1.0 (/opt/workspace/agent-computer/crates/worker)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s
+
+
+BAZEL FINAL BUILD
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 31 targets (0 packages loaded, 0 targets configured)
+Analyzing: 31 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 31 targets (1 packages loaded, 28 targets configured).
+INFO: Found 31 targets...
+INFO: Elapsed time: 0.282s, Critical Path: 0.00s
+INFO: 1 process: 76 action cache hit, 1 internal.
+INFO: Build completed successfully, 1 total action
+
+
+BAZEL DEFAULT TESTS
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 30 targets (4 packages loaded, 0 targets configured)
+Analyzing: 30 targets (4 packages loaded, 0 targets configured)
+
+INFO: Analyzed 30 targets (5 packages loaded, 100 targets configured).
+[978 / 989] 3 / 11 tests; Compiling Rust bin objects_contracts_test (6 files); 0s processwrapper-sandbox ... (8 actions running)
+[981 / 989] 6 / 11 tests; Compiling Rust bin objects_contracts_test (6 files); 1s processwrapper-sandbox ... (5 actions running)
+[985 / 990] 8 / 11 tests; Compiling Rust bin server_contracts_test (12 files); 3s processwrapper-sandbox ... (3 actions running)
+[986 / 990] 9 / 11 tests; Compiling Rust bin server_contracts_test (12 files); 4s processwrapper-sandbox ... (2 actions running)
+[988 / 991] 9 / 11 tests; Compiling Rust bin postgres_contracts_test (32 files); 5s processwrapper-sandbox ... (2 actions running)
+[988 / 991] 9 / 11 tests; Compiling Rust bin postgres_contracts_test (32 files); 9s processwrapper-sandbox ... (2 actions running)
+[989 / 991] 10 / 11 tests; Compiling Rust bin postgres_contracts_test (32 files); 10s processwrapper-sandbox
+[991 / 992] 10 / 11 tests; Testing //crates/store:postgres_contracts_test; 0s processwrapper-sandbox
+[991 / 992] 10 / 11 tests; Testing //crates/store:postgres_contracts_test; 10s processwrapper-sandbox
+[991 / 992] 10 / 11 tests; Testing //crates/store:postgres_contracts_test; 14s processwrapper-sandbox
+INFO: Found 19 targets and 11 test targets...
+INFO: Elapsed time: 26.047s, Critical Path: 25.33s
+INFO: 18 processes: 70 action cache hit, 4 internal, 25 processwrapper-sandbox.
+INFO: Build completed successfully, 18 total actions
+//crates/cli:cli_contracts_test                                          PASSED in 0.9s
+//crates/core:core_contracts_test                                        PASSED in 0.1s
+//crates/definitions:definitions_contracts_test                          PASSED in 0.8s
+//crates/kubernetes:kubernetes_contracts_test                            PASSED in 1.4s
+//crates/node:node_contracts_test                                        PASSED in 2.0s
+//crates/objects:objects_contracts_test                                  PASSED in 0.6s
+//crates/sandbox:sandbox_contracts_test                                  PASSED in 0.1s
+//crates/server:server_contracts_test                                    PASSED in 4.5s
+//crates/storage:storage_contracts_test                                  PASSED in 2.2s
+//crates/store:postgres_contracts_test                                   PASSED in 14.6s
+//crates/watchdog:watchdog_contracts_test                                PASSED in 0.2s
+
+Executed 11 out of 11 tests: 11 tests pass.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+
+WORKER LIVE FINAL
+active
+
+running 1 test
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery has been running for over 60 seconds
+EXECUTION_WORKER_DATABASE_CSI_GVISOR_PASSED
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 127.22s
+
+
+
+INDEPENDENT S3 READBACK
+
+For enterprise users, please visit https://seaweedfs.com for the SeaweedFS Enterprise Edition,
+which has advanced features, including data recovery, self-healing storage, customizable erasure coding, EC vacuum and repair, etc.
+{"database_counts": {"execution_requests": 11, "execution_dispatch_intents": 11, "execution_pod_plans": 10, "execution_pod_observations": 10, "execution_watchdog_arms": 8, "execution_startup_grants": 8, "candidate_writer_leases": 11, "candidate_writer_drains": 0, "candidate_writer_completions": 0, "execution_output_intents": 5, "execution_outputs": 5}, "independent_s3_references": 20, "reaper_service": "active"}
+
+
+CLEANUP
+{"boot_id": "bf4408c7-fd6f-41af-b8ac-0705c9a90bf3", "owned_root_fixture_cgroups_remaining": [], "independent_watchdogs_remaining": [], "fixture_service_before_removal": "NRestarts=0\nActiveState=active\nSubState=running\n", "fixture_service_unit_removed": true}
+{
+  "owned_vm_pid": 4067513,
+  "terminated": true,
+  "private_files_removed": [
+    "vm.json",
+    "disk.qcow2",
+    "seed.iso",
+    "id_ed25519",
+    "id_ed25519.pub",
+    "known_hosts",
+    "user-data",
+    "meta-data",
+    "serial.log",
+    "qemu.log"
+  ],
+  "public_cached_archives_retained": true
+}
+

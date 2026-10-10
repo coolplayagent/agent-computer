@@ -145,6 +145,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0018_reaper_admission.sql")),
                     false,
                 ),
+                Migration::new(
+                    19,
+                    Cow::Borrowed("durable execution outputs"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0019_execution_outputs.sql")),
+                    false,
+                ),
             ])
         })
     }

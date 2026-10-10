@@ -136,11 +136,25 @@ pub async fn kill_controller(
     while boottime_ms() <= deadline + 10 {
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
-    let state = store
-        .reconcile_candidate_execution(org, execution)
-        .await
-        .unwrap();
-    assert_eq!(state.state, ExecutionState::Unknown);
+    // The conservative node deadline can precede the original database
+    // deadline. Keep observing the latter; do not equate the two clocks or
+    // issue cancellation to force this assertion to pass.
+    let reconcile_until = tokio::time::Instant::now() + Duration::from_secs(5);
+    let state = loop {
+        let state = store
+            .reconcile_candidate_execution(org, execution)
+            .await
+            .unwrap();
+        if state.state == ExecutionState::Unknown {
+            break state;
+        }
+        assert_eq!(state.state, ExecutionState::Dispatching);
+        assert!(
+            tokio::time::Instant::now() < reconcile_until,
+            "database expiry reconciliation deadline"
+        );
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    };
     json!({"controller_pid":controller_pid,"controller_signal":9,"controller_killed_boottime_ms":killed_at,"pid1_state":stopped,"heartbeat_after_kill":heartbeat_after_kill,"cgroup_inode":runtime["cgroup_inode"],"deadline_boottime_ms":deadline,"empty_observed_boottime_ms":empty_at,"api_delete_before_empty":false,"state":state})
 }
 
