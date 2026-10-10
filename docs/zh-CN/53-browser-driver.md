@@ -37,3 +37,5 @@ PLAYWRIGHT_BROWSERS_PATH=/private/test-browsers bazel test //packages/browser-dr
 安装和测试需使用同一浏览器路径。浏览器及系统库属于显式环境准备，构建不会通过包安装脚本下载浏览器。手动标记的 browser target 需要配套 Chromium 和可用沙箱；缺失时失败，不跳过、不自动关闭沙箱。普通 `bazel test //...` 包含 unit target。
 
 测试使用真实页面和 HTTP 效果，覆盖 PNG/DOM、结构化及坐标输入、多页、撤权、导航/框架/控制切换失效、边界、回执丢失和迟到的 journal 准入。内存授权/journal fixture 仅验证驱动行为。完整 App 生命周期、持久 GUI 授权/journal、加密 profile checkpoint、跨节点 fencing、ComputerView 和 T04/T05/T10/T24 验收仍未完成。
+
+[绑定源码的组件证据](../evidence/browser-driver-2026-10-11.json)与[真实浏览器测试输出](../evidence/browser-driver-2026-10-11.log)记录一次性 VM 中同时启用 gVisor 和 Chromium 沙箱的 11 项通过结果，不构成 App 生命周期或产品验收。

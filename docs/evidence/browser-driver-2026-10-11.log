@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: real Chromium: screenshots, DOM actions, multi-page isolation and receipt replay
+ok 1 - real Chromium: screenshots, DOM actions, multi-page isolation and receipt replay
+  ---
+  duration_ms: 1528.938409
+  type: 'test'
+  ...
+# Subtest: real Chromium: DOM relocation and changed pixels reject stale targets before intent
+ok 2 - real Chromium: DOM relocation and changed pixels reject stale targets before intent
+  ---
+  duration_ms: 1196.577057
+  type: 'test'
+  ...
+# Subtest: real Chromium: navigation, frame recreation and control handoff invalidate observations
+ok 3 - real Chromium: navigation, frame recreation and control handoff invalidate observations
+  ---
+  duration_ms: 1602.908089
+  type: 'test'
+  ...
+# Subtest: real Chromium: revoked authority denies reads and rechecks after persisted intent
+ok 4 - real Chromium: revoked authority denies reads and rechecks after persisted intent
+  ---
+  duration_ms: 863.141098
+  type: 'test'
+  ...
+# Subtest: real Chromium: lost completion acknowledgement returns unknown and never repeats effects
+ok 5 - real Chromium: lost completion acknowledgement returns unknown and never repeats effects
+  ---
+  duration_ms: 1257.402374
+  type: 'test'
+  ...
+# Subtest: real Chromium: one in-flight operation and bounded observation lifetime
+ok 6 - real Chromium: one in-flight operation and bounded observation lifetime
+  ---
+  duration_ms: 1608.951907
+  type: 'test'
+  ...
+# Subtest: real Chromium: page quota rejects before intent and runtime closes the context
+ok 7 - real Chromium: page quota rejects before intent and runtime closes the context
+  ---
+  duration_ms: 3537.322307
+  type: 'test'
+  ...
+# Subtest: real Chromium: journal unavailable or late admission never dispatches
+ok 8 - real Chromium: journal unavailable or late admission never dispatches
+  ---
+  duration_ms: 12663.032204
+  type: 'test'
+  ...
+# Subtest: real Chromium: bounded traversal and page-created tabs
+ok 9 - real Chromium: bounded traversal and page-created tabs
+  ---
+  duration_ms: 1082.86737
+  type: 'test'
+  ...
+# Subtest: real Chromium: malformed journal admission fails closed and persisted Unknown is never replayed
+ok 10 - real Chromium: malformed journal admission fails closed and persisted Unknown is never replayed
+  ---
+  duration_ms: 1672.650165
+  type: 'test'
+  ...
+# Subtest: real Chromium: collecting target proof cannot extend observation validity
+ok 11 - real Chromium: collecting target proof cannot extend observation validity
+  ---
+  duration_ms: 3437.171394
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 31056.466418
