@@ -124,6 +124,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0015_execution_pods.sql")),
                     false,
                 ),
+                Migration::new(
+                    16,
+                    Cow::Borrowed("execution node watchdogs"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0016_execution_watchdogs.sql")),
+                    false,
+                ),
             ])
         })
     }

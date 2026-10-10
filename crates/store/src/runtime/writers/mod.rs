@@ -10,7 +10,7 @@ pub use executions::{
     CancelExecution, ExecutionCommand, ExecutionDispatchAttempt, ExecutionDispatchIntent,
     ExecutionLifetime, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRequest,
     ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionState,
-    SubmitExecution,
+    ExecutionWatchdogArm, SubmitExecution,
 };
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;

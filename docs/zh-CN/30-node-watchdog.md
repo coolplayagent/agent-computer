@@ -2,7 +2,7 @@
 
 ## 30.1 已交付组件
 
-`agent-computer-watchdog` 是用 Rust 与 Bazel 构建的一次性 Linux 宿主进程。它在可信运营方指定的专用工作负载 cgroup 之外运行，按固定截止时间终止该子树，独立于执行控制器和容器内 PID 1。组件不启动工作负载，也不访问 PostgreSQL、Kubernetes 或运行时 socket。[29 执行工作器](29-execution-worker.md)尚未调用它。
+`agent-computer-watchdog` 是用 Rust 与 Bazel 构建的一次性 Linux 宿主进程。它在可信运营方指定的专用工作负载 cgroup 之外运行，按固定截止时间终止该子树，独立于执行控制器和容器内 PID 1。组件不启动工作负载，也不访问 PostgreSQL、Kubernetes 或运行时 socket。[31 本地节点适配器](31-node-guarded-startup.md)现已在执行工作器签发启动授权前调用它。
 
 请求固定执行关联 ID、当前节点 boot ID、`/sys/fs/cgroup` 下的规范相对路径、预期 cgroup inode，以及绝对 `CLOCK_BOOTTIME` 截止时间。未来截止时间不得超过 30 秒；已经过期的请求立即终止目标。重试相同请求不会重新计算预算。执行 ID 只用于关联，不能证明 cgroup 属于该执行。
 
@@ -18,13 +18,13 @@
 
 用 `bazel build //crates/watchdog:agent-computer-watchdog` 构建。可信节点运营方将有界 JSON 文件传给 `agent-computer-watchdog --request PATH`，通过管道读取两行 JSON：`armed` 与最终观测报告。报告包括固定请求、设备标识、启动/终止/观测时间、触发原因和观测状态。退出码 0 表示已输出本地 `EmptyObserved` 报告；退出码 2 表示请求拒绝、观测未知或输出不可用。缺失输出不能证明终止没有发生。
 
-运营方必须在宿主初始命名空间中运行组件，将其置于目标子树和控制器生命周期之外，独占 cgroup 迁移/准入权限，并使用启动前固定的截止时间。CLI 尚不提供守护进程化、经过认证的远程协议、持久注册或崩溃恢复。watchdog 自身被杀死/暂停、内核故障和节点分区仍需可信恢复。重放请求不是生产恢复协议。
+运营方必须在宿主初始命名空间中运行组件，将其置于目标子树和控制器生命周期之外，独占 cgroup 迁移/准入权限，并使用启动前固定的截止时间。CLI 会创建独立 session，尚不提供服务监督、经过认证的远程协议或崩溃恢复；执行布防持久注册由节点适配器/数据库集成完成。watchdog 自身被杀死/暂停、内核故障和节点分区仍需可信恢复。重放请求不是生产恢复协议。
 
-`EmptyObserved` 只是某一时刻的本地内核观测，不能阻止后续进程进入，不能证明异步存储操作已排空，也不建立 Pod/container/Candidate 映射、接纳命令输出或释放数据库写入者。生产接入仍需持久节点注册、经过认证的 Pod/运行时/cgroup 身份、启动授权前的布防、监督与崩溃恢复、存储 fencing 和数据库对账。公开运行时仍不支持执行；[29 的流程](29-execution-worker.md)继续保留 Unknown/Draining。T01–T43 仍为 `not_run`。
+`EmptyObserved` 只是某一时刻的本地内核观测，不能阻止后续进程进入，不能证明异步存储操作已排空，也不建立 Pod/container/Candidate 映射、接纳命令输出或释放数据库写入者。[31](31-node-guarded-startup.md)已交付本地 Pod/运行时/cgroup 身份和启动授权前的持久布防；生产运行仍需持久节点服务注册、监督与崩溃恢复、存储 fencing 和数据库对账。公开运行时仍不支持执行；[29 的流程](29-execution-worker.md)继续保留 Unknown/Draining。T01–T43 仍为 `not_run`。
 
 ## 30.4 验证
 
-五项默认契约测试覆盖绝对截止时间、boot 身份、自身/祖先保护、严格有界请求解析和明确的递归空组判定。默认工作区现有 293 项测试，分布于九个 Bazel 测试目标。
+五项默认契约测试覆盖绝对截止时间、boot 身份、自身/祖先保护、严格有界请求解析和明确的递归空组判定。本增量交付时默认工作区有 293 项测试，分布于九个 Bazel 测试目标；当前数量见 [31](31-node-guarded-startup.md)。
 
 以下显式 root 测试必须在可销毁 VM 中运行：
 

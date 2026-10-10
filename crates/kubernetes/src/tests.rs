@@ -35,7 +35,7 @@ fn definition(mount: bool) -> agent_computer_definitions::ValidatedDefinition {
     validate_bytes(&serde_json::to_vec(&value).unwrap(), Format::Json).unwrap()
 }
 
-fn plan() -> EphemeralSandboxPlan {
+pub(super) fn plan() -> EphemeralSandboxPlan {
     EphemeralSandboxPlan::new(
         &definition(false),
         "sandbox",
@@ -64,7 +64,7 @@ fn prerequisites() -> Vec<Value> {
     ]
 }
 
-fn pod(plan: &EphemeralSandboxPlan) -> Value {
+pub(super) fn pod(plan: &EphemeralSandboxPlan) -> Value {
     let mut pod = plan.manifest();
     pod["metadata"]["uid"] = json!("pod-uid");
     pod["metadata"]["resourceVersion"] = json!("42");

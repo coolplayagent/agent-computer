@@ -2,7 +2,7 @@
 
 ## 30.1 Delivered component
 
-`agent-computer-watchdog` is a single-use Linux host process, built with Rust and Bazel. It runs outside a trusted operator's dedicated workload cgroup and terminates that subtree at a fixed deadline, independently of the execution controller and the in-container PID 1. It does not launch a workload or contact PostgreSQL, Kubernetes or a runtime socket. [29's worker](29-execution-worker.md) does not yet invoke it.
+`agent-computer-watchdog` is a single-use Linux host process, built with Rust and Bazel. It runs outside a trusted operator's dedicated workload cgroup and terminates that subtree at a fixed deadline, independently of the execution controller and the in-container PID 1. It does not launch a workload or contact PostgreSQL, Kubernetes or a runtime socket. [31's local node adapter](31-node-guarded-startup.md) now invokes it before the execution worker issues a startup grant.
 
 The request binds an execution correlation ID, the current node boot ID, a normalized path under `/sys/fs/cgroup`, the expected cgroup inode, and an absolute `CLOCK_BOOTTIME` deadline. Future deadlines must be within 30 seconds; expired requests terminate immediately. Retrying an identical request does not reset its deadline. Execution ID is a correlation value, not evidence that the cgroup belongs to that execution.
 
@@ -18,13 +18,13 @@ At expiry the component writes `1` to the pinned `cgroup.kill` file, then polls 
 
 Build with `bazel build //crates/watchdog:agent-computer-watchdog`. A trusted node operator supplies a bounded JSON file to `agent-computer-watchdog --request PATH` and reads the two JSON lines through a pipe: `armed`, then a report. The report contains the fixed request, device identity, arm/kill/observation times, trigger and observation. Exit 0 means a local `EmptyObserved` report was emitted; exit 2 means rejection, unknown observation or unavailable output. Missing output never proves that termination did not happen.
 
-The operator must run it in the host's initial namespaces, outside the workload tree and its controller's lifecycle, retain exclusive cgroup migration/admission authority, and use the fixed deadline established before launch. The CLI provides no daemonization, authenticated remote protocol, durable registration or restart recovery. A killed/stopped watchdog, kernel failure or node partition still requires trusted recovery. Replaying a request is not a production recovery protocol.
+The operator must run it in the host's initial namespaces, outside the workload tree and its controller's lifecycle, retain exclusive cgroup migration/admission authority, and use the fixed deadline established before launch. The CLI creates an independent session; it provides no service supervision, authenticated remote protocol or restart recovery. Durable execution-arm registration belongs to the node adapter/store integration. A killed/stopped watchdog, kernel failure or node partition still requires trusted recovery. Replaying a request is not a production recovery protocol.
 
-`EmptyObserved` is a point-in-time local kernel observation. It does not prevent later process admission, prove that asynchronous storage operations have drained, establish the Pod/container/Candidate mapping, accept command output, or release a database writer. Production integration still needs durable node registration, authenticated Pod/runtime/cgroup identity, arming before the startup grant, supervision and crash recovery, storage fencing and database reconciliation. Execution remains unsupported on the public runtime; executions retain Unknown/Draining under [29's workflow](29-execution-worker.md). T01–T43 remain `not_run`.
+`EmptyObserved` is a point-in-time local kernel observation. It does not prevent later process admission, prove that asynchronous storage operations have drained, establish the Pod/container/Candidate mapping, accept command output, or release a database writer. [31](31-node-guarded-startup.md) delivers local Pod/runtime/cgroup identity and durable arming before the startup grant. Production operation still needs durable node service registration, supervision and crash recovery, storage fencing and database reconciliation. Execution remains unsupported on the public runtime; executions retain Unknown/Draining under [29's workflow](29-execution-worker.md). T01–T43 remain `not_run`.
 
 ## 30.4 Verification
 
-Five default contracts cover absolute deadlines, boot identity, self/ancestor protection, strict bounded request parsing and explicit recursive-empty interpretation. The default workspace now contains 293 tests across nine Bazel test targets.
+Five default contracts cover absolute deadlines, boot identity, self/ancestor protection, strict bounded request parsing and explicit recursive-empty interpretation. This increment originally established 293 tests across nine Bazel test targets; [31](31-node-guarded-startup.md) records the current count.
 
 Explicit root-only tests must run in a disposable VM:
 

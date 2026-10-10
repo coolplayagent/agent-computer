@@ -4,6 +4,21 @@ domains:
     name: 人与 Agent 电脑基础设施
     description: 本项目领域术语；映射含设计与已实现领域规则，运行服务和基础设施尚待实现。
 terms:
+  - id: node-guarded-startup
+    domain: agent-infrastructure
+    canonical_name: NodeGuardedStartup
+    definition: 可信本地节点核对原 Pod、boot、runsc 进程树和 Candidate inode 后，以原派发截止时间布防独立 watchdog 并持久登记；一次性启动授权要求同一活句柄，序列化证据不能重建权限，空 cgroup 不构成存储排空或写锁释放。
+    language: zh-CN
+    mappings:
+      - relation: represented_by
+        target_kind: file
+        target: crates/node/src/lib.rs
+      - relation: represented_by
+        target_kind: file
+        target: crates/store/migrations/0016_execution_watchdogs.sql
+      - relation: represented_by
+        target_kind: file
+        target: docs/zh-CN/31-node-guarded-startup.md
   - id: node-cgroup-watchdog
     domain: agent-infrastructure
     canonical_name: NodeCgroupWatchdog

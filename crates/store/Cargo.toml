@@ -10,6 +10,7 @@ agent-computer-core = { path = "../core" }
 agent-computer-definitions = { path = "../definitions" }
 agent-computer-storage = { path = "../storage" }
 agent-computer-sandbox = { path = "../sandbox" }
+agent-computer-node = { path = "../node" }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true

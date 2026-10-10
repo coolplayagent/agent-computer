@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 52
-updated_at: unix:1791574113
+map_version: 53
+updated_at: unix:1791576929
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -112,13 +112,14 @@ topics:
   - kubernetes-adapter-guide
   - kubernetes-startup-attach
   - node-cgroup-watchdog
+  - node-guarded-startup-guide
   - numbered-bilingual-docs
   - reconciliation-coordination-guide
   - runtime-authorization-guide
   - sandbox-process-supervisor
   - volume-provisioning-guide
-  ref: topics/topic-875b9380866e9d56-5f932753a110b61ceb5737fd81245ad639a0ac7ec2f10de14eaf82fa49bf8cb5.yaml
-  digest: 5f932753a110b61ceb5737fd81245ad639a0ac7ec2f10de14eaf82fa49bf8cb5
+  ref: topics/topic-875b9380866e9d56-49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a.yaml
+  digest: 49bb0db2c95604332c4e2ce317b4ec4ca41dc6e76793eced742e91b738cf832a
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -142,12 +143,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 36
+  omitted_through: 37
   recent:
-  - version: 37
-    action: source.add
-    actor: cli
-    summary: Added source 'computer-start-admission' to topic 'development'.
   - version: 38
     action: source.add
     actor: cli
@@ -208,3 +205,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'node-cgroup-watchdog' to topic 'development'.
+  - version: 53
+    action: source.add
+    actor: cli
+    summary: Added source 'node-guarded-startup-guide' to topic 'development'.

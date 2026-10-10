@@ -24,7 +24,7 @@ fn manifest(attempt: &ExecutionDispatchAttempt) -> Value {
         "annotations":{"agent-computer.io/binding":binding.to_string()}},
         "spec":{"containers":[{"command":["/bin/agent-computer-sandbox","--attach-startup-json",serde_json::to_string(&bootstrap).unwrap()]}]}})
 }
-fn challenge(attempt: &ExecutionDispatchAttempt) -> StartupChallenge {
+pub(super) fn challenge(attempt: &ExecutionDispatchAttempt) -> StartupChallenge {
     let bootstrap = attempt.intent().bootstrap().unwrap();
     StartupChallenge {
         version: 1,
@@ -34,7 +34,10 @@ fn challenge(attempt: &ExecutionDispatchAttempt) -> StartupChallenge {
         nonce: "a".repeat(64),
     }
 }
-async fn register(db: &Database, attempt: &ExecutionDispatchAttempt) -> ExecutionPodAttempt {
+pub(super) async fn register(
+    db: &Database,
+    attempt: &ExecutionDispatchAttempt,
+) -> ExecutionPodAttempt {
     db.store
         .register_candidate_execution_pod(attempt, "namespace-uid", &manifest(attempt))
         .await
@@ -198,7 +201,7 @@ async fn pod_uid_observation_is_unique_durable_and_required_for_registered_start
             .await,
         Err(Error::RuntimeConflict)
     ));
-    let grant = db
+    let rejected = db
         .store
         .authorize_candidate_execution_startup(
             &organization,
@@ -208,8 +211,16 @@ async fn pod_uid_observation_is_unique_durable_and_required_for_registered_start
             &challenge,
         )
         .await
-        .unwrap();
-    assert_eq!(grant.grant().pod_uid, uid);
+        .unwrap_err();
+    assert!(matches!(rejected, Error::RuntimeAccessUnavailable));
+    assert_eq!(count(&db, "execution_startup_grants").await, 0);
+    let rejected = sqlx::query("INSERT INTO execution_startup_grants (organization,execution_id,pod_uid,challenge,grant_body,grant_digest,granted_at_ms) SELECT organization,execution_id,$1,$2,'{\"version\":1,\"lease_budget_ms\":1}'::jsonb,$3,floor(extract(epoch from clock_timestamp())*1000) FROM execution_requests")
+        .bind(uid).bind(serde_json::to_value(&challenge).unwrap()).bind(format!("sha256:{}","a".repeat(64))).execute(&db.pool).await.unwrap_err();
+    assert!(
+        rejected
+            .to_string()
+            .contains("execution watchdog is not armed")
+    );
     assert!(
         sqlx::query("UPDATE execution_pod_observations SET pod_uid='replacement'")
             .execute(&db.pool)

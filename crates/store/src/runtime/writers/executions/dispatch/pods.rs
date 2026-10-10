@@ -59,7 +59,7 @@ fn hash(
     )
 }
 
-async fn receipt(
+pub(super) async fn receipt(
     tx: &mut Transaction<'_, Postgres>,
     dispatch: &ExecutionDispatchIntent,
 ) -> Result<Option<ExecutionPodPlan>> {

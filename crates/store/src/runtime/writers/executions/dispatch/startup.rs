@@ -106,6 +106,41 @@ impl Store {
         pod_uid: &str,
         challenge: &StartupChallenge,
     ) -> Result<ExecutionStartupAttempt> {
+        self.authorize_execution_startup_inner(org, id, expected_revision, pod_uid, challenge, None)
+            .await
+    }
+
+    /// Planned Pods require the original live guard as well as its immutable
+    /// database receipt. Recovered JSON can never recreate this capability.
+    pub async fn authorize_guarded_candidate_execution_startup(
+        &self,
+        org: &OrganizationId,
+        id: &str,
+        expected_revision: i64,
+        pod_uid: &str,
+        challenge: &StartupChallenge,
+        guard: &mut agent_computer_node::ArmedGuard,
+    ) -> Result<ExecutionStartupAttempt> {
+        self.authorize_execution_startup_inner(
+            org,
+            id,
+            expected_revision,
+            pod_uid,
+            challenge,
+            Some(guard),
+        )
+        .await
+    }
+
+    async fn authorize_execution_startup_inner(
+        &self,
+        org: &OrganizationId,
+        id: &str,
+        expected_revision: i64,
+        pod_uid: &str,
+        challenge: &StartupChallenge,
+        mut guard: Option<&mut agent_computer_node::ArmedGuard>,
+    ) -> Result<ExecutionStartupAttempt> {
         valid_id(pod_uid)?;
         challenge
             .validate()
@@ -152,8 +187,13 @@ impl Store {
         // This read MUST follow reception of the runtime's challenge. Its budget
         // will be charged from before that challenge was emitted by PID 1.
         let now = transactions::now(&mut tx).await?;
-        let budget =
+        let mut budget =
             u32::try_from(dispatch.deadline_at_ms - now).map_err(|_| Error::WriterLeaseInactive)?;
+        if let Some(remaining) =
+            watchdogs::require_live(&mut tx, &dispatch, pod_uid, guard.as_deref_mut()).await?
+        {
+            budget = budget.min(remaining);
+        }
         if budget == 0 {
             return Err(Error::WriterLeaseInactive);
         }
@@ -175,6 +215,7 @@ impl Store {
         {
             return Err(Error::WriterLeaseInactive);
         }
+        watchdogs::require_live(&mut tx, &dispatch, pod_uid, guard).await?;
         let result = ExecutionStartupAttempt {
             grant: receipt(&mut tx, org.as_str(), id)
                 .await?

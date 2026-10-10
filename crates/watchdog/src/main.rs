@@ -11,6 +11,12 @@ fn main() -> ExitCode {
 }
 
 fn execute() -> Result<bool, Error> {
+    // The node adapter may exit after receiving the receipt. Give the guard its
+    // own session so the controller's terminal/session lifecycle cannot stop it.
+    let pid = rustix::process::getpid();
+    if rustix::process::getsid(None).map_err(|_| Error::Setup)? != pid {
+        rustix::process::setsid().map_err(|_| Error::Setup)?;
+    }
     let args: Vec<_> = std::env::args_os().collect();
     if args.len() != 3 || args[1] != "--request" {
         return Err(Error::InvalidRequest);

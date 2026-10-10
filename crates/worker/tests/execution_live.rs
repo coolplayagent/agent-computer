@@ -20,6 +20,8 @@ use std::{
     path::PathBuf,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+#[path = "support/execution_faults.rs"]
+mod faults;
 
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
@@ -126,9 +128,17 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
     let mut storage: StorageClassBinding = serde_json::from_value(kube["storage"].clone()).unwrap();
     storage.reference = catalog[0].clone();
     let image = field(&config, "image");
-    let names = ["normal", "command", "cancel", "lost", "rejected"];
+    let names = [
+        "normal",
+        "command",
+        "cancel",
+        "lost",
+        "rejected",
+        "controller-kill",
+        "pid1-stop",
+    ];
     let mut document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"execution-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":53687091200u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":75161927680u64,"reclaimPolicy":"Retain"}],"workspaces":[],"sandboxes":[],"computers":[]}});
     for name in names {
         document["spec"]["workspaces"]
             .as_array_mut()
@@ -250,7 +260,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 .unwrap();
         }
     }
-    let worker = json!({"approved_supervisor_image":image,"storage":storage,"candidate":local});
+    let worker = json!({"approved_supervisor_image":image,"storage":storage,"candidate":local,"node":config["node"]});
     let make_config =
         || serde_json::from_value::<execution::Configuration>(worker.clone()).unwrap();
     let mut results = vec![];
@@ -323,7 +333,11 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             )
             .await
             .unwrap();
-        let script = if name == "cancel" {
+        let script = if name == "pid1-stop" {
+            "kill -STOP 1; /bin/cat /proc/1/status > pid1-status.txt; /bin/sync pid1-status.txt; printf started > started.txt; /bin/sync started.txt; while :; do printf tick >> ticks.txt; /bin/sync ticks.txt; /bin/sleep 0.1; done"
+        } else if name == "controller-kill" {
+            "printf started > started.txt; /bin/sync started.txt; /bin/sleep 35; printf unexpected > late.txt"
+        } else if name == "cancel" {
             "printf started > started.txt; /bin/sync started.txt; /bin/sleep 20; printf unexpected > late.txt"
         } else {
             "printf persisted > output.txt; /bin/sync output.txt; printf done"
@@ -364,6 +378,19 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         .unwrap();
         let data = root.join(field(&prepared, "path_ref"));
         let outcome = match name {
+            "controller-kill" | "pid1-stop" => {
+                let private = json!({"api_url":kube["api_url"],"ca_file":kube["ca_file"],"token_file":kube["token_file"],"deployment":deployment,"execution":worker});
+                faults::kill_controller(
+                    &config,
+                    &private,
+                    &store,
+                    &org,
+                    &queued.execution_id,
+                    &data,
+                    name,
+                )
+                .await
+            }
             "lost" => {
                 let attempt = store
                     .begin_candidate_execution_dispatch(&org, &queued.execution_id, queued.revision)
@@ -546,7 +573,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                     result
                         .observation
                         .as_ref()
-                        .expect("raw report")
+                        .unwrap_or_else(|| panic!("missing raw report: {result:?}"))
                         .report_bytes(),
                 )
                 .unwrap();
@@ -591,13 +618,27 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 .await
                 .unwrap()
                 .is_some(),
-            matches!(name, "normal" | "command" | "cancel")
+            matches!(
+                name,
+                "normal" | "command" | "cancel" | "controller-kill" | "pid1-stop"
+            )
         );
         let recovery =
             execution::recover_once(&store, &client, &org, &queued.execution_id, &storage, image)
                 .await
                 .unwrap();
-        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap()}));
+        let watchdog = store
+            .candidate_execution_watchdog(&org, &queued.execution_id)
+            .await
+            .unwrap();
+        assert_eq!(
+            watchdog.is_some(),
+            matches!(
+                name,
+                "normal" | "command" | "cancel" | "controller-kill" | "pid1-stop"
+            )
+        );
+        results.push(json!({"case":name,"execution_id":queued.execution_id,"prepared":prepared,"outcome":outcome,"recovery":recovery,"pod":store.candidate_execution_pod(&org,&queued.execution_id).await.unwrap(),"watchdog":watchdog}));
     }
     let drains: i64 =
         sqlx::query_scalar("SELECT count(*) FROM candidate_writer_drains WHERE organization=$1")
@@ -606,7 +647,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .await
             .unwrap();
     assert_eq!(drains, 0);
-    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants and CSI mounts","raw process report is not accepted completion","API deletion is not physical fencing","independent watchdog and controller crash recovery scheduler pending"]});
+    let evidence = json!({"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"limits":["single VM; actual database grants, local node watchdog and CSI mounts","raw process report is not accepted completion","API deletion is not physical fencing","watchdog failure recovery and controller crash recovery scheduler pending"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

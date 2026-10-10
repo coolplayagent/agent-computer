@@ -2,11 +2,13 @@
 mod inputs;
 mod pods;
 mod startup;
+mod watchdogs;
 use super::*;
 pub use inputs::ExecutionRuntimeInputs;
 pub use pods::{ExecutionPodAttempt, ExecutionPodPlan};
 pub use startup::{ExecutionStartupAttempt, ExecutionStartupGrant};
 use std::time::{Duration, Instant};
+pub use watchdogs::ExecutionWatchdogArm;
 
 /// Fixed dispatch inputs and current metadata for a trusted store client. Reading
 /// this record does not grant permission to repeat the external mutation.

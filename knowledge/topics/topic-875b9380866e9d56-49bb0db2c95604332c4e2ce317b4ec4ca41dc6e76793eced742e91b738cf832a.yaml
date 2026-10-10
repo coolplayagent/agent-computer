@@ -14,6 +14,16 @@ sources:
   status: active
   version: 1
   description: Bounded atomic Candidate file saves, consumed dispatch permits and sealed drain evidence; paired English docs/en/20-bounded-file-saves.md
+- id: candidate-execution-worker
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/29-execution-worker.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 数据库授权、Candidate Pod 派发和仅观察恢复工作器
 - id: candidate-file-http-gateway
   topic: development
   kind: doc
@@ -173,6 +183,26 @@ sources:
   status: active
   version: 1
   description: 有界 Kubernetes v5 启动通道、固定运行身份与组件验证边界
+- id: node-cgroup-watchdog
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/30-node-watchdog.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Rust node cgroup watchdog, absolute boot deadlines, kernel observations and integration limits
+- id: node-guarded-startup-guide
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/31-node-guarded-startup.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 节点身份绑定、独立 watchdog 布防、持久启动授权及故障验证边界
 - id: numbered-bilingual-docs
   topic: development
   kind: doc
@@ -248,4 +278,7 @@ route:
   - kubernetes-startup-attach
   - candidate-pod-mounts
   - execution-pod-journal
+  - candidate-execution-worker
+  - node-cgroup-watchdog
+  - node-guarded-startup-guide
   fallback: bounded-search

@@ -8,6 +8,8 @@
 mod attach;
 mod candidate;
 mod client;
+mod node;
+pub use node::{NodeIdentity, PodRuntimeIdentity};
 mod plan;
 mod startup_plan;
 mod verify;

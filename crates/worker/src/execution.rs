@@ -16,6 +16,7 @@ pub struct Configuration {
     pub approved_supervisor_image: String,
     pub storage: agent_computer_kubernetes::volume::StorageClassBinding,
     pub candidate: crate::candidate::Configuration,
+    pub node: agent_computer_node::Configuration,
 }
 #[derive(Clone, Copy, Debug, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -26,6 +27,9 @@ pub enum Phase {
     PodStart,
     Attach,
     StorageCheck,
+    NodeBinding,
+    Watchdog,
+    WatchdogRegistration,
     Authorize,
     Run,
     Recovery,
@@ -46,6 +50,7 @@ pub struct WorkResult {
     pub execution: ExecutionRequest,
     pub interrupted_at: Option<Phase>,
     pub cleanup: Cleanup,
+    pub node_error: Option<agent_computer_node::Error>,
     #[serde(skip)]
     pub observation: Option<StartupObservation>,
 }
@@ -84,7 +89,7 @@ fn backend<T>(result: agent_computer_kubernetes::Result<T>) -> Result<T> {
 /// Consume one queued admission. Identical/concurrent calls fail at the dispatch
 /// journal and do not stop an active controller. Recovery is a separate operation.
 /// A live controller polls authority and deletes conditionally on every outcome;
-/// controller/PID 1 suspension still needs an independent external watchdog.
+/// a trusted local node watchdog must be armed before the startup grant.
 pub async fn execute_once(
     store: &Store,
     client: &Client,
@@ -103,6 +108,7 @@ pub async fn execute_once(
     let mut plan = None;
     let mut journal = None;
     let mut observed = None;
+    let mut node_error = None;
     let run=tokio::time::timeout(budget, async {
         let inputs=store.candidate_execution_runtime_inputs(org,id).await?;
         plan=Some(compile_plan(&inputs,client,&config.storage,&config.approved_supervisor_image)?);
@@ -136,18 +142,35 @@ pub async fn execute_once(
         let channel=backend(client.attach_startup(plan,observed.as_ref().ok_or(Error::InvalidStoredData)?).await)?;
         phase=Phase::StorageCheck;
         storage::verify(local).await?;
+        phase=Phase::NodeBinding;
+        let runtime=backend(client.observe_runtime(plan.pod_plan(),channel.pod_uid(),&config.node.node).await)?;
+        let anchor=agent_computer_watchdog::boottime_ms();
+        let guard_deadline=anchor+u64::from(attempt.remaining_budget_ms()?.saturating_sub(2));
+        let command=plan.pod_plan().manifest()["spec"]["containers"][0]["command"].clone();
+        let execution=id.to_owned();
+        let candidate=agent_computer_node::CandidateIdentity{data_inode:inputs.prepared.data_inode,volume_path:inputs.target.volume_path.clone()};
+        phase=Phase::Watchdog;
+        let mut guard=tokio::task::spawn_blocking(move || agent_computer_node::arm(&config.node,runtime,&execution,&command,&candidate,guard_deadline))
+            .await.map_err(|_|Error::RuntimeAccessUnavailable)?.map_err(|error|{node_error=Some(error);Error::ReferenceUnavailable})?;
+        phase=Phase::WatchdogRegistration;
+        store.register_candidate_execution_watchdog(&attempt,&mut guard).await?;
+        // Re-read API identity after host arming, before spending the grant.
+        phase=Phase::NodeBinding;
+        let actual=backend(client.observe_runtime(plan.pod_plan(),channel.pod_uid(),guard.evidence().runtime.identity.node()).await)?;
+        if actual!=guard.evidence().runtime.identity {return Err(Error::RuntimeConflict)}
         phase=Phase::Authorize;
         let current=active(store,org,id).await?;
-        let grant=store.authorize_candidate_execution_startup(org,id,current.revision,channel.pod_uid(),channel.challenge()).await?;
+        let grant=store.authorize_guarded_candidate_execution_startup(org,id,current.revision,channel.pod_uid(),channel.challenge(),&mut guard).await?;
         grant.remaining_budget_ms()?;
         attempt.remaining_budget_ms()?;
+        guard.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?;
         phase=Phase::Run;
         let run=channel.run(&grant.grant().grant);
         tokio::pin!(run);
         loop {
             tokio::select! {
                 value=&mut run => break backend(value),
-                _=tokio::time::sleep(Duration::from_millis(200)) => { active(store,org,id).await?; },
+                _=tokio::time::sleep(Duration::from_millis(200)) => { active(store,org,id).await?; guard.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?; },
             }
         }
     }).await;
@@ -175,6 +198,7 @@ pub async fn execute_once(
         execution: state?,
         interrupted_at,
         cleanup,
+        node_error,
         observation,
     })
 }
@@ -256,6 +280,7 @@ pub async fn recover_once(
         execution: state,
         interrupted_at: Some(Phase::Recovery),
         cleanup,
+        node_error: None,
         observation: None,
     })
 }

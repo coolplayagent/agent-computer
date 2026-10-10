@@ -27,18 +27,18 @@ agent-computer-server execution-dispatch-once --database-url-file /private/contr
 agent-computer-server execution-recover-once --database-url-file /private/control-url --organization ORG --execution-id EXECUTION --config-file /private/execution.json
 ```
 
-私有 JSON 包含 `api_url`、`ca_file`、`token_file`、`deployment` 和 `execution`。传输与部署字段沿用 [12 Kubernetes](12-kubernetes-adapter.md)。`execution` 包含 `approved_supervisor_image`、[13 卷供应](13-volume-provisioning.md)的已核验 `storage` 映射，以及 [17 准备工作器](17-candidate-preparation-worker.md)的 `candidate` 配置。执行不使用其中的对象缓存，也不重新物化输入。秘密通过文件引用提供，不进入 Pod 或命令输出。
+私有 JSON 包含 `api_url`、`ca_file`、`token_file`、`deployment` 和 `execution`。传输与部署字段沿用 [12 Kubernetes](12-kubernetes-adapter.md)。`execution` 包含 `approved_supervisor_image`、[13 卷供应](13-volume-provisioning.md)的已核验 `storage` 映射，[17 准备工作器](17-candidate-preparation-worker.md)的 `candidate` 配置，以及 [31 节点布防](31-node-guarded-startup.md)要求的本地 `node` 绑定。执行不使用其中的对象缓存，也不重新物化输入。秘密通过文件引用提供，不进入 Pod 或命令输出。
 
 ## 29.4 验证与限制
 
 新增 3 项 PostgreSQL 契约覆盖固定输入重建、WAL 恢复、撤权后的只读恢复和缺失/不匹配卷证据拒绝。默认 Cargo/Bazel 测试共 288 项，其中 PostgreSQL 131 项；Clippy、格式、双语文档和现有完整 Qualitygate 策略另行验证。
 
-手动目标 `//crates/worker:execution_worker_live_test` 使用真实控制 PostgreSQL、Kubernetes/CSI、JuiceFS 和 gVisor。五个场景覆盖库调用、运营命令、子进程写入标记后的取消、创建回执丢失后的仅观察清理，以及监督器镜像拒绝；检查持久启动授权、持续写入互斥、禁止替代派发和零虚构排空。仅在一次性 root 所有的环境设置 `AGENT_COMPUTER_EXECUTION_TEST_CONFIG` 运行；配置在 [17 的夹具](17-candidate-preparation-worker.md)上增加 `image`、`server_binary` 和 `result_file`。测试目标存在不等于实测通过，实际运行必须另有固定源码证据。
+手动目标 `//crates/worker:execution_worker_live_test` 使用真实控制 PostgreSQL、Kubernetes/CSI、JuiceFS 和 gVisor。最初五个场景覆盖库调用、运营命令、子进程写入标记后的取消、创建回执丢失后的仅观察清理，以及监督器镜像拒绝；检查持久启动授权、持续写入互斥、禁止替代派发和零虚构排空。仅在一次性 root 所有的环境设置 `AGENT_COMPUTER_EXECUTION_TEST_CONFIG` 运行；配置在 [17 的夹具](17-candidate-preparation-worker.md)上增加 `image`、`server_binary` 和 `result_file`。测试目标存在不等于实测通过，实际运行必须另有固定源码证据。
 
-公开运行能力仍报告执行不支持。生产监督器打包、独立于控制器的 watchdog、物理 fencing、持久有界输出对象、完成接纳、自动崩溃对账和后台存续期仍待实现。本地轮询不能解决控制器或 PID 1 暂停。T01–T43 保持 `not_run`。
+公开运行能力仍报告执行不支持。生产监督器打包、watchdog 监督、持久物理 fencing、持久有界输出对象、完成接纳、自动崩溃对账和后台存续期仍待实现。本地轮询不能解决控制器或 PID 1 暂停。T01–T43 保持 `not_run`。
 
-实测夹具为五个固定 10 GiB Candidate 配置 50 GiB Volume。最初的 4 GiB 配置在创建执行 Pod 前被容量准入正确拒绝。可选 `node_observation_file` 为独立[节点检查器](../../crates/worker/tests/execution_node.py)启用最多 8 秒的取消屏障：在一次性 VM 内以 `--observation PATH --output PATH` 并行运行。检查器验证实际 runsc 容器和 kubelet Candidate 挂载 inode 后才释放屏障，执行预算持续消耗。
+原始实测夹具为五个固定 10 GiB Candidate 配置 50 GiB Volume。最初的 4 GiB 配置在创建执行 Pod 前被容量准入正确拒绝。可选 `node_observation_file` 为独立[节点检查器](../../crates/worker/tests/execution_node.py)启用最多 8 秒的取消屏障：在一次性 VM 内以 `--observation PATH --output PATH` 并行运行。检查器验证实际 runsc 容器和 kubelet Candidate 挂载 inode 后才释放屏障，执行预算持续消耗。
 
 五个场景已在 `bacaef9` 上实测通过。数据库回读保留 5 条派发、4 份 Pod 计划/UID 和 3 份启动授权，均关联原身份；5 条执行保持 Unknown，写入租约保持 Draining，完成接纳与排空记录均为零。节点检查确认取消场景的 runsc 容器及 Candidate inode 25。新的只读 JuiceFS 客户端通过两次 S3 GET 回读两个持久文件，共 18 字节。[固定源码记录](../evidence/candidate-execution-worker-2026-10-10.json)与[原始输出](../evidence/candidate-execution-worker-2026-10-10.log)绑定 223 个源码/构建输入、精确二进制/镜像，并保留此前的容量拒绝。取证后已回收自建 VM 及其私有凭据和存储。
 
-[30 节点 watchdog](30-node-watchdog.md)已提供独立 cgroup 终止组件。本工作器仍需完成经过认证的节点身份绑定和启动授权前布防，才能依赖该组件。
+[30 节点 watchdog](30-node-watchdog.md)已提供独立 cgroup 终止组件。[31 节点布防后的启动](31-node-guarded-startup.md)现已连接精确本地节点/运行时/Candidate 身份和授权前持久布防。当前夹具增加控制器 SIGKILL 与 PID 1 STOP 场景，在 70 GiB 卷上准备七个 Candidate，私有配置也须包含 `node`。

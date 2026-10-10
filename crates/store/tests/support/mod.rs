@@ -10,7 +10,11 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_execution_watchdogs(&self) {
+        sqlx::raw_sql("DROP TRIGGER check_execution_startup_watchdog ON execution_startup_grants; DROP FUNCTION guard_execution_startup_watchdog(); DROP TABLE execution_watchdog_arms; DROP FUNCTION guard_execution_watchdog(); DELETE FROM _sqlx_migrations WHERE version=16;").execute(&self.pool).await.unwrap();
+    }
     pub async fn remove_execution_pods(&self) {
+        self.remove_execution_watchdogs().await;
         sqlx::raw_sql("DROP TRIGGER check_execution_startup_pod ON execution_startup_grants; DROP FUNCTION guard_execution_startup_pod(); DROP TABLE execution_pod_observations; DROP TABLE execution_pod_plans; DROP FUNCTION guard_execution_pod_plan(); DELETE FROM _sqlx_migrations WHERE version=15;").execute(&self.pool).await.unwrap();
     }
     pub async fn remove_execution_startup(&self) {

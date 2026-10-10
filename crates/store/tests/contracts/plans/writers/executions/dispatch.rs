@@ -1,6 +1,7 @@
 mod inputs;
 mod pods;
 mod startup;
+mod watchdogs;
 use super::*;
 
 async fn begin(db: &Database, queued: &ExecutionRequest) -> ExecutionDispatchAttempt {
