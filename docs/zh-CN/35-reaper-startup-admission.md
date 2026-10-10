@@ -23,3 +23,5 @@ migration 18 将初始回执绑定到不可变 arm 及两个日志引用，检�
 验证覆盖回复重放、身份移植、过期拒绝、PostgreSQL 元数据约束与历史迁移。root fixture 检查服务缺失/暂停拒绝、正常探测不终止目标、重复日志拒绝、重启实例变化和失败后永久失效。真实单节点 K3s/CSI/gVisor worker fixture 在执行、取消、controller/PID 1 故障场景之外加入服务缺失拒绝。这些是组件证据，不代表产品 T01–T43 完成。
 
 服务仍只执行终止意图。服务存活与空 cgroup 都不能证明存储 fencing、writer drain、输出接受或权威完成；这些仍需后续实现。
+
+2026-10-10 的[绑定源码证据](../evidence/reaper-startup-admission-2026-10-10.json)与[日志](../evidence/reaper-startup-admission-2026-10-10.log)记录了 315 个默认测试（含 138 个 PostgreSQL 场景）、十个 Bazel 测试目标、38 个 root 组件场景和八个真实 worker 场景通过。五个持久 arm 使用不同挑战并绑定同一服务实例；服务缺失时不创建 arm 或 grant，八个 writer 均保持 Draining。新的只读 JuiceFS 客户端通过两次对象 GET 读回两份九字节输出。已删除本轮专用 VM 及其私有文件。

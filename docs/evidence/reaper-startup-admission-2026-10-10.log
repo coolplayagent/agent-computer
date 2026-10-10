@@ -1,0 +1,194 @@
+CARGO WORKSPACE RESULT LINES
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+test result: ok. 7 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.44s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.15s
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.06s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 138 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.98s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+CLIPPY
+    Checking agent-computer-watchdog v0.1.0 (/opt/workspace/agent-computer/crates/watchdog)
+    Checking agent-computer-node v0.1.0 (/opt/workspace/agent-computer/crates/node)
+    Checking agent-computer-store v0.1.0 (/opt/workspace/agent-computer/crates/store)
+    Checking agent-computer-worker v0.1.0 (/opt/workspace/agent-computer/crates/worker)
+    Checking agent-computer-server v0.1.0 (/opt/workspace/agent-computer/crates/server)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.36s
+
+
+BAZEL BUILD
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 29 targets (1 packages loaded, 0 targets configured)
+Analyzing: 29 targets (1 packages loaded, 0 targets configured)
+
+INFO: Analyzed 29 targets (1 packages loaded, 43 targets configured).
+[969 / 970] [Prepa] runfiles for //crates/worker:execution_worker_live_test
+INFO: Found 29 targets...
+INFO: Elapsed time: 1.917s, Critical Path: 1.68s
+INFO: 4 processes: 60 action cache hit, 3 internal, 1 processwrapper-sandbox.
+INFO: Build completed successfully, 4 total actions
+
+
+BAZEL DEFAULT TESTS
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 28 targets (0 packages loaded, 30 targets configured).
+[972 / 975] 7 / 10 tests; Testing //crates/node:node_contracts_test; 1s processwrapper-sandbox ... (3 actions running)
+[974 / 975] 9 / 10 tests; Testing //crates/store:postgres_contracts_test; 3s processwrapper-sandbox
+[974 / 975] 9 / 10 tests; Testing //crates/store:postgres_contracts_test; 9s processwrapper-sandbox
+INFO: Found 18 targets and 10 test targets...
+INFO: Elapsed time: 9.543s, Critical Path: 9.35s
+INFO: 5 processes: 57 action cache hit, 1 internal, 8 processwrapper-sandbox.
+INFO: Build completed successfully, 5 total actions
+//crates/cli:cli_contracts_test                                 (cached) PASSED in 0.9s
+//crates/core:core_contracts_test                               (cached) PASSED in 0.1s
+//crates/definitions:definitions_contracts_test                 (cached) PASSED in 0.5s
+//crates/kubernetes:kubernetes_contracts_test                   (cached) PASSED in 1.8s
+//crates/sandbox:sandbox_contracts_test                         (cached) PASSED in 0.1s
+//crates/storage:storage_contracts_test                         (cached) PASSED in 2.2s
+//crates/node:node_contracts_test                                        PASSED in 2.0s
+//crates/server:server_contracts_test                                    PASSED in 2.5s
+//crates/store:postgres_contracts_test                                   PASSED in 9.3s
+//crates/watchdog:watchdog_contracts_test                                PASSED in 0.1s
+
+Executed 4 out of 10 tests: 10 tests pass.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+
+ROOT COMPONENTS
+
+running 3 tests
+{"case":"reaper_admission","failed_client_revoked":true,"missing_service_denied":true,"probe_did_not_kill_target":true,"receipt":{"cgroup_device":28,"instance":"285e01697f978a71ce28592b2b0992c70d40b4f221efd058835fc4916c7ca814","journals":[{"device":64769,"id":"journal-G9Ukhb","inode":524295,"intent_digest":"sha256:51096a1059f19e42eceed0709ee4ecc4864b092cdf4614a7c8cc17e015f315c5"},{"device":64769,"id":"journal-FmRLaV","inode":524305,"intent_digest":"sha256:a56972928f51a8709d49903862c660b8e805f968c628ffb6718a58b561d2541d"}],"nonce":"22eb6d194edc78320f5395ae010c0732f55fc48e88c7e49d5935124f9499cff7","observed_boottime_ms":245208,"pid":4014,"request":{"boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_inode":5247,"cgroup_path":"ac-admission-4000-244785","deadline_boottime_ms":249794,"execution_id":"ac-admission-4000-244785","version":1},"spool_device":64769,"spool_inode":524289,"version":1},"restart_rejected_by_original_client":true,"status":"pass","stopped_service_denied":true}
+test guard::tests::reaper_admission_checks_live_instance_and_never_revives_a_failed_client ... ok
+{"guards":[{"state":"recovered","journal":{"id":"journal-gcV2CW","device":64769,"inode":524296,"intent_digest":"sha256:1bb29bac29e455a77e70f47edf975e282f86beeff16078791b3fce021208a1fd"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-reaper-node-4000-244785","boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_path":"ac-reaper-node-4000-244785","cgroup_inode":5296,"deadline_boottime_ms":245994},"cgroup_device":28,"armed_boottime_ms":245998,"kill_boottime_ms":245998,"observed_boottime_ms":245998,"trigger":"Recovery","observation":"EmptyObserved","error":null,"journal":{"id":"journal-gcV2CW","device":64769,"inode":524296,"intent_digest":"sha256:1bb29bac29e455a77e70f47edf975e282f86beeff16078791b3fce021208a1fd"}}},{"state":"recovered","journal":{"id":"journal-aaIgm6","device":64769,"inode":524304,"intent_digest":"sha256:c7f9a6f832085cbe1d4ce0daee5ec148d1eec51906cfd37b80747dc8c900ddca"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-reaper-node-4000-244785","boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_path":"ac-reaper-node-4000-244785","cgroup_inode":5296,"deadline_boottime_ms":245994},"cgroup_device":28,"armed_boottime_ms":246040,"kill_boottime_ms":246040,"observed_boottime_ms":246040,"trigger":"Recovery","observation":"EmptyObserved","error":null,"journal":{"id":"journal-aaIgm6","device":64769,"inode":524304,"intent_digest":"sha256:c7f9a6f832085cbe1d4ce0daee5ec148d1eec51906cfd37b80747dc8c900ddca"}}}]}
+{"case":"node_reaper_recovery","status":"pass","writer_released":false}
+test guard::tests::reaper_observation_preserves_original_arms_after_both_guards_die ... ok
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-vGLbxh","device":64769,"inode":524297,"intent_digest":"sha256:17d4b4327bf9a570b9889fe01162c7f66c70572506c23ef1cfc361831c9b1d67"}},{"state":"recorded","journal":{"id":"journal-p1cXuX","device":64769,"inode":524308,"intent_digest":"sha256:66576f2f6ad1bb467eb4f25fb9638878788de76ff3e3ece68b00f17143b14cff"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-4000-244785","boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_path":"ac-guard-pair-4000-244785","cgroup_inode":5345,"deadline_boottime_ms":246294},"cgroup_device":28,"armed_boottime_ms":244905,"kill_boottime_ms":246295,"observed_boottime_ms":246306,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-p1cXuX","device":64769,"inode":524308,"intent_digest":"sha256:66576f2f6ad1bb467eb4f25fb9638878788de76ff3e3ece68b00f17143b14cff"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":246294,"empty_observed_boottime_ms":246298,"failed_index":0,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-NQu3fF","device":64769,"inode":524292,"intent_digest":"sha256:b1388f870649335b69980ec8f7dfb0b58b969f43c4f0a16125986735b64c8b67"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-4000-246412","boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_path":"ac-guard-pair-4000-246412","cgroup_inode":5394,"deadline_boottime_ms":247920},"cgroup_device":28,"armed_boottime_ms":246462,"kill_boottime_ms":247921,"observed_boottime_ms":247932,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-NQu3fF","device":64769,"inode":524292,"intent_digest":"sha256:b1388f870649335b69980ec8f7dfb0b58b969f43c4f0a16125986735b64c8b67"}}},{"state":"unconfirmed","journal":{"id":"journal-YklKPE","device":64769,"inode":524295,"intent_digest":"sha256:f0778aeeaa267d1bf5bc6ec5e734c5dd16e5cb45d863d8f94fe67c8e129b5fef"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":247920,"empty_observed_boottime_ms":247927,"failed_index":1,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-24d47a","device":64769,"inode":524501,"intent_digest":"sha256:047c4f0e6e25c224e32fce58251b1196643aa28ea325a4acce14a764a364dd14"}},{"state":"recorded","journal":{"id":"journal-5j30K0","device":64769,"inode":524504,"intent_digest":"sha256:5c254dced80272117eee43cd4b0c7a78062d77d6d5fa5c56c9c5c4f2ed051e9f"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-4000-248041","boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_path":"ac-guard-pair-4000-248041","cgroup_inode":6224,"deadline_boottime_ms":249549},"cgroup_device":28,"armed_boottime_ms":248112,"kill_boottime_ms":249549,"observed_boottime_ms":249559,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-5j30K0","device":64769,"inode":524504,"intent_digest":"sha256:5c254dced80272117eee43cd4b0c7a78062d77d6d5fa5c56c9c5c4f2ed051e9f"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":249549,"empty_observed_boottime_ms":249558,"failed_index":0,"signal":"\"Signal::STOP\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-jCDxgb","device":64769,"inode":524776,"intent_digest":"sha256:6807401dbd5e83ced2e803739d3694ee138321971aa56f573922ad0dd1ed17cd"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-4000-249612","boot_id":"da33e98e-cf87-48fb-9ee4-35819cc87bfd","cgroup_path":"ac-guard-pair-4000-249612","cgroup_inode":6284,"deadline_boottime_ms":251121},"cgroup_device":28,"armed_boottime_ms":249642,"kill_boottime_ms":251121,"observed_boottime_ms":251131,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-jCDxgb","device":64769,"inode":524776,"intent_digest":"sha256:6807401dbd5e83ced2e803739d3694ee138321971aa56f573922ad0dd1ed17cd"}}},{"state":"unconfirmed","journal":{"id":"journal-aQJ7vf","device":64769,"inode":524779,"intent_digest":"sha256:6bfe9393ba3c4cd6fa2238886a59fae94fd59712ec5823eb55a745c28b2d03fe"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":251121,"empty_observed_boottime_ms":251129,"failed_index":1,"signal":"\"Signal::STOP\"","writer_released":false}
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 6.45s
+
+{"case": "both-killed", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "both-killed", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-ad62c5c5caf245ac96d55242aea83b7b", "cgroup_inode": 6404, "deadline_boottime_ms": 253250}, "cgroup_device": 28, "armed_boottime_ms": 253331, "kill_boottime_ms": 253331, "observed_boottime_ms": 253331, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-737aca1c4b824d03870f1639a0118843", "device": 64769, "inode": 524294, "intent_digest": "sha256:618d99050426e8de1eb620d9a0061cf3c87fba49b04581b2369c204667848839"}}, {"version": 1, "request": {"version": 1, "execution_id": "both-killed", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-ad62c5c5caf245ac96d55242aea83b7b", "cgroup_inode": 6404, "deadline_boottime_ms": 253250}, "cgroup_device": 28, "armed_boottime_ms": 253592, "kill_boottime_ms": 253592, "observed_boottime_ms": 253592, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-b980bdd4f4c242b8bb6dbc95bb40781d", "device": 64769, "inode": 524297, "intent_digest": "sha256:1d122a45e9b52b18d14a5b001c6b0b75a29a693444a1a5647f9d78b375078f37"}}], "max_observation_delay_ms": 342, "service_restarts": 0}
+{"case": "both-stopped", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "both-stopped", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-05312e3be7ed49068dc80bfc20519e3f", "cgroup_inode": 7072, "deadline_boottime_ms": 255469}, "cgroup_device": 28, "armed_boottime_ms": 255750, "kill_boottime_ms": 255750, "observed_boottime_ms": 255750, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-c77b7b36b48d410a95f4db200aa76d30", "device": 64769, "inode": 524295, "intent_digest": "sha256:acfb6a0559397ba785358439daea8d930205a82d82650a3b0c9967b4b4ca57da"}}, {"version": 1, "request": {"version": 1, "execution_id": "both-stopped", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-05312e3be7ed49068dc80bfc20519e3f", "cgroup_inode": 7072, "deadline_boottime_ms": 255469}, "cgroup_device": 28, "armed_boottime_ms": 255481, "kill_boottime_ms": 255481, "observed_boottime_ms": 255481, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-12a2c572141248a085f710841f56de1a", "device": 64769, "inode": 524298, "intent_digest": "sha256:a6c7e6c4a5bd8e28765492623f56ca95f580ef3eb798f7a0141a5b228c05f2aa"}}], "max_observation_delay_ms": 281, "service_restarts": 0}
+{"case": "service-killed", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "service-killed", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-a970125703ec4261915a79b39cfc04af", "cgroup_inode": 7391, "deadline_boottime_ms": 257603}, "cgroup_device": 28, "armed_boottime_ms": 257889, "kill_boottime_ms": 257889, "observed_boottime_ms": 257889, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-b29d152e7e174e99905bf57dd9325617", "device": 64769, "inode": 524296, "intent_digest": "sha256:e3b987b4d73564432978b60953aaa112db0b25b89b22139251cbb03462cd029f"}}, {"version": 1, "request": {"version": 1, "execution_id": "service-killed", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-a970125703ec4261915a79b39cfc04af", "cgroup_inode": 7391, "deadline_boottime_ms": 257603}, "cgroup_device": 28, "armed_boottime_ms": 257628, "kill_boottime_ms": 257628, "observed_boottime_ms": 257628, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-e49d0505e12f4e95891e0209cc4d0f3b", "device": 64769, "inode": 525163, "intent_digest": "sha256:bdd74e04e6f66aecd8c7a076d5bead2ecc9c1be9592a63c992dbac552f76e20d"}}], "max_observation_delay_ms": 286, "service_restarts": 1}
+{"case": "service-stopped", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "service-stopped", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-d4e8ff0d28404b7ebd0890c308dba165", "cgroup_inode": 7650, "deadline_boottime_ms": 259784}, "cgroup_device": 28, "armed_boottime_ms": 268599, "kill_boottime_ms": 268599, "observed_boottime_ms": 268599, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-6650d537f5c34f978aeadafed84d4e3f", "device": 64769, "inode": 524297, "intent_digest": "sha256:e246aad49c36cf284cc3ec8a214976fc6987e4c941b6fb776cc5ba8f5e6db4a2"}}, {"version": 1, "request": {"version": 1, "execution_id": "service-stopped", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-d4e8ff0d28404b7ebd0890c308dba165", "cgroup_inode": 7650, "deadline_boottime_ms": 259784}, "cgroup_device": 28, "armed_boottime_ms": 268861, "kill_boottime_ms": 268861, "observed_boottime_ms": 268861, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-781e6eeaecf44da1b32a388ea756ffff", "device": 64769, "inode": 525164, "intent_digest": "sha256:1f581d29a7efaf12731356558c44e97443d7ff7db5b398d22f7086a46b603753"}}], "max_observation_delay_ms": 9077, "service_restarts": 1}
+{"case": "interrupted-publication", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "interrupted-publication", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-068957d31727415a99fecbbcc809bfab", "cgroup_inode": 8576, "deadline_boottime_ms": 270727}, "cgroup_device": 28, "armed_boottime_ms": 270970, "kill_boottime_ms": 270970, "observed_boottime_ms": 270970, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-da00b91b24d249c5bbd2571f512d08ae", "device": 64769, "inode": 524300, "intent_digest": "sha256:79f7a8918fccb315d79c6130bc37aa3ddb68af51bc1c30cf334d6b1ef0089ec2"}}, {"version": 1, "request": {"version": 1, "execution_id": "interrupted-publication", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-068957d31727415a99fecbbcc809bfab", "cgroup_inode": 8576, "deadline_boottime_ms": 270727}, "cgroup_device": 28, "armed_boottime_ms": 271231, "kill_boottime_ms": 271231, "observed_boottime_ms": 271231, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-4d50c1bea5be4d3f9daf2207ddda8196", "device": 64769, "inode": 525251, "intent_digest": "sha256:d56e5b6eb0307f4cc4b0ed948c762e313382fa42affc5c7867a28ae86fed62cc"}}], "max_observation_delay_ms": 504, "service_restarts": 0}
+{"case": "wrong-device", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-bb6b3a4db105466d8d47619dbde63891", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}, {"journal_id": "journal-f06118eb2a2c4a0faa7be3a83a8b00c4", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}]}
+{"case": "wrong-inode", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-480f5da268f64c02bd8ac859a34d7e8f", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}, {"journal_id": "journal-05b985c601704ff999b855b0ddaafbe9", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}]}
+{"case": "old-boot", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-3888be8a652d453dba290d94e96e8bc4", "outcome": {"state": "historical_boot"}}, {"journal_id": "journal-d3264e600c434f699f37efd4a60be31e", "outcome": {"state": "historical_boot"}}]}
+{"case": "altered-digest", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-695a4def4acf47e78509232cf601da6e", "outcome": {"state": "unavailable", "error": "InvalidJournal"}}, {"journal_id": "journal-597d5c6fc352411e8514920af1e6a1f1", "outcome": {"state": "unavailable", "error": "InvalidJournal"}}]}
+{"case": "unenrolled", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-32065f4ef46642faafafea5713c016f8", "outcome": {"state": "unenrolled"}}, {"journal_id": "journal-5dac01237964425098c84c28b1480e43", "outcome": {"state": "unenrolled"}}]}
+{"case": "path-reuse", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-db7dc8a3deb449e58377108d39a0ae6e", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}, {"journal_id": "journal-c0e08ba297974c6da5d663c9ce22f1d9", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}]}
+{"case": "pagination", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "pagination", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-70cfe75684cd467bb3311e5ae7e0dbb8", "cgroup_inode": 10048, "deadline_boottime_ms": 287908}, "cgroup_device": 28, "armed_boottime_ms": 288192, "kill_boottime_ms": 288192, "observed_boottime_ms": 288192, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-021eb79ad6784e7a814ceea62a58a5bd", "device": 64769, "inode": 524297, "intent_digest": "sha256:eddd7f60b09da4570cf93cd08bc225147c69602dc29a568a2661309fb67bff38"}}, {"version": 1, "request": {"version": 1, "execution_id": "pagination", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-reaper-70cfe75684cd467bb3311e5ae7e0dbb8", "cgroup_inode": 10048, "deadline_boottime_ms": 287908}, "cgroup_device": 28, "armed_boottime_ms": 287931, "kill_boottime_ms": 287931, "observed_boottime_ms": 287931, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-9ddf02bf0b8740229d88dd546649d441", "device": 64769, "inode": 525164, "intent_digest": "sha256:befcb31bea4259efa6cda84190cc4cdf3291000acca87eafc5650e28039ae7a5"}}], "max_observation_delay_ms": 284, "service_restarts": 0}
+{"case": "normal", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "normal", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-journal-155aa38f8099448ab93544e225be4558", "cgroup_inode": 10247, "deadline_boottime_ms": 289747}, "cgroup_device": 28, "armed_boottime_ms": 288560, "kill_boottime_ms": 289747, "observed_boottime_ms": 289757, "trigger": "Deadline", "observation": "EmptyObserved", "error": null, "journal": {"id": "normal", "device": 64769, "inode": 524292, "intent_digest": "sha256:090ab454072ac8ccbe4ccb26bb8003f90f302e608d25a903b6fb9addffad5c0c"}}}
+{"case": "closed-output", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "closed-output", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-journal-ad32b818b207452d924f9a333982f80c", "cgroup_inode": 10326, "deadline_boottime_ms": 290975}, "cgroup_device": 28, "armed_boottime_ms": 289787, "kill_boottime_ms": 290975, "observed_boottime_ms": 290985, "trigger": "Deadline", "observation": "EmptyObserved", "error": null, "journal": {"id": "closed-output", "device": 64769, "inode": 525164, "intent_digest": "sha256:7c8065ae3c1fc79e39534318f193ff22ef57bf082d8fc2e1f3368a69fa3fc897"}}}
+{"case": "report-write-error", "status": "pass", "target_empty": true, "report_missing": true}
+{"case": "full-output", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "full-output", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-journal-3f28cee24b2545dfa945f727551eceb2", "cgroup_inode": 10484, "deadline_boottime_ms": 317249}, "cgroup_device": 28, "armed_boottime_ms": 292260, "kill_boottime_ms": 292260, "observed_boottime_ms": 292270, "trigger": "ReceiptUnavailable", "observation": "EmptyObserved", "error": null, "journal": {"id": "full-output", "device": 64769, "inode": 526099, "intent_digest": "sha256:06772793f689c10716790c3aaa6d3550d8cb92864fb8cc1b5ac4880c1f2d92ee"}}}
+{"case": "duplicate-journal", "status": "pass", "armed": false, "target_untouched": true}
+{"case": "nonprivate-journal", "status": "pass", "armed": false, "target_untouched": true}
+{"case": "stopped-supervisor", "status": "pass", "pids": {"parent": 5505, "child": 5506}, "report": {"version": 1, "request": {"version": 1, "execution_id": "stopped-supervisor", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-watchdog-3634f08871b84c5bb92f8d699782fa56/stopped-supervisor", "cgroup_inode": 10800, "deadline_boottime_ms": 293600}, "cgroup_device": 28, "armed_boottime_ms": 292401, "kill_boottime_ms": 293600, "observed_boottime_ms": 293610, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "frozen-tree", "status": "pass", "pids": {"parent": 5508, "child": 5509}, "report": {"version": 1, "request": {"version": 1, "execution_id": "frozen-tree", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-watchdog-3634f08871b84c5bb92f8d699782fa56/frozen-tree", "cgroup_inode": 10836, "deadline_boottime_ms": 294863}, "cgroup_device": 28, "armed_boottime_ms": 293664, "kill_boottime_ms": 294863, "observed_boottime_ms": 294873, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "expired-deadline", "status": "pass", "pids": {"parent": 5511, "child": 5512}, "report": {"version": 1, "request": {"version": 1, "execution_id": "expired-deadline", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-watchdog-3634f08871b84c5bb92f8d699782fa56/expired-deadline", "cgroup_inode": 10872, "deadline_boottime_ms": 293925}, "cgroup_device": 28, "armed_boottime_ms": 294926, "kill_boottime_ms": 294926, "observed_boottime_ms": 294936, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "closed-receipt", "status": "pass", "pids": {"parent": 5514, "child": 5515}, "elapsed_ms": 16, "deadline": 319998}
+{"case": "full-receipt", "status": "pass", "pids": {"parent": 5517, "child": 5518}, "elapsed_ms": 16, "deadline": 320076}
+{"case": "controller-exit", "status": "pass", "pids": {"parent": 5520, "child": 5521}, "report": {"version": 1, "request": {"version": 1, "execution_id": "controller-exit", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-watchdog-3634f08871b84c5bb92f8d699782fa56/controller-exit", "cgroup_inode": 10980, "deadline_boottime_ms": 296353}, "cgroup_device": 28, "armed_boottime_ms": 295190, "kill_boottime_ms": 296353, "observed_boottime_ms": 296363, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "path-reuse", "status": "pass", "original": {"parent": 5524, "child": 5525}, "replacement": {"parent": 5527, "child": 5528}, "report": {"version": 1, "request": {"version": 1, "execution_id": "path-reuse", "boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "cgroup_path": "ac-watchdog-3634f08871b84c5bb92f8d699782fa56/path-reuse", "cgroup_inode": 11016, "deadline_boottime_ms": 298246}, "cgroup_device": 28, "armed_boottime_ms": 296450, "kill_boottime_ms": 298246, "observed_boottime_ms": 298246, "trigger": "Deadline", "observation": "Unknown", "error": "KillFailed"}}
+{"case": "wrong-inode", "status": "pass", "pids": {"parent": 5529, "child": 5530}}
+{"case": "wrong-boot", "status": "pass", "pids": {"parent": 5532, "child": 5533}}
+{"case": "own-ancestor", "status": "pass", "pids": {"parent": 5535, "child": 5536}}
+{"case": "delegated-group", "status": "pass", "pids": {"parent": 5538, "child": 5539}}
+{"case": "threaded-group", "status": "pass"}
+
+
+WORKER LIVE TEST
+role.rbac.authorization.k8s.io/ac-startup-attach created
+rolebinding.rbac.authorization.k8s.io/ac-startup-attach created
+clusterrole.rbac.authorization.k8s.io/ac-node-watchdog-observer created
+clusterrolebinding.rbac.authorization.k8s.io/ac-node-watchdog-observer created
+PRIVATE_NODE_EXECUTION_CONFIG_READY
+StatusText=Scanned 3 entries; 0 unavailable; pass complete true
+ActiveState=active
+SubState=running
+
+running 1 test
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery has been running for over 60 seconds
+EXECUTION_WORKER_DATABASE_CSI_GVISOR_PASSED
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 163.70s
+
+
+
+REMOTE HASHES
+1418a2d641db57fef286a80f9031cdaf7c980123d0463048bf1d5e9dd867f910  /home/ac-test/node_contracts_test
+942d7fdf90913551e151c61bfa4a4045496de584f0534fde65fa361fe676c84e  /usr/local/bin/agent-computer-watchdog
+4deb08cb7bac234b6fe53ad9f331f36fadafdadcdc159e34ecc47aafd32964fc  /usr/local/bin/execution_worker_live_test
+4af02baab52c95189a7841d3184221b65d4d4451e14d5bba1da9916f8746a9c2  /usr/local/bin/agent-computer-server
+d793a00efe8a02df462ad44819110b10ca7e8ac16772b439e67fba9a59db2ef5  /etc/systemd/system/ac-execution-reaper-test.service
+
+
+READ-ONLY COLD CLIENT
+
+For enterprise users, please visit https://seaweedfs.com for the SeaweedFS Enterprise Edition,
+which has advanced features, including data recovery, self-healing storage, customizable erasure coding, EC vacuum and repair, etc.
+{"database_counts": {"execution_requests": 8, "execution_dispatch_intents": 8, "execution_pod_plans": 7, "execution_pod_observations": 7, "execution_watchdog_arms": 5, "execution_startup_grants": 5, "candidate_writer_leases": 8, "candidate_writer_drains": 0, "candidate_writer_completions": 0}, "fresh_client_reads": [{"case": "normal", "bytes": 9, "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664", "inode": 2050}, {"case": "command", "bytes": 9, "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664", "inode": 3074}], "object_get_metrics": ["juicefs_object_request_data_bytes_GET 18", "juicefs_object_request_durations_histogram_seconds_GET_total 2", "juicefs_object_request_durations_histogram_seconds_GET_sum 0.003665389"]}
+
+
+CLEANUP
+{"boot_id": "da33e98e-cf87-48fb-9ee4-35819cc87bfd", "owned_root_fixture_cgroups_remaining": [], "independent_watchdogs_remaining": [], "fixture_service_before_removal": "NRestarts=0\nActiveState=active\nSubState=running\n", "fixture_service_unit_removed": true}
+{
+  "owned_vm_pid": 3998644,
+  "owned_command_verified": true,
+  "terminated": true,
+  "private_files_removed": [
+    "disk.qcow2",
+    "seed.iso",
+    "id_ed25519",
+    "id_ed25519.pub",
+    "user-data",
+    "meta-data",
+    "known_hosts",
+    "serial.log",
+    "qemu.log",
+    "vm.json"
+  ],
+  "public_download_cache_retained": true
+}
