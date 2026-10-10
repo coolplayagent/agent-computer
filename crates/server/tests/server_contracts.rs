@@ -5,6 +5,7 @@ mod cases {
     mod connections;
     mod executions;
     mod files;
+    mod outputs;
     mod plans;
     mod process;
     mod protocol;

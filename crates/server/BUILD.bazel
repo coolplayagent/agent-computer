@@ -3,7 +3,7 @@ load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "server",
-    srcs = ["src/lib.rs", "src/http.rs", "src/error.rs", "src/plans.rs", "src/requests.rs", "src/runtime.rs", "src/computers.rs", "src/connections.rs", "src/writers.rs", "src/files.rs", "src/executions.rs", "src/artifacts.rs"],
+    srcs = ["src/lib.rs", "src/outputs.rs", "src/http.rs", "src/error.rs", "src/plans.rs", "src/requests.rs", "src/runtime.rs", "src/computers.rs", "src/connections.rs", "src/writers.rs", "src/files.rs", "src/executions.rs", "src/artifacts.rs"],
     compile_data = ["//schemas:openapi-v1alpha1.json"],
     crate_name = "agent_computer_server",
     edition = "2024",
@@ -35,4 +35,11 @@ rust_test(
     tags = ["requires-postgresql"],
     deps = [":server", "//crates/core", "//crates/definitions", "//crates/store", "//crates/worker", "//crates/objects", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
     proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
+)
+
+rust_test(
+    name = "server_unit_test",
+    crate = ":server",
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
 )

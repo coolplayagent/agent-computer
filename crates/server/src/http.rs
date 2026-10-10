@@ -17,23 +17,26 @@ use tokio::sync::Semaphore;
 pub(crate) struct ServiceState {
     pub(crate) store: Store,
     pub(crate) files: Option<agent_computer_worker::files::FileGateway>,
+    pub(crate) outputs: Option<crate::OutputGateway>,
     requests: Arc<Semaphore>,
     pub(crate) validators: Arc<Semaphore>,
 }
 
 pub fn router(store: Store) -> Router {
-    configured_router(store, None)
+    router_with_gateways(store, None, None)
 }
 pub fn router_with_files(store: Store, files: agent_computer_worker::files::FileGateway) -> Router {
-    configured_router(store, Some(files))
+    router_with_gateways(store, Some(files), None)
 }
-fn configured_router(
+pub fn router_with_gateways(
     store: Store,
     files: Option<agent_computer_worker::files::FileGateway>,
+    outputs: Option<crate::OutputGateway>,
 ) -> Router {
     let state = ServiceState {
         store,
         files,
+        outputs,
         requests: Arc::new(Semaphore::new(64)),
         validators: Arc::new(Semaphore::new(8)),
     };
@@ -75,6 +78,10 @@ fn configured_router(
         .route(
             "/v1alpha1/executions/{id}/output",
             get(crate::executions::output),
+        )
+        .route(
+            "/v1alpha1/executions/{id}/output/{stream}",
+            get(crate::outputs::download),
         )
         .route(
             "/v1alpha1/executions/{id}/cancel",
@@ -185,7 +192,7 @@ async fn capabilities(State(state): State<ServiceState>) -> Json<serde_json::Val
             "definitions.validate":"static", "auth.service_credentials":"supported", "auth.oidc":"unsupported", "auth.runtime_grants":"control-plane",
             "definitions.plan":"control-plane", "definitions.apply":"control-plane", "reconciliation.coordination":"control-plane", "reconciliation":"unsupported", "computer":"unsupported", "computer.start_admission":"control-plane", "computer.stop_before_user_dispatch":"control-plane",
             "connection.sessions":"control-plane", "candidate.writer_leases":"control-plane","candidate.file_save":"trusted-worker", "files.read":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "files.save":if state.files.is_some(){"bounded-candidate"}else{"unsupported"}, "browser":"unsupported", "execution":"unsupported", "artifacts":"sealed-file-candidates",
-            "execution.admission":"connection-queued", "execution.outputs":"bounded-durable-observations", "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
+            "execution.admission":"connection-queued", "execution.outputs":"bounded-durable-observations", "execution.output_downloads":if state.outputs.is_some(){"bounded-verified-streams"}else{"unsupported"}, "presentation":"unsupported", "deployment":"unsupported", "mcp":"unsupported", "evaluation":"unsupported"
         }}),
     )
 }

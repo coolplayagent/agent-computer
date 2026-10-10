@@ -1,8 +1,10 @@
 //! Publication of observations only. No terminal execution or writer transition.
+mod download;
 use super::*;
 use agent_computer_kubernetes::StartupObservation;
 use agent_computer_objects::{Client, ObjectRef, Spool};
 use agent_computer_sandbox::{Outcome, Output, StartupReport};
+pub use download::{ExecutionOutputDownload, OutputStream};
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

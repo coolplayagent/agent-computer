@@ -4,8 +4,9 @@ use super::*;
 use crate::plans::DefinitionKind;
 pub use dispatch::{
     ExecutionCompletion, ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionOutput,
-    ExecutionPodAttempt, ExecutionPodPlan, ExecutionRuntimeInputs, ExecutionStartupAttempt,
-    ExecutionStartupGrant, ExecutionWatchdogArm, OutputState,
+    ExecutionOutputDownload, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRuntimeInputs,
+    ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionWatchdogArm, OutputState,
+    OutputStream,
 };
 use serde::{Deserialize, Serialize};
 
