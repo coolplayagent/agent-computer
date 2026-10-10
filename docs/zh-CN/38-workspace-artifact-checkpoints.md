@@ -52,3 +52,5 @@ worker 上传不可变对象后完整读回所有分块及清单，校验长度�
 PostgreSQL/HTTP 测试覆盖封存与抢占竞态、未知派发、历史不可变性、分支/CAS 冲突、即时授权、凭据替换、outbox 写入期间租约到期、事务回滚、迁移、checkpoint 停止、WAL 重启及新输入准入。文件系统测试覆盖多分块文件、独立 inode、空目录、模式保留、损坏和并发修改。使用合成存储回执的数据库用例仅证明授权与事务边界。
 
 真实一次性单 VM 实验使用 K3s/CSI、JuiceFS、分离的控制/元数据 PostgreSQL 数据库及 SeaweedFS S3，通过有界文件网关保存文件，拒绝错误 S3 凭据，注入发布 outbox 失败，删除本地 spool 后由新进程恢复发布，再 checkpoint 停止。清空缓存并故意修改旧目录后，新 Candidate 仍从 S3 恢复原内容、executable 权限及独立 inode。这是组件证据，不是多节点 fencing、断电、HA 或完整 Computer 认证。交付证据记录源码哈希、独立 S3 读回与环境清理。
+
+2026-10-10 的[源码绑定记录](../evidence/workspace-artifact-checkpoints-2026-10-10.json)与[日志](../evidence/workspace-artifact-checkpoints-2026-10-10.log)记录了 354 项 Cargo 测试（含 162 项 PostgreSQL、22 项 HTTP）、11 个 Bazel 目标、最终真实 VM 运行、独立 S3 读回及已完成的环境清理。格式、Clippy、OpenAPI 和现有 Qualitygate 策略检查通过。
