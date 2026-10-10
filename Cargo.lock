@@ -172,6 +172,7 @@ dependencies = [
  "agent-computer-sandbox",
  "agent-computer-storage",
  "agent-computer-test-support",
+ "agent-computer-watchdog",
  "getrandom 0.4.3",
  "serde",
  "serde_json",

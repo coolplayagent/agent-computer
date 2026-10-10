@@ -223,6 +223,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0028_background_execution.sql")),
                     false,
                 ),
+                Migration::new(
+                    29,
+                    Cow::Borrowed("execution renewal"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0029_execution_renewal.sql")),
+                    false,
+                ),
             ])
         })
     }

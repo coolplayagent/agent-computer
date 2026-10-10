@@ -3,6 +3,7 @@ use super::*;
 fn fixture() -> (Probe, Receipt) {
     let request = Request {
         version: 1,
+        renewal: None,
         execution_id: "e".into(),
         boot_id: "12345678-1234-1234-1234-123456789abc".into(),
         cgroup_path: "fixture".into(),
@@ -22,6 +23,7 @@ fn fixture() -> (Probe, Receipt) {
     };
     let query = Probe {
         version: 1,
+        renewals: None,
         nonce: "a".repeat(64),
         request,
         journals: [first, second],
@@ -29,6 +31,7 @@ fn fixture() -> (Probe, Receipt) {
     };
     let reply = Receipt {
         version: 1,
+        renewals: None,
         instance: "b".repeat(64),
         nonce: query.nonce.clone(),
         request: query.request.clone(),

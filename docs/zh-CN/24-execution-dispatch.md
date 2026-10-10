@@ -41,3 +41,5 @@
 仍须实现实际 Candidate Pod/worker、可信监督器交付、存储挂载身份核验、进程启动授权、外部 watchdog 与物理 fencing、有界输出对象、可信完成接纳和独立后台存续期。[22 监督器暂停故障](22-sandbox-supervisor.md) 不能由本地监督报告或 Kubernetes 状态解决。在取得真实运行时证据前，本日志保留不确定写入权。
 
 后续 [25 启动授权](25-execution-startup.md)已加入运行时挑战后的新鲜授权，并将传输延迟计入固定预算。实际 Pod/attach 集成仍待实现。
+
+以上固定期限继续适用于 v1 和准备阶段。[v2 协议](49-renewable-execution-leases.md)新增独立的不可变硬上限，运行期后续期限只来自 worker 已确认的续约。

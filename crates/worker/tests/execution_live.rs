@@ -32,6 +32,8 @@ mod output_http;
 mod outputs;
 #[path = "support/execution_queue.rs"]
 mod queue;
+#[path = "support/execution_renewal.rs"]
+mod renewal;
 
 fn key(s: &str) -> IdempotencyKey {
     IdempotencyKey::new(s).unwrap()
@@ -112,6 +114,17 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         })
         .await
         .unwrap();
+    let renewal_actor = PrincipalId::new("renewal-operator").unwrap();
+    let renewal_credential = store
+        .issue_credential(IssueCredential {
+            organization: &org,
+            principal: &renewal_actor,
+            kind: PrincipalKind::Human,
+            scopes: &ServiceScope::ALL,
+            lifetime: Duration::from_secs(1800),
+        })
+        .await
+        .unwrap();
     for kind in [
         DefinitionKind::Declaration,
         DefinitionKind::Volume,
@@ -142,7 +155,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             .register_catalog_reference(&org, kind, name)
             .await
             .unwrap();
-        for principal in [&actor, &output_actor] {
+        for principal in [&actor, &output_actor, &renewal_actor] {
             store
                 .set_definition_grant(
                     DefinitionGrant {
@@ -192,6 +205,14 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         "output-revoked",
         "output-unknown",
         "output-completion-retry",
+        "renew-short",
+        "renew-long",
+        "renew-cancel",
+        "renew-revoked",
+        "renew-controller-kill",
+        "renew-db-failure",
+        "renew-ack-failure",
+        "renew-hard",
     ];
     // Stopping retains old Candidate reservations. The two restorations need
     // one additional generation each; keep platform admission limits intact.
@@ -301,7 +322,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
             _ => continue,
         };
         for permission in permissions {
-            for principal in [&actor, &output_actor] {
+            for principal in [&actor, &output_actor, &renewal_actor] {
                 store
                     .set_runtime_grant(
                         RuntimeGrant {
@@ -324,6 +345,9 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
     let mut results = vec![];
     let mut queue_evidence = Value::Null;
     for name in names {
+        if name.starts_with("renew-") {
+            continue;
+        }
         let token = if name.starts_with("output-") {
             output_credential.expose_token()
         } else {
@@ -432,6 +456,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 &key(&format!("execution-{name}")),
                 computer,
                 &SubmitExecution {
+                    renewable: Some(false),
                     lease_id: lease.lease_id.clone(),
                     lease: WriterLeaseCommand {
                         connection_session_id: lease.connection_session_id.clone(),
@@ -1078,7 +1103,57 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
         normal: results.iter().find(|v| v["case"] == "cancel").unwrap(),
     })
     .await;
-    let evidence = json!({"cancelled_checkpoint_stop":cancelled_checkpoint,"checkpoint_stop":checkpoint,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
+    let renewal_cases: Vec<_> = names
+        .iter()
+        .filter(|name| name.starts_with("renew-"))
+        .map(|name| {
+            let computer = declaration
+                .resources
+                .iter()
+                .find(|r| r.kind == DefinitionKind::Computer && r.name == *name)
+                .unwrap()
+                .resource_id
+                .clone();
+            let sandbox = declaration
+                .resources
+                .iter()
+                .find(|r| r.kind == DefinitionKind::Sandbox && r.name == *name)
+                .unwrap()
+                .resource_id
+                .clone();
+            ((*name).to_owned(), computer, sandbox)
+        })
+        .collect();
+    let private = json!({"api_url":kube["api_url"],"ca_file":kube["ca_file"],"token_file":kube["token_file"],"deployment":deployment,"execution":worker});
+    let renewals = renewal::run(
+        renewal::Context {
+            store: &store,
+            pool: &pool,
+            client: &client,
+            org: &org,
+            actor: &renewal_actor,
+            token: renewal_credential.expose_token(),
+            config: &config,
+            worker: &worker,
+            private: &private,
+            local: &local,
+            root: &root,
+            owner: &owner,
+            storage: &storage,
+            image,
+        },
+        &renewal_cases,
+    )
+    .await;
+    results.extend(renewals);
+    let total_drains: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM candidate_writer_drains WHERE organization=$1")
+            .bind(org.as_str())
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(total_drains, drains + 7);
+    let evidence = json!({"cancelled_checkpoint_stop":cancelled_checkpoint,"checkpoint_stop":checkpoint,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":local["target"]["filesystem_uuid"],"results":results,"writer_drains":total_drains,"legacy_writer_drains":drains,"queue":queue_evidence,"limits":["single VM; actual database grants, node watchdog/reaper admission and CSI mounts","raw process report alone is not accepted completion","API deletion is not physical fencing","controller-loss recovery and multi-node fencing do not recreate live seals"]});
     fs::write(
         field(&config, "result_file"),
         serde_json::to_vec_pretty(&evidence).unwrap(),

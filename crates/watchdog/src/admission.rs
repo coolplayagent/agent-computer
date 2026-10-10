@@ -27,6 +27,20 @@ struct Probe {
     request: Request,
     journals: [Reference; 2],
     cgroup_device: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    renewals: Option<[crate::renewal::Receipt; 2]>,
+}
+impl Probe {
+    fn deadline(&self) -> u64 {
+        self.renewals
+            .as_ref()
+            .map_or(self.request.deadline_boottime_ms, |r| {
+                r.iter()
+                    .map(|r| r.command.deadline_boottime_ms)
+                    .min()
+                    .unwrap()
+            })
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -42,6 +56,8 @@ pub struct Receipt {
     pub spool_device: u64,
     pub spool_inode: u64,
     pub observed_boottime_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renewals: Option<[crate::renewal::Receipt; 2]>,
 }
 
 #[derive(Debug)]
@@ -49,6 +65,7 @@ pub struct Client {
     spool: PathBuf,
     initial: Receipt,
     failed: bool,
+    renewals: Option<[crate::renewal::Receipt; 2]>,
 }
 impl Client {
     pub fn connect(
@@ -57,11 +74,12 @@ impl Client {
         journals: [Reference; 2],
         cgroup_device: u64,
     ) -> Result<Self> {
-        let initial = probe(spool, request, &journals, cgroup_device)?;
+        let initial = probe(spool, request, &journals, cgroup_device, None)?;
         Ok(Self {
             spool: spool.into(),
             initial,
             failed: false,
+            renewals: None,
         })
     }
     pub fn receipt(&self) -> &Receipt {
@@ -75,12 +93,36 @@ impl Client {
         self.failed = result.is_err();
         result
     }
+    /// Called only after both original live guards acknowledge the same grant.
+    /// Failure is sticky, including a lost service response or restart.
+    pub fn renewed(&mut self, receipts: [crate::renewal::Receipt; 2]) -> Result<()> {
+        if self.failed {
+            return Err(Error::ReaperUnavailable);
+        }
+        for (index, receipt) in receipts.iter().enumerate() {
+            if receipt
+                .validate(&self.initial.request, &self.initial.journals[index])
+                .is_err()
+                || receipt.command.sequence
+                    != self
+                        .renewals
+                        .as_ref()
+                        .map_or(1, |r| r[index].command.sequence + 1)
+            {
+                self.failed = true;
+                return Err(Error::InvalidJournal);
+            }
+        }
+        self.renewals = Some(receipts);
+        self.check()
+    }
     fn check_inner(&self) -> Result<()> {
         let next = probe(
             &self.spool,
             &self.initial.request,
             &self.initial.journals,
             self.initial.cgroup_device,
+            self.renewals.as_ref(),
         )?;
         if next.instance != self.initial.instance
             || next.pid != self.initial.pid
@@ -132,6 +174,7 @@ fn probe(
     request: &Request,
     journals: &[Reference; 2],
     cgroup_device: u64,
+    renewals: Option<&[crate::renewal::Receipt; 2]>,
 ) -> Result<Receipt> {
     if !rustix::process::geteuid().is_root() {
         return Err(Error::RootRequired);
@@ -147,6 +190,7 @@ fn probe(
         request: request.clone(),
         journals: journals.clone(),
         cgroup_device,
+        renewals: renewals.cloned(),
     };
     let path = spool.join(format!("probe-{}", &query.nonce[..16]));
     fs::DirBuilder::new()
@@ -167,7 +211,7 @@ fn probe(
         .send(&frame(&query)?)
         .map_err(|_| Error::ReaperUnavailable)?;
     loop {
-        if Instant::now() >= deadline || boottime_ms() >= request.deadline_boottime_ms {
+        if Instant::now() >= deadline || boottime_ms() >= query.deadline() {
             return Err(Error::ReaperUnavailable);
         }
         let mut bytes = [0; MAX_FRAME + 1];
@@ -201,13 +245,14 @@ fn validate(
         || reply.request != query.request
         || reply.journals != query.journals
         || reply.cgroup_device != query.cgroup_device
+        || reply.renewals != query.renewals
         || reply.pid == 0
         || reply.spool_device != device
         || reply.spool_inode != inode
         || reply.observed_boottime_ms < start
         || reply.observed_boottime_ms > now
         || now.saturating_sub(start) > PROBE_MS
-        || now >= query.request.deadline_boottime_ms
+        || now >= query.deadline()
     {
         return Err(Error::InvalidJournal);
     }
@@ -310,7 +355,7 @@ impl Server {
                 .trim_end_matches('\n'),
         )?;
         let mut pids = Vec::new();
-        for reference in &query.journals {
+        for (index, reference) in query.journals.iter().enumerate() {
             if !reference.id.starts_with("journal-") {
                 return Err(Error::InvalidRequest);
             }
@@ -322,6 +367,7 @@ impl Server {
                     .is_none_or(|v| v.cgroup_device != query.cgroup_device)
                 || snapshot.report.is_some()
                 || snapshot.recovery.is_some()
+                || snapshot.renewal.as_ref() != query.renewals.as_ref().map(|r| &r[index])
             {
                 return Err(Error::InvalidJournal);
             }
@@ -330,9 +376,17 @@ impl Server {
         if pids[0] == pids[1] {
             return Err(Error::InvalidJournal);
         }
+        if let Some(receipts) = &query.renewals {
+            if receipts[0].command != receipts[1].command {
+                return Err(Error::InvalidJournal);
+            }
+            for (index, receipt) in receipts.iter().enumerate() {
+                receipt.validate(&query.request, &query.journals[index])?;
+            }
+        }
         cgroup::Cgroup::verify(&query.request, query.cgroup_device)?;
         let observed = boottime_ms();
-        if observed >= query.request.deadline_boottime_ms {
+        if observed >= query.deadline() {
             return Err(Error::InvalidRequest);
         }
         Ok(Receipt {
@@ -346,6 +400,7 @@ impl Server {
             spool_device: self.device,
             spool_inode: self.inode,
             observed_boottime_ms: observed,
+            renewals: query.renewals,
         })
     }
 }

@@ -168,6 +168,7 @@ async fn candidate_data_leaf_mount_preserves_private_metadata_and_independent_fi
             image,
             Bootstrap {
                 version: 1,
+                hard_budget_ms: None,
                 intent_digest: format!("sha256:{}", "b".repeat(64)),
                 request: Request {
                     execution_id,
@@ -198,7 +199,7 @@ async fn candidate_data_leaf_mount_preserves_private_metadata_and_independent_fi
                 while !marker.with_extension("inspected").exists() {if tokio::time::Instant::now()>=until{return Err("node inspection timeout".into());}tokio::time::sleep(Duration::from_millis(100)).await;}
             }
             let channel=client.attach_startup(&plan,&observed).await.map_err(|e|e.to_string())?;
-            let grant=StartupGrant {version:1,challenge_digest:channel.challenge().digest().unwrap(),lease_budget_ms:15000};
+            let grant=StartupGrant {version:1, hard_budget_ms: None,challenge_digest:channel.challenge().digest().unwrap(),lease_budget_ms:15000};
             let observation=channel.run(&grant).await.map_err(|e|e.to_string())?;
             serde_json::from_slice(observation.report_bytes()).map_err(|e|e.to_string())
         }.await;

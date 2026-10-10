@@ -124,6 +124,15 @@ pub(crate) async fn run_anchored(
     namespace: NamespaceInit,
     start: Instant,
 ) -> Result<Report> {
+    run_controlled(request, namespace, start, None).await
+}
+
+pub(crate) async fn run_controlled(
+    request: Request,
+    namespace: NamespaceInit,
+    start: Instant,
+    mut control: Option<&mut crate::renewal::Channel>,
+) -> Result<Report> {
     let process_start = Instant::now();
     let mut report = Report {
         version: 1,
@@ -163,13 +172,14 @@ pub(crate) async fn run_anchored(
     };
     let timeout = Duration::from_secs(request.timeout_seconds.into());
     let lease = Duration::from_millis(request.lease_budget_ms.into());
-    let deadline = (process_start + timeout).min(start + lease);
-    let deadline_outcome = if start + lease <= process_start + timeout {
+    let command_deadline = process_start + timeout;
+    let mut lease_deadline = start + lease;
+    let deadline_outcome = if lease_deadline <= command_deadline {
         Outcome::LeaseExpired
     } else {
         Outcome::TimedOut
     };
-    if Instant::now() >= deadline {
+    if Instant::now() >= command_deadline.min(lease_deadline) {
         report.outcome = deadline_outcome;
         report.children_reaped = true;
         report.elapsed_ms = elapsed(start);
@@ -242,13 +252,26 @@ pub(crate) async fn run_anchored(
                 .drain(&mut stderr, request.output_limit_bytes)
                 .is_err();
         }
+        if stop.is_none()
+            && let Some(control) = control.as_mut()
+        {
+            match control.poll() {
+                Ok(()) | Err(Error::LeaseExpired) => {}
+                Err(_) => fault = true,
+            }
+            lease_deadline = control.window.deadline();
+        }
         let now = Instant::now();
         // Deadline has priority over an exit first observed after it expired.
         if stop.is_none() {
             let reason = if fault {
                 Some(Outcome::Unknown)
-            } else if now >= deadline {
-                Some(deadline_outcome)
+            } else if now >= command_deadline.min(lease_deadline) {
+                Some(if lease_deadline <= command_deadline {
+                    Outcome::LeaseExpired
+                } else {
+                    Outcome::TimedOut
+                })
             } else if main_status.is_some() && !no_children {
                 Some(Outcome::DescendantsTerminated)
             } else {

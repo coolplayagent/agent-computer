@@ -5,7 +5,8 @@ pub use queue::{QueueEvent, QueueOptions, QueueSummary, run_queue};
 mod storage;
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_kubernetes::{
-    Client, DeleteOutcome, PodObservation, PodPhase, StartupObservation, StartupSandboxPlan,
+    Client, DeleteOutcome, ExecutionEvent, PodObservation, PodPhase, StartupObservation,
+    StartupSandboxPlan,
 };
 use agent_computer_store::{Error, Result, Store, runtime::writers::*};
 pub use plan::compile_plan;
@@ -36,6 +37,9 @@ pub enum Phase {
     WatchdogRegistration,
     Authorize,
     Run,
+    RenewalAuthorize,
+    RenewalWatchdog,
+    RenewalAcknowledge,
     Recovery,
 }
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -129,7 +133,7 @@ fn output_resources(
 async fn execute_admitted(
     store: &Store,
     client: &Client,
-    attempt: ExecutionDispatchAttempt,
+    mut attempt: ExecutionDispatchAttempt,
     config: Configuration,
     output_client: Arc<agent_computer_objects::Client>,
     output_spool: agent_computer_objects::Spool,
@@ -141,6 +145,12 @@ async fn execute_admitted(
     // Commitment itself can consume the last millisecond. Still pass through
     // authority lowering if the returned in-process budget has already expired.
     let budget = Duration::from_millis(attempt.remaining_budget_ms().unwrap_or_default().into());
+    let hard_budget = Duration::from_millis(
+        attempt
+            .remaining_hard_budget_ms()
+            .unwrap_or_default()
+            .into(),
+    );
     let mut phase = Phase::Preparing;
     let mut plan = None;
     let mut journal = None;
@@ -149,7 +159,8 @@ async fn execute_admitted(
     let mut fence = None;
     let mut node_guard = None;
     let mut registered = false;
-    let run=tokio::time::timeout(budget, async {
+    let run=tokio::time::timeout(hard_budget, async {
+        let mut channel=tokio::time::timeout(budget, async {
         let inputs=store.candidate_execution_runtime_inputs(org,id).await?;
         let local=storage::open(&inputs,config.candidate).await?;
         storage::verify(local.clone()).await?;
@@ -191,12 +202,17 @@ async fn execute_admitted(
         let runtime=backend(client.observe_runtime(plan.pod_plan(),channel.pod_uid(),&config.node.node).await)?;
         let anchor=agent_computer_watchdog::boottime_ms();
         let guard_deadline=anchor+u64::from(attempt.remaining_budget_ms()?.saturating_sub(2));
+        let renewal=attempt.intent().hard_deadline_at_ms.map(|hard| agent_computer_watchdog::renewal::Policy {
+            hard_deadline_boottime_ms:guard_deadline+(hard-attempt.intent().deadline_at_ms) as u64,
+            authority_digest:attempt.intent().intent_digest.clone(),
+        });
+        let lease=agent_computer_node::ExecutionLease{deadline_boottime_ms:guard_deadline,renewal};
         let command=plan.pod_plan().manifest()["spec"]["containers"][0]["command"].clone();
         let execution=id.to_owned();
         let candidate=agent_computer_node::CandidateIdentity{data_inode:inputs.prepared.data_inode,volume_path:inputs.target.volume_path.clone()};
         phase=Phase::Watchdog;
         let live_fence=fence.clone();
-        node_guard=Some(tokio::task::spawn_blocking(move || agent_computer_node::arm_fenced(&config.node,runtime,&execution,&command,&candidate,guard_deadline,&live_fence))
+        node_guard=Some(tokio::task::spawn_blocking(move || agent_computer_node::arm_fenced(&config.node,runtime,&execution,&command,&candidate,lease,&live_fence))
             .await.map_err(|_|Error::RuntimeAccessUnavailable)?.map_err(|error|{node_error=Some(error);Error::ReferenceUnavailable})?);
         let guard=node_guard.as_mut().ok_or(Error::InvalidStoredData)?;
         phase=Phase::WatchdogRegistration;
@@ -211,13 +227,39 @@ async fn execute_admitted(
         grant.remaining_budget_ms()?;
         attempt.remaining_budget_ms()?;
         guard.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?;
+        let running=backend(channel.start(&grant.grant().grant).await)?;
+        Ok::<_,Error>(running)
+        }).await.map_err(|_|Error::WriterLeaseInactive)??;
         phase=Phase::Run;
-        let run=channel.run(&grant.grant().grant);
-        tokio::pin!(run);
         loop {
+            let remaining=Duration::from_millis(attempt.remaining_budget_ms()?.into());
             tokio::select! {
-                value=&mut run => break backend(value),
-                _=tokio::time::sleep(Duration::from_millis(200)) => { active(store,org,id).await?; guard.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?; },
+                value=channel.next_event() => match backend(value)? {
+                    ExecutionEvent::Complete(observation) => break Ok(observation),
+                    ExecutionEvent::Renewal(challenge) => {
+                        phase=Phase::RenewalAuthorize;
+                        let guard=node_guard.as_mut().ok_or(Error::InvalidStoredData)?;
+                        let permit=tokio::time::timeout(remaining,store.authorize_candidate_execution_renewal(&attempt,&challenge,guard)).await.map_err(|_|Error::WriterLeaseInactive)??;
+                        let response=permit.grant().grant.clone();
+                        let command=permit.grant().node_command.clone();
+                        phase=Phase::RenewalWatchdog;
+                        let mut guard=node_guard.take().ok_or(Error::InvalidStoredData)?;
+                        let (guard,result)=tokio::task::spawn_blocking(move || { let result=guard.renew(&command); (guard,result) }).await.map_err(|_|Error::RuntimeAccessUnavailable)?;
+                        node_guard=Some(guard);
+                        result.map_err(|error|{node_error=Some(error);Error::ReferenceUnavailable})?;
+                        phase=Phase::RenewalAcknowledge;
+                        let remaining=Duration::from_millis(attempt.remaining_budget_ms()?.into());
+                        tokio::time::timeout(remaining,store.acknowledge_candidate_execution_renewal(&mut attempt,permit,node_guard.as_mut().ok_or(Error::InvalidStoredData)?)).await.map_err(|_|Error::WriterLeaseInactive)??;
+                        backend(channel.send_renewal(&response).await)?;
+                        phase=Phase::Run;
+                    },
+                },
+                _=tokio::time::sleep(remaining) => return Err(Error::WriterLeaseInactive),
+                _=tokio::time::sleep(Duration::from_millis(200)) => {
+                    let remaining=Duration::from_millis(attempt.remaining_budget_ms()?.into());
+                    tokio::time::timeout(remaining,active(store,org,id)).await.map_err(|_|Error::WriterLeaseInactive)??;
+                    node_guard.as_mut().ok_or(Error::InvalidStoredData)?.remaining_budget_ms().map_err(|_|Error::WriterLeaseInactive)?;
+                },
             }
         }
     }).await;

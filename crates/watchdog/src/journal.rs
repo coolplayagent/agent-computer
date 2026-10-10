@@ -21,7 +21,7 @@ pub struct Reference {
     pub intent_digest: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Intent {
     pub version: u8,
@@ -35,6 +35,7 @@ pub struct Snapshot {
     pub report: Option<Report>,
     pub enrollment: Option<Enrollment>,
     pub recovery: Option<Report>,
+    pub renewal: Option<crate::renewal::Receipt>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -98,12 +99,93 @@ impl Journal {
         let report = journal.report()?;
         let enrollment = journal.enrollment()?;
         let recovery = journal.recovery()?;
+        let renewal = journal.latest_renewal()?;
         Ok(Snapshot {
             intent: journal.intent,
             report,
             enrollment,
             recovery,
+            renewal,
         })
+    }
+
+    pub(crate) fn duplicate(&self) -> Result<Self> {
+        Ok(Self {
+            directory: self
+                .directory
+                .try_clone()
+                .map_err(|_| Error::JournalUnavailable)?,
+            reference: self.reference.clone(),
+            intent: self.intent.clone(),
+        })
+    }
+
+    /// Single original watchdog writer only. The timer has already accepted
+    /// this bounded window. IO may delay acknowledgment but never the timer.
+    pub(crate) fn renew(&self, receipt: &crate::renewal::Receipt) -> Result<()> {
+        receipt
+            .validate(self.request(), self.reference())
+            .map_err(|_| Error::InvalidJournal)?;
+        let previous = self.latest_renewal()?;
+        if receipt.command.sequence != previous.as_ref().map_or(1, |r| r.command.sequence + 1)
+            || receipt.previous_deadline_boottime_ms
+                != previous
+                    .as_ref()
+                    .map_or(self.request().deadline_boottime_ms, |r| {
+                        r.command.deadline_boottime_ms
+                    })
+            || self.report()?.is_some()
+            || self.recovery()?.is_some()
+        {
+            return Err(Error::InvalidJournal);
+        }
+        let bytes = serde_json::to_vec(receipt).map_err(|_| Error::InvalidJournal)?;
+        let name = format!("renewal-{:08}.json", receipt.command.sequence);
+        let pending = format!("renewal-{:08}.pending", receipt.command.sequence);
+        publish(&self.directory, &name, &pending, &bytes)?;
+        let head_pending = format!("renewal-head-{:08}.pending", receipt.command.sequence);
+        publish_inner(
+            &self.directory,
+            "renewal.json",
+            &head_pending,
+            &bytes,
+            RenameFlags::empty(),
+        )
+    }
+
+    /// Read-only expiry evidence. The original intent and each accepted receipt
+    /// remain immutable; the atomic head merely selects an existing receipt.
+    /// This does not authorize renewals or reconstruct a live execution seal.
+    pub fn latest_renewal(&self) -> Result<Option<crate::renewal::Receipt>> {
+        let Some(bytes) = read(&self.directory, "renewal.json")? else {
+            return Ok(None);
+        };
+        let receipt: crate::renewal::Receipt =
+            serde_json::from_slice(&bytes).map_err(|_| Error::InvalidJournal)?;
+        receipt
+            .validate(self.request(), self.reference())
+            .map_err(|_| Error::InvalidJournal)?;
+        let name = format!("renewal-{:08}.json", receipt.command.sequence);
+        if read(&self.directory, &name)?.as_ref() != Some(&bytes) {
+            return Err(Error::InvalidJournal);
+        }
+        if receipt.command.sequence > 1 {
+            let previous = format!("renewal-{:08}.json", receipt.command.sequence - 1);
+            let previous: crate::renewal::Receipt = serde_json::from_slice(
+                &read(&self.directory, &previous)?.ok_or(Error::InvalidJournal)?,
+            )
+            .map_err(|_| Error::InvalidJournal)?;
+            previous
+                .validate(self.request(), self.reference())
+                .map_err(|_| Error::InvalidJournal)?;
+            if previous.command.sequence + 1 != receipt.command.sequence
+                || previous.command.deadline_boottime_ms != receipt.previous_deadline_boottime_ms
+                || previous.accepted_boottime_ms > receipt.accepted_boottime_ms
+            {
+                return Err(Error::InvalidJournal);
+            }
+        }
+        Ok(Some(receipt))
     }
 
     fn open_reference(spool: &Path, reference: &Reference) -> Result<Self> {
@@ -246,6 +328,16 @@ impl Journal {
     }
 
     fn validate_common(&self, report: &Report) -> Result<()> {
+        if let Some(renewal) = &report.renewal {
+            renewal
+                .validate(self.request(), self.reference())
+                .map_err(|_| Error::InvalidJournal)?;
+            if report.trigger == Trigger::Deadline
+                && report.kill_boottime_ms < renewal.command.deadline_boottime_ms
+            {
+                return Err(Error::InvalidJournal);
+            }
+        }
         if report.version != 1
             || report.request != self.intent.request
             || report.journal.as_ref() != Some(&self.reference)
@@ -320,6 +412,15 @@ pub(crate) fn directory(path: &Path, private: bool) -> Result<File> {
 }
 
 fn publish(dir: &File, name: &str, pending: &str, bytes: &[u8]) -> Result<()> {
+    publish_inner(dir, name, pending, bytes, RenameFlags::NOREPLACE)
+}
+fn publish_inner(
+    dir: &File,
+    name: &str,
+    pending: &str,
+    bytes: &[u8],
+    flags: RenameFlags,
+) -> Result<()> {
     if bytes.len() as u64 > MAX_RECORD {
         return Err(Error::InvalidJournal);
     }
@@ -336,8 +437,7 @@ fn publish(dir: &File, name: &str, pending: &str, bytes: &[u8]) -> Result<()> {
     file.write_all(bytes)
         .map_err(|_| Error::JournalUnavailable)?;
     file.sync_all().map_err(|_| Error::JournalUnavailable)?;
-    renameat_with(dir, pending, dir, name, RenameFlags::NOREPLACE)
-        .map_err(|_| Error::JournalUnavailable)?;
+    renameat_with(dir, pending, dir, name, flags).map_err(|_| Error::JournalUnavailable)?;
     dir.sync_all().map_err(|_| Error::JournalUnavailable)?;
     Ok(())
 }

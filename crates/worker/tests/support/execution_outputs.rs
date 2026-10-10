@@ -15,6 +15,8 @@ pub async fn verify(
     let expected = matches!(
         case,
         "normal"
+            | "renew-short"
+            | "renew-long"
             | "command"
             | "output-store-failure"
             | "output-db-failure"

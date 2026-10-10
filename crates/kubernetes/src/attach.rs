@@ -21,6 +21,9 @@ const DIAGNOSTIC_LIMIT: usize = 65536;
 const MAX_FRAMES: usize = 4096;
 type Socket = WebSocketStream<reqwest::Upgraded>;
 
+mod running;
+pub use running::{ExecutionChannel, ExecutionEvent};
+
 /// A single live channel to one verified Pod. It cannot be cloned/deserialized.
 /// Dropping it closes transport, not a process or a Candidate writer lease.
 pub struct StartupChannel<'a> {
@@ -106,10 +109,10 @@ async fn next(
         if *frames >= MAX_FRAMES || Instant::now() >= deadline {
             return Err(Error::ResponseLimit);
         }
-        *frames += 1;
         let message = timeout_at(deadline, socket.next())
             .await
             .map_err(|_| Error::Transport)?;
+        *frames += 1;
         match message {
             Some(Ok(Message::Binary(bytes))) if !bytes.is_empty() => {
                 return Ok(Some(bytes.to_vec()));
@@ -267,7 +270,7 @@ impl Client {
         Ok(())
     }
 }
-impl StartupChannel<'_> {
+impl<'a> StartupChannel<'a> {
     pub fn pod_uid(&self) -> &str {
         &self.pod_uid
     }
@@ -275,21 +278,22 @@ impl StartupChannel<'_> {
         &self.challenge
     }
 
-    /// Consume this channel and send one fresh, database-authorized grant, then
-    /// close stdin with v5's per-stream close. Any write/collection uncertainty
-    /// is MutationUnconfirmed. There is no retry, reconnect, exec or fallback.
-    /// An external watchdog must remain independent of this future and channel.
-    pub async fn run(mut self, grant: &StartupGrant) -> Result<StartupObservation> {
-        grant.validate().map_err(|_| Error::InvalidCommand)?;
-        if grant.challenge_digest
-            != self
-                .challenge
-                .digest()
-                .map_err(|_| Error::InvalidResponse)?
-            || grant.lease_budget_ms > self.plan.bootstrap.request.lease_budget_ms
-        {
-            return Err(Error::IdentityMismatch);
+    /// Legacy convenience path. A renewal challenge requires the explicit event
+    /// API and fresh external authorization; it is never answered automatically.
+    pub async fn run(self, grant: &StartupGrant) -> Result<StartupObservation> {
+        let mut running = self.start(grant).await?;
+        match running.next_event().await? {
+            ExecutionEvent::Complete(observation) => Ok(observation),
+            ExecutionEvent::Renewal(_) => Err(Error::MutationUnconfirmed),
         }
+    }
+    /// Consume the verified startup channel. Version 1 closes stdin immediately;
+    /// version 2 keeps the same authenticated stream for one-shot renewal grants.
+    pub async fn start(mut self, grant: &StartupGrant) -> Result<ExecutionChannel<'a>> {
+        grant.validate().map_err(|_| Error::InvalidCommand)?;
+        grant
+            .accept(&self.challenge, &self.plan.bootstrap)
+            .map_err(|_| Error::IdentityMismatch)?;
         let send_deadline = self.created + Duration::from_millis(grant.lease_budget_ms.into());
         timeout_at(send_deadline, self.client.running(self.plan, &self.pod_uid))
             .await
@@ -303,73 +307,15 @@ impl StartupChannel<'_> {
         send(&mut self.socket, bytes, send_deadline)
             .await
             .map_err(|_| Error::MutationUnconfirmed)?;
-        send(&mut self.socket, vec![255, 0], send_deadline)
-            .await
-            .map_err(|_| Error::MutationUnconfirmed)?;
-        let deadline = send_deadline
-            + Duration::from_millis(u64::from(self.plan.bootstrap.request.term_grace_ms) + 2000);
-        self.collect(grant, deadline)
-            .await
-            .map_err(|_| Error::MutationUnconfirmed)
-    }
-    async fn collect(
-        mut self,
-        grant: &StartupGrant,
-        deadline: Instant,
-    ) -> Result<StartupObservation> {
-        let mut report = Vec::new();
-        let mut stderr = Vec::new();
-        let mut status = Vec::new();
-        let limit = 8 * self.plan.bootstrap.request.output_limit_bytes + 16384;
-        while let Some(frame) = next(&mut self.socket, &mut self.frames, deadline).await? {
-            match frame[0] {
-                1 => {
-                    append(&mut report, &frame[1..], limit)?;
-                    line(&report)?;
-                }
-                2 => append(&mut stderr, &frame[1..], DIAGNOSTIC_LIMIT)?,
-                3 => append(&mut status, &frame[1..], 4096)?,
-                255 if frame.len() == 2 && matches!(frame[1], 1..=3) => {}
-                _ => return Err(Error::InvalidResponse),
-            }
-            // Status Success means the attach operation ended, not process
-            // success. Stop after both complete channels; no fence is inferred.
-            if line(&report)?.is_some()
-                && serde_json::from_slice::<RemoteStatus>(&status)
-                    .is_ok_and(|v| v.status == "Success")
-            {
-                break;
-            }
+        if grant.hard_budget_ms.is_none() {
+            send(&mut self.socket, vec![255, 0], send_deadline)
+                .await
+                .map_err(|_| Error::MutationUnconfirmed)?;
         }
-        let status: RemoteStatus =
-            serde_json::from_slice(&status).map_err(|_| Error::InvalidResponse)?;
-        if status.status != "Success" {
-            return Err(Error::ApiRejected);
-        }
-        let bytes = line(&report)?.ok_or(Error::InvalidResponse)?;
-        let envelope: Envelope =
-            serde_json::from_slice(bytes).map_err(|_| Error::InvalidResponse)?;
-        let identity: ReportIdentity =
-            serde_json::from_str(envelope.report.get()).map_err(|_| Error::InvalidResponse)?;
-        let mut request = self.plan.bootstrap.request.clone();
-        request.lease_budget_ms = grant.lease_budget_ms;
-        if envelope.version != 1
-            || envelope.challenge_digest != grant.challenge_digest
-            || envelope.grant_digest != grant.digest().map_err(|_| Error::InvalidCommand)?
-            || identity.version != 1
-            || identity.execution_id != request.execution_id
-            || identity.generation != request.generation
-            || identity.request_digest != request.digest().map_err(|_| Error::InvalidCommand)?
-        {
-            return Err(Error::IdentityMismatch);
-        }
-        Ok(StartupObservation {
-            pod_uid: self.pod_uid,
-            report,
-            supervisor_stderr: stderr,
-        })
+        ExecutionChannel::new(self, grant.clone(), send_deadline)
     }
 }
+
 #[derive(Deserialize)]
 struct RemoteStatus {
     status: String,
@@ -381,6 +327,8 @@ struct Envelope {
     challenge_digest: String,
     grant_digest: String,
     report: Box<serde_json::value::RawValue>,
+    #[serde(default)]
+    renewal: Option<agent_computer_sandbox::renewal::Progress>,
 }
 // Only correlation is checked here. Result semantics and durable acceptance are
 // the collector's responsibility; ignoring fields does not attest their validity.

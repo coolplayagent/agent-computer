@@ -5875,9 +5875,14 @@
           },
           "command": {
             "$ref": "#/components/schemas/ExecutionCommand"
+          },
+          "renewable": {
+            "type": "boolean",
+            "default": true,
+            "description": "New admissions allow trusted worker renewals by default. False pins fixed startup protocol v1. Retry identity distinguishes omitted, true and false. Historical rows retain their original fixed policy."
           }
         },
-        "description": "Bounded queue reservation on a Prepared Candidate. Background (default) survives logical connection close; connection lifetime requires an active connection. Neither mode extends the original writer or dispatch deadline (at most 30 seconds on the current guarded path). Original credential, grants, catalog and generation remain required. Selected gVisor Sandbox must belong to the pinned Computer snapshot and cannot host an App. Admission increments writer revision; re-read the lease before renewal/release. Public runtime execution remains unsupported."
+        "description": "Bounded queue reservation on a Prepared Candidate. Background (default) survives logical connection close; connection lifetime requires an active connection. The queue deadline cannot be renewed. New renewable admissions allow the original worker to extend execution windows by at most 30 seconds after fresh authorization and both node watchdog acknowledgments. The immutable execution hard limit is capped by command timeout plus 30 seconds, the pinned Computer start duration and original credential expiry; connection lifetime also caps it by session expiry. This is an execution duration, not a full Computer activation or idle lifetime implementation. Original grants, catalog and generation remain required. Selected gVisor Sandbox must belong to the pinned Computer snapshot and cannot host an App. Public runtime execution remains unsupported."
       },
       "CancelExecution": {
         "type": "object",
@@ -5913,7 +5918,8 @@
           "reason",
           "input_digest",
           "binding_digest",
-          "dispatch_started"
+          "dispatch_started",
+          "renewable"
         ],
         "properties": {
           "execution_id": {
@@ -6004,6 +6010,10 @@
               "connection"
             ],
             "description": "Immutable submitted lifetime, included in the input digest."
+          },
+          "renewable": {
+            "type": "boolean",
+            "description": "Immutable admitted policy. False for historical fixed execution records. This does not indicate a live controller or a renewed deadline."
           }
         },
         "description": "Current execution metadata bound to the original credential. Succeeded/Failed require a live kernel and Candidate IO seal, verified output and current authority; dispatched Cancelled requires the seal and an explicit cancellation request. Unknown preserves uncertainty even when physical writes are sealed. Queue deadline is fixed at admission and never extended by retry or lease renewal.",

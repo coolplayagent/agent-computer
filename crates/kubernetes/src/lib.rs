@@ -15,7 +15,7 @@ mod startup_plan;
 mod verify;
 pub mod volume;
 
-pub use attach::{StartupChannel, StartupObservation};
+pub use attach::{ExecutionChannel, ExecutionEvent, StartupChannel, StartupObservation};
 pub use candidate::CandidateMount;
 pub use client::{Client, DeleteOutcome, Deployment, PodObservation, PodPhase};
 pub use plan::{EphemeralSandboxPlan, InstanceIdentity};

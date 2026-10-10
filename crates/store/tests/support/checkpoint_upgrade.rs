@@ -1,7 +1,42 @@
 use super::Database;
 
 impl Database {
+    pub async fn remove_execution_renewal(&self) {
+        sqlx::raw_sql("DROP TABLE execution_renewal_acks,execution_renewal_grants; DROP FUNCTION guard_execution_renewal_grant(); DROP FUNCTION guard_execution_renewal_ack(); DROP FUNCTION complete_execution_renewal(); DROP FUNCTION execution_effective_deadline(TEXT,TEXT); DROP FUNCTION execution_renewal_progress(TEXT,TEXT); DROP TRIGGER check_execution_hard_limit ON execution_dispatch_intents; DROP FUNCTION guard_execution_hard_limit(); DROP TRIGGER check_execution_watchdog_lease_policy ON execution_watchdog_arms; DROP FUNCTION guard_execution_watchdog_lease_policy(); ALTER TABLE execution_requests DROP CONSTRAINT execution_renewal_input, DROP CONSTRAINT execution_renewal_policy; ALTER TABLE execution_dispatch_intents DROP COLUMN hard_deadline_at_ms; DELETE FROM _sqlx_migrations WHERE version=29;")
+            .execute(&self.pool).await.unwrap();
+        for (source, name) in [
+            (
+                include_str!("../../migrations/0014_execution_startup.sql"),
+                "guard_execution_startup",
+            ),
+            (
+                include_str!("../../migrations/0019_execution_outputs.sql"),
+                "guard_execution_output",
+            ),
+            (
+                include_str!("../../migrations/0023_execution_completions.sql"),
+                "guard_execution_completion",
+            ),
+            (
+                include_str!("../../migrations/0023_execution_completions.sql"),
+                "complete_execution_completion",
+            ),
+        ] {
+            let body = source
+                .split(&format!("FUNCTION {name}"))
+                .nth(1)
+                .unwrap()
+                .split("$$;")
+                .next()
+                .unwrap();
+            sqlx::raw_sql(&format!("CREATE OR REPLACE FUNCTION {name}{body}$$;"))
+                .execute(&self.pool)
+                .await
+                .unwrap();
+        }
+    }
     pub async fn remove_background_execution(&self) {
+        self.remove_execution_renewal().await;
         sqlx::raw_sql("DROP FUNCTION writer_has_background_execution(TEXT,TEXT,BIGINT); ALTER TABLE execution_requests DROP CONSTRAINT execution_lifetime; DELETE FROM _sqlx_migrations WHERE version=28;")
             .execute(&self.pool).await.unwrap();
     }

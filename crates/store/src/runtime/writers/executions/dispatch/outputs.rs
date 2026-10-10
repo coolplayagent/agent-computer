@@ -33,6 +33,8 @@ struct Manifest {
     dispatch_digest: String,
     grant_digest: String,
     arm_digest: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    renewal: Option<agent_computer_sandbox::renewal::Progress>,
     // Fixed order: envelope, stdout, stderr, supervisor diagnostics.
     objects: [ObjectRef; 4],
     summary: Summary,
@@ -42,8 +44,10 @@ impl Manifest {
         digest("agent-computer/execution-outputs-v1", self)
     }
     fn validate(&self) -> Result<()> {
-        if self.version != 1
-            || !agent_computer_objects::identifier(&self.organization)
+        if !matches!(
+            (self.version, self.renewal.is_some()),
+            (1, false) | (2, true)
+        ) || !agent_computer_objects::identifier(&self.organization)
             || !agent_computer_objects::identifier(&self.execution_id)
             || self.pod_uid.is_empty()
             || [&self.dispatch_digest, &self.grant_digest, &self.arm_digest]
@@ -51,6 +55,9 @@ impl Manifest {
                 .any(|s| !agent_computer_objects::digest(s))
         {
             return Err(Error::InvalidStoredData);
+        }
+        if let Some(progress) = &self.renewal {
+            progress.validate().map_err(|_| Error::InvalidStoredData)?;
         }
         for object in &self.objects {
             object.validate().map_err(|_| Error::InvalidStoredData)?;
@@ -140,6 +147,7 @@ fn content(
     pod: &str,
     bytes: &[u8],
     diagnostics: &[u8],
+    renewal: Option<&agent_computer_sandbox::renewal::Progress>,
 ) -> Result<(Summary, Vec<Vec<u8>>)> {
     let cap = dispatch.input.command.output_limit_bytes;
     if bytes.len() > 8 * cap + 16384 || diagnostics.len() > 65536 {
@@ -150,7 +158,8 @@ fn content(
     let mut request = dispatch.bootstrap()?.request;
     request.lease_budget_ms = grant.grant.lease_budget_ms;
     let r = &parsed.report;
-    if parsed.version != 1
+    if parsed.version != grant.grant.version
+        || parsed.renewal.as_ref() != renewal
         || r.version != 1
         || r.execution_id != dispatch.execution.execution_id
         || r.generation != dispatch.execution.generation as u64
@@ -225,12 +234,33 @@ pub(super) async fn verified_outcome(
         || manifest.arm_digest != arm.evidence_digest
         || manifest.grant_digest != grant.grant_digest
         || manifest.pod_uid != grant.pod_uid
+        || manifest.renewal != renewal_progress(tx, dispatch, &grant).await?
     {
         return Err(Error::InvalidStoredData);
     }
     Ok(Some((
         manifest.digest()?,
         manifest.summary.observed_outcome,
+    )))
+}
+async fn renewal_progress(
+    tx: &mut Transaction<'_, Postgres>,
+    dispatch: &ExecutionDispatchIntent,
+    startup: &ExecutionStartupGrant,
+) -> Result<Option<agent_computer_sandbox::renewal::Progress>> {
+    if startup.grant.version == 1 {
+        return Ok(None);
+    }
+    let ack = super::renewal::latest_ack(tx, dispatch).await?;
+    Ok(Some(ack.map_or(
+        agent_computer_sandbox::renewal::Progress {
+            sequence: 0,
+            grant_digest: startup.grant_digest.clone(),
+        },
+        |a| agent_computer_sandbox::renewal::Progress {
+            sequence: a.grant.sequence,
+            grant_digest: a.grant.grant_digest,
+        },
     )))
 }
 impl Store {
@@ -257,12 +287,14 @@ impl Store {
         if dispatch.intent_digest != original.intent_digest {
             return Err(Error::InvalidReconcileResult);
         }
+        let renewal = renewal_progress(&mut tx, &dispatch, &grant).await?;
         let (summary, bytes) = content(
             &dispatch,
             &grant,
             observation.pod_uid(),
             observation.report_bytes(),
             observation.supervisor_stderr(),
+            renewal.as_ref(),
         )?;
         let objects: Vec<_> = bytes
             .iter()
@@ -273,13 +305,14 @@ impl Store {
             })
             .collect::<Result<_>>()?;
         let m = Manifest {
-            version: 1,
+            version: if renewal.is_some() { 2 } else { 1 },
             organization: org.clone(),
             execution_id: id.clone(),
             pod_uid: observation.pod_uid().into(),
             dispatch_digest: dispatch.intent_digest,
             grant_digest: grant.grant_digest,
             arm_digest: arm,
+            renewal,
             objects: objects.try_into().map_err(|_| Error::InvalidStoredData)?,
             summary,
         };

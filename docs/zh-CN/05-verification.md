@@ -69,3 +69,5 @@
 常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。
 
 新增四项契约测试并扩展运行时与宿主故障断言，覆盖 CSI 发布边界。显式十一场景执行夹具现使用 FUSE 前置挂载：活跃重试和发布器重启保留身份，替换 Pod UID 被拒绝，控制器死亡后旧描述符写入失败且不宣称排空。见 [41 执行 CSI 集成](41-fenced-execution-csi.md)。受认可完成及完整运行时验收仍待交付。
+
+最新[可续期执行增量](49-renewable-execution-leases.md)通过 451 项 Cargo 测试、15 个 Bazel 目标、fmt/Clippy、25 个真实执行场景、八个节点续约故障场景及 Candidate/CSI 回归。[固定源码记录](../evidence/renewable-execution-leases-2026-10-10.json)保留独立 SQL/S3/只读文件系统核验、早期夹具失败、精确二进制、最终仅注释差异及本次 VM 清理记录。以上早期测试数属于历史记录；T01–T43 仍未完成。

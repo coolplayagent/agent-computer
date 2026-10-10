@@ -36,4 +36,6 @@ PostgreSQL 契约覆盖完整存储身份隔离、并发争抢、WAL 重启、�
 
 [固定源码的组件记录](../evidence/queued-execution-worker-2026-10-10.json) · [验证日志](../evidence/queued-execution-worker-2026-10-10.log)
 
-本增量交付已准备 Candidate 的节点本地自动派发。完整 Computer 生命周期调度、自动排空恢复、跨节点 fencing、可续期的长时间执行预算、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。
+本增量交付已准备 Candidate 的节点本地自动派发。完整 Computer 生命周期调度、自动排空恢复、跨节点 fencing、浏览器、ComputerView 和产品验收仍待实现。Computer `ready=false`，公开 `execution` 仍不支持，T01–T43 保持 `not_run`。
+
+[可续期执行租约](49-renewable-execution-leases.md)只扩展运行阶段，队列和准备期限保持固定。

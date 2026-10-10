@@ -29,6 +29,7 @@ fn fixture() -> (tempfile::TempDir, Journal, Report) {
     let tmp = tempfile::tempdir().unwrap();
     let request = Request {
         version: 1,
+        renewal: None,
         execution_id: "exec".into(),
         boot_id: "12345678-1234-1234-1234-123456789abc".into(),
         cgroup_path: "fixture".into(),
@@ -43,6 +44,7 @@ fn fixture() -> (tempfile::TempDir, Journal, Report) {
     };
     let report = Report {
         version: 1,
+        renewal: None,
         request: request.clone(),
         cgroup_device: 3,
         armed_boottime_ms: 500,

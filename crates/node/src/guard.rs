@@ -7,7 +7,7 @@ use std::{
     fs::File,
     io::{Read, Write},
     os::unix::fs::PermissionsExt,
-    process::{Child, ChildStdout},
+    process::{Child, ChildStdin, ChildStdout, Stdio},
     time::{Duration, Instant},
 };
 
@@ -35,12 +35,16 @@ pub struct Evidence {
 }
 
 /// Live, non-cloneable handle. Serialized evidence alone cannot recreate this.
-/// Dropping it detaches; the independent watchdog keeps the original deadline.
+/// Dropping it detaches the children. Fixed guards keep their original deadline;
+/// renewable guards terminate when their control pipes close.
 #[derive(Debug)]
 pub struct ArmedGuard {
     evidence: Evidence,
     children: [DetachedChild; 2],
-    _stdout: [ChildStdout; 2],
+    stdout: [ChildStdout; 2],
+    stdin: [Option<ChildStdin>; 2],
+    renewals: Option<[agent_computer_watchdog::renewal::Receipt; 2]>,
+    failed: bool,
     reaper: agent_computer_watchdog::admission::Client,
     pub(super) termination: crate::termination::ProcessDomain,
 }
@@ -49,20 +53,114 @@ impl ArmedGuard {
         &self.evidence
     }
     pub fn remaining_budget_ms(&mut self) -> Result<u32> {
+        if self.failed {
+            return Err(Error::WatchdogUnavailable);
+        }
+        let result = self.remaining_inner();
+        self.failed = result.is_err();
+        result
+    }
+    fn remaining_inner(&mut self) -> Result<u32> {
         self.reaper.check().map_err(|_| Error::ReaperUnavailable)?;
         for child in &mut self.children {
             child.require_running()?;
         }
-        let remaining = self
-            .evidence
-            .armed
-            .request
-            .deadline_boottime_ms
-            .saturating_sub(boottime_ms());
+        let remaining = self.deadline_boottime_ms().saturating_sub(boottime_ms());
         if remaining == 0 {
             return Err(Error::Deadline);
         }
         u32::try_from(remaining).map_err(|_| Error::Deadline)
+    }
+    pub fn deadline_boottime_ms(&self) -> u64 {
+        self.renewals
+            .as_ref()
+            .map_or(self.evidence.armed.request.deadline_boottime_ms, |r| {
+                r.iter()
+                    .map(|r| r.command.deadline_boottime_ms)
+                    .min()
+                    .unwrap()
+            })
+    }
+    pub fn renewal_evidence(&self) -> Option<&[agent_computer_watchdog::renewal::Receipt; 2]> {
+        self.renewals.as_ref()
+    }
+
+    /// Both original processes must durably acknowledge one identical command.
+    /// Any partial/lost response permanently closes this handle to further work.
+    pub fn renew(&mut self, command: &agent_computer_watchdog::renewal::Command) -> Result<()> {
+        self.remaining_budget_ms()?;
+        let result = self.renew_inner(command);
+        if result.is_err() {
+            self.failed = true;
+            self.stdin = [None, None];
+        }
+        result
+    }
+    fn renew_inner(&mut self, command: &agent_computer_watchdog::renewal::Command) -> Result<()> {
+        let request = &self.evidence.armed.request;
+        let old_deadline = self.deadline_boottime_ms();
+        let expected_sequence = self
+            .renewals
+            .as_ref()
+            .map_or(1, |r| r[0].command.sequence + 1);
+        if command.sequence != expected_sequence
+            || request.renewal.is_none()
+            || command.request_digest
+                != agent_computer_watchdog::renewal::request_digest(request)
+                    .map_err(|_| Error::InvalidObservation)?
+            || command.deadline_boottime_ms <= old_deadline
+        {
+            return Err(Error::InvalidObservation);
+        }
+        let deadline = Instant::now()
+            + Duration::from_millis(old_deadline.saturating_sub(boottime_ms()).min(2000));
+        let sent_boottime_ms = boottime_ms();
+        for stdin in &self.stdin {
+            agent_computer_watchdog::write_frame(
+                stdin.as_ref().ok_or(Error::WatchdogUnavailable)?,
+                command,
+            )
+            .map_err(|_| Error::WatchdogUnavailable)?;
+        }
+        let mut receipts = Vec::new();
+        for index in 0..2 {
+            let receipt: agent_computer_watchdog::renewal::Receipt = read_receipt(
+                &mut self.stdout[index],
+                self.children[index].process(),
+                deadline,
+            )?;
+            let reference = if index == 0 {
+                &self.evidence.armed.journal
+            } else {
+                &self.evidence.backup_armed.journal
+            };
+            receipt
+                .validate(
+                    request,
+                    reference.as_ref().ok_or(Error::InvalidObservation)?,
+                )
+                .map_err(|_| Error::InvalidObservation)?;
+            if receipt.command != *command
+                || receipt.previous_deadline_boottime_ms != old_deadline
+                || receipt.accepted_boottime_ms > boottime_ms()
+                || receipt.accepted_boottime_ms < sent_boottime_ms
+                || boottime_ms() >= old_deadline
+            {
+                return Err(Error::Deadline);
+            }
+            self.children[index].require_running()?;
+            receipts.push(receipt);
+        }
+        let receipts: [_; 2] = receipts.try_into().map_err(|_| Error::InvalidObservation)?;
+        self.reaper
+            .renewed(receipts.clone())
+            .map_err(|_| Error::ReaperUnavailable)?;
+        if boottime_ms() >= old_deadline {
+            return Err(Error::Deadline);
+        }
+        self.renewals = Some(receipts);
+        self.remaining_budget_ms()?;
+        Ok(())
     }
 }
 
@@ -112,8 +210,8 @@ pub(crate) fn launch(
     termination: crate::termination::ProcessDomain,
 ) -> Result<ArmedGuard> {
     let [
-        (armed, primary, primary_stdout),
-        (backup_armed, backup, backup_stdout),
+        (armed, primary, primary_stdout, primary_stdin),
+        (backup_armed, backup, backup_stdout, backup_stdin),
     ] = launch_pair(executable, spool, &request, deadline)?;
     let watchdog_pids = [
         primary.0.as_ref().unwrap().id(),
@@ -143,7 +241,10 @@ pub(crate) fn launch(
             observed_boottime_ms: boottime_ms(),
         },
         children: [primary, backup],
-        _stdout: [primary_stdout, backup_stdout],
+        stdout: [primary_stdout, backup_stdout],
+        stdin: [primary_stdin, backup_stdin],
+        renewals: None,
+        failed: false,
         reaper,
         termination,
     };
@@ -151,7 +252,7 @@ pub(crate) fn launch(
     Ok(guard)
 }
 
-type ArmedProcess = (ArmedReceipt, DetachedChild, ChildStdout);
+type ArmedProcess = (ArmedReceipt, DetachedChild, ChildStdout, Option<ChildStdin>);
 
 fn launch_pair(
     executable: &File,
@@ -202,6 +303,11 @@ fn launch_one(
     // Do not create a child process group here: the CLI calls setsid itself.
     let mut child = DetachedChild(Some(
         command::command(executable, "agent-computer-watchdog")
+            .stdin(if request.renewal.is_some() {
+                Stdio::piped()
+            } else {
+                Stdio::null()
+            })
             .args([
                 std::ffi::OsStr::new("--request"),
                 input.path().as_os_str(),
@@ -211,6 +317,11 @@ fn launch_one(
             .spawn()
             .map_err(|_| Error::WatchdogUnavailable)?,
     ));
+    let stdin = child.process().stdin.take();
+    if let Some(stdin) = &stdin {
+        rustix::fs::fcntl_setfl(stdin, rustix::fs::OFlags::NONBLOCK)
+            .map_err(|_| Error::WatchdogUnavailable)?;
+    }
     let mut stdout = child
         .process()
         .stdout
@@ -219,7 +330,7 @@ fn launch_one(
     rustix::fs::fcntl_setfl(&stdout, rustix::fs::OFlags::NONBLOCK)
         .map_err(|_| Error::WatchdogUnavailable)?;
     // On any error close this reader, never kill or reset the independent guard.
-    let armed = read_receipt(&mut stdout, child.process(), deadline)?;
+    let armed: ArmedReceipt = read_receipt(&mut stdout, child.process(), deadline)?;
     let now = boottime_ms();
     if armed.version != 1
         || armed.event != "armed"
@@ -247,14 +358,14 @@ fn launch_one(
         return Err(Error::IdentityMismatch);
     }
     child.require_running()?;
-    Ok((armed, child, stdout))
+    Ok((armed, child, stdout, stdin))
 }
 
-fn read_receipt(
+fn read_receipt<T: serde::de::DeserializeOwned>(
     stdout: &mut ChildStdout,
     child: &mut Child,
     deadline: Instant,
-) -> Result<ArmedReceipt> {
+) -> Result<T> {
     let mut bytes = Vec::new();
     loop {
         if Instant::now() >= deadline

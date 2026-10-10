@@ -92,6 +92,7 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
         kill_process(pid, Signal::STOP).unwrap();
         let request = Request {
             version: 1,
+            renewal: None,
             execution_id: name.clone(),
             boot_id: std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
                 .unwrap()
@@ -112,7 +113,7 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
             serde_json::to_value(&guards[0].0.request).unwrap(),
             serde_json::to_value(&guards[1].0.request).unwrap()
         );
-        for (_, child, _) in &mut guards {
+        for (_, child, _, _) in &mut guards {
             let guard_pid = Pid::from_child(child.process());
             assert_eq!(rustix::process::getsid(Some(guard_pid)).unwrap(), guard_pid);
         }
@@ -120,7 +121,7 @@ fn redundant_timers_survive_either_guard_killed_or_stopped() {
         let mut cleanup = OwnedProcesses(
             guards
                 .iter_mut()
-                .map(|(_, child, _)| child.0.take().unwrap())
+                .map(|(_, child, _, _)| child.0.take().unwrap())
                 .collect(),
         );
         let expected = serde_json::json!({"version":2,"armed":guards[0].0,"backup_armed":guards[1].0,"watchdog_pids":[cleanup.0[0].id(),cleanup.0[1].id()]});
@@ -278,6 +279,7 @@ fn reaper_observation_preserves_original_arms_after_both_guards_die() {
     kill_process(pid, Signal::STOP).unwrap();
     let request = Request {
         version: 1,
+        renewal: None,
         execution_id: name.clone(),
         boot_id: std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
             .unwrap()
@@ -297,7 +299,7 @@ fn reaper_observation_preserves_original_arms_after_both_guards_die() {
     let mut children = OwnedProcesses(
         guards
             .iter_mut()
-            .map(|(_, child, _)| child.0.take().unwrap())
+            .map(|(_, child, _, _)| child.0.take().unwrap())
             .collect(),
     );
     let evidence = serde_json::json!({"version":2,"armed":guards[0].0,"backup_armed":guards[1].0,"watchdog_pids":[children.0[0].id(),children.0[1].id()]});
@@ -376,6 +378,7 @@ fn reaper_admission_checks_live_instance_and_never_revives_a_failed_client() {
     kill_process(pid, Signal::STOP).unwrap();
     let request = Request {
         version: 1,
+        renewal: None,
         execution_id: name.clone(),
         boot_id: std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
             .unwrap()
@@ -395,7 +398,7 @@ fn reaper_admission_checks_live_instance_and_never_revives_a_failed_client() {
     let _children = OwnedProcesses(
         guards
             .iter_mut()
-            .map(|(_, child, _)| child.0.take().unwrap())
+            .map(|(_, child, _, _)| child.0.take().unwrap())
             .collect(),
     );
     let refs = [

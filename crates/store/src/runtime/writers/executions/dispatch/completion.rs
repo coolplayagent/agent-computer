@@ -105,6 +105,13 @@ impl Store {
             return Err(Error::RuntimeConflict);
         }
         let lease = authority::row(&mut tx, org, &dispatch.execution.lease_id).await?;
+        let renewal = super::renewal::latest_ack(&mut tx, &dispatch).await?;
+        let confirmed_renewal = renewal
+            .as_ref()
+            .map(|a| serde_json::to_value(&a.evidence).map_err(|_| Error::InvalidStoredData))
+            .transpose()?
+            .unwrap_or(serde_json::Value::Null);
+        let effective_deadline = super::renewal::effective_deadline(&mut tx, &dispatch).await?;
         if lease.try_get::<i64, _>("epoch")? != dispatch.execution.epoch
             || !matches!(
                 lease.try_get::<String, _>("state")?.as_str(),
@@ -117,8 +124,9 @@ impl Store {
         sqlx::query("SELECT c.credential_id FROM connection_sessions s JOIN service_credentials c ON c.organization=s.organization AND c.credential_id=s.credential_id JOIN principals p ON p.organization=s.organization AND p.principal=s.principal WHERE s.organization=$1 AND s.session_id=$2 FOR SHARE OF c,p")
             .bind(org).bind(record.try_get::<String,_>("session_id")?).fetch_one(&mut *tx).await?;
         let authorized = lease.try_get::<String, _>("state")? == "Held"
+            && seal["renewals"] == confirmed_renewal
             && authority::active(&mut tx, org, &lease).await?
-            && transactions::now(&mut tx).await? < dispatch.deadline_at_ms
+            && transactions::now(&mut tx).await? < effective_deadline
             && attempt.remaining_budget_ms().is_ok();
         let output = outputs::verified_outcome(&mut tx, &dispatch, &arm).await?;
         let accepted = outcome(
@@ -146,7 +154,7 @@ impl Store {
         drain(&mut tx, org, &dispatch.execution.lease_id, seq).await?;
         if matches!(accepted, ExecutionState::Succeeded | ExecutionState::Failed)
             && (!authority::active(&mut tx, org, &lease).await?
-                || transactions::now(&mut tx).await? >= dispatch.deadline_at_ms
+                || transactions::now(&mut tx).await? >= effective_deadline
                 || attempt.remaining_budget_ms().is_err())
         {
             return Err(Error::WriterLeaseInactive);

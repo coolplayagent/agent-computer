@@ -9,7 +9,7 @@ rust_library(
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     visibility = ["//visibility:public"],
-    deps = ["//crates/core", "//crates/definitions", "//crates/storage", "//crates/sandbox", "//crates/node", "//crates/objects", "//crates/kubernetes"] + all_crate_deps(normal = True),
+    deps = ["//crates/core", "//crates/definitions", "//crates/storage", "//crates/sandbox", "//crates/node", "//crates/watchdog", "//crates/objects", "//crates/kubernetes"] + all_crate_deps(normal = True),
     proc_macro_deps = all_crate_deps(proc_macro = True),
 )
 
@@ -18,10 +18,10 @@ rust_test(
     size = "large",
     srcs = glob(["tests/**/*.rs"]),
     crate_root = "tests/postgres_contracts.rs",
-    compile_data = ["//examples:research.computer.yaml", "migrations/0011_candidate_file_completions.sql", "migrations/0012_execution_admission.sql", "migrations/0013_execution_dispatch.sql", "migrations/0021_workspace_artifacts.sql", "migrations/0026_checkpoint_stop_worker.sql"],
+    compile_data = ["//examples:research.computer.yaml", "migrations/0011_candidate_file_completions.sql", "migrations/0012_execution_admission.sql", "migrations/0013_execution_dispatch.sql", "migrations/0014_execution_startup.sql", "migrations/0019_execution_outputs.sql", "migrations/0021_workspace_artifacts.sql", "migrations/0023_execution_completions.sql", "migrations/0026_checkpoint_stop_worker.sql"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
     tags = ["requires-postgresql"],
-    deps = [":store", "//crates/objects", "//crates/core", "//crates/definitions", "//crates/storage", "//crates/sandbox", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
+    deps = [":store", "//crates/watchdog", "//crates/objects", "//crates/core", "//crates/definitions", "//crates/storage", "//crates/sandbox", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
     proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
 )

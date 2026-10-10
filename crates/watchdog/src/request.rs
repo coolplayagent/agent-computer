@@ -16,6 +16,8 @@ pub struct Request {
     pub cgroup_inode: u64,
     /// Absolute CLOCK_BOOTTIME milliseconds, fixed before invocation.
     pub deadline_boottime_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renewal: Option<crate::renewal::Policy>,
 }
 
 impl Request {
@@ -30,8 +32,10 @@ impl Request {
 
     fn validate(&self) -> Result<()> {
         let id = &self.execution_id;
-        if self.version != 1
-            || id.is_empty()
+        if !matches!(
+            (self.version, self.renewal.is_some()),
+            (1, false) | (2, true)
+        ) || id.is_empty()
             || id.len() > 128
             || !id
                 .bytes()
@@ -43,6 +47,9 @@ impl Request {
         {
             return Err(Error::InvalidRequest);
         }
+        if let Some(policy) = &self.renewal {
+            policy.validate(self.deadline_boottime_ms)?;
+        }
         Ok(())
     }
 
@@ -50,6 +57,9 @@ impl Request {
         self.validate()?;
         if self.boot_id != boot_id
             || self.deadline_boottime_ms > now.saturating_add(MAX_BUDGET_MS)
+            || self.renewal.as_ref().is_some_and(|p| {
+                p.hard_deadline_boottime_ms > now.saturating_add(crate::renewal::MAX_EXECUTION_MS)
+            })
             || !own_path.starts_with('/')
             || (own_path != "/" && !path_valid(&own_path[1..]))
             || own_path[1..] == self.cgroup_path
@@ -94,6 +104,7 @@ mod tests {
     fn request() -> Request {
         Request {
             version: 1,
+            renewal: None,
             execution_id: "exec-1".into(),
             boot_id: "12345678-1234-1234-1234-123456789abc".into(),
             cgroup_path: "test.slice/workload.scope".into(),

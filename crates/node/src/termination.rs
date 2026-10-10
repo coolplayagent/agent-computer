@@ -140,6 +140,8 @@ pub struct SealEvidence<'a> {
     pub io: &'a agent_computer_fence::Evidence,
     pub domain: EmptyDomain,
     pub observed_boottime_ms: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub renewals: Option<&'a [agent_computer_watchdog::renewal::Receipt; 2]>,
 }
 impl SealedExecution {
     pub fn evidence(&self) -> SealEvidence<'_> {
@@ -149,6 +151,7 @@ impl SealedExecution {
             io: self.io.evidence(),
             domain: self.domain,
             observed_boottime_ms: self.observed_boottime_ms,
+            renewals: self.guard.renewal_evidence(),
         }
     }
 }

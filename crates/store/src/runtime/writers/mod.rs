@@ -11,9 +11,10 @@ use agent_computer_core::identity::{ComputerId, IdempotencyKey, OrganizationId};
 pub use executions::{
     CancelExecution, ExecutionCommand, ExecutionCompletion, ExecutionDispatchAttempt,
     ExecutionDispatchIntent, ExecutionLifetime, ExecutionOutput, ExecutionOutputDownload,
-    ExecutionPodAttempt, ExecutionPodPlan, ExecutionRequest, ExecutionRuntimeInputs,
-    ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionState, ExecutionWatchdogArm,
-    OutputState, OutputStream, QueuedDispatch, SubmitExecution,
+    ExecutionPodAttempt, ExecutionPodPlan, ExecutionRenewalAttempt, ExecutionRenewalGrant,
+    ExecutionRequest, ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant,
+    ExecutionState, ExecutionWatchdogArm, OutputState, OutputStream, QueuedDispatch,
+    SubmitExecution,
 };
 pub use files::ClosedWriter;
 use sqlx::postgres::PgRow;

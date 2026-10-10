@@ -87,6 +87,7 @@ async fn execution(
     .await
     .unwrap();
     let input = SubmitExecution {
+        renewable: Some(false),
         lease_id: lease.lease_id.clone(),
         lease: command(lease),
         sandbox_id: sandbox,

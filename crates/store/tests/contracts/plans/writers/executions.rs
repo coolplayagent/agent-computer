@@ -10,6 +10,7 @@ pub(super) async fn submission(db: &Database, lease: &WriterLease) -> SubmitExec
     .await
     .unwrap();
     SubmitExecution {
+        renewable: Some(false),
         lease_id: lease.lease_id.clone(),
         lease: command(lease),
         sandbox_id: sandbox,

@@ -1,0 +1,978 @@
+Captured logs: trailing whitespace stripped; original log digests are retained in the JSON record. Earlier failures are not passing runs.
+
+CARGO WORKSPACE
+   Compiling agent-computer-sandbox v0.1.0 (/opt/workspace/agent-computer/crates/sandbox)
+   Compiling agent-computer-watchdog v0.1.0 (/opt/workspace/agent-computer/crates/watchdog)
+   Compiling agent-computer-kubernetes v0.1.0 (/opt/workspace/agent-computer/crates/kubernetes)
+   Compiling agent-computer-node v0.1.0 (/opt/workspace/agent-computer/crates/node)
+   Compiling agent-computer-store v0.1.0 (/opt/workspace/agent-computer/crates/store)
+   Compiling agent-computer-worker v0.1.0 (/opt/workspace/agent-computer/crates/worker)
+   Compiling agent-computer-server v0.1.0 (/opt/workspace/agent-computer/crates/server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.03s
+     Running unittests src/main.rs (target/debug/deps/agent_computer-183212f75ce134ed)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_contracts.rs (target/debug/deps/cli_contracts-935cca8b3e57eba1)
+
+running 7 tests
+test malformed_json_is_machine_readable_and_does_not_echo_source_secrets ... ok
+test oversized_stdin_is_rejected_before_parsing ... ok
+test text_diagnostics_go_to_stderr_and_source_read_failures_exit_two ... ok
+test capabilities_and_schema_distinguish_static_checks_from_runtime_support ... ok
+test invalid_options_have_no_success_output ... ok
+test yaml_stdin_returns_a_static_digest_without_runtime_claims ... ok
+test bazel_launch_resolves_files_from_the_original_invocation_directory ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_core-a33f5cc801922cd4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/core_contracts.rs (target/debug/deps/core_contracts-b8d1eb1a476820cc)
+
+running 28 tests
+test computer_contracts::delete_is_a_stopped_computer_tombstone_that_retains_storage ... ok
+test computer_contracts::computer_restart_retains_identity_and_workspace_but_changes_generation ... ok
+test computer_contracts::force_stop_records_lost_state_and_preserves_last_valid_checkpoint ... ok
+test computer_contracts::normal_stop_drains_executions_and_needs_a_committed_checkpoint ... ok
+test computer_contracts::ordinary_stop_protects_people_and_presentations ... ok
+test computer_contracts::partition_recovery_requires_fencing_before_a_new_generation ... ok
+test computer_contracts::idle_stop_requires_every_activity_class_to_be_clear ... ok
+test computer_contracts::revision_precondition_applies_even_to_idempotent_start ... ok
+test computer_contracts::start_is_idempotent_without_allocating_another_generation ... ok
+test computer_contracts::stop_rejects_fencing_for_another_computer_or_generation ... ok
+test execution_contracts::actual_success_can_win_the_cancel_race_without_fabricating_cancellation ... ok
+test execution_contracts::queued_cancel_prevents_any_dispatch ... ok
+test execution_contracts::running_cancel_does_not_claim_that_the_process_has_stopped ... ok
+test execution_contracts::stale_revision_cannot_complete_or_reconcile_execution ... ok
+test execution_contracts::stale_workers_cannot_dispatch_or_complete_an_execution ... ok
+test execution_contracts::terminal_receipts_are_immutable_and_failed_is_not_succeeded ... ok
+test execution_contracts::unknown_outcomes_cannot_be_replayed_or_overwritten_by_late_receipts ... ok
+test idempotency_contracts::idempotency_never_crosses_organization_principal_operation_or_key ... ok
+test idempotency_contracts::retired_keys_remain_tombstones_instead_of_becoming_new_work ... ok
+test idempotency_contracts::retries_return_original_execution_but_changed_intent_conflicts ... ok
+test identity_contracts::generations_revisions_and_epochs_never_wrap ... ok
+test identity_contracts::never_started_generation_cannot_own_a_lease_or_execution ... ok
+test identity_contracts::untrusted_identifiers_and_non_sha256_digests_are_rejected ... ok
+test lease_contracts::invalid_or_overflowing_lease_deadlines_do_not_acquire_or_mutate ... ok
+test lease_contracts::lease_expiry_never_hands_control_to_a_second_owner ... ok
+test lease_contracts::lease_tokens_cannot_cross_scope_or_runtime_generation ... ok
+test lease_contracts::tokens_are_bound_to_organization_even_if_storage_is_misconfigured ... ok
+test lease_contracts::voluntary_handoff_rejects_inputs_until_drained_and_rejects_stale_proof ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_csi-2e200708429375d5)
+
+running 3 tests
+test registry::tests::cleanup_mount_identity_rejects_foreign_device_source_and_subtree ... ok
+test registry::tests::csi_request_requires_exact_node_pod_uid_and_ephemeral_context ... ok
+test registry::tests::csi_cannot_request_block_shared_readonly_or_custom_mount_options ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/agent_computer_csi-827552eea9f98952)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_definitions-d00ec869d93dc41b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/definitions_contracts.rs (target/debug/deps/definitions_contracts-5c3f198861bb4ea4)
+
+running 28 tests
+test parsing::duplicate_keys_are_rejected_before_json_or_yaml_can_overwrite_them ... ok
+test parsing::multiple_documents_tags_and_recursive_aliases_do_not_get_ignored ... ok
+test references::each_layer_can_be_declared_without_creating_a_computer ... ok
+test canonical::exported_schema_matches_checked_in_schema_and_rejects_unknown_objects ... ok
+test parsing::required_types_and_integer_ranges_are_not_coerced ... ok
+test parsing::unknown_and_server_owned_fields_fail_closed_at_every_level ... ok
+test parsing::unknown_versions_drivers_modes_and_destructive_defaults_are_rejected ... ok
+test parsing::document_depth_node_count_and_yaml_alias_expansion_are_bounded ... ok
+test parsing::diagnostics_and_total_resources_are_bounded ... ok
+test canonical::omitted_defaults_and_explicit_empty_lists_are_equivalent ... ok
+test canonical::formatting_and_unordered_resource_lists_do_not_change_the_digest ... ok
+test references::app_sandbox_must_be_attached_and_references_must_be_unique ... ok
+test references::explicit_ids_are_deferred_for_authorized_resolution_and_cannot_select_a_tenant ... ok
+test canonical::argv_order_and_revision_preconditions_are_part_of_the_intent ... ok
+test references::names_in_different_kinds_are_independent ... ok
+test references::local_references_have_typed_targets_and_missing_names_fail ... ok
+test sandbox::browser_launch_and_profile_state_cannot_be_overridden ... ok
+test sandbox::zero_resource_limits_and_out_of_range_quotas_fail ... ok
+test references::duplicate_names_are_rejected_within_each_kind ... ok
+test parsing::documented_example_passes_without_an_agent_or_workflow ... ok
+test canonical::example_digest_matches_an_independent_python_sha256_vector ... ok
+test references::names_and_expected_revisions_are_bounded_without_leaking_input ... ok
+test sandbox::writable_mounts_use_the_computers_primary_workspace ... ok
+test sandbox::floating_or_malformed_images_and_runtime_fallbacks_are_rejected ... ok
+test references::capabilities_and_secret_references_do_not_accept_unknown_or_duplicate_values ... ok
+test references::hosted_and_external_agents_have_distinct_runtime_locations ... ok
+test sandbox::mount_paths_cannot_escape_or_overlap ... ok
+test sandbox::web_application_has_explicit_launch_health_and_state_contracts ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_fence-2b31ec494d3d31ac)
+
+running 6 tests
+test tests::rejected_namespace_operations_do_not_poison_successful_storage ... ok
+test tests::persistence_failure_cannot_produce_or_revive_a_barrier ... ok
+test tests::pinned_inode_survives_path_replacement_without_following_a_new_target ... ok
+test tests::path_escape_links_devices_foreign_identity_and_privileged_modes_are_rejected ... ok
+test tests::sealed_open_and_unlinked_handles_cannot_modify_the_candidate ... ok
+test tests::barrier_joins_inflight_io_and_rejects_a_queued_writer_before_acknowledging ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_kubernetes-6fdad11262b5ed04)
+
+running 39 tests
+test node::tests::binds_exact_node_boot_pod_and_container_without_host_claims ... ok
+test tests::admission_cannot_inject_sidecars_mounts_or_weaken_security ... ok
+test tests::attach::candidate::fenced_candidate_pins_node_and_rejects_direct_mount_substitution ... ok
+test tests::adoption_requires_binding_label_actual_uid_and_resource_version ... ok
+test tests::attach::candidate::candidate_admission_cannot_change_subpath_or_reintroduce_volume_ownership ... ok
+test node::tests::rejects_replacement_wrong_node_restarts_and_ambiguous_container_status ... ok
+test tests::attach::candidate::candidate_receipt_and_fixed_generation_must_match_preparation ... ok
+test tests::attach::candidate::candidate_only_mounts_the_declared_workspace_data_leaf ... ok
+test tests::claim_data_sources_and_capacity_mismatch_cannot_be_adopted ... ok
+test tests::attach::startup_plan_requires_approved_supervisor_and_preserves_strict_admission ... ok
+test tests::attach::candidate::candidate_conditional_delete_does_not_depend_on_storage_availability ... ok
+test tests::deletion_is_uid_and_version_conditional_and_absence_is_only_api_absence ... ok
+test tests::known_api_defaults_and_omitted_false_values_are_safe_but_unknown_fields_fail ... ok
+test tests::failed_preflight_performs_no_mutation ... ok
+test tests::namespace_runtime_and_deny_policy_are_bound_to_actual_uids ... ok
+test tests::omitted_protections_and_unexpected_runtime_annotations_are_rejected ... ok
+test tests::one_instance_name_survives_changed_generation_and_spec_but_cannot_be_adopted ... ok
+test tests::pending_claim_identity_is_recordable_but_bound_volume_requires_reciprocal_uid ... ok
+test tests::production_configuration_rejects_insecure_endpoints_ambient_auth_and_empty_ca ... ok
+test tests::creation_conflicts_and_mutated_success_do_not_trigger_replacement ... ok
+test tests::transport_rejects_redirects_large_responses_and_redacts_error_bodies ... ok
+test tests::volume_claim_metadata_cannot_override_csi_mount_configuration ... ok
+test tests::volume_preflight_rejects_replaced_driver_async_upload_and_destructive_reclaim ... ok
+test tests::workspace_mounts_and_invalid_runtime_identity_are_rejected ... ok
+test tests::attach::attach_rejects_downgraded_or_forged_handshake_without_hello ... ok
+test tests::lost_create_ack_is_observed_by_same_identity_without_repeating_post ... ok
+test tests::attach::attach_never_follows_redirect_or_retries_failed_upgrade ... ok
+test tests::attach::candidate::candidate_create_rechecks_claim_and_pv_before_one_post ... ok
+test tests::attach::attach_fragmented_challenge_single_grant_and_correlated_raw_report ... ok
+test tests::volume_creation_ack_loss_is_observed_without_second_post ... ok
+test tests::attach::renewal::renewal_keeps_stdin_open_and_survives_cancelled_fragment_reads ... ok
+test tests::attach::attach_rejects_malformed_oversized_or_foreign_challenge ... ok
+test tests::attach::candidate::candidate_attach_preserves_single_grant_after_storage_checks ... ok
+test tests::attach::replacement_uid_before_or_after_challenge_or_before_grant_never_receives_grant ... ok
+test tests::attach::invalid_grant_is_rejected_before_any_grant_write ... ok
+test tests::attach::renewal::wrong_response_never_writes_and_report_must_bind_accepted_renewal ... ok
+test tests::attach::candidate::replaced_volume_at_every_startup_check_prevents_grant ... ok
+test tests::attach::renewal::foreign_skipped_replayed_and_unbounded_renewal_frames_are_uncertain ... ok
+test tests::attach::post_grant_disconnect_corruption_failure_and_overflow_remain_uncertain ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_node-d7d1daf8cd50feb5)
+
+running 12 tests
+test guard::tests::reaper_admission_checks_live_instance_and_never_revives_a_failed_client ... ignored, requires root, writable host cgroup v2 and AGENT_COMPUTER_WATCHDOG_BIN in a disposable VM
+test guard::tests::reaper_observation_preserves_original_arms_after_both_guards_die ... ignored, requires root, writable host cgroup v2 and AGENT_COMPUTER_WATCHDOG_BIN in a disposable VM
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... ignored, requires root, writable host cgroup v2 and AGENT_COMPUTER_WATCHDOG_BIN in a disposable VM
+test observation::tests::process_identity_uses_start_ticks_and_rejects_dead_or_partial_records ... ok
+test guard::tests::dropping_controller_handle_keeps_independent_guard_alive ... ok
+test termination::tests::pinned_proc_identity_rejects_foreign_start_ticks_and_cgroup ... ok
+test observation::tests::runtime_mapping_rejects_foreign_ids_processes_mounts_and_privilege ... ok
+test termination::tests::pidfd_distinguishes_stopped_running_exited_and_reaped_processes ... ok
+test guard::tests::killed_or_stopped_watchdog_cannot_authorize_and_is_not_reaped_by_observation ... ok
+test command::tests::exit_observation_keeps_child_waitable_until_group_cleanup ... ok
+test command::tests::invokes_the_pinned_description_and_rejects_wrong_hash ... ok
+test command::tests::bounds_host_command_output_and_elapsed_time ... ok
+
+test result: ok. 9 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.46s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_objects-33d326b18e3fc138)
+
+running 9 tests
+test s3::tests::sigv4_get_matches_independent_hmac_vector ... ok
+test tests::spool_refuses_nonprivate_paths_symlinks_and_hardlinks ... ok
+test tests::object_references_require_exact_namespace_and_digest ... ok
+test tests::durable_spool_reopens_retries_and_rejects_tampering ... ok
+test s3::tests::http::lost_put_ack_is_not_a_receipt_and_retry_reads_existing_bytes ... ok
+test s3::tests::http::credentials_and_endpoint_are_explicit_and_bound ... ok
+test s3::tests::http::put_conflict_and_service_failure_do_not_generate_receipts ... ok
+test s3::tests::http::conditional_put_and_existing_object_require_full_readback ... ok
+test s3::tests::http::get_rejects_corruption_truncation_oversize_redirect_and_service_errors ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_sandbox-225aa2cdc98311ce)
+
+running 19 tests
+test output::tests::zero_retention_still_drains_and_counts_binary_bytes ... ok
+test output::tests::output_flood_keeps_prefix_and_yields_after_finite_work ... ok
+test renewal::tests::eof_flood_multiple_frames_and_backpressure_fail_without_extension ... ok
+test renewal::tests::another_execution_or_sequence_cannot_authorize_a_renewal ... ok
+test renewal::tests::initial_budget_and_hard_ceiling_require_explicit_bounds ... ok
+test renewal::tests::every_extension_remains_bounded_by_the_immutable_hard_limit ... ok
+test renewal::tests::control_frames_reject_unknown_duplicate_and_oversized_input ... ok
+test renewal::tests::fragmented_response_is_bounded_and_expires_during_delivery ... ok
+test renewal::tests::no_response_or_replayed_response_can_extend_the_current_window ... ok
+test renewal::tests::pending_challenge_and_late_valid_grant_cannot_revive_expiry ... ok
+test renewal::tests::response_delay_is_charged_from_before_the_challenge ... ok
+test request::tests::argv_is_structured_and_every_execution_input_is_bound ... ok
+test startup::tests::startup_rejects_invalid_versions_duplicates_and_unbounded_frames ... ok
+test renewal::tests::rejects_shortened_or_unbounded_grants_without_mutating_progress ... ok
+test startup::tests::startup_binds_nonce_bootstrap_and_bounded_budget ... ok
+test supervisor::tests::refuses_host_execution_without_spawning_a_child ... ok
+test startup::tests::startup_refuses_the_host_without_emitting_a_challenge ... ok
+test request::tests::rejects_unbounded_or_ambiguous_requests ... ok
+test startup::tests::renewable_protocol_requires_both_version_and_bounded_hard_ceiling ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/agent_computer_sandbox-750c4ea7fda55d90)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_server-8a743e54fb55b817)
+
+running 1 test
+test outputs::tests::unconsumed_output_bodies_hold_capacity_and_drop_releases_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/agent_computer_server-d90e3c45ef0b4045)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/server_contracts.rs (target/debug/deps/server_contracts-eb01cdc42ba52c46)
+
+running 28 tests
+test cases::files::gateway_configuration_rejects_empty_duplicate_and_relative_mounts ... ok
+test cases::authentication::spoofed_identity_browser_origin_and_revoked_credentials_are_rejected ... ok
+test cases::authentication::authentication_precedes_body_parsing_and_requires_exact_scope ... ok
+test cases::files::file_requests_reject_ambiguous_queries_unknown_fields_and_oversize_bodies ... ok
+test cases::connections::connection_http_rejects_identity_spoofing_unknown_activity_browser_tokens_and_cross_owner_reads ... ok
+test cases::files::blocked_file_jobs_retain_slots_after_caller_abort_and_preserve_control_routes ... ok
+test cases::process::private_database_files_and_cli_arguments_fail_closed ... ok
+test cases::files::file_routes_require_authentication_and_explicit_gateway_configuration ... ok
+test cases::outputs::output_download_http_authentication_configuration_and_capabilities_are_explicit ... ok
+test cases::connections::connection_http_lifecycle_rechecks_authority_without_starting_compute ... ok
+test cases::executions::execution_http_rejects_unknown_lifetime_forgery_unbounded_body_and_browser_origin ... ok
+test cases::artifacts::artifact_http_authority_strict_input_and_durable_sealing ... ok
+test cases::executions::execution_http_after_dispatch_reports_cancel_request_and_unknown_without_completion ... ok
+test cases::executions::execution_http_defaults_background_and_retains_status_and_cancel_after_disconnect ... ok
+test cases::executions::execution_http_queue_retry_query_and_cancel_do_not_dispatch ... ok
+test cases::artifacts::checkpoint_stop_http_opt_in_drain_preserves_authority_and_strict_input ... ok
+test cases::outputs::output_download_http_does_not_publish_queued_output ... ok
+test cases::artifacts::checkpoint_stop_http_authority_strict_input_and_durable_acceptance ... ok
+test cases::outputs::output_download_http_rejects_range_queries_and_nonpublic_objects ... ok
+test cases::protocol::error_envelopes_body_limits_media_types_and_unknown_fields ... ok
+test cases::plans::plan_apply_and_operation_routes_bind_keys_digests_and_revisions ... ok
+test cases::runtime::runtime_access_requires_read_grant_and_scoped_credential_and_rechecks_revocation ... ok
+test cases::protocol::readiness_checks_schema_and_database_while_health_and_contract_remain_available ... ok
+test cases::starts::queued_start_http_contract_validates_scope_identity_revisions_retry_and_cancel ... ok
+test cases::writers::writer_http_requires_prepared_candidate_scopes_and_non_forgeable_owner ... ok
+test cases::stops::prepared_stop_http_authority_input_validation_and_replay ... ok
+test cases::writers::writer_http_handoff_and_dispatched_release_have_distinct_results ... ok
+test cases::process::operator_commands_and_real_http_reject_revoked_credentials ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.24s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_storage-bdfca27d4c8e9d2b)
+
+running 37 tests
+test tests::capture_tests::cache_rejects_corrupt_incomplete_and_replaced_objects ... ok
+test files::tests::expired_before_mutation_yields_no_write_and_positive_drain ... ok
+test files::tests::prepared_receipt_and_operation_digest_bind_every_file_intent_field ... ok
+test files::tests::reads_reject_unsafe_objects_staging_and_candidate_replacement ... ok
+test files::tests::invalid_paths_and_oversize_fail_before_any_effect ... ok
+test tests::final_quota_failure_returns_no_success_and_retry_recovers_same_inode ... ok
+test tests::identity_bounds_manifest_digest_and_size_overflow_fail_closed ... ok
+test tests::local_filesystem_cannot_use_production_backend_constructor ... ok
+test tests::manifest_digest_matches_independent_canonical_json_vector ... ok
+test tests::durable_binding_digest_rejects_unsafe_owner_path_and_manifest ... ok
+test tests::mount_requires_matching_uuid_and_both_writeback_layers_disabled ... ok
+test tests::corrupt_short_or_oversized_input_never_publishes ... ok
+test files::tests::parent_symlink_and_replaced_candidate_identity_are_rejected ... ok
+test files::tests::atomic_create_replace_and_conflict_preserve_old_open_inode ... ok
+test tests::operator_inputs_require_private_single_link_regular_files ... ok
+test tests::concurrent_conflicting_publishers_never_overwrite_winner ... ok
+test tests::invalid_paths_and_conflicting_file_parents_fail_before_side_effects ... ok
+test tests::candidate_and_generation_copies_are_independent ... ok
+test tests::copies_independent_inodes_with_modes_and_private_receipt ... ok
+test tests::preexisting_symlink_cannot_escape_volume ... ok
+test tests::quota_failure_prevents_source_read_and_publication ... ok
+test tests::quota_config_rejects_credentials_unknown_query_and_unpinned_executable ... ok
+test tests::observation_never_creates_missing_or_partial_generations_and_preserves_edits ... ok
+test files::tests::symlinks_hardlinks_fifo_and_directory_never_follow_or_overwrite ... ok
+test tests::capture_tests::capture_rejects_symlinks_hardlinks_fifos_and_private_staging ... ok
+test tests::shared_writable_control_directory_is_rejected ... ok
+test tests::replaced_data_inode_is_not_accepted_as_existing_preparation ... ok
+test tests::concurrent_identical_publishers_return_one_data_inode ... ok
+test tests::retry_preserves_mutated_files_and_does_not_read_source ... ok
+test tests::source_cache_rejects_symlink_hardlink_fifo_and_directory ... ok
+test tests::retained_identity_rejects_changed_computer_manifest_quota_or_owner ... ok
+test tests::quota_adapter_binds_metadata_uuid_and_exact_capacity_arguments ... ok
+test files::tests::bounded_reads_return_exact_binary_version_and_absence ... ok
+test files::tests::binary_unicode_and_empty_files_have_exact_hashes ... ok
+test tests::capture_tests::capture_observed_mutation_and_sink_failure_do_not_produce_a_receipt ... ok
+test tests::capture_tests::capture_chunks_large_files_and_restores_independent_verified_input ... ok
+test tests::quota_adapter_propagates_backend_failure_and_timeout_without_raw_output ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.06s
+
+     Running unittests src/main.rs (target/debug/deps/agent_computer_storage-a1b5a4cfa9faec2a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_store-727f701885bf5fc1)
+
+running 1 test
+test runtime::writers::executions::dispatch::completion::tests::accepted_outcome_requires_authority_and_verified_output_except_explicit_cancellation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/postgres_contracts.rs (target/debug/deps/postgres_contracts-9f58a282066ce52e)
+
+running 221 tests
+test contracts::authentication::revocation_expiry_and_principal_disable_are_checked_without_cache ... ok
+test contracts::atomicity::failure_at_final_write_rolls_back_every_effect_and_key_reservation ... ok
+test contracts::authentication::credentials_bind_identity_and_scopes_and_store_only_hashes ... ok
+test contracts::concurrency::organization_lock_orders_commits_without_blocking_other_organizations ... ok
+test contracts::concurrency::simultaneous_retries_and_cas_have_one_winner ... ok
+test contracts::plans::admission::expired_plan_is_rejected_against_database_time ... ok
+test contracts::plans::admission::revocation_winning_the_admission_lock_prevents_all_apply_writes ... ok
+test contracts::authentication::credential_bounds_kind_conflicts_and_schema_readiness ... ok
+test contracts::plans::admission::retired_plan_and_apply_request_keys_never_start_new_work ... ok
+test contracts::concurrency::snapshots_have_consistent_watermarks_while_writers_commit ... ok
+test contracts::authentication::runtime_scope_migration_preserves_existing_credentials_without_granting_access ... ok
+test contracts::plans::admission::service_scope_never_substitutes_for_grants_and_plans_are_principal_scoped ... ok
+test contracts::plans::artifacts::artifact_rejects_stale_base_unauthorized_read_and_corrupt_objects ... ok
+test contracts::plans::artifacts::artifact_outbox_failure_rolls_back_head_and_fresh_authority_is_required ... ok
+test contracts::plans::artifacts::artifact_publication_checkpoint_and_restart_survive_wal_and_retries ... ok
+test contracts::plans::artifacts::checkpoint::artifact_queue_is_read_only_exact_target_and_excludes_active_claims ... ok
+test contracts::plans::artifacts::continuation::omitted_artifact_preserves_legacy_start_serialization_for_idempotency ... ok
+test contracts::plans::artifacts::checkpoint::checkpoint_stop_branch_preserves_workspace_head_and_fixed_checkpoint ... ok
+test contracts::plans::artifacts::checkpoint::migration_twenty_six_preserves_ordinary_artifact_work ... ok
+test contracts::plans::artifacts::artifact_retry_with_new_credential_invalidates_the_old_worker_lease ... ok
+test contracts::plans::artifacts::checkpoint::checkpoint_stop_database_constraint_rejects_publication_without_stop ... ok
+test contracts::plans::artifacts::checkpoint::checkpoint_stop_event_failure_rolls_back_publication_stop_and_head ... ok
+test contracts::plans::artifacts::checkpoint::checkpoint_stop_publication_is_atomic_and_survives_wal_and_new_generation ... ok
+test contracts::plans::artifacts::checkpoint_authority::checkpoint_stop_requires_current_manage_authority_and_replacement_credentials ... ok
+test contracts::plans::artifacts::checkpoint_authority::newly_active_use_blocks_finalization_without_losing_sealed_work ... ok
+test contracts::plans::artifacts::checkpoint_authority::own_idle_connection_is_allowed_but_human_activity_blocks_both_boundaries ... ok
+test contracts::plans::artifacts::artifact_branch_and_conflict_preserve_fixed_versions_without_overwriting_head ... ok
+test contracts::plans::artifacts::continuation::artifact_selector_cannot_cross_workspace_even_with_both_workspace_grants ... ok
+test contracts::plans::artifacts::continuation::migration_twenty_two_preserves_history_and_releases_branch_checkpoint ... ok
+test contracts::plans::artifacts::continuation::selected_input_requires_published_version_and_fresh_workspace_access ... ok
+test contracts::plans::artifacts::checkpoint_authority::checkpoint_stop_deferred_constraint_keeps_an_expired_commit_atomic ... ok
+test contracts::plans::artifacts::continuation::selected_input_guard_and_final_authorization_roll_back_all_admission_effects ... ok
+test contracts::plans::artifacts::checkpoint_authority::checkpoint_stop_rejects_apps_and_other_active_connections ... ok
+test contracts::plans::artifacts::drain::draining_outbox_failure_rolls_back_cancellation_and_writer_boundary ... ok
+test contracts::plans::artifacts::drain::draining_migration_preserves_existing_stop_and_hash_without_opt_in ... ok
+test contracts::plans::artifacts::drain::draining_promotion_rechecks_authority_and_has_one_claim_winner ... ok
+test contracts::plans::artifacts::continuation::parallel_candidates_conflict_then_restore_distinct_inputs_without_moving_head ... ok
+test contracts::plans::artifacts::drain::draining_dispatch_requires_physical_proof_and_rejects_all_new_authority ... ok
+test contracts::plans::artifacts::drain::draining_unknown_is_durable_and_new_publisher_credential_cannot_resolve_it ... ok
+test contracts::plans::artifacts::recovery::artifact_manifest_is_workspace_authorized_and_full_file_hash_is_verified ... ok
+test contracts::plans::artifacts::drain::draining_queued_work_is_atomic_durable_and_never_dispatches ... ok
+test contracts::plans::connections::concurrent_connect_and_heartbeat_retries_do_not_duplicate_or_extend_sessions ... ok
+test contracts::plans::artifacts::recovery::committed_files_cannot_silently_omit_required_app_checkpoint_state ... ok
+test contracts::plans::artifacts::checkpoint_authority::checkpoint_stop_lease_expiring_during_stop_outbox_rolls_back_both_results ... ok
+test contracts::plans::artifacts::drain::draining_does_not_bypass_apps_or_other_active_connections ... ok
+test contracts::plans::connections::connection_capacity_is_serialized_and_close_releases_only_connection_slots ... ok
+test contracts::plans::artifacts::recovery::migration_twenty_one_preserves_existing_stop_receipts ... ok
+test contracts::plans::connections::connection_upgrade_preserves_existing_metadata_and_checks_exact_migration_history ... ok
+test contracts::plans::artifacts::recovery::artifact_lease_expiring_during_outbox_cannot_publish ... ok
+test contracts::plans::connections::connections_bind_exact_credentials_and_isolate_principals_and_organizations ... ok
+test contracts::plans::connections::current_requested_grants_and_scopes_intersect_and_connect_revocation_is_terminal ... ok
+test contracts::plans::connections::invalid_intent_missing_permissions_and_immutable_fields_never_create_connections ... ok
+test contracts::plans::connections::outbox_failure_and_late_identity_expiry_roll_back_connection_mutations ... ok
+test contracts::plans::connections::human_connection_is_idempotent_durable_and_independent_of_compute_generation ... ok
+test contracts::plans::connections::revocation_waits_for_inflight_connection_then_prevents_revival ... ok
+test contracts::plans::preparation::failed_completion_or_late_expiry_rolls_back_receipt_state_and_outbox ... ok
+test contracts::plans::preparation::completion_rejects_all_changed_receipt_bindings_and_retains_capacity ... ok
+test contracts::plans::preparation::preparation_rechecks_grants_and_original_credential_at_each_boundary ... ok
+test contracts::plans::preparation::queue::preparation_discovery_filters_existing_binding_and_cancelled_or_completed_starts ... ok
+test contracts::plans::preparation::input_and_volume_are_bound_before_dispatch_and_completion_survives_restart ... ok
+test contracts::plans::preparation::queue::migration_twenty_five_retains_preparation_history_and_readiness ... ok
+test contracts::plans::preparation::queue::preparation_discovery_is_read_only_and_claims_still_have_one_winner ... ok
+test contracts::plans::publication::final_write_failure_rolls_back_definitions_grants_intents_and_events ... ok
+test contracts::plans::preparation::stale_preparation_can_only_observe_after_dispatch_and_cannot_replace_identity ... ok
+test contracts::plans::preparation::upgrade_never_infers_empty_inputs_for_legacy_workspaces_or_queued_requests ... ok
+test contracts::plans::connections::expired_connections_cannot_be_revived_and_identity_expiry_caps_lifetime ... ok
+test contracts::plans::preparation::queue::revoked_discovered_request_cannot_claim_and_does_not_hide_other_requests ... ok
+test contracts::plans::preparation::queued_cancellation_wins_over_a_claim_and_wrong_volume_evidence_is_rejected ... ok
+test contracts::plans::publication::concurrent_apply_retries_and_competing_plans_publish_only_one_version ... ok
+test contracts::plans::reconciliation::admission::credential_revocation_winning_dispatch_admission_never_sets_the_marker ... ok
+test contracts::plans::publication::plan_is_side_effect_free_for_resources_and_apply_is_atomic_and_retryable ... ok
+test contracts::plans::publication::updates_pin_dependencies_and_keep_old_versions_and_unchanged_digests ... ok
+test contracts::plans::reconciliation::admission::revoked_admission_credentials_and_grants_block_workers_without_dispatch ... ok
+test contracts::plans::reconciliation::claims::blocked_shared_resources_exclude_newer_operations_but_not_independent_work ... ok
+test contracts::plans::reconciliation::objects::object_identity_write_rollback_and_authority_checks_leave_no_partial_binding ... ok
+test contracts::plans::reconciliation::objects::object_identity_is_immutable_and_survives_worker_retry ... ok
+test contracts::plans::reconciliation::claims::claims_are_exclusive_ordered_and_complete_only_from_bound_receipts ... ok
+test contracts::plans::reconciliation::objects::filtered_workers_do_not_claim_other_kinds_or_skip_dependencies ... ok
+test contracts::plans::reconciliation::results::uncertain_effects_survive_block_resume_and_cannot_be_abandoned ... ok
+test contracts::plans::references::existing_app_cannot_bypass_profile_grants_or_pin_a_different_sandbox_version ... ok
+test contracts::plans::reconciliation::admission::legacy_unbound_operations_and_disabled_references_fail_closed ... ok
+test contracts::plans::reconciliation::results::completion_final_write_failure_rolls_back_progress_events_and_outbox ... ok
+test contracts::plans::references::explicit_ids_are_kind_and_organization_checked_and_preserve_digest_equivalence ... ok
+test contracts::plans::references::reference_grant_removal_and_catalog_disable_invalidate_pending_plan ... ok
+test contracts::plans::runtime::activation_requires_explicit_bounded_budget_and_budget_updates_take_effect ... ok
+test contracts::plans::runtime::credential_revocation_is_rechecked_after_request_time_authentication ... ok
+test contracts::plans::references::external_app_must_use_a_sandbox_attached_to_the_computer ... ok
+test contracts::plans::reconciliation::leases::completion_that_outlives_its_lease_rolls_back_at_commit_boundary ... ok
+test contracts::plans::runtime::effective_access_intersects_grants_with_credential_scopes ... ok
+test contracts::plans::reconciliation::leases::retries_are_durable_and_do_not_erase_dispatch_uncertainty ... ok
+test contracts::plans::runtime::definition_creators_scopes_and_runtime_manage_do_not_imply_other_permissions ... ok
+test contracts::plans::runtime::exact_organization_principal_kind_and_resource_match_is_required ... ok
+test contracts::plans::runtime::grant_event_and_outbox_are_atomic_and_exact_repeats_emit_no_event ... ok
+test contracts::plans::runtime::requirements_cover_all_resources_and_disabled_principals_lose_access ... ok
+test contracts::plans::runtime::grant_revocation_winning_stream_lock_blocks_waiting_authorization ... ok
+test contracts::plans::runtime::invalid_targets_combinations_and_duplicate_requirements_fail_closed ... ok
+test contracts::plans::reconciliation::leases::lease_expiry_and_database_restart_preserve_unknown_effects_and_reject_old_workers ... ok
+test contracts::plans::starts::concurrent_start_keys_allocate_one_generation_and_detect_changed_intent ... ok
+test contracts::plans::starts::cancelled_capacity_is_not_released_when_outbox_publication_fails ... ok
+test contracts::plans::starts::grant_revocation_while_waiting_for_admission_lock_is_seen_before_allocation ... ok
+test contracts::plans::starts::failed_receipt_and_late_credential_expiry_roll_back_entire_admission ... ok
+test contracts::plans::starts::preparing_cannot_be_cancelled_or_reused_without_fencing ... ok
+test contracts::plans::starts::admission_migration_preserves_existing_definitions_and_grants_without_autostart ... ok
+test contracts::plans::starts::queued_snapshot_pins_definition_versions_and_catalog_must_remain_enabled ... ok
+test contracts::plans::starts::start_requires_all_live_runtime_grants_and_never_definition_manage ... ok
+test contracts::plans::starts::start_admission_survives_wal_restart_and_cancel_preserves_generation_history ... ok
+test contracts::plans::starts::per_principal_queue_limit_is_durable_and_rejected_work_does_not_consume_ids ... ok
+test contracts::plans::writers::authority::collaborator_uses_own_authority_after_starter_credential_revocation ... ok
+test contracts::plans::starts::concurrent_volume_capacity_is_reserved_until_cancel ... ok
+test contracts::plans::writers::artifacts::sealing_serializes_with_writer_acquisition_and_never_reopens_released_epochs ... ok
+test contracts::plans::writers::artifacts::unknown_dispatched_writer_blocks_artifact_even_after_connection_closes ... ok
+test contracts::plans::writers::authority::pinned_catalog_drift_and_connect_revocation_block_dispatched_ownership ... ok
+test contracts::plans::writers::acquisition_survives_wal_restart_and_does_not_advertise_ready ... ok
+test contracts::plans::writers::authority::revocation_and_close_persist_draining_and_regrant_cannot_revive_it ... ok
+test contracts::plans::writers::authority::permissions_are_independent_and_other_credentials_cannot_steal_an_owner ... ok
+test contracts::plans::writers::background::background_disconnect_is_atomic_with_outbox_and_does_not_renew_any_deadline ... ok
+test contracts::plans::writers::background::cancelled_background_reservation_does_not_preserve_a_closed_writer ... ok
+test contracts::plans::writers::background::checkpoint_stop_cancels_detached_background_but_still_waits_for_physical_proof ... ok
+test contracts::plans::writers::background::background_queue_survives_disconnect_and_wal_without_new_writer_authority ... ok
+test contracts::plans::writers::competing_connections_and_stale_commands_cannot_change_owner ... ok
+test contracts::plans::writers::executions::closing_connection_cancels_queued_execution_without_dispatch_or_resurrection ... ok
+test contracts::plans::writers::background::migration_twenty_eight_preserves_explicit_connection_inputs_and_metadata ... ok
+test contracts::plans::writers::executions::dispatch::dispatched_cancel_and_unknown_never_claim_stopped_or_allow_handoff ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_outbox_failure_and_late_expiry_roll_back_all_journals ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_and_queued_cancel_are_serialized ... ok
+test contracts::plans::writers::executions::dispatch::execution_cancellation_and_unknown_events_roll_back_writer_authority_together ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_has_one_winner_and_wal_recovery_never_reissues_attempt ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_uses_connection_owner_not_original_start_credential ... ok
+test contracts::plans::writers::background::execution_disconnect_follows_the_immutable_submitted_lifetime ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_deadline_and_attempt_budget_cannot_renew ... ok
+test contracts::plans::writers::executions::dispatch::incomplete_execution_dispatch_intent_cannot_commit ... ok
+test contracts::plans::writers::executions::dispatch::inputs::runtime_recovery_inputs_survive_revocation_without_restoring_authority ... ok
+test contracts::plans::writers::executions::dispatch::lease_policy::migration_twenty_nine_preserves_fixed_dispatch_bytes_and_cannot_promote_history ... ok
+test contracts::plans::writers::executions::dispatch::inputs::runtime_inputs_bind_original_preparation_manifest_and_successful_volume_effect ... ok
+test contracts::plans::writers::executions::dispatch::migration_thirteen_preserves_queued_identity_and_does_not_dispatch ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_revocation_and_connection_close_make_outcome_unknown ... ok
+test contracts::plans::writers::executions::dispatch::pods::pod_journal_and_observation_outbox_failures_roll_back_atomically ... ok
+test contracts::plans::writers::executions::dispatch::pods::migration_fifteen_preserves_prior_grants_and_never_invents_pod_identity ... ok
+test contracts::plans::writers::executions::dispatch::pods::pod_plan_rejects_transplanted_identity_bootstrap_namespace_and_prepared_receipt ... ok
+test contracts::plans::writers::executions::dispatch::inputs::runtime_inputs_reject_missing_or_mismatched_volume_evidence ... ok
+test contracts::plans::writers::executions::dispatch::pods::pod_plan_has_one_creation_attempt_and_survives_lost_response_and_wal_recovery ... ok
+test contracts::plans::writers::executions::dispatch::lease_policy::renewable_hard_limit_is_capped_by_original_credential_and_connection ... ok
+test contracts::plans::writers::executions::dispatch::queue::concurrent_queue_claims_have_one_winner_and_restart_never_replays ... ok
+test contracts::plans::writers::executions::dispatch::pods::pod_observation_after_expiry_does_not_renew_budget_or_release_writer ... ok
+test contracts::plans::writers::executions::dispatch::pods::pod_uid_observation_is_unique_durable_and_required_for_registered_startup ... ok
+test contracts::plans::writers::executions::dispatch::queue::migration_twenty_four_preserves_queue_and_index_excludes_historical_rows ... ok
+test contracts::plans::writers::background::background_execution_expiry_cannot_be_renewed_by_reconnect_or_retry ... ok
+test contracts::plans::writers::background::background_disconnect_never_bypasses_revocation_or_catalog_authority ... ok
+test contracts::plans::writers::executions::dispatch::queue::queue_claim_requires_the_exact_organization_and_complete_storage_target ... ok
+test contracts::plans::writers::executions::dispatch::startup::migration_fourteen_never_invents_a_startup_grant_for_an_existing_dispatch ... ok
+test contracts::plans::writers::executions::dispatch::startup::startup_grant_and_outbox_roll_back_after_failure_or_late_credential_expiry ... ok
+test contracts::plans::writers::executions::dispatch::startup::startup_rejects_transplanted_bootstrap_generation_and_stale_revision ... ok
+test contracts::plans::writers::executions::dispatch::startup::startup_grant_is_unique_bound_and_durable_without_reporting_process_started ... ok
+test contracts::plans::writers::executions::dispatch::queue::failed_queue_outbox_rolls_back_claim_and_expiry_never_gets_a_new_budget ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::migration_eighteen_preserves_arms_without_reaper_but_denies_new_startup ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::migration_seventeen_preserves_single_guard_history_but_denies_new_grants ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::migration_sixteen_retains_history_without_inventing_a_watchdog ... ok
+test contracts::plans::writers::executions::dispatch::startup::startup_fixed_deadline_survives_delayed_challenge_and_writer_renewal ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::completions::completion_rejects_transplants_and_cannot_replace_a_live_seal_with_output_metadata ... ok
+test contracts::plans::writers::executions::dispatch::lease_policy::new_admission_pins_policy_without_changing_omitted_input_or_queue_budget ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::completions::completion_requires_atomic_state_and_writer_drain_and_survives_wal ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::completions::unknown_seal_releases_physical_writer_but_preserves_result_and_blocks_artifacts ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::completions::legacy_mount_metadata_and_historical_grants_cannot_be_promoted_by_migration ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::downloads::output_download_keeps_historical_reads_after_disconnect_but_requires_current_read_grants ... ok
+test contracts::plans::writers::executions::dispatch::startup::startup_rechecks_revocation_and_cancel_after_the_original_dispatch ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::completions::completion_accepts_failed_report_or_explicit_cancel_but_not_success_without_verified_output ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::downloads::output_download_requires_verified_publication_and_owner_before_remote_io ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::migration_nineteen_does_not_infer_outputs_from_historical_grants ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::output_intent_rejects_cross_execution_store_pod_and_grant_references ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::downloads::output_download_preserves_binary_and_empty_streams_without_accepting_completion ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::downloads::output_download_reverifies_integrity_and_never_uses_a_cached_receipt_as_bytes ... ok
+test contracts::plans::writers::executions::dispatch::pods::pod_plan_rechecks_revoked_authority_and_expiry_after_journal_writes ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::output_publication_is_immutable_survives_wal_and_never_completes_execution ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::reaper_metadata_requires_fresh_exact_journal_and_challenge_bindings ... ok
+test contracts::plans::writers::executions::dispatch::execution_dispatch_rechecks_original_credential_grants_catalog_and_connection ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::redundant_watchdogs_require_matching_timers_and_distinct_live_process_evidence ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::renewal::authorization_alone_never_extends_and_ack_requires_atomic_writer_update ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::watchdog_metadata_enforces_original_deadline_and_caps_sql_startup_budget ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::renewal::renewal_rejects_skips_wrong_startup_and_partial_or_transplanted_proofs ... ok
+test contracts::plans::writers::executions::dispatch::queue::queue_poll_cancels_revoked_or_closed_requests_without_dispatch ... ok
+test contracts::plans::writers::executions::execution_admission_rejects_stale_lease_foreign_sandbox_and_browser_reuse ... ok
+test contracts::plans::writers::executions::execution_queue_binds_original_credential_and_revocation_lowers_authority ... ok
+test contracts::plans::writers::executions::execution_outbox_failure_and_late_expiry_roll_back_reservation_and_revision ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::watchdog_metadata_rejects_transplants_and_wal_read_cannot_recreate_live_guard ... ok
+test contracts::plans::writers::executions::execution_queue_is_durable_bound_and_retry_never_extends_or_dispatches ... ok
+test contracts::plans::writers::executions::failed_queue_cancellation_rolls_back_writer_release_and_drain_proof ... ok
+test contracts::plans::writers::executions::file_dispatch_and_execution_reservation_have_one_winner ... ok
+test contracts::plans::writers::executions::migration_twelve_does_not_invent_execution_for_existing_dispatch ... ok
+test contracts::plans::writers::executions::queue_reserves_the_writer_slot_and_cancel_restores_file_admission ... ok
+test contracts::plans::writers::reads::read_checks_independent_grants_and_original_connection_credential ... ok
+test contracts::plans::writers::reads::read_path_validation_and_requested_capability_apply_before_storage ... ok
+test contracts::plans::writers::executions::release_cancels_queue_atomically_before_zero_dispatch_handoff ... ok
+test contracts::plans::writers::reads::read_only_candidate_access_requires_no_writer_or_modify_scope ... ok
+test contracts::plans::writers::reads::read_never_accepts_a_changed_candidate_generation_workspace_or_catalog ... ok
+test contracts::plans::writers::executions::execution_queue_deadline_does_not_extend_with_writer_renewal ... ok
+test contracts::plans::writers::recovery::migration_ten_does_not_infer_owners_and_readiness_detects_checksum_drift ... ok
+test contracts::plans::writers::recovery::migration_eleven_preserves_unconfirmed_dispatch_without_creating_drain_evidence ... ok
+test contracts::plans::writers::recovery::missing_file_completion_never_reissues_io_and_proof_cannot_be_inferred ... ok
+test contracts::plans::writers::recovery::outbox_failure_and_late_credential_expiry_roll_back_all_writer_records ... ok
+test contracts::plans::writers::renewal_retry_never_extends_twice_and_session_expiry_caps_authority ... ok
+test contracts::plans::writers::stops::active_human_input_blocks_stop_until_idle_even_without_a_writer ... ok
+test contracts::plans::writers::stops::acquiring_writer_and_stopping_share_one_authority_boundary ... ok
+test contracts::plans::writers::recovery::recorded_dispatch_never_reissues_and_cannot_claim_zero_dispatch_drain ... ok
+test contracts::plans::writers::stops::completed_file_in_an_older_epoch_still_requires_a_checkpoint ... ok
+test contracts::plans::writers::stops::dispatch_history_and_queued_execution_block_stop ... ok
+test contracts::plans::writers::stops::queued_and_preparing_are_not_assumed_to_be_stopped ... ok
+test contracts::registry::idempotency_covers_intent_scope_and_retired_keys ... ok
+test contracts::plans::writers::reads::rechecking_read_after_revocation_or_close_rejects_disclosure ... ok
+test contracts::plans::writers::stops::stop_rolls_back_on_outbox_failure_and_late_credential_expiry ... ok
+test contracts::plans::writers::stops::stop_requires_manage_again_on_retry_and_rejects_forged_proofs ... ok
+test contracts::plans::writers::stops::migration_twenty_preserves_old_dispatch_and_does_not_invent_stop_proof ... ok
+test contracts::streams::bounded_replay_retention_and_at_least_once_outbox ... ok
+test contracts::registry::migration_checksum_mismatch_is_rejected ... ok
+test contracts::plans::writers::recovery::expiry_blocks_renewal_and_takeover_until_zero_dispatch_reconciliation ... ok
+test contracts::plans::writers::stops::unreleased_writer_blocks_stop_and_released_epoch_cannot_restart ... ok
+test contracts::registry::immutable_history_and_retry_survive_wal_recovery ... ok
+test contracts::plans::writers::zero_dispatch_release_is_durable_and_handoff_advances_epoch ... ok
+test contracts::plans::writers::stops::stop_survives_wal_restart_and_new_generation_retains_old_storage ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::renewal::renewal_commit_crossing_old_expiry_rolls_back_even_with_new_writer_deadline ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::downloads::output_download_rechecks_revocation_after_success_or_failed_remote_io ... ok
+test contracts::plans::writers::executions::dispatch::watchdogs::outputs::completions::deadline_crossed_during_commit_rolls_back_the_whole_completion ... ok
+
+test result: ok. 221 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 56.68s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_test_support-491f5c1bf79b0967)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_watchdog-d5b5aaf63e0ee8e5)
+
+running 15 tests
+test cgroup::tests::only_explicit_unique_zero_is_an_empty_observation ... ok
+test admission::tests::admission_frames_are_bounded_and_challenges_are_full_length_hex ... ok
+test journal::tests::journal_references_are_confined_single_components ... ok
+test journal::tests::publication_does_not_replace_existing_or_partial_records ... ok
+test reaper::tests::expiry_never_renews_the_original_deadline_or_crosses_boots ... ok
+test request::tests::absolute_deadline_cannot_be_refreshed_or_cross_boots ... ok
+test request::tests::cannot_kill_watchdog_or_its_ancestor ... ok
+test admission::tests::probe_rejects_replayed_foreign_and_stale_replies ... ok
+test termination::tests::pinned_domain_handles_stopped_descendants_removal_and_path_reuse ... ignored, requires explicitly disposable root VM and writable cgroup v2
+test renewal::tests::fresh_request_bound_sequence_never_replays_or_revives_expiry ... ok
+test journal::tests::report_identity_time_and_error_must_agree ... ok
+test request::tests::rejects_ambiguous_or_unbounded_protocol ... ok
+test request::tests::rejects_root_traversal_and_noncanonical_paths ... ok
+test renewal::tests::no_shortening_overlong_window_or_hard_ceiling_extension ... ok
+test renewal::tests::kernel_reset_detects_expiry_even_without_a_userspace_timer_read ... ok
+
+test result: ok. 14 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/main.rs (target/debug/deps/agent_computer_watchdog-4f4eab01c186592f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/agent_computer_worker-12c140da877fb87d)
+
+running 1 test
+test artifacts::capture::tests::lost_authority_waits_for_the_real_capture_thread_and_returns_no_bundle ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+   Doc-tests agent_computer_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_csi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_definitions
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_fence
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_kubernetes
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_node
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_objects
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_sandbox
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_server
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_storage
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_store
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_test_support
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_watchdog
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests agent_computer_worker
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+CLIPPY ALL TARGETS/FEATURES
+    Checking agent-computer-store v0.1.0 (/opt/workspace/agent-computer/crates/store)
+    Checking agent-computer-worker v0.1.0 (/opt/workspace/agent-computer/crates/worker)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.31s
+
+BAZEL DEFAULT TARGETS
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 38 targets (4 packages loaded, 0 targets configured)
+Analyzing: 38 targets (4 packages loaded, 0 targets configured)
+
+INFO: Analyzed 38 targets (4 packages loaded, 121 targets configured).
+[1,131 / 1,143] 8 / 15 tests; Compiling Rust bin server_unit_test (13 files); 1s processwrapper-sandbox ... (7 actions, 6 running)
+[1,138 / 1,145] 11 / 15 tests; Compiling Rust bin postgres_contracts_test (49 files); 2s processwrapper-sandbox ... (4 actions, 3 running)
+[1,144 / 1,148] 12 / 15 tests; Compiling Rust bin postgres_contracts_test (49 files); 3s processwrapper-sandbox ... (3 actions running)
+[1,145 / 1,148] 13 / 15 tests; Compiling Rust bin postgres_contracts_test (49 files); 4s processwrapper-sandbox ... (2 actions running)
+[1,145 / 1,148] 13 / 15 tests; Compiling Rust bin postgres_contracts_test (49 files); 7s processwrapper-sandbox ... (2 actions running)
+[1,147 / 1,148] 14 / 15 tests; [Prepa] runfiles for //crates/store:postgres_contracts_test
+[1,148 / 1,149] 14 / 15 tests; Testing //crates/store:postgres_contracts_test; 1s processwrapper-sandbox
+[1,148 / 1,149] 14 / 15 tests; Testing //crates/store:postgres_contracts_test; 10s processwrapper-sandbox
+[1,148 / 1,149] 14 / 15 tests; Testing //crates/store:postgres_contracts_test; 40s processwrapper-sandbox
+[1,148 / 1,149] 14 / 15 tests; Testing //crates/store:postgres_contracts_test; 41s processwrapper-sandbox
+INFO: Found 23 targets and 15 test targets...
+INFO: Elapsed time: 50.530s, Critical Path: 50.29s
+INFO: 23 processes: 79 action cache hit, 10 internal, 20 processwrapper-sandbox.
+INFO: Build completed successfully, 23 total actions
+//crates/cli:cli_contracts_test                                 (cached) PASSED in 0.9s
+//crates/core:core_contracts_test                               (cached) PASSED in 0.1s
+//crates/csi:csi_contracts_test                                 (cached) PASSED in 0.0s
+//crates/definitions:definitions_contracts_test                 (cached) PASSED in 0.8s
+//crates/fence:fence_contracts_test                             (cached) PASSED in 0.1s
+//crates/objects:objects_contracts_test                         (cached) PASSED in 0.2s
+//crates/server:server_unit_test                                (cached) PASSED in 0.0s
+//crates/storage:storage_contracts_test                         (cached) PASSED in 2.2s
+//crates/kubernetes:kubernetes_contracts_test                            PASSED in 1.1s
+//crates/node:node_contracts_test                                        PASSED in 1.5s
+//crates/sandbox:sandbox_contracts_test                                  PASSED in 0.1s
+//crates/server:server_contracts_test                                    PASSED in 3.9s
+//crates/store:postgres_contracts_test                                   PASSED in 41.6s
+//crates/watchdog:watchdog_contracts_test                                PASSED in 0.1s
+//crates/worker:worker_test                                              PASSED in 0.1s
+
+Executed 7 out of 15 tests: 15 tests pass.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+FINAL STORE TARGET
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: target //crates/store:postgres_contracts_test (0 packages loaded, 0 targets configured)
+Analyzing: target //crates/store:postgres_contracts_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //crates/store:postgres_contracts_test (0 packages loaded, 13 targets configured).
+[964 / 966] Compiling Rust bin postgres_contracts_test (49 files); 1s processwrapper-sandbox
+[965 / 966] [Prepa] runfiles for //crates/store:postgres_contracts_test
+[966 / 967] Testing //crates/store:postgres_contracts_test; 1s processwrapper-sandbox
+[966 / 967] Testing //crates/store:postgres_contracts_test; 11s processwrapper-sandbox
+[966 / 967] Testing //crates/store:postgres_contracts_test; 41s processwrapper-sandbox
+INFO: Found 1 test target...
+Target //crates/store:postgres_contracts_test up-to-date:
+  bazel-bin/crates/store/postgres_contracts_test
+INFO: Elapsed time: 50.071s, Critical Path: 49.64s
+INFO: 4 processes: 4 action cache hit, 2 internal, 3 processwrapper-sandbox.
+INFO: Build completed successfully, 4 total actions
+//crates/store:postgres_contracts_test                                   PASSED in 42.7s
+
+Executed 1 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+MANUAL BUILDS
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 9 targets (6 packages loaded, 0 targets configured)
+Analyzing: 9 targets (6 packages loaded, 0 targets configured)
+
+INFO: Analyzed 9 targets (287 packages loaded, 12287 targets configured).
+[1,053 / 1,073] Compiling Rust bin watchdog_contracts_test (10 files); 0s processwrapper-sandbox ... (3 actions, 2 running)
+[1,062 / 1,073] Compiling Rust bin node_contracts_test (7 files); 0s processwrapper-sandbox ... (2 actions, 1 running)
+[1,064 / 1,073] Compiling Rust rlib store (54 files); 1s processwrapper-sandbox
+[1,065 / 1,073] [Prepa] Compiling Rust rlib worker (13 files)
+[1,065 / 1,073] Compiling Rust rlib worker (13 files); 1s processwrapper-sandbox
+[1,066 / 1,073] Compiling Rust rlib server (13 files); 1s processwrapper-sandbox ... (3 actions running)
+[1,067 / 1,073] Compiling Rust bin candidate_worker_live_test (8 files); 2s processwrapper-sandbox ... (3 actions, 2 running)
+[1,071 / 1,073] Compiling Rust bin agent-computer-server (9 files); 1s processwrapper-sandbox
+[1,072 / 1,073] [Prepa] runfiles for //crates/server:agent-computer-server
+INFO: Found 9 targets...
+INFO: Elapsed time: 13.381s, Critical Path: 12.64s
+INFO: 25 processes: 757 action cache hit, 11 internal, 14 processwrapper-sandbox.
+INFO: Build completed successfully, 25 total actions
+
+EXECUTION FIXTURE REBUILD
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: target //crates/worker:execution_worker_live_test (0 packages loaded, 0 targets configured)
+Analyzing: target //crates/worker:execution_worker_live_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //crates/worker:execution_worker_live_test (0 packages loaded, 9 targets configured).
+[1,030 / 1,032] Compiling Rust bin execution_worker_live_test (8 files); 1s processwrapper-sandbox
+[1,031 / 1,032] [Prepa] runfiles for //crates/worker:execution_worker_live_test
+INFO: Found 1 target...
+Target //crates/worker:execution_worker_live_test up-to-date:
+  bazel-bin/crates/worker/execution_worker_live_test
+INFO: Elapsed time: 3.950s, Critical Path: 3.55s
+INFO: 3 processes: 3 action cache hit, 2 internal, 1 processwrapper-sandbox.
+INFO: Build completed successfully, 3 total actions
+
+COMMENT-ONLY REBUILD
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 4 targets (4 packages loaded, 6 targets configured)
+Analyzing: 4 targets (4 packages loaded, 6 targets configured)
+
+INFO: Analyzed 4 targets (452 packages loaded, 15825 targets configured).
+[1,037 / 1,048] Compiling Rust bin node_contracts_test (7 files); 0s processwrapper-sandbox ... (2 actions, 1 running)
+[1,039 / 1,048] Compiling Rust rlib store (54 files); 1s processwrapper-sandbox
+[1,040 / 1,048] [Prepa] Compiling Rust rlib worker (13 files)
+[1,041 / 1,048] [Prepa] Compiling Rust rlib server (13 files)
+[1,041 / 1,048] Compiling Rust rlib server (13 files); 1s processwrapper-sandbox ... (3 actions running)
+[1,042 / 1,048] Compiling Rust bin candidate_worker_live_test (8 files); 2s processwrapper-sandbox ... (3 actions, 2 running)
+[1,045 / 1,048] Compiling Rust bin agent-computer-server (9 files); 1s processwrapper-sandbox ... (2 actions, 1 running)
+[1,046 / 1,048] Compiling Rust bin agent-computer-server (9 files); 2s processwrapper-sandbox
+[1,047 / 1,048] [Prepa] runfiles for //crates/server:agent-computer-server
+INFO: Found 4 targets...
+INFO: Elapsed time: 13.263s, Critical Path: 12.26s
+INFO: 12 processes: 1036 action cache hit, 4 internal, 8 processwrapper-sandbox.
+INFO: Build completed successfully, 12 total actions
+
+NODE MANUAL CHECKS AND SERVICES
+registry.invalid/agent computer/startup 	saved
+application/vnd.oci.image.manifest.v1+json sha256:e0f8dc4f21089e47451bd42dfe15e180b1f7ac14b056e6f17319cf23888c95c4
+Importing	elapsed: 0.7 s	total:   0.0 B	(0.0 B/s)
+clusterrole.rbac.authorization.k8s.io/ac-node-watchdog-observer created
+clusterrolebinding.rbac.authorization.k8s.io/ac-node-watchdog-observer created
+role.rbac.authorization.k8s.io/ac-startup-attach created
+rolebinding.rbac.authorization.k8s.io/ac-startup-attach created
+csidriver.storage.k8s.io/csi.agent-computer.io created
+PRIVATE_NODE_EXECUTION_CONFIG_READY
+active
+active
+active
+
+running 1 test
+test termination::tests::pinned_domain_handles_stopped_descendants_removal_and_path_reuse ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.04s
+
+
+running 3 tests
+{"case":"reaper_admission","failed_client_revoked":true,"missing_service_denied":true,"probe_did_not_kill_target":true,"receipt":{"cgroup_device":28,"instance":"dd931f42e868a74919dc2591a3ce26b31d85c49f49fa6923db94215480e3014f","journals":[{"device":64769,"id":"journal-Y9kc3e","inode":1049378,"intent_digest":"sha256:fe1d7334e431fe76ec2c3da471800f363ae743eede99452f7c5fbd977fe4abcc"},{"device":64769,"id":"journal-sGLOFD","inode":1049387,"intent_digest":"sha256:1564432e5efd40d59ffb80a849cb115436ebaad40dfe827a7355f01920f18b51"}],"nonce":"da84556199fa4761dc2c58bed822133ce300ed7476f655e1217d720df1d84ed7","observed_boottime_ms":534324,"pid":6432,"request":{"boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_inode":8847,"cgroup_path":"ac-admission-6418-533973","deadline_boottime_ms":538982,"execution_id":"ac-admission-6418-533973","version":1},"spool_device":64769,"spool_inode":1049371,"version":1},"restart_rejected_by_original_client":true,"status":"pass","stopped_service_denied":true}
+test guard::tests::reaper_admission_checks_live_instance_and_never_revives_a_failed_client ... ok
+{"guards":[{"state":"recovered","journal":{"id":"journal-v8Myf0","device":64769,"inode":1049377,"intent_digest":"sha256:77de5789035e12692025037498316a0ade91a20a9ac2c9a4ced27cf4be451b7d"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-reaper-node-6418-533972","boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_path":"ac-reaper-node-6418-533972","cgroup_inode":8768,"deadline_boottime_ms":535182},"cgroup_device":28,"armed_boottime_ms":535189,"kill_boottime_ms":535189,"observed_boottime_ms":535189,"trigger":"Recovery","observation":"EmptyObserved","error":null,"journal":{"id":"journal-v8Myf0","device":64769,"inode":1049377,"intent_digest":"sha256:77de5789035e12692025037498316a0ade91a20a9ac2c9a4ced27cf4be451b7d"}}},{"state":"recovered","journal":{"id":"journal-s8Y8bF","device":64769,"inode":1049388,"intent_digest":"sha256:708932ddcba8fe122d172de379f4271ed6a1a3a9ed258366c4f00bb40da58745"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-reaper-node-6418-533972","boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_path":"ac-reaper-node-6418-533972","cgroup_inode":8768,"deadline_boottime_ms":535182},"cgroup_device":28,"armed_boottime_ms":535221,"kill_boottime_ms":535221,"observed_boottime_ms":535221,"trigger":"Recovery","observation":"EmptyObserved","error":null,"journal":{"id":"journal-s8Y8bF","device":64769,"inode":1049388,"intent_digest":"sha256:708932ddcba8fe122d172de379f4271ed6a1a3a9ed258366c4f00bb40da58745"}}}]}
+{"case":"node_reaper_recovery","status":"pass","writer_released":false}
+test guard::tests::reaper_observation_preserves_original_arms_after_both_guards_die ... ok
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-heRquU","device":64769,"inode":1049375,"intent_digest":"sha256:afa2f3cb678ce545a157ac84449b615236553912d6b16d2f1c1d53e736789b4b"}},{"state":"recorded","journal":{"id":"journal-JyDMON","device":64769,"inode":1049384,"intent_digest":"sha256:d9ecb396dea3930187ccae6da254d6a1e2da2d9a90e8ffead56c26a114dd39f6"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-6418-533972","boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_path":"ac-guard-pair-6418-533972","cgroup_inode":8689,"deadline_boottime_ms":535482},"cgroup_device":28,"armed_boottime_ms":534026,"kill_boottime_ms":535482,"observed_boottime_ms":535492,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-JyDMON","device":64769,"inode":1049384,"intent_digest":"sha256:d9ecb396dea3930187ccae6da254d6a1e2da2d9a90e8ffead56c26a114dd39f6"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":535482,"empty_observed_boottime_ms":535484,"failed_index":0,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-UEHh8u","device":64769,"inode":1049372,"intent_digest":"sha256:fb76de22e72e46856a0f2bb5a5d23490cceb54d9193013215771f49c4e0ab31e"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-6418-535537","boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_path":"ac-guard-pair-6418-535537","cgroup_inode":8986,"deadline_boottime_ms":537048},"cgroup_device":28,"armed_boottime_ms":535564,"kill_boottime_ms":537048,"observed_boottime_ms":537058,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-UEHh8u","device":64769,"inode":1049372,"intent_digest":"sha256:fb76de22e72e46856a0f2bb5a5d23490cceb54d9193013215771f49c4e0ab31e"}}},{"state":"unconfirmed","journal":{"id":"journal-yV2k4G","device":64769,"inode":1049377,"intent_digest":"sha256:31d96aad2cd2616d9dd73d5c6effe0297ec3791b507a0c1118fc15c5147d1cc3"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":537048,"empty_observed_boottime_ms":537058,"failed_index":1,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-sR4BhX","device":64769,"inode":1049382,"intent_digest":"sha256:b7f08c931a38368f43d0ca2940d3a7cfd7595915c409e9803ba5a0609e5f38d5"}},{"state":"recorded","journal":{"id":"journal-snSLl4","device":64769,"inode":1049388,"intent_digest":"sha256:86106c7976aa0dab48185e6e955ef8379a7dceb6326260081e5905bd263fb8ef"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-6418-537097","boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_path":"ac-guard-pair-6418-537097","cgroup_inode":9065,"deadline_boottime_ms":538603},"cgroup_device":28,"armed_boottime_ms":537146,"kill_boottime_ms":538603,"observed_boottime_ms":538613,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-snSLl4","device":64769,"inode":1049388,"intent_digest":"sha256:86106c7976aa0dab48185e6e955ef8379a7dceb6326260081e5905bd263fb8ef"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":538603,"empty_observed_boottime_ms":538604,"failed_index":0,"signal":"\"Signal::STOP\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-TSLVvS","device":64769,"inode":1049392,"intent_digest":"sha256:ff81aa4c0f004e37e1f56542c59aafe726c5d9714388ff499e13f251d49a0675"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-6418-538655","boot_id":"a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3","cgroup_path":"ac-guard-pair-6418-538655","cgroup_inode":9144,"deadline_boottime_ms":540165},"cgroup_device":28,"armed_boottime_ms":538743,"kill_boottime_ms":540165,"observed_boottime_ms":540175,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-TSLVvS","device":64769,"inode":1049392,"intent_digest":"sha256:ff81aa4c0f004e37e1f56542c59aafe726c5d9714388ff499e13f251d49a0675"}}},{"state":"unconfirmed","journal":{"id":"journal-RVjGTk","device":64769,"inode":1049395,"intent_digest":"sha256:23c901f845219f3c458445c3987942b88d1d5d686002ee5b7aee4d9d2c64b50b"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":540165,"empty_observed_boottime_ms":540172,"failed_index":1,"signal":"\"Signal::STOP\"","writer_released":false}
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 6.24s
+
+
+EARLIER NODE FIXTURE FAILURE
+{"case": "renewed-deadline", "status": "pass", "request": {"version": 2, "execution_id": "renewed-deadline", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-87c5c3148c874e1d819fd326361c3e44", "cgroup_inode": 9321, "deadline_boottime_ms": 568401, "renewal": {"hard_deadline_boottime_ms": 573801, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:31e9e5e188506144a797f2fa477aaf32e0c8e2737ee0799010ec4ac981606d46", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 570017}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049378, "intent_digest": "sha256:3ac9c4872c46bca21fb25d023f5af4deda249bfc9ffe8654a3144cbf86f7c916"}, "command": {"version": 1, "request_digest": "sha256:31e9e5e188506144a797f2fa477aaf32e0c8e2737ee0799010ec4ac981606d46", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 570017}, "previous_deadline_boottime_ms": 568401, "accepted_boottime_ms": 566822}], "empty_observed_boottime_ms": 570040}
+{"case": "closed-control", "status": "pass", "request": {"version": 2, "execution_id": "closed-control", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-8d8cde953b494fa9aef0e2d729837c4f", "cgroup_inode": 9400, "deadline_boottime_ms": 571649, "renewal": {"hard_deadline_boottime_ms": 577049, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:bbc3a43e36b6a290d964284b255131391799d8418de700fca98f9c5f2d224fc2", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573263}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049387, "intent_digest": "sha256:134838b51977ab7b0b33540c5bc572eab409eb142a3451d49cae8fecb29b0299"}, "command": {"version": 1, "request_digest": "sha256:bbc3a43e36b6a290d964284b255131391799d8418de700fca98f9c5f2d224fc2", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573263}, "previous_deadline_boottime_ms": 571649, "accepted_boottime_ms": 570067}], "empty_observed_boottime_ms": 570094}
+{"case": "replay", "status": "pass", "request": {"version": 2, "execution_id": "replay", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-f1dbd4aafde04e529678db8270d470df", "cgroup_inode": 9479, "deadline_boottime_ms": 571705, "renewal": {"hard_deadline_boottime_ms": 577105, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:3e85e78981803b3bbba1e2e5137c79bb12de8cedb576e825d06bbf15cf06347d", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573317}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049395, "intent_digest": "sha256:0a19c536f29266c1f365e774024f57f66ac38435560836139b3764fe1d6f0b18"}, "command": {"version": 1, "request_digest": "sha256:3e85e78981803b3bbba1e2e5137c79bb12de8cedb576e825d06bbf15cf06347d", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573317}, "previous_deadline_boottime_ms": 571705, "accepted_boottime_ms": 570122}], "empty_observed_boottime_ms": 570149}
+{"case": "lost-output", "status": "pass", "request": {"version": 2, "execution_id": "lost-output", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-946a35e690d643c4b750677a653bbd08", "cgroup_inode": 9558, "deadline_boottime_ms": 571760, "renewal": {"hard_deadline_boottime_ms": 577160, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:64eac52a48e88e8a146aba2ce68f0ae6febcb801ecdde3a17dc0aef8b66b804c", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573372}, "acknowledgments": [], "empty_observed_boottime_ms": 570193}
+{"case": "partial-dual", "status": "pass", "request": {"version": 2, "execution_id": "partial-dual", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-f4f3adcf19fe47bfbafa47b00c25feec", "cgroup_inode": 9637, "deadline_boottime_ms": 571804, "renewal": {"hard_deadline_boottime_ms": 577204, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:a1c9a003c1c360e53f61e107c3eea9984bf90a35286b9ce6337a892774b391ad", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573430}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049411, "intent_digest": "sha256:d8a4a0b0d96d5d12edb8596e4d35cfb8593198899dd3af81864531eb940e03f6"}, "command": {"version": 1, "request_digest": "sha256:a1c9a003c1c360e53f61e107c3eea9984bf90a35286b9ce6337a892774b391ad", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573430}, "previous_deadline_boottime_ms": 571804, "accepted_boottime_ms": 570233}], "empty_observed_boottime_ms": 570255}
+{"case": "frozen-journal", "status": "pass", "request": {"version": 2, "execution_id": "frozen-journal", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-58dcc3137e9f49a48cc8894d64dc4d4e", "cgroup_inode": 9716, "deadline_boottime_ms": 571920, "renewal": {"hard_deadline_boottime_ms": 577320, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:5c912b6fdc72e3c4d94d188e68309581890c118dfe5b91766461242a8b166514", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 573551}, "acknowledgments": [], "empty_observed_boottime_ms": 573602, "empty_while_filesystem_frozen_boottime_ms": 573562}
+Traceback (most recent call last):
+  File "/home/ac-test/renewal_component.py", line 202, in <module>
+    main()
+  File "/home/ac-test/renewal_component.py", line 155, in main
+    assert probe.returncode == 0, (probe.stdout, probe.stderr)
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('{"pass_complete":true,"scanned":4,"entries":[{"journal_id":"journal-1","outcome":{"state":"unavailable","error":"DrainTimeout"}},{"journal_id":"journal-0","outcome":{"state":"recovered"}}]}\n', '')
+
+FINAL NODE RENEWAL CHECKS
+{"case": "renewed-deadline", "status": "pass", "request": {"version": 2, "execution_id": "renewed-deadline", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-448dbed09d574e3f8ff6dc3e07d936ca", "cgroup_inode": 9972, "deadline_boottime_ms": 612942, "renewal": {"hard_deadline_boottime_ms": 618342, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:039185b9b49afeff3207370467a526f7e6de0eb8d1d77de17b5c0fcb43068da7", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 614556}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049378, "intent_digest": "sha256:0ee52ffba8177f8dec62d84aabf735def049ef9c57bc682f7fd5ab35b4b4d075"}, "command": {"version": 1, "request_digest": "sha256:039185b9b49afeff3207370467a526f7e6de0eb8d1d77de17b5c0fcb43068da7", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 614556}, "previous_deadline_boottime_ms": 612942, "accepted_boottime_ms": 611361}], "empty_observed_boottime_ms": 614586, "reaper_passes": []}
+{"case": "closed-control", "status": "pass", "request": {"version": 2, "execution_id": "closed-control", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-285bffa4dd6a4111b396dfe2a7f512f2", "cgroup_inode": 10051, "deadline_boottime_ms": 616198, "renewal": {"hard_deadline_boottime_ms": 621598, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:9dedffc849230e43d29c7b821c7feeb1d297ffcfa2d70c76cc425551cdb8ab80", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617812}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049387, "intent_digest": "sha256:a7bacc44384d23a366e396068acd8a621bf24d276af3d1504aa31b988aeaf4ec"}, "command": {"version": 1, "request_digest": "sha256:9dedffc849230e43d29c7b821c7feeb1d297ffcfa2d70c76cc425551cdb8ab80", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617812}, "previous_deadline_boottime_ms": 616198, "accepted_boottime_ms": 614616}], "empty_observed_boottime_ms": 614638, "reaper_passes": []}
+{"case": "replay", "status": "pass", "request": {"version": 2, "execution_id": "replay", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-a9f236832918450c95f306991f9a1664", "cgroup_inode": 10130, "deadline_boottime_ms": 616247, "renewal": {"hard_deadline_boottime_ms": 621647, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:65524b97ee671a6028587783625aaac894e6e749fc1f40793accbc43b9b8513d", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617864}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049395, "intent_digest": "sha256:c75977a9d7f510bb69bd9f5242cc9a4df760709adeea8b673469e18556623ced"}, "command": {"version": 1, "request_digest": "sha256:65524b97ee671a6028587783625aaac894e6e749fc1f40793accbc43b9b8513d", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617864}, "previous_deadline_boottime_ms": 616247, "accepted_boottime_ms": 614669}], "empty_observed_boottime_ms": 614691, "reaper_passes": []}
+{"case": "lost-output", "status": "pass", "request": {"version": 2, "execution_id": "lost-output", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-8790bee1d1594af396503ba6be5913e2", "cgroup_inode": 10209, "deadline_boottime_ms": 616301, "renewal": {"hard_deadline_boottime_ms": 621701, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:0cdc32dbd29a77e80fe2838e5af6547d0b7c90d19bfd4e0492b47c900f6a9044", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617916}, "acknowledgments": [], "empty_observed_boottime_ms": 614737, "reaper_passes": []}
+{"case": "partial-dual", "status": "pass", "request": {"version": 2, "execution_id": "partial-dual", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-a76eea993df84787b322b59c465838d0", "cgroup_inode": 10288, "deadline_boottime_ms": 616349, "renewal": {"hard_deadline_boottime_ms": 621749, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:05463a1a119a86427811d64f4959b0b2352cbb2206571b8b4f2c5c899c2d71a7", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617980}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049411, "intent_digest": "sha256:dafaa70ac4f0429822cf21ca6d03d582a279f56d1cc885844d9c5d11c609d89c"}, "command": {"version": 1, "request_digest": "sha256:05463a1a119a86427811d64f4959b0b2352cbb2206571b8b4f2c5c899c2d71a7", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 617980}, "previous_deadline_boottime_ms": 616349, "accepted_boottime_ms": 614780}], "empty_observed_boottime_ms": 614803, "reaper_passes": []}
+{"case": "frozen-journal", "status": "pass", "request": {"version": 2, "execution_id": "frozen-journal", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-7f0b9472fab3408890b130e41a42b53a", "cgroup_inode": 10367, "deadline_boottime_ms": 616452, "renewal": {"hard_deadline_boottime_ms": 621852, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:30d35e30ae671c140d837dcac87962795ba723b4b7c3f921d18f2760bf685b24", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 618076}, "acknowledgments": [], "empty_observed_boottime_ms": 618130, "reaper_passes": [], "empty_while_filesystem_frozen_boottime_ms": 618081}
+{"case": "reaper-renewed", "status": "pass", "request": {"version": 2, "execution_id": "reaper-renewed", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-320905bd22514d339889de427182c1b3", "cgroup_inode": 10446, "deadline_boottime_ms": 619769, "renewal": {"hard_deadline_boottime_ms": 625169, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:57a452d0af7ff4c01cb5d55ebaa2c53836c95fa30dd2d1f191973a0996ff31cc", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 621400}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049426, "intent_digest": "sha256:afac2c30612b4f1198fc70eadadab7bb5fcf2c0e5e5d927c46079511163c37cd"}, "command": {"version": 1, "request_digest": "sha256:57a452d0af7ff4c01cb5d55ebaa2c53836c95fa30dd2d1f191973a0996ff31cc", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 621400}, "previous_deadline_boottime_ms": 619769, "accepted_boottime_ms": 618200}, {"version": 1, "event": "renewed", "journal": {"id": "journal-1", "device": 64769, "inode": 1049429, "intent_digest": "sha256:2ee95ec0fc7a9f29b08326312a6c2e6fad3288103af837f917de959318229189"}, "command": {"version": 1, "request_digest": "sha256:57a452d0af7ff4c01cb5d55ebaa2c53836c95fa30dd2d1f191973a0996ff31cc", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 621400}, "previous_deadline_boottime_ms": 619769, "accepted_boottime_ms": 618205}], "empty_observed_boottime_ms": 621507, "reaper_passes": [{"pass_complete": true, "scanned": 4, "entries": [{"journal_id": "journal-1", "outcome": {"state": "waiting"}}, {"journal_id": "journal-0", "outcome": {"state": "waiting"}}]}, {"pass_complete": true, "scanned": 4, "entries": [{"journal_id": "journal-1", "outcome": {"state": "unavailable", "error": "DrainTimeout"}}, {"journal_id": "journal-0", "outcome": {"state": "recovered"}}]}, {"pass_complete": true, "scanned": 4, "entries": [{"journal_id": "journal-1", "outcome": {"state": "recovered"}}, {"journal_id": "journal-0", "outcome": {"state": "recorded"}}]}]}
+{"case": "reaper-corrupt-head", "status": "pass", "request": {"version": 2, "execution_id": "reaper-corrupt-head", "boot_id": "a7ddce65-0ea6-48f3-b5ec-6297d1ae03a3", "cgroup_path": "ac-renewal-3bd5929b6e774a6c89ea5ad97543a9ec", "cgroup_inode": 10525, "deadline_boottime_ms": 623117, "renewal": {"hard_deadline_boottime_ms": 628517, "authority_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}, "command": {"version": 1, "request_digest": "sha256:9ea478a7bba6568acd50b3632133b18e287e47e818e947c5e773a140d374c435", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 624744}, "acknowledgments": [{"version": 1, "event": "renewed", "journal": {"id": "journal-0", "device": 64769, "inode": 1049441, "intent_digest": "sha256:53e925b32549fd936acdae7f9c1538e7b7ce2da43629c2457cc9d35628067c0b"}, "command": {"version": 1, "request_digest": "sha256:9ea478a7bba6568acd50b3632133b18e287e47e818e947c5e773a140d374c435", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 624744}, "previous_deadline_boottime_ms": 623117, "accepted_boottime_ms": 621545}, {"version": 1, "event": "renewed", "journal": {"id": "journal-1", "device": 64769, "inode": 1049444, "intent_digest": "sha256:76f328694fdfed78baf7178c5d80f0b410981d72029ce74c46d1de4a3eb9cc90"}, "command": {"version": 1, "request_digest": "sha256:9ea478a7bba6568acd50b3632133b18e287e47e818e947c5e773a140d374c435", "sequence": 1, "grant_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "deadline_boottime_ms": 624744}, "previous_deadline_boottime_ms": 623117, "accepted_boottime_ms": 621549}], "empty_observed_boottime_ms": 623230, "reaper_passes": [{"pass_complete": true, "scanned": 4, "entries": [{"journal_id": "journal-1", "outcome": {"state": "unavailable", "error": "DrainTimeout"}}, {"journal_id": "journal-0", "outcome": {"state": "recovered"}}]}, {"pass_complete": true, "scanned": 4, "entries": [{"journal_id": "journal-1", "outcome": {"state": "recovered"}}, {"journal_id": "journal-0", "outcome": {"state": "recorded"}}]}]}
+
+REAL CANDIDATE
+
+running 1 test
+CANDIDATE_WORKER_REAL_PREPARATION_AND_OBSERVATION_PASSED
+test actual_volume_preparation_commits_receipts_and_observes_lost_acknowledgement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 50.86s
+
+
+INDEPENDENT CANDIDATE COLLECTION
+
+For enterprise users, please visit https://seaweedfs.com for the SeaweedFS Enterprise Edition,
+which has advanced features, including data recovery, self-healing storage, customizable erasure coding, EC vacuum and repair, etc.
+{"database_counts": {"runtime_start_requests": 10, "candidate_preparations": 10, "candidate_writer_leases": 6, "candidate_writer_dispatches": 15, "candidate_writer_drains": 14, "candidate_writer_completions": 15, "artifact_commits": 5, "runtime_stops": 5, "workspace_input_versions": 10}, "independent_s3_references": 11, "files_verified": 7, "artifacts_verified": 5}
+{"implementation": "fresh read-only JuiceFS process, cache-size 0", "distinct_client_pid": true, "bytes": 7, "sha256": "54dab9eb6d3204a0b42800148196ed4785d258f980432579b62ef0d9db0207b8"}
+{"independent_preparation_queue": {"requests": 3, "phase_summaries": [{"scheduled": 2, "prepared": 2, "busy": 0, "storage_unknown": 0, "unconfirmed": 0, "poll_failures": 0}, {"scheduled": 0, "prepared": 0, "busy": 0, "storage_unknown": 0, "unconfirmed": 0, "poll_failures": 0}, {"scheduled": 1, "prepared": 0, "busy": 0, "storage_unknown": 1, "unconfirmed": 0, "poll_failures": 0}]}}
+{"independent_checkpoint_stop": {"database": {"stop_after_commit": true, "receipt": {"proof": "artifact_checkpoint", "checkpoint": {"app_states": [], "artifact_id": "artifact_d3c8c242ac201358404a7d44e002dd3f", "input_revision": 2, "manifest_digest": "sha256:4eb21fdb3d2f1d4d9b8410ba2e2f134778c75e83b5c05c2eec107be95ab4c39d", "snapshot_digest": "sha256:462320635afe2cd4cf1c0d0a03e00a02b8959eb44ce7a1bc55a8d6ba2f129911", "computer_spec_digest": "sha256:0fa3387c2083c2b1ff8cab51cf3b306910726d8ad7844fa8ff89e92d56aed8d2", "unfinished_execution_ids": []}, "generation": 1, "request_id": "start_f55064e9a9875a8dc07d0e136b7b0636", "computer_id": "res_97dcbf68d84b6eb5de1df9fe8f9a6fe3", "candidate_id": "candidate_3cd6b42c8f4b568b37e72421027a7350", "stopped_at_ms": 1791640946868, "event_sequence": 143, "input_revision": 2, "control_revision": 7, "input_manifest_digest": "sha256:4eb21fdb3d2f1d4d9b8410ba2e2f134778c75e83b5c05c2eec107be95ab4c39d", "retained_storage_bytes": 10737418240}, "state": "Stopped", "publication_event": 142}, "daemon_summary": {"busy": 0, "committed": 1, "poll_failures": 0, "scheduled": 1, "stopped": 1, "unconfirmed": 0}, "restart_summary": {"busy": 0, "committed": 0, "poll_failures": 0, "scheduled": 0, "stopped": 0, "unconfirmed": 0}, "atomic_event_sequence": true}}
+
+EARLIER EXECUTION FIXTURE FAILURE
+
+running 1 test
+
+running 1 test
+CSI_ACTIVE_EVIDENCE {"exact_retry_retained_mount":true,"instance":"f4d44225492a10a96868ad2a44739a95b1f9af03183e5e8af916b274276cf028","publisher_restart_retained_mount":true,"replacement_uid_denied":true}
+test real_csi_active_retry_and_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.13s
+
+
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery has been running for over 60 seconds
+renewal fixture renew-short: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_e6c1b7da15085953e8b59a9b0c148fe1", seal_digest: "sha256:95c9890ba47bb06f48afdb82f18b2b483190bb37f74dd7e26b772a915db9a4b8", output_manifest_digest: Some("sha256:aac6a9690bc2420cc7ae5162abd7b35b80d569b79c6c5c589609f74ecc5eb40c"), accepted_state: Succeeded, completed_at_ms: 1791641205722 }), io_fence: Some(Evidence { version: 1, instance: "14f0a579dd35c28bb9772873ed2929e74469091df230473cb0c672b287d207c8", prepared: Prepared { version: 1, request_digest: "sha256:5926a9c3967ed8b5e341c76aabd021d414ff04a6e268148e43d3eddad2488790", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "1fede9d0-4759-488b-bea7-0137e30736b0", path_ref: "organization/execution_probe_1791640999984432428/workspace/res_2bda2fb0d0cbe770c32a9c1ebd179eec/candidates/candidate_293e6a379bf3f41ad65d4665200220af/generation/1/data", data_inode: 247, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: Some(ExecutionOutput { execution_id: "exec_e6c1b7da15085953e8b59a9b0c148fe1", manifest_digest: "sha256:aac6a9690bc2420cc7ae5162abd7b35b80d569b79c6c5c589609f74ecc5eb40c", state: Verified, observed_outcome: Succeeded, stdout: StreamMetadata { sha256: "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211", retained_bytes: 4, observed_bytes: 4, truncated: false, eof: true }, stderr: StreamMetadata { sha256: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", retained_bytes: 0, observed_bytes: 0, truncated: false, eof: true }, verified_at_ms: Some(1791641205700) }), output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_e6c1b7da15085953e8b59a9b0c148fe1", lifetime: Background, renewable: true, computer_id: "res_b5d281d2cd2b777c6a51b3cbf5dc1d7f", generation: 1, candidate_id: "candidate_293e6a379bf3f41ad65d4665200220af", sandbox_id: "res_2f61d88eff73ef00ad8b9bddc78f47bb", sandbox_revision: 1, lease_id: "lease_c4babe42d4805c642ad87be21b1c0021", epoch: 1, revision: 3, state: Succeeded, reason: "completed", input_digest: "sha256:dc568f1003fc56bade8d7dabda62ea8386fa988aa7095d577d46512fc06b793c", binding_digest: "sha256:30f0f4ed22b5c1e3a659950c5788efe7c337f7e1c796817764f3ed9bc7746935", created_at_ms: 1791641200158, queue_deadline_at_ms: 1791641230143, dispatch_started: true }, interrupted_at: None, cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: Some(StartupObservation { pod_uid: "7e48bc04-a1ac-4fda-8527-76e0591d81c3", report_bytes: 789, stderr_bytes: 0 }) })
+
+thread 'real_candidate_execution_uses_durable_grants_and_observation_only_recovery' (7658) panicked at crates/worker/tests/support/execution_renewal.rs:199:25:
+assertion `left == right` failed
+  left: WriterLease { lease_id: "lease_19d11e4570af10a1e10653a5cd3cddf4", computer_id: "res_c87ba08686f23fc2f2654abc3a9de493", candidate_id: "candidate_b820da88e3f2d49a9ce638e0fc0a0c41", connection_session_id: "conn_fce2ca95f13d9b410202ad8b06ded6bc", generation: 1, epoch: 1, revision: 4, state: Held, expires_at_ms: 1791641250197, checked_at_ms: 1791641220449, dispatch_recorded: true, release_proof: None, file_edit: None }
+ right: WriterLease { lease_id: "lease_19d11e4570af10a1e10653a5cd3cddf4", computer_id: "res_c87ba08686f23fc2f2654abc3a9de493", candidate_id: "candidate_b820da88e3f2d49a9ce638e0fc0a0c41", connection_session_id: "conn_fce2ca95f13d9b410202ad8b06ded6bc", generation: 1, epoch: 1, revision: 4, state: Held, expires_at_ms: 1791641250197, checked_at_ms: 1791641220486, dispatch_recorded: true, release_proof: None, file_edit: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery ... FAILED
+
+failures:
+
+failures:
+    real_candidate_execution_uses_durable_grants_and_observation_only_recovery
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 220.58s
+
+
+FINAL REAL EXECUTION
+
+running 1 test
+
+running 1 test
+CSI_ACTIVE_EVIDENCE {"exact_retry_retained_mount":true,"instance":"ce4d84fb23f9f80b465db9ed2786dcf154ba8055800c78d8c3866cffd2210d37","publisher_restart_retained_mount":true,"replacement_uid_denied":true}
+test real_csi_active_retry_and_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.12s
+
+
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery has been running for over 60 seconds
+renewal fixture renew-short: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_a7870b461a6e7e4ce29b71db9d481b7a", seal_digest: "sha256:2c64663920095ccd07b5f4b291bf8c5809df3b7894e7038f293104270da36792", output_manifest_digest: Some("sha256:f17319768a80cb118ea84bf34e5eb1d38fe700d17c22fc8a60cbbb787c6b4f16"), accepted_state: Succeeded, completed_at_ms: 1791641628963 }), io_fence: Some(Evidence { version: 1, instance: "30bd7f5de9c6675017048ee26144f1dd039232861f42abb1f482844ad0b0483c", prepared: Prepared { version: 1, request_digest: "sha256:1c1ac6366d5edc8d01c671a330e575594561eacb862210a11842de8d2c4b5d9a", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_05d9b47085745fb69f50d5b5fb796dec/candidates/candidate_71227f3f98fa6a49de11dc403b547653/generation/1/data", data_inode: 419, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: Some(ExecutionOutput { execution_id: "exec_a7870b461a6e7e4ce29b71db9d481b7a", manifest_digest: "sha256:f17319768a80cb118ea84bf34e5eb1d38fe700d17c22fc8a60cbbb787c6b4f16", state: Verified, observed_outcome: Succeeded, stdout: StreamMetadata { sha256: "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211", retained_bytes: 4, observed_bytes: 4, truncated: false, eof: true }, stderr: StreamMetadata { sha256: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", retained_bytes: 0, observed_bytes: 0, truncated: false, eof: true }, verified_at_ms: Some(1791641628954) }), output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_a7870b461a6e7e4ce29b71db9d481b7a", lifetime: Background, renewable: true, computer_id: "res_bdcf30712156dade323c9788adea36cd", generation: 1, candidate_id: "candidate_71227f3f98fa6a49de11dc403b547653", sandbox_id: "res_c3dc1ea774bd1491af9739eeea8ed6be", sandbox_revision: 1, lease_id: "lease_4337185ec35393f787f9c071314d5f2e", epoch: 1, revision: 3, state: Succeeded, reason: "completed", input_digest: "sha256:74167ce331f3fb4200d33b58ff243a19d5c10c9e8fb9aacdd2b1abdac0b49c87", binding_digest: "sha256:4fe2c8e7a6a4fccc09e0e94564c823cfbf19cdf644e29bdcec45b0e32016be18", created_at_ms: 1791641623630, queue_deadline_at_ms: 1791641653598, dispatch_started: true }, interrupted_at: None, cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: Some(StartupObservation { pod_uid: "b31af6e3-875b-4a42-9ab6-09a70b7f2c37", report_bytes: 789, stderr_bytes: 0 }) })
+renewal fixture renew-long: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_da84c0f0435c546b60e23dac5cdf3416", seal_digest: "sha256:09b7e0f11e88bf4e2078a6a65c09e2011bb209bae91411211817f36264bae471", output_manifest_digest: Some("sha256:593aa65eb23f0347c54b2df448765df227b5035abf450447ec188dfdf92fca12"), accepted_state: Succeeded, completed_at_ms: 1791641675466 }), io_fence: Some(Evidence { version: 1, instance: "106156715ad30a26741b52e46a5d7f1011c905dcf22dcbb290b672f5b4fcec6f", prepared: Prepared { version: 1, request_digest: "sha256:688e02f66d1ab92bd505022875d27d9bc516ad3716388f9d963eef90b12fae1e", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_86e12d2770211be9c319070ba613ca0f/candidates/candidate_c180ab684ba36ecfbc0931e4f5f9eaa6/generation/1/data", data_inode: 427, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 6 }), publication_revoked: true, output: Some(ExecutionOutput { execution_id: "exec_da84c0f0435c546b60e23dac5cdf3416", manifest_digest: "sha256:593aa65eb23f0347c54b2df448765df227b5035abf450447ec188dfdf92fca12", state: Verified, observed_outcome: Succeeded, stdout: StreamMetadata { sha256: "sha256:a4c3ed04a95a3da14a9d235c83d868bed7c0f45cf7f3faa751ee8f50598d2211", retained_bytes: 4, observed_bytes: 4, truncated: false, eof: true }, stderr: StreamMetadata { sha256: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", retained_bytes: 0, observed_bytes: 0, truncated: false, eof: true }, verified_at_ms: Some(1791641675438) }), output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_da84c0f0435c546b60e23dac5cdf3416", lifetime: Background, renewable: true, computer_id: "res_7c019e615270ba8e16f6ed6023ba0e8a", generation: 1, candidate_id: "candidate_c180ab684ba36ecfbc0931e4f5f9eaa6", sandbox_id: "res_1916590f633ab1bec5abc6fb9b23b4e7", sandbox_revision: 1, lease_id: "lease_27259fa198634ef22be6eb0fbd555239", epoch: 1, revision: 3, state: Succeeded, reason: "completed", input_digest: "sha256:f33f90b965ae80111f6e2e79f4964ed70fa2320e8bf7cbe284b787a29011f0ce", binding_digest: "sha256:f594ded06eb050b6cf7e9e530bb5b482f48d59f33ace193e908dbc035c52346d", created_at_ms: 1791641632122, queue_deadline_at_ms: 1791641662095, dispatch_started: true }, interrupted_at: None, cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: Some(StartupObservation { pod_uid: "828c7991-4266-45ce-974d-05f0ed2be1b3", report_bytes: 790, stderr_bytes: 0 }) })
+renewal fixture renew-cancel: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_14d7473588eeefc7f7dfbf4c280b0f53", seal_digest: "sha256:db9247bd0b37421caec7c1f215a92f7eb45025b68b88985fd62a1a0d71825e5e", output_manifest_digest: None, accepted_state: Cancelled, completed_at_ms: 1791641690339 }), io_fence: Some(Evidence { version: 1, instance: "638abe8df32340f37ce1d00b50eb934cd80d71bf905de22505bee4e75c754a67", prepared: Prepared { version: 1, request_digest: "sha256:b5ced70c821eac7dfec4e2d9603999cd255c2892588082b3c65e127ebd760fe0", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_7a336ad255ade220400aabbe8c7bf4de/candidates/candidate_f29781ff2e1a22602c96e0213104d047/generation/1/data", data_inode: 436, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: None, output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_14d7473588eeefc7f7dfbf4c280b0f53", lifetime: Background, renewable: true, computer_id: "res_d7469ac6667352e13bc840adee36639a", generation: 1, candidate_id: "candidate_f29781ff2e1a22602c96e0213104d047", sandbox_id: "res_b684bd53754a37e158fe060c806e2c2d", sandbox_revision: 1, lease_id: "lease_a3e201ed182fa04a28e3d9fe3c3be8a5", epoch: 1, revision: 4, state: Cancelled, reason: "completed_cancelled", input_digest: "sha256:712134008110c2879b81b2285c0b17bf2d7f1f98ddaf37d1cb9fa0d0405b88ff", binding_digest: "sha256:6ecaa304e4f7f4cad882f121150a11bb4e82af026bbc269d3c05a327215e0103", created_at_ms: 1791641678597, queue_deadline_at_ms: 1791641708542, dispatch_started: true }, interrupted_at: Some(Run), cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: None })
+renewal fixture renew-revoked: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_e5d0b9f84f8ea5dbb821d21d04136a5d", seal_digest: "sha256:c93f7126641760d6f1ec6661da01a467f18b5187dd4d8281c674e747c6527eec", output_manifest_digest: None, accepted_state: Unknown, completed_at_ms: 1791641704593 }), io_fence: Some(Evidence { version: 1, instance: "ab9d870a3b1ac7cc70780b39103f7fdc412a8c921b758da7347e3cf67a4db75c", prepared: Prepared { version: 1, request_digest: "sha256:ae5bf962ade705a92dc52ab5448677ef3754cf8f25a0ee59ad519f15f341e572", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_4f6f9ee6155c4fb61e637c27fd7f312b/candidates/candidate_c15eb265a533cb57053a17815b897031/generation/1/data", data_inode: 444, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: None, output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_e5d0b9f84f8ea5dbb821d21d04136a5d", lifetime: Background, renewable: true, computer_id: "res_cf0c7fb8ccf1058432f998895dac4e02", generation: 1, candidate_id: "candidate_c15eb265a533cb57053a17815b897031", sandbox_id: "res_5c833ccc29b80147162972eb9d486584", sandbox_revision: 1, lease_id: "lease_025464caebd388f071e04b5fb452d11a", epoch: 1, revision: 3, state: Unknown, reason: "writer_unavailable", input_digest: "sha256:b22d5c9cfb9ca771584a02a365693e2ba963acde22ec00349b7e5d1c67fb243b", binding_digest: "sha256:4747d35a043db8f4dabad4f14dfe520028346c08f6e5d22e2c23643c3b1dc6a3", created_at_ms: 1791641692818, queue_deadline_at_ms: 1791641722797, dispatch_started: true }, interrupted_at: Some(Run), cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: None })
+renewal fixture renew-db-failure: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_c1f6c8244f204a28489a34581343724a", seal_digest: "sha256:9a3837dbced92d42579fa3391b9413c39c5d5441685162b96f0a874fba98ede2", output_manifest_digest: None, accepted_state: Unknown, completed_at_ms: 1791641792658 }), io_fence: Some(Evidence { version: 1, instance: "0f1a4a6de55c0b83a078eab118e4937d54193936ce5599c93960173690000a39", prepared: Prepared { version: 1, request_digest: "sha256:5df597f1c326eff5cab4fa4b552281342774b5bb416f9797c81049b0e2eecbf9", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_53c15bc96259c0b884dfa5a39c9484e1/candidates/candidate_3d1aba87549cb026d1f2e6f2826f5323/generation/1/data", data_inode: 460, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: None, output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_c1f6c8244f204a28489a34581343724a", lifetime: Background, renewable: true, computer_id: "res_b81844bc591d721124a7c5d4aad39407", generation: 1, candidate_id: "candidate_3d1aba87549cb026d1f2e6f2826f5323", sandbox_id: "res_4875b419e5432ce851c5e0a55ebfde95", sandbox_revision: 1, lease_id: "lease_d04b1cc6bd047863084061d31f1f8c68", epoch: 1, revision: 3, state: Unknown, reason: "completion_unconfirmed", input_digest: "sha256:f763ce25347394fca00b37f57996eb17c7362de933e25c989b79867f52b003ad", binding_digest: "sha256:0fb4cb45f0701cf83a2440339365b93facf16e63f8be4b40d83a92d7d049b371", created_at_ms: 1791641771126, queue_deadline_at_ms: 1791641801102, dispatch_started: true }, interrupted_at: Some(RenewalAuthorize), cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: None })
+renewal fixture renew-ack-failure: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_1d8976e56337937ad2ff361b9ed39637", seal_digest: "sha256:b4398e73f57cf68d72b2ab5b2ee3c5bd1b9273c5b039f373b7389d88578c79f2", output_manifest_digest: None, accepted_state: Unknown, completed_at_ms: 1791641816697 }), io_fence: Some(Evidence { version: 1, instance: "f0a0645fa79ebfb7297aeb5c7045e6fafb677acdc76566454907da7868cea6ce", prepared: Prepared { version: 1, request_digest: "sha256:c5aa25c8ae3fbb4afd5e30c1608a59d38f8e58e724d317b2b905aeb699a5ac94", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_801ce9c98f4e4a26f1ad92e8b1976ff9/candidates/candidate_b2dc1359ebb6d48685fa6ee635d25c7e/generation/1/data", data_inode: 468, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: None, output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_1d8976e56337937ad2ff361b9ed39637", lifetime: Background, renewable: true, computer_id: "res_86d288df1d69bedf45ff312a1d2a25a6", generation: 1, candidate_id: "candidate_b2dc1359ebb6d48685fa6ee635d25c7e", sandbox_id: "res_096869d53d0d7c7aec3b4a7f3f9a70d4", sandbox_revision: 1, lease_id: "lease_0fae7706cb2103d3419459b6146a2c20", epoch: 1, revision: 3, state: Unknown, reason: "completion_unconfirmed", input_digest: "sha256:2ca460c9fa0a0358a099e5c46e3f1127a2ff10389b070d0f8e0e41f701e09d14", binding_digest: "sha256:4d559f2959d0e8fa512dee77906ec294792a1a8d8212077442a9e24a0f171c05", created_at_ms: 1791641795085, queue_deadline_at_ms: 1791641825056, dispatch_started: true }, interrupted_at: Some(RenewalAcknowledge), cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: None })
+renewal fixture renew-hard: Ok(WorkResult { completion: Some(ExecutionCompletion { execution_id: "exec_539e8e441314027c7218b064d007ca53", seal_digest: "sha256:9846ef1a6fcc8ce65d09d87ebdd559e0ab09d627c80e6ad00000091916ebb964", output_manifest_digest: Some("sha256:d3e128127b342a6bd3283a763666c83598db73b188007264a9d38ca77ea770ed"), accepted_state: Unknown, completed_at_ms: 1791641852298 }), io_fence: Some(Evidence { version: 1, instance: "aa399f0bd94993fa3f485ef3b463a6457612e4aed0d484f9a0423e86f26efd3c", prepared: Prepared { version: 1, request_digest: "sha256:2b70da1d53596165d1696158cc83fa7a4b0a2ac15063eb9b91e01114d92900e5", filesystem_uuid: "7f41008c-eaae-446d-b271-8daba0539820", volume_uid: "f1d063f4-e20a-4b47-abca-0dd539b40f33", path_ref: "organization/execution_probe_1791641403967326303/workspace/res_c03fced5f6d3ef210973c74a20c8a473/candidates/candidate_6823d19771214ff405899fce256017c1/generation/1/data", data_inode: 476, manifest_digest: "sha256:ab937bf40b8cf506d07ed6b7138e04c69e9a3cd55da20d0a2a48f78463a7d56f", quota_bytes: 10737418240 }, accepted_mutating_requests: 3 }), publication_revoked: true, output: Some(ExecutionOutput { execution_id: "exec_539e8e441314027c7218b064d007ca53", manifest_digest: "sha256:d3e128127b342a6bd3283a763666c83598db73b188007264a9d38ca77ea770ed", state: Verified, observed_outcome: LeaseExpired, stdout: StreamMetadata { sha256: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", retained_bytes: 0, observed_bytes: 0, truncated: false, eof: true }, stderr: StreamMetadata { sha256: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", retained_bytes: 0, observed_bytes: 0, truncated: false, eof: true }, verified_at_ms: Some(1791641852284) }), output_unconfirmed: false, execution: ExecutionRequest { execution_id: "exec_539e8e441314027c7218b064d007ca53", lifetime: Background, renewable: true, computer_id: "res_8a69ad4b9555285492c670553cf1781d", generation: 1, candidate_id: "candidate_6823d19771214ff405899fce256017c1", sandbox_id: "res_7c9893652325e21b783017e1b59a3ec1", sandbox_revision: 1, lease_id: "lease_55ea85f6031c097c944418791c4356dd", epoch: 1, revision: 3, state: Unknown, reason: "completion_unconfirmed", input_digest: "sha256:4fecb6e90f8459553a815f9f6d3c642a47460d8893c16fd33344612b2604a041", binding_digest: "sha256:055859c3b9788e80efd588db033f93eae86dd555f409b7425647e6889cbef950", created_at_ms: 1791641819122, queue_deadline_at_ms: 1791641849098, dispatch_started: true }, interrupted_at: None, cleanup: DeleteRequested, node_error: None, watchdog_journals: None, observation: Some(StartupObservation { pod_uid: "5335aa78-9519-452d-85b7-0bbdf4f0f555", report_bytes: 780, stderr_bytes: 0 }) })
+EXECUTION_WORKER_DATABASE_CSI_GVISOR_PASSED
+test real_candidate_execution_uses_durable_grants_and_observation_only_recovery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 448.61s
+
+
+INDEPENDENT HISTORY COLLECTION
+
+For enterprise users, please visit https://seaweedfs.com for the SeaweedFS Enterprise Edition,
+which has advanced features, including data recovery, self-healing storage, customizable erasure coding, EC vacuum and repair, etc.
+{"database_counts": {"execution_requests": 25, "execution_dispatch_intents": 25, "execution_pod_plans": 24, "execution_pod_observations": 24, "execution_watchdog_arms": 22, "execution_startup_grants": 22, "candidate_writer_leases": 24, "candidate_writer_drains": 20, "candidate_writer_completions": 1, "execution_output_intents": 12, "execution_outputs": 12, "execution_completions": 19}, "independent_s3_references": 48, "reaper_service": "active"}
+{"registrations": 23, "independent_s3_refs": 48, "fresh_candidate_reads": 10, "rpc_checks": {"cleanup_idempotent": true, "driver": "csi.agent-computer.io", "foreign_mount_retained": true, "foreign_target_denied": true, "instance": "7e0685b0f97b2e1e40beae2157c6b44d09882b88860a8eae763c798f9ca39178", "non_root_denied": true, "replacement_pod_denied": true, "revoked_republish_denied": true, "unregistered_instance_denied": true}}
+{"independent_execution_checkpoint": {"implementation": "Separate SQL queries, signed S3 GETs and a fresh readonly JuiceFS client with cache-size 0", "objects": [{"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_eb7bf0a99a524166047efe27807b6b40/c3a8d02ee80c68442f46f8582d49c64f3e4daa42f6784c4a4eaf59b69d828a8a", "bytes": 2852, "sha256": "sha256:c3a8d02ee80c68442f46f8582d49c64f3e4daa42f6784c4a4eaf59b69d828a8a"}, {"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_eb7bf0a99a524166047efe27807b6b40/255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664", "bytes": 9, "sha256": "sha256:255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664"}, {"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_eb7bf0a99a524166047efe27807b6b40/96879611650f80a81392a52e0db9b0237669087c4518e1c130e541a505e0eeef", "bytes": 6, "sha256": "sha256:96879611650f80a81392a52e0db9b0237669087c4518e1c130e541a505e0eeef"}, {"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_eb7bf0a99a524166047efe27807b6b40/b1d9428705c364fb7c3ed7b0e0888809139804a3ce5811122632c9f83c614fd1", "bytes": 11, "sha256": "sha256:b1d9428705c364fb7c3ed7b0e0888809139804a3ce5811122632c9f83c614fd1"}, {"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_eb7bf0a99a524166047efe27807b6b40/a35178ecc6460905972723565d23d62ff38f8d206c2b399c25d06853e17d30fe", "bytes": 10, "sha256": "sha256:a35178ecc6460905972723565d23d62ff38f8d206c2b399c25d06853e17d30fe"}], "references_verified": 5, "files_verified": 4, "restored_reads": [{"path": "output.txt", "bytes": 9, "sha256": "255703f871486907cb7a6c85388489e0e2f3ba54d8714960e2e3e1c8f333d664", "independent_inode": true}, {"path": "queue-started.txt", "bytes": 6, "sha256": "96879611650f80a81392a52e0db9b0237669087c4518e1c130e541a505e0eeef", "independent_inode": true}, {"path": "after-execution.txt", "bytes": 11, "sha256": "b1d9428705c364fb7c3ed7b0e0888809139804a3ce5811122632c9f83c614fd1", "independent_inode": true}, {"path": "queue-concurrent.txt", "bytes": 10, "sha256": "a35178ecc6460905972723565d23d62ff38f8d206c2b399c25d06853e17d30fe", "independent_inode": true}], "stop_receipt_matches": true}}
+{"independent_cancelled_checkpoint": {"implementation": "Separate SQL queries, signed S3 GETs and a fresh readonly JuiceFS client with cache-size 0", "objects": [{"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_bb6efd49533c05749403318fa702cf0f/61688bd1adbcd325e2b1a468459889b5f39a4e8ded65fa8e7359457263267158", "bytes": 1292, "sha256": "sha256:61688bd1adbcd325e2b1a468459889b5f39a4e8ded65fa8e7359457263267158"}, {"key": "artifacts/v1/execution_probe_1791641403967326303/artifact_bb6efd49533c05749403318fa702cf0f/03494afd4248c42f5fa1237bf2eeebe751ab8d9c977d55405fcb17469dbd91f8", "bytes": 7, "sha256": "sha256:03494afd4248c42f5fa1237bf2eeebe751ab8d9c977d55405fcb17469dbd91f8"}], "references_verified": 2, "files_verified": 1, "restored_reads": [{"path": "started.txt", "bytes": 7, "sha256": "03494afd4248c42f5fa1237bf2eeebe751ab8d9c977d55405fcb17469dbd91f8", "independent_inode": true}], "stop_receipt_matches": true}}
+{"background_cases_verified": 3, "phases": ["before_cancel", "before_dispatch", "after_startup"]}
+{"renewal_histories_verified": 8, "authorization_rows": 13, "acknowledgment_rows": 12}

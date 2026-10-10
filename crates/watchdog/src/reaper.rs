@@ -81,6 +81,7 @@ impl Reaper {
             entries: Vec::new(),
         };
         for _ in 0..128 {
+            self.poll_admission()?;
             let Some(entry) = self.entries.next() else {
                 self.entries.rewind();
                 batch.pass_complete = true;
@@ -120,13 +121,14 @@ fn expire(spool: &Path, id: &str) -> Result<Outcome> {
         return Ok(Outcome::Unenrolled);
     };
     let request = journal.request();
+    // Missing, corrupt or unreadable renewal evidence never grants additional
+    // time. The immutable initial request still permits conservative expiry.
+    let renewal = journal.latest_renewal().unwrap_or(None);
+    let deadline = renewal.as_ref().map_or(request.deadline_boottime_ms, |r| {
+        r.command.deadline_boottime_ms
+    });
     let boot = cgroup::read_small("/proc/sys/kernel/random/boot_id")?;
-    if let Some(outcome) = eligible(
-        request.deadline_boottime_ms,
-        &request.boot_id,
-        boot.trim_end(),
-        boottime_ms(),
-    ) {
+    if let Some(outcome) = eligible(deadline, &request.boot_id, boot.trim_end(), boottime_ms()) {
         return Ok(outcome);
     }
     if journal.recovery()?.is_some()
@@ -162,6 +164,7 @@ fn expire(spool: &Path, id: &str) -> Result<Outcome> {
         observation: Observation::EmptyObserved,
         error: None,
         journal: Some(journal.reference().clone()),
+        renewal,
     };
     journal.complete_recovery(&report)?;
     Ok(Outcome::Recovered)
