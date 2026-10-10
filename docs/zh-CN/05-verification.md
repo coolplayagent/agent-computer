@@ -73,3 +73,5 @@
 最新[可续期执行增量](49-renewable-execution-leases.md)通过 451 项 Cargo 测试、15 个 Bazel 目标、fmt/Clippy、25 个真实执行场景、八个节点续约故障场景及 Candidate/CSI 回归。[固定源码记录](../evidence/renewable-execution-leases-2026-10-10.json)保留独立 SQL/S3/只读文件系统核验、早期夹具失败、精确二进制、最终仅注释差异及本次 VM 清理记录。以上早期测试数属于历史记录；T01–T43 仍未完成。
 
 最新[持久化输出流增量](50-durable-execution-output.md)通过 471 项 Cargo 测试、15 个 Bazel 目标、fmt/Clippy、32 个真实执行场景、7 个聚焦流式场景、8 类节点续租故障以及 Candidate/CSI 回归。独立读取核对了 271 个输出块对象、60 个最终输出对象和 13 个冷读取 Candidate 输出文件。[源码绑定记录](../evidence/durable-execution-output-stream-2026-10-10.json)保留洪泛失败尝试、EOF/续租回归、进程退出后的报告接收诊断、准确二进制和 VM 清理证明。T01–T43 仍为 `not_run`。
+
+[认证执行 CLI](52-authenticated-execution-cli.md)新增八项线路契约测试和一项真实 CLI/TCP/Axum/PostgreSQL 测试。最终 Bazel 快照的 17 个目标共通过 487 项 Rust 测试，四项已有特权运行测试按默认配置忽略。准备回执为合成数据且派发意图为零，仅证明客户端与控制面行为，见[源码绑定记录](../evidence/authenticated-execution-cli-2026-10-11.json)。

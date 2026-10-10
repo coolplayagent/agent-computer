@@ -14,7 +14,7 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 
 执行链路已连接单次数据库派发、Candidate Pod 创建和 CSI 身份复核、启动挑战与有界 gVisor attach。[31 节点布防后的启动](docs/zh-CN/31-node-guarded-startup.md)新增本地 Pod/运行时/cgroup/Candidate 身份绑定，要求独立节点 watchdog 布防并持久登记后才能发出启动授权。[40 可撤销 Candidate 文件系统](docs/zh-CN/40-candidate-io-fence.md)新增可封存的 FUSE 修改入口与挂载内 I/O 排空屏障；[41 执行 CSI 集成](docs/zh-CN/41-fenced-execution-csi.md)已把它接入实际 Pod，并绑定节点身份、首次 Pod UID 和不可逆发布撤销。[42 执行完成](docs/zh-CN/42-accepted-execution-completion.md)把活的进程与 I/O 封闭证明、持久输出及原子写租约释放接入可信 worker；缺少证明或控制器丢失时仍保留 Unknown/Draining，跨节点 fencing 和自动排空恢复尚未交付。[43 执行输出下载](docs/zh-CN/43-execution-output-downloads.md)新增经过当前授权和对象完整性复核的 stdout/stderr HTTP 下载。[44 常驻执行队列 worker](docs/zh-CN/44-queued-execution-worker.md)新增精确组织与存储身份的原子领取、有界并发和停止后等待已领取任务完成；重启不会重放已派发请求。[45 常驻 Candidate 准备 worker](docs/zh-CN/45-continuous-candidate-preparation.md)自动处理已准入启动与原目录观察恢复，轮换失败请求并在停止后等待已调度操作。[46 持久检查点停止](docs/zh-CN/46-checkpoint-stop-worker.md)将封存、后台 Artifact 发布和停止回执串成一个持久操作，发布与停止原子提交；活跃使用和未确认写入仍阻止停止。[47 显式执行取消](docs/zh-CN/47-checkpoint-stop-drain.md)允许检查点停止先进入 Draining 并取消执行，只有原有进程与 IO 排空证明齐备后才捕获文件；Unknown 保持阻塞。[48 有界后台执行](docs/zh-CN/48-background-execution.md)使已提交任务在逻辑连接关闭后继续执行，仍受原身份与执行预算约束。[49 可续期执行租约](docs/zh-CN/49-renewable-execution-leases.md)允许原 worker 在不可变硬上限内续约 30 秒窗口，要求双 watchdog、reaper、监督器与数据库共同确认。[50 持久执行输出分块](docs/zh-CN/50-durable-execution-output.md)新增运行期有界发布、已验证连续游标和断连后鉴权续读，分块恢复不重新执行命令。[51 持久排空恢复](docs/zh-CN/51-durable-drain-recovery.md)在原节点封闭完成后保留私有回执，控制器丢失后可自动补交；封闭前崩溃仍未确认，Unknown 不改判成功。
 
-当前源码通过 479 项默认 Rust 测试及 15 个 Bazel 测试目标，另有固定源码的 K3s/gVisor、JuiceFS/PostgreSQL/S3 组件证据。宿主子进程回收修复后的七个节点布防启动场景已完成 VM 复验，证据已回读并清理临时 VM。组件通过不表示完整 Computer 可用：纯文件 Artifact/checkpoint、S3 恢复、同 Workspace 并行 Candidate 与分支继续编辑已交付；浏览器、ComputerView、完整 App checkpoint、Presentation、部署运维及生态适配仍待实现，公开执行能力仍不支持，T01–T43 保持 `not_run`。构建方法与完整进度见[编号中英文文档](docs/README.md)。以下仍为首版目标，CodeSpec 中未交付的 API、命令和声明属于待实现契约。
+当前源码通过 Bazel 执行的 487 项 Rust 测试及 17 个测试目标，另有固定源码的 K3s/gVisor、JuiceFS/PostgreSQL/S3 组件证据。宿主子进程回收修复后的七个节点布防启动场景已完成 VM 复验，证据已回读并清理临时 VM。组件通过不表示完整 Computer 可用：纯文件 Artifact/checkpoint、S3 恢复、同 Workspace 并行 Candidate 与分支继续编辑已交付；浏览器、ComputerView、完整 App checkpoint、Presentation、部署运维及生态适配仍待实现，公开执行能力仍不支持，T01–T43 保持 `not_run`。构建方法与完整进度见[编号中英文文档](docs/README.md)。以下仍为首版目标，CodeSpec 中未交付的 API、命令和声明属于待实现契约。
 
 - 开发者与平台团队负责集成部署；人和 Agent 都是直接使用者。私有多机 Linux，本地采用同构单节点环境。
 - 认证后的稳定连接链接与嵌入视图提供同等能力；日常 ComputerView 与运维管理界面分开。
@@ -26,6 +26,8 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 - 私人/共享会话显式绑定环境；动作许可、交接事实、证据导出和资源准入共同支撑长任务与团队产品。
 - coolplayagent 各 CLI 独立发布，通过适配器组合。
 - 提供独立电脑、Agent 团队、持久流程、开发/资料处理及知识接续的组合方案；配置、适配契约和端到端示例见生态集成 E08–E10，均待实现。
+
+已提供[认证执行命令行](docs/zh-CN/52-authenticated-execution-cli.md)：连接、修改租约、结构化提交、查询/取消及校验后的输出下载，经现有 HTTP API 鉴权，支持外部 Agent 和终端调用。
 
 ## 文档入口
 

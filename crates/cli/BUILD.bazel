@@ -20,3 +20,28 @@ rust_test(
     edition = "2024",
     deps = all_crate_deps(normal = True),
 )
+
+rust_test(
+    name = "remote_contracts_test",
+    size = "small",
+    srcs = ["tests/remote_contracts.rs"],
+    data = [":agent-computer"],
+    rustc_env = {"AGENT_COMPUTER_BIN": "$(rootpath :agent-computer)"},
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    deps = all_crate_deps(normal = True),
+)
+
+rust_test(
+    name = "remote_service_test",
+    size = "large",
+    srcs = ["tests/remote_service.rs", "tests/support/runtime.rs"],
+    crate_root = "tests/remote_service.rs",
+    data = [":agent-computer"],
+    rustc_env = {"AGENT_COMPUTER_BIN": "$(rootpath :agent-computer)"},
+    edition = "2024",
+    rustc_flags = ["-Dwarnings"],
+    tags = ["requires-postgresql"],
+    deps = ["//crates/core", "//crates/definitions", "//crates/server", "//crates/store", "//crates/test-support"] + all_crate_deps(normal = True, normal_dev = True),
+    proc_macro_deps = all_crate_deps(proc_macro = True, proc_macro_dev = True),
+)

@@ -32,7 +32,7 @@ The PostgreSQL integration suite requires locally installed server/client binari
 
 Bazelisk reads `.bazelversion`; Rustup reads `rust-toolchain.toml`. Use an organization-provided HTTPS proxy or verified mirror if downloads are restricted. Do not change pinned versions to conceal a download failure.
 
-CLI JSON is written to stdout and diagnostics to stderr. Unsupported commands or arguments exit with code 2. Runtime features are not delivered yet; a successful version query is not a service health check.
+Remote CLI results are written to stdout and diagnostics to stderr. Unsupported commands or arguments exit with code 2. A successful local version query is not a service health check; remote commands use the separately configured service and workers.
 
 ## 02.3 Development conventions
 
@@ -43,3 +43,5 @@ Rule configuration follows the [official rules_rust documentation](https://bazel
 The constrained Kubernetes library and explicit live component target are documented in [12 Kubernetes adapter](12-kubernetes-adapter.md).
 
 The one-claim JuiceFS worker and explicit PostgreSQL/CSI target are documented in [13 Volume provisioning](13-volume-provisioning.md).
+
+The authenticated [execution CLI](52-authenticated-execution-cli.md) supports the existing Computer, connection, writer and execution APIs, with explicit request JSON/idempotency keys and verified output downloads. External workflow/ecosystem adapters remain pending.

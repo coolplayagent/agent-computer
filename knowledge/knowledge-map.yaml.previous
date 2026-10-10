@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 72
-updated_at: unix:1791644898
+map_version: 73
+updated_at: unix:1791657680
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -130,6 +130,7 @@ topics:
   - accepted-execution-completion
   - background-execution
   - candidate-io-fence
+  - durable-drain-recovery
   - durable-execution-output
   - durable-execution-outputs
   - execution-output-downloads
@@ -140,8 +141,8 @@ topics:
   - redundant-node-watchdogs
   - renewable-execution-leases
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-41ac33b7ab256eed59029d5d2737ec02be96bc21eea9bdabfbe518670b0630f0.yaml
-  digest: 41ac33b7ab256eed59029d5d2737ec02be96bc21eea9bdabfbe518670b0630f0
+  ref: topics/topic-a402c4336ebfd782-a7b5d0e6d7cf25170ca9a07c0a20c529f32b9808ea003f6496568d33130faaf6.yaml
+  digest: a7b5d0e6d7cf25170ca9a07c0a20c529f32b9808ea003f6496568d33130faaf6
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -174,12 +175,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 56
+  omitted_through: 57
   recent:
-  - version: 57
-    action: source.add
-    actor: cli
-    summary: Added source 'reaper-startup-admission' to topic 'execution'.
   - version: 58
     action: source.add
     actor: cli
@@ -240,3 +237,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'durable-execution-output' to topic 'execution'.
+  - version: 73
+    action: source.add
+    actor: cli
+    summary: Added source 'durable-drain-recovery' to topic 'execution'.

@@ -3,6 +3,7 @@
 use agent_computer_core::{API_VERSION, VERSION};
 use std::process::ExitCode;
 
+mod remote;
 mod validate;
 
 fn main() -> ExitCode {
@@ -11,7 +12,8 @@ fn main() -> ExitCode {
     match words.as_slice() {
         [] | ["help" | "--help" | "-h"] => {
             println!(
-                "agent-computer {VERSION}\n\nUsage: agent-computer <command> [--json]\n\nCommands:\n  version                Build and API version\n  capabilities           Implemented capability status\n  validate <file|->      Static ComputerSet validation (YAML or JSON)\n  schema computer-set    Export the structural JSON Schema\n\nValidation: [--format yaml|json] [--json]\nNo running Computer service is included yet."
+                "agent-computer {VERSION}\n\nUsage: agent-computer <command> [--json]\n\nCommands:\n  version                Build and API version\n  capabilities           Client capability status\n  validate <file|->       Static ComputerSet validation (YAML or JSON)\n  schema computer-set    Export the structural JSON Schema\n\n{}\nValidation: [--format yaml|json] [--json]",
+                remote::HELP
             );
         }
         ["version" | "--version" | "-V"] => println!("agent-computer {VERSION}"),
@@ -20,15 +22,20 @@ fn main() -> ExitCode {
         }
         ["capabilities", "--json"] => {
             println!(
-                "{{\"api_version\":\"{API_VERSION}\",\"stage\":\"development\",\"capabilities\":{{\"definitions.validate\":\"static\",\"definitions.schema\":\"supported\",\"definitions.plan\":\"unsupported\",\"definitions.apply\":\"unsupported\",\"computer\":\"unsupported\",\"browser\":\"unsupported\",\"execution\":\"unsupported\",\"artifacts\":\"unsupported\",\"presentation\":\"unsupported\",\"deployment\":\"unsupported\",\"mcp\":\"unsupported\",\"evaluation\":\"unsupported\"}}}}"
+                "{{\"api_version\":\"{API_VERSION}\",\"stage\":\"development\",\"capabilities\":{{\"definitions.validate\":\"static\",\"definitions.schema\":\"supported\",\"definitions.plan\":\"unsupported\",\"definitions.apply\":\"unsupported\",\"computer\":\"unsupported\",\"browser\":\"unsupported\",\"execution\":\"unsupported\",\"client.execution\":\"authenticated-http\",\"artifacts\":\"unsupported\",\"presentation\":\"unsupported\",\"deployment\":\"unsupported\",\"mcp\":\"unsupported\",\"evaluation\":\"unsupported\"}}}}"
             );
         }
         ["capabilities"] => {
             println!(
-                "Static ComputerSet validation and schema export are available. Plan/apply, Computer, browser, execution, artifacts, presentation, deployment, MCP and evaluation runtime capabilities are unsupported."
+                "Static ComputerSet validation, schema export and an authenticated HTTP execution client are available. Remote service capabilities are deployment-dependent; use doctor. Full Computer/browser runtime support remains incomplete."
             );
         }
         ["validate", rest @ ..] => return ExitCode::from(validate::run(rest)),
+        [
+            "computer" | "connect" | "disconnect" | "connection" | "lease" | "exec" | "status"
+            | "logs" | "cancel" | "doctor",
+            ..,
+        ] => return ExitCode::from(remote::run(&words)),
         ["schema", "computer-set"] | ["schema", "computer-set", "--json"] => {
             println!(
                 "{}",
