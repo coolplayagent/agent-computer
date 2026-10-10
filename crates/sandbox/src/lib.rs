@@ -5,6 +5,7 @@
 #![forbid(unsafe_code)]
 
 mod output;
+pub mod renewal;
 mod request;
 mod startup;
 mod supervisor;
@@ -24,6 +25,7 @@ pub enum Error {
     Setup,
     StartupExpired,
     StartupCancelled,
+    LeaseExpired,
 }
 
 impl std::fmt::Display for Error {

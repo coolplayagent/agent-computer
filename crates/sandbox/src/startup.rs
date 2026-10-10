@@ -1,5 +1,5 @@
 //! One-shot, credential-free startup over a trusted runtime attach channel.
-use crate::{Error, MAX_REQUEST_BYTES, Report, Request, Result, supervisor};
+use crate::{Error, MAX_REQUEST_BYTES, Report, Request, Result, renewal, supervisor};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
@@ -8,6 +8,7 @@ use std::{
 };
 
 pub const STARTUP_PROTOCOL: u32 = 1;
+pub const RENEWABLE_PROTOCOL: u32 = 2;
 pub const STARTUP_WAIT_MS: u32 = 30000;
 
 /// Immutable, operator-delivered bootstrap. Its lease budget is a ceiling only;
@@ -18,6 +19,9 @@ pub struct Bootstrap {
     pub version: u32,
     pub intent_digest: String,
     pub request: Request,
+    /// Version 2 only; an immutable ceiling, never authority to launch or renew.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hard_budget_ms: Option<u32>,
 }
 impl Bootstrap {
     pub fn parse(bytes: &[u8]) -> Result<Self> {
@@ -26,14 +30,26 @@ impl Bootstrap {
         Ok(value)
     }
     pub fn validate(&self) -> Result<()> {
-        if self.version != STARTUP_PROTOCOL || !valid_digest(&self.intent_digest) {
+        if !protocol_budget(
+            self.version,
+            self.request.lease_budget_ms,
+            self.hard_budget_ms,
+        ) || !valid_digest(&self.intent_digest)
+        {
             return Err(Error::InvalidRequest);
         }
         self.request.validate()
     }
     pub fn digest(&self) -> Result<String> {
         self.validate()?;
-        digest("agent-computer/sandbox-bootstrap-v1", self)
+        digest(
+            if self.version == STARTUP_PROTOCOL {
+                "agent-computer/sandbox-bootstrap-v1"
+            } else {
+                "agent-computer/sandbox-bootstrap-v2"
+            },
+            self,
+        )
     }
 }
 
@@ -56,7 +72,7 @@ impl StartupChallenge {
         Ok(value)
     }
     pub fn validate(&self) -> Result<()> {
-        if self.version != STARTUP_PROTOCOL
+        if !matches!(self.version, STARTUP_PROTOCOL | RENEWABLE_PROTOCOL)
             || self.execution_id.is_empty()
             || self.execution_id.len() > 128
             || !self
@@ -77,11 +93,19 @@ impl StartupChallenge {
     }
     pub fn digest(&self) -> Result<String> {
         self.validate()?;
-        digest("agent-computer/sandbox-challenge-v1", self)
+        digest(
+            if self.version == STARTUP_PROTOCOL {
+                "agent-computer/sandbox-challenge-v1"
+            } else {
+                "agent-computer/sandbox-challenge-v2"
+            },
+            self,
+        )
     }
     pub fn matches(&self, bootstrap: &Bootstrap) -> Result<bool> {
         self.validate()?;
-        Ok(self.execution_id == bootstrap.request.execution_id
+        Ok(self.version == bootstrap.version
+            && self.execution_id == bootstrap.request.execution_id
             && self.generation == bootstrap.request.generation
             && self.bootstrap_digest == bootstrap.digest()?)
     }
@@ -97,6 +121,9 @@ pub struct StartupGrant {
     pub version: u32,
     pub challenge_digest: String,
     pub lease_budget_ms: u32,
+    /// Fresh remaining hard ceiling, charged from the original challenge anchor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hard_budget_ms: Option<u32>,
 }
 impl StartupGrant {
     pub fn parse(bytes: &[u8]) -> Result<Self> {
@@ -105,7 +132,7 @@ impl StartupGrant {
         Ok(grant)
     }
     pub fn validate(&self) -> Result<()> {
-        if self.version != STARTUP_PROTOCOL
+        if !protocol_budget(self.version, self.lease_budget_ms, self.hard_budget_ms)
             || !valid_digest(&self.challenge_digest)
             || !(1..=STARTUP_WAIT_MS).contains(&self.lease_budget_ms)
         {
@@ -115,12 +142,22 @@ impl StartupGrant {
     }
     pub fn digest(&self) -> Result<String> {
         self.validate()?;
-        digest("agent-computer/sandbox-startup-grant-v1", self)
+        digest(
+            if self.version == STARTUP_PROTOCOL {
+                "agent-computer/sandbox-startup-grant-v1"
+            } else {
+                "agent-computer/sandbox-startup-grant-v2"
+            },
+            self,
+        )
     }
-    fn accept(&self, challenge: &StartupChallenge, bootstrap: &Bootstrap) -> Result<()> {
+    pub fn accept(&self, challenge: &StartupChallenge, bootstrap: &Bootstrap) -> Result<()> {
         self.validate()?;
-        if self.challenge_digest != challenge.digest()?
+        if !challenge.matches(bootstrap)?
+            || self.version != bootstrap.version
+            || self.challenge_digest != challenge.digest()?
             || self.lease_budget_ms > bootstrap.request.lease_budget_ms
+            || self.hard_budget_ms > bootstrap.hard_budget_ms
         {
             return Err(Error::InvalidRequest);
         }
@@ -135,6 +172,18 @@ pub struct StartupReport {
     pub challenge_digest: String,
     pub grant_digest: String,
     pub report: Report,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renewal: Option<renewal::Progress>,
+}
+
+fn protocol_budget(version: u32, initial: u32, hard: Option<u32>) -> bool {
+    match (version, hard) {
+        (STARTUP_PROTOCOL, None) => true,
+        (RENEWABLE_PROTOCOL, Some(hard)) => {
+            (initial..=renewal::MAX_EXECUTION_BUDGET_MS).contains(&hard)
+        }
+        _ => false,
+    }
 }
 
 fn bounded<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
@@ -143,14 +192,14 @@ fn bounded<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
     }
     serde_json::from_slice(bytes).map_err(|_| Error::InvalidRequest)
 }
-fn valid_digest(value: &str) -> bool {
+pub(crate) fn valid_digest(value: &str) -> bool {
     value.len() == 71
         && value.starts_with("sha256:")
         && value[7..]
             .bytes()
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
-fn digest<T: Serialize>(domain: &str, value: &T) -> Result<String> {
+pub(crate) fn digest<T: Serialize>(domain: &str, value: &T) -> Result<String> {
     let mut hash = Sha256::new();
     hash.update(domain);
     hash.update(b"\0");
@@ -168,7 +217,7 @@ pub struct StartupHello {
 impl StartupHello {
     pub fn for_bootstrap(bootstrap: &Bootstrap) -> Result<Self> {
         Ok(Self {
-            version: STARTUP_PROTOCOL,
+            version: bootstrap.version,
             bootstrap_digest: bootstrap.digest()?,
         })
     }
@@ -243,14 +292,14 @@ async fn serve(bootstrap: Bootstrap, attached: bool) -> Result<StartupReport> {
     let mut input = Input::new()?;
     if attached {
         let hello: StartupHello = bounded(&input.read(Instant::now()).await?)?;
-        if hello.version != STARTUP_PROTOCOL || hello.bootstrap_digest != bootstrap.digest()? {
+        if hello.version != bootstrap.version || hello.bootstrap_digest != bootstrap.digest()? {
             return Err(Error::InvalidRequest);
         }
     }
     let mut random = [0u8; 32];
     getrandom::fill(&mut random).map_err(|_| Error::Setup)?;
     let challenge = StartupChallenge {
-        version: STARTUP_PROTOCOL,
+        version: bootstrap.version,
         execution_id: bootstrap.request.execution_id.clone(),
         generation: bootstrap.request.generation,
         bootstrap_digest: bootstrap.digest()?,
@@ -275,12 +324,25 @@ async fn serve(bootstrap: Bootstrap, attached: bool) -> Result<StartupReport> {
     let grant_digest = grant.digest()?;
     let mut request = bootstrap.request;
     request.lease_budget_ms = grant.lease_budget_ms;
-    let report = supervisor::run_anchored(request, namespace, anchor).await?;
+    let mut control = grant
+        .hard_budget_ms
+        .map(|hard| {
+            renewal::Channel::new(renewal::Window::new(
+                grant_digest.clone(),
+                grant.lease_budget_ms,
+                hard,
+                anchor,
+            )?)
+        })
+        .transpose()?;
+    let report = supervisor::run_controlled(request, namespace, anchor, control.as_mut()).await?;
+    let renewal = control.as_ref().map(|c| c.window.progress().clone());
     Ok(StartupReport {
-        version: STARTUP_PROTOCOL,
+        version: bootstrap.version,
         challenge_digest,
         grant_digest,
         report,
+        renewal,
     })
 }
 
@@ -290,6 +352,7 @@ mod tests {
     fn bootstrap() -> Bootstrap {
         Bootstrap {
             version: 1,
+            hard_budget_ms: None,
             intent_digest: format!("sha256:{}", "a".repeat(64)),
             request: Request {
                 execution_id: "exec_1".into(),
@@ -315,6 +378,7 @@ mod tests {
         };
         let grant = StartupGrant {
             version: 1,
+            hard_budget_ms: None,
             challenge_digest: challenge.digest().unwrap(),
             lease_budget_ms: 300,
         };
@@ -348,12 +412,62 @@ mod tests {
         assert!(
             StartupGrant {
                 version: 1,
+                hard_budget_ms: None,
                 challenge_digest: format!("sha256:{}", "a".repeat(64)),
                 lease_budget_ms: 0
             }
             .validate()
             .is_err()
         );
+    }
+    #[test]
+    fn renewable_protocol_requires_both_version_and_bounded_hard_ceiling() {
+        let legacy = bootstrap();
+        let bytes = serde_json::to_vec(&legacy).unwrap();
+        assert!(
+            !String::from_utf8(bytes.clone())
+                .unwrap()
+                .contains("hard_budget")
+        );
+        assert_eq!(
+            Bootstrap::parse(&bytes).unwrap().digest().unwrap(),
+            legacy.digest().unwrap()
+        );
+        let mut b = legacy.clone();
+        b.hard_budget_ms = Some(90_000);
+        assert!(b.validate().is_err());
+        b.version = RENEWABLE_PROTOCOL;
+        b.validate().unwrap();
+        assert_ne!(b.digest().unwrap(), legacy.digest().unwrap());
+        let challenge = StartupChallenge {
+            version: RENEWABLE_PROTOCOL,
+            execution_id: b.request.execution_id.clone(),
+            generation: b.request.generation,
+            bootstrap_digest: b.digest().unwrap(),
+            nonce: "b".repeat(64),
+        };
+        let mut g = StartupGrant {
+            version: RENEWABLE_PROTOCOL,
+            challenge_digest: challenge.digest().unwrap(),
+            lease_budget_ms: 20_000,
+            hard_budget_ms: Some(80_000),
+        };
+        g.accept(&challenge, &b).unwrap();
+        for hard in [
+            None,
+            Some(19_999),
+            Some(90_001),
+            Some(renewal::MAX_EXECUTION_BUDGET_MS + 1),
+        ] {
+            g.hard_budget_ms = hard;
+            assert!(g.accept(&challenge, &b).is_err());
+        }
+        g.version = STARTUP_PROTOCOL;
+        g.hard_budget_ms = None;
+        assert!(g.accept(&challenge, &b).is_err());
+        let mut old_challenge = challenge;
+        old_challenge.version = STARTUP_PROTOCOL;
+        assert!(!old_challenge.matches(&b).unwrap());
     }
     #[tokio::test]
     async fn startup_refuses_the_host_without_emitting_a_challenge() {

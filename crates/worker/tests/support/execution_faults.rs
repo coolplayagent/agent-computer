@@ -55,6 +55,41 @@ pub async fn kill_controller(
         assert!(tokio::time::Instant::now() < limit, "fault marker deadline");
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
+    let renewed_deadline = if case == "renew-controller-kill" {
+        let pool = sqlx::PgPool::connect(
+            fs::read_to_string(field(config, "database_url_file"))
+                .unwrap()
+                .trim(),
+        )
+        .await
+        .unwrap();
+        let until = tokio::time::Instant::now() + Duration::from_secs(40);
+        loop {
+            let row:Option<(i32,Value)>=sqlx::query_as("SELECT sequence,evidence FROM execution_renewal_acks WHERE organization=$1 AND execution_id=$2 ORDER BY sequence DESC LIMIT 1")
+                .bind(org.as_str()).bind(execution).fetch_optional(&pool).await.unwrap();
+            if let Some((sequence, evidence)) = row
+                && sequence >= 3
+            {
+                break Some(
+                    evidence[0]["command"]["deadline_boottime_ms"]
+                        .as_u64()
+                        .unwrap(),
+                );
+            }
+            assert!(
+                controller.try_wait().unwrap().is_none(),
+                "controller exited before renewal: {}",
+                fs::read_to_string(&output_path).unwrap()
+            );
+            assert!(
+                tokio::time::Instant::now() < until,
+                "third renewal deadline"
+            );
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+    } else {
+        None
+    };
     let arm = store
         .candidate_execution_watchdog(org, execution)
         .await
@@ -113,9 +148,11 @@ pub async fn kill_controller(
     let exit = controller.wait().unwrap();
     use std::os::unix::process::ExitStatusExt;
     assert_eq!(exit.signal(), Some(9));
-    let deadline = arm.evidence["armed"]["request"]["deadline_boottime_ms"]
-        .as_u64()
-        .unwrap();
+    let deadline = renewed_deadline.unwrap_or_else(|| {
+        arm.evidence["armed"]["request"]["deadline_boottime_ms"]
+            .as_u64()
+            .unwrap()
+    });
     assert!(killed_at < deadline);
     // A disconnected FUSE connection denies new IO even on an old descriptor.
     // This is not a successful seal: in-flight backing IO remains unconfirmed.
@@ -178,7 +215,7 @@ pub async fn kill_controller(
         );
         tokio::time::sleep(Duration::from_millis(20)).await;
     };
-    json!({"controller_pid":controller_pid,"controller_signal":9,"controller_killed_boottime_ms":killed_at,"pid1_state":stopped,"heartbeat_before_kill":heartbeat_before_kill,"post_kill_old_fd_write_errno":write_error,"cgroup_inode":runtime["cgroup_inode"],"deadline_boottime_ms":deadline,"empty_observed_boottime_ms":empty_at,"api_delete_before_empty":false,"state":state})
+    json!({"renewed_deadline_boottime_ms":renewed_deadline,"controller_pid":controller_pid,"controller_signal":9,"controller_killed_boottime_ms":killed_at,"pid1_state":stopped,"heartbeat_before_kill":heartbeat_before_kill,"post_kill_old_fd_write_errno":write_error,"cgroup_inode":runtime["cgroup_inode"],"deadline_boottime_ms":deadline,"empty_observed_boottime_ms":empty_at,"api_delete_before_empty":false,"state":state})
 }
 
 fn read_events(file: &mut fs::File) -> String {

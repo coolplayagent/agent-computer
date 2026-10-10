@@ -81,6 +81,7 @@ async fn real_kubernetes_v5_startup_attach() {
             image,
             Bootstrap {
                 version: 1,
+                hard_budget_ms: None,
                 intent_digest: format!("sha256:{}", "a".repeat(64)),
                 request: Request {
                     execution_id,
@@ -118,7 +119,7 @@ async fn real_kubernetes_v5_startup_attach() {
                 }
             }
             let channel=client.attach_startup(&plan,&observed).await.map_err(|e|format!("attach: {e}"))?;
-            let grant=StartupGrant {version:1,challenge_digest:channel.challenge().digest().unwrap(),lease_budget_ms:budget};
+            let grant=StartupGrant {version:1, hard_budget_ms: None,challenge_digest:channel.challenge().digest().unwrap(),lease_budget_ms:budget};
             let observation=channel.run(&grant).await.map_err(|e|format!("run: {e}"))?;
             let report:Value=serde_json::from_slice(observation.report_bytes()).map_err(|e|e.to_string())?;
             Ok(json!({"case":case,"pod_name":plan.pod_plan().pod_name(),"pod_uid":observation.pod_uid(),"bootstrap":plan.bootstrap(),

@@ -53,7 +53,17 @@ impl ExecutionDispatchIntent {
             output_limit_bytes: command.output_limit_bytes,
         };
         let result = Bootstrap {
-            version: STARTUP_PROTOCOL,
+            version: if self.hard_deadline_at_ms.is_some() {
+                2
+            } else {
+                STARTUP_PROTOCOL
+            },
+            hard_budget_ms: self
+                .hard_deadline_at_ms
+                .map(|hard| {
+                    u32::try_from(hard - self.started_at_ms).map_err(|_| Error::InvalidStoredData)
+                })
+                .transpose()?,
             intent_digest: self.intent_digest.clone(),
             request,
         };
@@ -198,7 +208,14 @@ impl Store {
             return Err(Error::WriterLeaseInactive);
         }
         let grant = StartupGrant {
-            version: STARTUP_PROTOCOL,
+            version: dispatch.bootstrap()?.version,
+            hard_budget_ms: dispatch
+                .hard_deadline_at_ms
+                .map(|hard| {
+                    u32::try_from(hard - dispatch.deadline_at_ms + i64::from(budget))
+                        .map_err(|_| Error::InvalidStoredData)
+                })
+                .transpose()?,
             challenge_digest: challenge
                 .digest()
                 .map_err(|_| Error::InvalidRuntimeRequest)?,

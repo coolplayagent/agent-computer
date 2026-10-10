@@ -90,6 +90,10 @@ pub(super) async fn require_live(
         .await?
         .ok_or(Error::RuntimeAccessUnavailable)?;
     let now = transactions::now(tx).await?;
+    let renewal = super::renewal::latest_ack(tx, dispatch).await?;
+    let expires = renewal
+        .as_ref()
+        .map_or(arm.expires_at_ms, |a| a.grant.deadline_at_ms);
     let node_remaining = guard
         .remaining_budget_ms()
         .map_err(|_| Error::WriterLeaseInactive)?;
@@ -97,12 +101,13 @@ pub(super) async fn require_live(
         || guard.evidence().armed.request.execution_id != dispatch.execution.execution_id
         || serde_json::to_value(guard.evidence()).map_err(|_| Error::InvalidRuntimeRequest)?
             != arm.evidence
-        || now >= arm.expires_at_ms
+        || guard.renewal_evidence() != renewal.as_ref().map(|a| &a.evidence)
+        || now >= expires
     {
         return Err(Error::WriterLeaseInactive);
     }
     Ok(Some(node_remaining.min(
-        u32::try_from(arm.expires_at_ms - now).map_err(|_| Error::InvalidStoredData)?,
+        u32::try_from(expires - now).map_err(|_| Error::InvalidStoredData)?,
     )))
 }
 
@@ -127,6 +132,18 @@ impl Store {
             .await?
             .ok_or(Error::RuntimeAccessUnavailable)?;
         let runtime = &guard.evidence().runtime;
+        let node_request = &guard.evidence().armed.request;
+        match (dispatch.hard_deadline_at_ms, &node_request.renewal) {
+            (None, None) => {}
+            (Some(hard), Some(policy))
+                if node_request.version == 2
+                    && policy.authority_digest == dispatch.intent_digest
+                    && policy
+                        .hard_deadline_boottime_ms
+                        .checked_sub(node_request.deadline_boottime_ms)
+                        == u64::try_from(hard - dispatch.deadline_at_ms).ok() => {}
+            _ => return Err(Error::RuntimeConflict),
+        }
         let pod_binding: serde_json::Value = serde_json::from_str(
             plan.manifest["metadata"]["annotations"]["agent-computer.io/binding"]
                 .as_str()

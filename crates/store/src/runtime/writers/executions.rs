@@ -4,9 +4,9 @@ use super::*;
 use crate::plans::DefinitionKind;
 pub use dispatch::{
     ExecutionCompletion, ExecutionDispatchAttempt, ExecutionDispatchIntent, ExecutionOutput,
-    ExecutionOutputDownload, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRuntimeInputs,
-    ExecutionStartupAttempt, ExecutionStartupGrant, ExecutionWatchdogArm, OutputState,
-    OutputStream, QueuedDispatch,
+    ExecutionOutputDownload, ExecutionPodAttempt, ExecutionPodPlan, ExecutionRenewalAttempt,
+    ExecutionRenewalGrant, ExecutionRuntimeInputs, ExecutionStartupAttempt, ExecutionStartupGrant,
+    ExecutionWatchdogArm, OutputState, OutputStream, QueuedDispatch,
 };
 use serde::{Deserialize, Serialize};
 
@@ -56,6 +56,10 @@ pub struct SubmitExecution {
     pub sandbox_id: String,
     #[serde(default)]
     pub lifetime: ExecutionLifetime,
+    /// New admissions default to worker renewal. Omission remains absent from
+    /// canonical input bytes, so retries of historical fixed records still match.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renewable: Option<bool>,
     pub command: ExecutionCommand,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -81,6 +85,8 @@ pub struct ExecutionRequest {
     pub execution_id: String,
     #[serde(default = "historical_lifetime")]
     pub lifetime: ExecutionLifetime,
+    #[serde(default)]
+    pub renewable: bool,
     pub computer_id: String,
     pub generation: i64,
     pub candidate_id: String,
@@ -151,6 +157,7 @@ fn view(row: &PgRow) -> Result<ExecutionRequest> {
         lifetime: serde_json::from_value::<SubmitExecution>(row.try_get("input")?)
             .map_err(|_| Error::InvalidStoredData)?
             .lifetime,
+        renewable: binding.get("execution_lease").is_some(),
         computer_id: string("computer_id")?,
         generation: binding["generation"]
             .as_i64()
@@ -210,6 +217,16 @@ async fn reconcile(
     let epoch = row.try_get("epoch")?;
     let owner = authority::row(tx, org, &lease).await?;
     let now = transactions::now(tx).await?;
+    let effective_deadline = if state == "Queued" {
+        row.try_get("queue_deadline_at_ms")?
+    } else {
+        sqlx::query_scalar::<_, Option<i64>>("SELECT execution_effective_deadline($1,$2)")
+            .bind(org)
+            .bind(row.try_get::<String, _>("execution_id")?)
+            .fetch_one(&mut **tx)
+            .await?
+            .ok_or(Error::InvalidStoredData)?
+    };
     let authorized = if state == "CancelRequested" {
         authority::cancellation_active(tx, org, &owner).await?
     } else {
@@ -218,7 +235,7 @@ async fn reconcile(
     if owner.try_get::<i64, _>("epoch")? != epoch
         || !(owner.try_get::<String, _>("state")? == "Held"
             || (state == "CancelRequested" && owner.try_get::<String, _>("state")? == "Draining"))
-        || now >= row.try_get::<i64, _>("queue_deadline_at_ms")?
+        || now >= effective_deadline
         || now >= owner.try_get::<i64, _>("expires_at_ms")?
         || !authorized
     {
@@ -295,7 +312,16 @@ impl Store {
         {
             return Err(Error::ReferenceUnavailable);
         }
-        let binding = serde_json::json!({"computer_id":computer,"generation":input.lease.generation,"candidate_id":owner.try_get::<String,_>("candidate_id")?,"sandbox_id":input.sandbox_id,"sandbox_revision":sandbox.reference.revision,"sandbox":sandbox,"prepared":prepared,"storage_target":start.try_get::<serde_json::Value,_>("binding")?,"input_revision":start.try_get::<i64,_>("revision")?});
+        let mut binding = serde_json::json!({"computer_id":computer,"generation":input.lease.generation,"candidate_id":owner.try_get::<String,_>("candidate_id")?,"sandbox_id":input.sandbox_id,"sandbox_revision":sandbox.reference.revision,"sandbox":sandbox,"prepared":prepared,"storage_target":start.try_get::<serde_json::Value,_>("binding")?,"input_revision":start.try_get::<i64,_>("revision")?});
+        if input.renewable.unwrap_or(true) {
+            let max_budget_ms = (u64::from(input.command.timeout_seconds) * 1000 + 30_000)
+                .min(start.try_get::<i32, _>("max_runtime_seconds")? as u64 * 1000)
+                .min(u64::from(
+                    agent_computer_sandbox::renewal::MAX_EXECUTION_BUDGET_MS,
+                ));
+            binding["execution_lease"] =
+                serde_json::json!({"version":1,"max_budget_ms":max_budget_ms});
+        }
         let binding_hash = digest("agent-computer/execution-binding-v1", &binding)?;
         let id = random_id("exec")?;
         let now = transactions::now(&mut tx).await?;

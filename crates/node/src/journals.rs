@@ -17,13 +17,13 @@ pub enum JournalStatus {
     },
     Recorded {
         journal: Reference,
-        report: Report,
+        report: Box<Report>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        recovery: Option<Report>,
+        recovery: Option<Box<Report>>,
     },
     Recovered {
         journal: Reference,
-        report: Report,
+        report: Box<Report>,
     },
     Unavailable {
         error: Error,
@@ -83,13 +83,13 @@ pub fn observe_journals(spool: &Path, evidence: &Value) -> Result<JournalObserva
                 }
                 Ok(JournalStatus::Recorded {
                     journal: reference,
-                    report,
-                    recovery: snapshot.recovery,
+                    report: Box::new(report),
+                    recovery: snapshot.recovery.map(Box::new),
                 })
             } else if let Some(report) = snapshot.recovery {
                 Ok(JournalStatus::Recovered {
                     journal: reference,
-                    report,
+                    report: Box::new(report),
                 })
             } else {
                 Ok(JournalStatus::Unconfirmed { journal: reference })

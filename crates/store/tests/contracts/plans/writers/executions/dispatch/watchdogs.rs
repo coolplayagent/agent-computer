@@ -3,6 +3,7 @@ use super::*;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 mod outputs;
+mod renewal;
 
 async fn fixture() -> (
     Database,
@@ -36,9 +37,25 @@ async fn fixture_with_token(
     i64,
     String,
 ) {
+    fixture_with_policy(fenced, false).await
+}
+async fn fixture_with_policy(
+    fenced: bool,
+    renewable: bool,
+) -> (
+    Database,
+    ExecutionDispatchAttempt,
+    ExecutionPodPlan,
+    Value,
+    i64,
+    String,
+) {
     let (db, token, computer, acquire_input) = setup().await;
     let lease = acquire(&db, &token, &computer, &acquire_input).await;
-    let input = submission(&db, &lease).await;
+    let mut input = submission(&db, &lease).await;
+    if renewable {
+        input.renewable = None;
+    }
     let queued = submit(&db, &token, &computer, &input).await;
     let attempt = begin(&db, &queued).await;
     let mount = json!({"version":1,"instance":"c".repeat(64),"prepared":attempt.intent().binding["prepared"],"boot_id":"boot-one","inode":1});
@@ -79,10 +96,18 @@ async fn fixture_with_token(
             .unwrap();
     let mut evidence = json!({"runtime":{"identity":{"pod_uid":"pod-one","node":{"uid":"node-one","boot_id":"boot-one"},"container_id":"a".repeat(64)},"cgroup_inode":123,"cgroup_path":"fixture-only"},"armed":{"version":1,"event":"armed","request":{"execution_id":queued.execution_id,"boot_id":"boot-one","cgroup_inode":123,"cgroup_path":"fixture-only"}}});
     evidence["version"] = json!(2);
+    evidence["armed"]["request"]["version"] = json!(1);
     if fenced {
         evidence["runtime"]["workspace_mount"] = mount;
     }
     evidence["armed"]["request"]["deadline_boottime_ms"] = json!(30000);
+    if renewable {
+        evidence["armed"]["request"]["version"] = json!(2);
+        evidence["armed"]["request"]["renewal"] = json!({
+            "authority_digest":attempt.intent().intent_digest,
+            "hard_deadline_boottime_ms":30000 + attempt.intent().hard_deadline_at_ms.unwrap()-attempt.intent().deadline_at_ms,
+        });
+    }
     evidence["armed"]["cgroup_device"] = json!(42);
     evidence["armed"]["armed_boottime_ms"] = json!(1000);
     evidence["backup_armed"] = evidence["armed"].clone();
@@ -310,12 +335,15 @@ async fn migration_seventeen_preserves_single_guard_history_but_denies_new_grant
         .await
         .unwrap();
     let id = &attempt.intent().execution.execution_id;
-    let before = db
-        .store
-        .candidate_execution_watchdog(&org("acme"), id)
-        .await
-        .unwrap()
-        .unwrap();
+    // Inspect historical SQL bytes before upgrading; the current Store requires
+    // the current schema, including the new dispatch ceiling column.
+    let before: (String, Value) = sqlx::query_as(
+        "SELECT evidence_digest,evidence FROM execution_watchdog_arms WHERE execution_id=$1",
+    )
+    .bind(id)
+    .fetch_one(&db.pool)
+    .await
+    .unwrap();
     assert!(db.store.ready().await.is_err());
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
@@ -325,8 +353,8 @@ async fn migration_seventeen_preserves_single_guard_history_but_denies_new_grant
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(before.evidence_digest, after.evidence_digest);
-    assert_eq!(before.evidence, after.evidence);
+    assert_eq!(before.0, after.evidence_digest);
+    assert_eq!(before.1, after.evidence);
     let error=sqlx::query("INSERT INTO execution_startup_grants (organization,execution_id,pod_uid,challenge,grant_body,grant_digest,granted_at_ms) SELECT organization,execution_id,'pod-one',$1,'{\"version\":1,\"lease_budget_ms\":1000}'::jsonb,$2,floor(extract(epoch from clock_timestamp())*1000) FROM execution_requests")
         .bind(serde_json::to_value(pods::challenge(&attempt)).unwrap()).bind(format!("sha256:{}","a".repeat(64))).execute(&db.pool).await.unwrap_err();
     assert!(error.to_string().contains("watchdog is not armed"));
@@ -384,12 +412,15 @@ async fn migration_eighteen_preserves_arms_without_reaper_but_denies_new_startup
         .await
         .unwrap();
     let id = &attempt.intent().execution.execution_id;
-    let before = db
-        .store
-        .candidate_execution_watchdog(&org("acme"), id)
-        .await
-        .unwrap()
-        .unwrap();
+    // Inspect historical SQL bytes before upgrading; the current Store requires
+    // the current schema, including the new dispatch ceiling column.
+    let before: (String, Value) = sqlx::query_as(
+        "SELECT evidence_digest,evidence FROM execution_watchdog_arms WHERE execution_id=$1",
+    )
+    .bind(id)
+    .fetch_one(&db.pool)
+    .await
+    .unwrap();
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
     let after = db
@@ -398,8 +429,8 @@ async fn migration_eighteen_preserves_arms_without_reaper_but_denies_new_startup
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(before.evidence_digest, after.evidence_digest);
-    assert_eq!(before.evidence, after.evidence);
+    assert_eq!(before.0, after.evidence_digest);
+    assert_eq!(before.1, after.evidence);
     let error=sqlx::query("INSERT INTO execution_startup_grants (organization,execution_id,pod_uid,challenge,grant_body,grant_digest,granted_at_ms) SELECT organization,execution_id,'pod-one',$1,'{\"version\":1,\"lease_budget_ms\":1000}'::jsonb,$2,floor(extract(epoch from clock_timestamp())*1000) FROM execution_requests")
         .bind(serde_json::to_value(pods::challenge(&attempt)).unwrap()).bind(format!("sha256:{}","a".repeat(64))).execute(&db.pool).await.unwrap_err();
     assert!(error.to_string().contains("reaper watchdog is not armed"));

@@ -11,6 +11,7 @@ agent-computer-definitions = { path = "../definitions" }
 agent-computer-storage = { path = "../storage" }
 agent-computer-sandbox = { path = "../sandbox" }
 agent-computer-node = { path = "../node" }
+agent-computer-watchdog = { path = "../watchdog" }
 agent-computer-objects = { path = "../objects" }
 agent-computer-kubernetes = { path = "../kubernetes" }
 tokio.workspace = true

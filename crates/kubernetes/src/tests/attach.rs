@@ -4,6 +4,7 @@ use std::net::TcpStream;
 use tokio_tungstenite::tungstenite::{self, Message, WebSocket, protocol::Role};
 
 mod candidate;
+mod renewal;
 
 type Socket = WebSocket<TcpStream>;
 
@@ -16,6 +17,7 @@ fn startup_plan() -> StartupSandboxPlan {
         &format!("docker.io/library/busybox@sha256:{}", "a".repeat(64)),
         Bootstrap {
             version: 1,
+            hard_budget_ms: None,
             intent_digest: format!("sha256:{}", "b".repeat(64)),
             request: Request {
                 execution_id: identity().instance,
@@ -33,7 +35,7 @@ fn startup_plan() -> StartupSandboxPlan {
 }
 fn challenge(plan: &StartupSandboxPlan) -> StartupChallenge {
     StartupChallenge {
-        version: 1,
+        version: plan.bootstrap().version,
         execution_id: identity().instance,
         generation: 1,
         bootstrap_digest: plan.bootstrap().digest().unwrap(),
@@ -42,7 +44,8 @@ fn challenge(plan: &StartupSandboxPlan) -> StartupChallenge {
 }
 fn grant(plan: &StartupSandboxPlan) -> StartupGrant {
     StartupGrant {
-        version: 1,
+        version: plan.bootstrap().version,
+        hard_budget_ms: plan.bootstrap().hard_budget_ms.map(|n| n - 1000),
         challenge_digest: challenge(plan).digest().unwrap(),
         lease_budget_ms: 10000,
     }
@@ -98,7 +101,7 @@ fn expect_hello(socket: &mut Socket, plan: &StartupSandboxPlan) {
     assert_eq!(bytes[0], 0);
     assert_eq!(bytes.last(), Some(&b'\n'));
     let hello: StartupHello = serde_json::from_slice(&bytes[1..]).unwrap();
-    assert_eq!(hello.version, 1);
+    assert_eq!(hello.version, plan.bootstrap().version);
     assert_eq!(hello.bootstrap_digest, plan.bootstrap().digest().unwrap());
 }
 fn send(socket: &mut Socket, channel: u8, bytes: &[u8]) {
@@ -120,15 +123,21 @@ fn expect_grant(socket: &mut Socket, plan: &StartupSandboxPlan) {
         StartupGrant::parse(&bytes[1..]).unwrap().digest().unwrap(),
         grant(plan).digest().unwrap()
     );
-    assert_eq!(read_binary(socket), [255, 0]);
+    if plan.bootstrap().hard_budget_ms.is_none() {
+        assert_eq!(read_binary(socket), [255, 0]);
+    }
 }
 fn report(plan: &StartupSandboxPlan) -> Value {
     let grant = grant(plan);
     let mut request = plan.bootstrap().request.clone();
     request.lease_budget_ms = grant.lease_budget_ms;
-    json!({"version":1,"challenge_digest":grant.challenge_digest,"grant_digest":grant.digest().unwrap(),
+    let mut value = json!({"version":grant.version,"challenge_digest":grant.challenge_digest,"grant_digest":grant.digest().unwrap(),
         "report":{"version":1,"execution_id":request.execution_id,"generation":request.generation,
-            "request_digest":request.digest().unwrap(),"outcome":"component-observation-only"}})
+            "request_digest":request.digest().unwrap(),"outcome":"component-observation-only"}});
+    if grant.hard_budget_ms.is_some() {
+        value["renewal"] = json!({"sequence":0,"grant_digest":grant.digest().unwrap()});
+    }
+    value
 }
 fn send_report(socket: &mut Socket, value: &Value) {
     let mut bytes = serde_json::to_vec(value).unwrap();

@@ -110,6 +110,7 @@ mod tests {
         let stat = fs::metadata(&fixture.path).unwrap();
         let request = Request {
             version: 1,
+            renewal: None,
             execution_id: name.clone(),
             boot_id: fs::read_to_string("/proc/sys/kernel/random/boot_id")
                 .unwrap()

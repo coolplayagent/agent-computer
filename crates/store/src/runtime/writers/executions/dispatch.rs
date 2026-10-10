@@ -1,7 +1,9 @@
 //! Trusted worker journal API. No Kubernetes mutation or process launch here.
 mod completion;
 mod queue;
+mod renewal;
 pub use queue::QueuedDispatch;
+pub use renewal::{ExecutionRenewalAttempt, ExecutionRenewalGrant};
 mod inputs;
 pub use completion::ExecutionCompletion;
 mod outputs;
@@ -27,6 +29,8 @@ pub struct ExecutionDispatchIntent {
     pub intent_digest: String,
     pub started_at_ms: i64,
     pub deadline_at_ms: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hard_deadline_at_ms: Option<i64>,
 }
 
 /// Returned once, after the intent commits. Not cloneable or deserializable.
@@ -37,6 +41,8 @@ pub struct ExecutionDispatchIntent {
 pub struct ExecutionDispatchAttempt {
     intent: ExecutionDispatchIntent,
     deadline: Instant,
+    hard_deadline: Instant,
+    renewal_sequence: u32,
 }
 impl ExecutionDispatchAttempt {
     pub fn intent(&self) -> &ExecutionDispatchIntent {
@@ -51,6 +57,19 @@ impl ExecutionDispatchAttempt {
             return Err(Error::WriterLeaseInactive);
         }
         u32::try_from(remaining).map_err(|_| Error::InvalidStoredData)
+    }
+    pub fn remaining_hard_budget_ms(&self) -> Result<u32> {
+        let remaining = self
+            .hard_deadline
+            .saturating_duration_since(Instant::now())
+            .as_millis();
+        if remaining == 0 {
+            return Err(Error::WriterLeaseInactive);
+        }
+        u32::try_from(remaining).map_err(|_| Error::InvalidStoredData)
+    }
+    pub fn renewal_sequence(&self) -> u32 {
+        self.renewal_sequence
     }
 }
 
@@ -77,20 +96,28 @@ async fn bound_authority(
     }
     Ok(())
 }
-fn hash(org: &str, record: &PgRow, started: i64, deadline: i64) -> Result<String> {
-    digest(
-        "agent-computer/execution-dispatch-v1",
-        &(
-            org,
-            record.try_get::<String, _>("execution_id")?,
-            record.try_get::<String, _>("lease_id")?,
-            record.try_get::<i64, _>("epoch")?,
-            record.try_get::<String, _>("input_digest")?,
-            record.try_get::<String, _>("binding_digest")?,
-            started,
-            deadline,
-        ),
-    )
+fn hash(
+    org: &str,
+    record: &PgRow,
+    started: i64,
+    deadline: i64,
+    hard: Option<i64>,
+) -> Result<String> {
+    let identity = (
+        org,
+        record.try_get::<String, _>("execution_id")?,
+        record.try_get::<String, _>("lease_id")?,
+        record.try_get::<i64, _>("epoch")?,
+        record.try_get::<String, _>("input_digest")?,
+        record.try_get::<String, _>("binding_digest")?,
+        started,
+        deadline,
+    );
+    if let Some(hard) = hard {
+        digest("agent-computer/execution-dispatch-v2", &(identity, hard))
+    } else {
+        digest("agent-computer/execution-dispatch-v1", &identity)
+    }
 }
 async fn intent(
     tx: &mut Transaction<'_, Postgres>,
@@ -128,8 +155,11 @@ async fn intent(
     .ok_or(Error::RuntimeAccessUnavailable)?;
     let started = row.try_get("started_at_ms")?;
     let deadline = row.try_get("deadline_at_ms")?;
+    let hard = row.try_get("hard_deadline_at_ms")?;
     let intent_digest: String = row.try_get("intent_digest")?;
-    if hash(org, record, started, deadline)? != intent_digest {
+    if hash(org, record, started, deadline, hard)? != intent_digest
+        || hard.is_some() != execution.renewable
+    {
         return Err(Error::InvalidStoredData);
     }
     Ok(ExecutionDispatchIntent {
@@ -140,6 +170,7 @@ async fn intent(
         intent_digest,
         started_at_ms: started,
         deadline_at_ms: deadline,
+        hard_deadline_at_ms: hard,
     })
 }
 
@@ -289,12 +320,38 @@ async fn begin_queued(
         return Ok(QueuedDispatch::Cancelled(Box::new(cancelled)));
     }
     let started = transactions::now(&mut tx).await?;
-    let deadline: i64 = record.try_get("queue_deadline_at_ms")?;
+    let mut deadline: i64 = record.try_get("queue_deadline_at_ms")?;
+    let binding: serde_json::Value = record.try_get("binding")?;
+    let hard = if let Some(policy) = binding.get("execution_lease") {
+        let maximum = policy["max_budget_ms"]
+            .as_i64()
+            .filter(|n| (1..=3_630_000).contains(n))
+            .ok_or(Error::InvalidStoredData)?;
+        if policy["version"] != 1 {
+            return Err(Error::InvalidStoredData);
+        }
+        let ceiling = sqlx::query("SELECT floor(extract(epoch from c.expires_at)*1000)::bigint AS credential_until,s.expires_at_ms FROM connection_sessions s JOIN service_credentials c ON c.organization=s.organization AND c.credential_id=s.credential_id WHERE s.organization=$1 AND s.session_id=$2")
+            .bind(org.as_str()).bind(record.try_get::<String,_>("session_id")?).fetch_one(&mut *tx).await?;
+        let mut until = started
+            .checked_add(maximum)
+            .ok_or(Error::CounterExhausted)?
+            .min(ceiling.try_get("credential_until")?);
+        if view(&record)?.lifetime == ExecutionLifetime::Connection {
+            until = until.min(ceiling.try_get("expires_at_ms")?);
+        }
+        if until <= started {
+            return Err(Error::WriterLeaseInactive);
+        }
+        deadline = deadline.min(until);
+        Some(until)
+    } else {
+        None
+    };
     let lease: String = record.try_get("lease_id")?;
     let epoch: i64 = record.try_get("epoch")?;
-    let hash = hash(org.as_str(), &record, started, deadline)?;
-    sqlx::query("INSERT INTO execution_dispatch_intents (organization,execution_id,lease_id,epoch,intent_digest,started_at_ms,deadline_at_ms) VALUES ($1,$2,$3,$4,$5,$6,$7)")
-            .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).bind(started).bind(deadline).execute(&mut *tx).await?;
+    let hash = hash(org.as_str(), &record, started, deadline, hard)?;
+    sqlx::query("INSERT INTO execution_dispatch_intents (organization,execution_id,lease_id,epoch,intent_digest,started_at_ms,deadline_at_ms,hard_deadline_at_ms) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)")
+            .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).bind(started).bind(deadline).bind(hard).execute(&mut *tx).await?;
     sqlx::query("INSERT INTO candidate_writer_dispatches (organization,dispatch_id,lease_id,epoch,input_digest) VALUES ($1,$2,$3,$4,$5)")
             .bind(org.as_str()).bind(id).bind(&lease).bind(epoch).bind(&hash).execute(&mut *tx).await?;
     sqlx::query("UPDATE execution_requests SET state='Dispatching',reason='dispatch_committed',revision=revision+1 WHERE organization=$1 AND execution_id=$2")
@@ -315,6 +372,9 @@ async fn begin_queued(
     let result = ExecutionDispatchAttempt {
         intent: intent(&mut tx, org.as_str(), &current).await?,
         deadline: local_start + Duration::from_millis((deadline - started) as u64),
+        hard_deadline: local_start
+            + Duration::from_millis((hard.unwrap_or(deadline) - started) as u64),
+        renewal_sequence: 0,
     };
     result.remaining_budget_ms()?;
     tx.commit().await?;

@@ -59,6 +59,19 @@ pub struct CandidateIdentity {
     pub volume_path: String,
 }
 
+pub struct ExecutionLease {
+    pub deadline_boottime_ms: u64,
+    pub renewal: Option<agent_computer_watchdog::renewal::Policy>,
+}
+impl From<u64> for ExecutionLease {
+    fn from(deadline_boottime_ms: u64) -> Self {
+        Self {
+            deadline_boottime_ms,
+            renewal: None,
+        }
+    }
+}
+
 pub fn arm(
     config: &Configuration,
     identity: PodRuntimeIdentity,
@@ -73,7 +86,7 @@ pub fn arm(
         execution,
         command,
         candidate,
-        deadline_boottime_ms,
+        deadline_boottime_ms.into(),
         None,
     )
 }
@@ -83,7 +96,7 @@ pub fn arm_fenced(
     execution: &str,
     command: &serde_json::Value,
     candidate: &CandidateIdentity,
-    deadline_boottime_ms: u64,
+    lease: impl Into<ExecutionLease>,
     fence: &agent_computer_fence::MountedFence,
 ) -> Result<ArmedGuard> {
     arm_inner(
@@ -92,7 +105,7 @@ pub fn arm_fenced(
         execution,
         command,
         candidate,
-        deadline_boottime_ms,
+        lease.into(),
         Some(fence),
     )
 }
@@ -102,9 +115,10 @@ fn arm_inner(
     execution: &str,
     command: &serde_json::Value,
     candidate: &CandidateIdentity,
-    deadline_boottime_ms: u64,
+    lease: ExecutionLease,
     fence: Option<&agent_computer_fence::MountedFence>,
 ) -> Result<ArmedGuard> {
+    let deadline_boottime_ms = lease.deadline_boottime_ms;
     if !rustix::process::geteuid().is_root() {
         return Err(Error::RootRequired);
     }
@@ -253,7 +267,8 @@ fn arm_inner(
         return Err(Error::IdentityMismatch);
     }
     let request = Request {
-        version: 1,
+        version: if lease.renewal.is_some() { 2 } else { 1 },
+        renewal: lease.renewal,
         execution_id: execution.into(),
         boot_id: config.node.boot_id.clone(),
         cgroup_path: fields.parent.clone(),

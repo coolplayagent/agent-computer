@@ -6,6 +6,7 @@ pub mod admission;
 mod cgroup;
 pub mod journal;
 pub mod reaper;
+pub mod renewal;
 mod request;
 pub mod termination;
 
@@ -34,6 +35,7 @@ pub enum Error {
     InvalidJournal,
     ReaperAlreadyRunning,
     ReaperUnavailable,
+    LeaseExpired,
 }
 
 impl std::fmt::Display for Error {
@@ -55,6 +57,7 @@ pub enum Trigger {
     ReceiptUnavailable,
     TimerFailure,
     Recovery,
+    ControlUnavailable,
 }
 
 #[derive(Debug, Eq, PartialEq, Deserialize, Serialize)]
@@ -77,6 +80,8 @@ pub struct Report {
     pub error: Option<Error>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub journal: Option<journal::Reference>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub renewal: Option<renewal::Receipt>,
 }
 
 #[derive(Serialize)]
@@ -117,6 +122,9 @@ fn run_inner(
     output: &impl AsFd,
     journal: Option<&journal::Journal>,
 ) -> Result<Report> {
+    if request.renewal.is_some() && journal.is_none() {
+        return Err(Error::InvalidRequest);
+    }
     if !rustix::process::geteuid().is_root() {
         return Err(Error::RootRequired);
     }
@@ -134,8 +142,17 @@ fn run_inner(
     if let Some(journal) = journal {
         journal.enroll(group.device)?;
     }
-    let journal = journal.map(journal::Journal::reference);
     let timer = timer(request.deadline_boottime_ms)?;
+    let mut control = if request.renewal.is_some() {
+        Some(renewal::Control::new(
+            request.clone(),
+            journal.ok_or(Error::InvalidJournal)?.duplicate()?,
+            &timer,
+        )?)
+    } else {
+        None
+    };
+    let journal = journal.map(journal::Journal::reference);
     let armed_boottime_ms = boottime_ms();
     let armed = Armed {
         version: 1,
@@ -147,6 +164,8 @@ fn run_inner(
     };
     let trigger = if write_frame(output, &armed).is_err() {
         Trigger::ReceiptUnavailable
+    } else if let Some(control) = &mut control {
+        control.wait(&timer, output)
     } else if wait(&timer).is_err() {
         Trigger::TimerFailure
     } else {
@@ -169,6 +188,7 @@ fn run_inner(
         },
         error: result.err(),
         journal: journal.cloned(),
+        renewal: control.and_then(|c| c.state.latest),
     })
 }
 
@@ -179,8 +199,13 @@ pub fn boottime_ms() -> u64 {
 
 fn timer(deadline_ms: u64) -> Result<OwnedFd> {
     let fd = time::timerfd_create(time::TimerfdClockId::Boottime, time::TimerfdFlags::CLOEXEC)?;
-    time::timerfd_settime(
-        &fd,
+    reset_timer(&fd, deadline_ms)?;
+    Ok(fd)
+}
+
+fn reset_timer(fd: &impl AsFd, deadline_ms: u64) -> Result<time::Itimerspec> {
+    Ok(time::timerfd_settime(
+        fd,
         time::TimerfdTimerFlags::ABSTIME,
         &time::Itimerspec {
             it_interval: time::Timespec {
@@ -194,8 +219,7 @@ fn timer(deadline_ms: u64) -> Result<OwnedFd> {
                 tv_nsec: ((deadline_ms % 1000) * 1_000_000) as _,
             },
         },
-    )?;
-    Ok(fd)
+    )?)
 }
 
 fn wait(timer: &OwnedFd) -> Result<()> {

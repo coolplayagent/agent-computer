@@ -36,4 +36,6 @@ PostgreSQL contracts exercise full target isolation, concurrent claims, WAL rest
 
 [Source-bound component record](../evidence/queued-execution-worker-2026-10-10.json) · [validation log](../evidence/queued-execution-worker-2026-10-10.log)
 
-This delivers node-local automatic dispatch for prepared Candidates. Full Computer lifecycle scheduling, automatic drain recovery, cross-node fencing, longer renewable execution budgets, browser/ComputerView and product acceptance remain pending. Computer `ready=false`, public `execution` remains unsupported, and T01–T43 remain `not_run`.
+This delivers node-local automatic dispatch for prepared Candidates. Full Computer lifecycle scheduling, automatic drain recovery, cross-node fencing, browser/ComputerView and product acceptance remain pending. Computer `ready=false`, public `execution` remains unsupported, and T01–T43 remain `not_run`.
+
+[Renewable execution leases](49-renewable-execution-leases.md) extend the running phase only; queue and setup deadlines remain fixed.

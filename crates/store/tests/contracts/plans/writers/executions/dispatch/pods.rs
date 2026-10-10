@@ -27,7 +27,7 @@ pub(super) fn manifest(attempt: &ExecutionDispatchAttempt) -> Value {
 pub(super) fn challenge(attempt: &ExecutionDispatchAttempt) -> StartupChallenge {
     let bootstrap = attempt.intent().bootstrap().unwrap();
     StartupChallenge {
-        version: 1,
+        version: bootstrap.version,
         execution_id: bootstrap.request.execution_id.clone(),
         generation: bootstrap.request.generation,
         bootstrap_digest: bootstrap.digest().unwrap(),

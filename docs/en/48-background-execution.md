@@ -8,7 +8,7 @@ New execution submissions default to `lifetime: background`. The submitted task 
 
 ## Authority and limits
 
-This is a disconnect policy for the existing guarded path. It does not extend the original queue, writer, dispatch, startup or watchdog deadlines. That path still has a maximum 30-second budget, often less after preparation and dispatch. Longer background jobs and renewable worker-owned budgets remain pending.
+This disconnect policy does not itself extend a deadline. Fixed v1 executions retain their original budget of at most 30 seconds, reduced by setup. New admissions can separately use [renewable execution leases](49-renewable-execution-leases.md); only the original trusted worker can authorize and confirm those extensions.
 
 A Closed connection has no capabilities and cannot renew, acquire, save files or submit new work. Reconnecting cannot steal the reserved epoch or change its deadline. The original still-valid credential may query, replay or cancel its owned execution. Another credential does not inherit that ownership. Explicit cancellation and `checkpoint-stop` with `cancel_running=true` still cancel background work; cancellation alone never proves that a process stopped.
 
@@ -24,4 +24,4 @@ Database and HTTP regressions cover disconnect before/after dispatch, WAL restar
 
 [Source-bound record](../evidence/background-execution-2026-10-10.json) · [Validation log](../evidence/background-execution-2026-10-10.log)
 
-Evidence is limited to one disposable Linux VM and the bounded integrated path. Full lifecycle scheduling, App/browser health and checkpointing, automatic drain recovery, cross-node fencing, longer budgets and T01–T43 product acceptance remain incomplete.
+Evidence is limited to one disposable Linux VM and the bounded integrated path. Full lifecycle scheduling, App/browser health and checkpointing, automatic drain recovery, cross-node fencing, T01–T43 product acceptance remain incomplete.
