@@ -8,6 +8,7 @@ fn start() -> StartRequest {
         expected_revision: 1,
         expected_spec_revision: 1,
         max_runtime_seconds: 300,
+        input_artifact_id: None,
     }
 }
 pub(super) async fn grants(db: &Database) {
@@ -471,10 +472,9 @@ async fn multi_fixture(
 }
 
 #[tokio::test]
-async fn concurrent_volume_capacity_and_workspace_ownership_are_reserved_until_cancel() {
+async fn concurrent_volume_capacity_is_reserved_until_cancel() {
     for same_workspace in [false, true] {
-        let (db, token, ids) =
-            multi_fixture(2, if same_workspace { 20 } else { 10 }, same_workspace).await;
+        let (db, token, ids) = multi_fixture(2, 10, same_workspace).await;
         let request = start();
         let a = key("a");
         let b = key("b");

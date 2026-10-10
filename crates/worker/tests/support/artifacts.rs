@@ -48,6 +48,7 @@ pub async fn verify(c: Context<'_>) -> Value {
                 expected_revision: 1,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await
@@ -304,6 +305,7 @@ pub async fn verify(c: Context<'_>) -> Value {
                 expected_revision: stopped.control_revision,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await

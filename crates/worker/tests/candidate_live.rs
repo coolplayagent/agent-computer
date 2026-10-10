@@ -28,6 +28,8 @@ use std::{
 
 #[path = "support/artifacts.rs"]
 mod artifacts;
+#[path = "support/continuation.rs"]
+mod continuation;
 #[path = "support/file_http.rs"]
 mod file_http;
 #[path = "support/file_writer.rs"]
@@ -120,9 +122,9 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         .unwrap();
     storage.reference = format!("id:{catalog}");
     let document = json!({"apiVersion":"agent-computer/v1alpha1","kind":"ComputerSet","metadata":{"name":"candidate-probe"},"spec":{
-        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":64424509440_u64,"reclaimPolicy":"Retain"}],
-        "workspaces":[{"name":"one","volumeRef":"data","conflictPolicy":"explicit"},{"name":"two","volumeRef":"data","conflictPolicy":"explicit"},{"name":"three","volumeRef":"data","conflictPolicy":"explicit"},{"name":"artifact","volumeRef":"data","conflictPolicy":"explicit"}],
-        "computers":[{"name":"one","workspaceRef":"one","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"two","workspaceRef":"two","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"three","workspaceRef":"three","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"artifact","workspaceRef":"artifact","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"}]
+        "volumes":[{"name":"data","storageClass":storage.reference,"quotaBytes":107374182400_u64,"reclaimPolicy":"Retain"}],
+        "workspaces":[{"name":"one","volumeRef":"data","conflictPolicy":"explicit"},{"name":"two","volumeRef":"data","conflictPolicy":"explicit"},{"name":"three","volumeRef":"data","conflictPolicy":"explicit"},{"name":"artifact","volumeRef":"data","conflictPolicy":"explicit"},{"name":"parallel","volumeRef":"data","conflictPolicy":"explicit"}],
+        "computers":[{"name":"one","workspaceRef":"one","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"two","workspaceRef":"two","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"three","workspaceRef":"three","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"artifact","workspaceRef":"artifact","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"parallel-one","workspaceRef":"parallel","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"},{"name":"parallel-two","workspaceRef":"parallel","sandboxRefs":[],"appRefs":[],"desiredState":"Stopped"}]
     }});
     let plan = store
         .create_definition_plan(credential.expose_token(), &key("plan"), &checked(&document))
@@ -281,6 +283,7 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
                     expected_revision: 1,
                     expected_spec_revision: 1,
                     max_runtime_seconds: 300,
+                    input_artifact_id: None,
                 },
             )
             .await
@@ -446,7 +449,32 @@ async fn actual_volume_preparation_commits_receipts_and_observes_lost_acknowledg
         owner: &owner,
     })
     .await;
-    let evidence = json!({"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
+    let continuation = continuation::verify(continuation::Context {
+        store: &store,
+        pool: &pool,
+        token: credential.expose_token(),
+        org: &org,
+        computers: ["parallel-one", "parallel-two"].map(|name| {
+            plan.resources
+                .iter()
+                .find(|r| r.kind == DefinitionKind::Computer && r.name == name)
+                .unwrap()
+                .resource_id
+                .as_str()
+        }),
+        workspace: &plan
+            .resources
+            .iter()
+            .find(|r| r.kind == DefinitionKind::Workspace && r.name == "parallel")
+            .unwrap()
+            .resource_id,
+        worker: &worker_config,
+        config: &config,
+        root: &root,
+        owner: &owner,
+    })
+    .await;
+    let evidence = json!({"continuation":continuation,"artifact":artifact,"organization":org.as_str(),"pvc_uid":pvc.uid(),"pv_uid":pv.uid(),"volume_path":pv.handle(),"filesystem_uuid":target.filesystem_uuid,"observations":observations,"file_writer":file_evidence,"limits":["single VM","file-only checkpoint; App state and general process fencing pending","bounded file gateway only; no product Pod launch or general process fencing","no power loss or HA test"]});
     fs::write(
         config["observation_file"].as_str().unwrap(),
         serde_json::to_vec_pretty(&evidence).unwrap(),

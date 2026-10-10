@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 60
-updated_at: unix:1791605389
+map_version: 61
+updated_at: unix:1791607014
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -93,6 +93,7 @@ topics:
   title: development
   description: Added by CLI source registration.
   source_ids:
+  - artifact-candidate-continuation
   - bounded-candidate-file-saves
   - candidate-execution-worker
   - candidate-file-http-gateway
@@ -120,8 +121,8 @@ topics:
   - undispatched-computer-stop
   - volume-provisioning-guide
   - workspace-artifact-checkpoints
-  ref: topics/topic-875b9380866e9d56-1dec99db709258e1372c45822f19096197b14fdc7deecbc91332e23e181fc678.yaml
-  digest: 1dec99db709258e1372c45822f19096197b14fdc7deecbc91332e23e181fc678
+  ref: topics/topic-875b9380866e9d56-86e38942fc65138f6824a505b8390a0ff0366a0ed4dd88b701ace7bdb4a889f9.yaml
+  digest: 86e38942fc65138f6824a505b8390a0ff0366a0ed4dd88b701ace7bdb4a889f9
 - id: execution
   title: execution
   description: Added by CLI source registration.
@@ -156,12 +157,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 44
+  omitted_through: 45
   recent:
-  - version: 45
-    action: source.add
-    actor: cli
-    summary: Added source 'durable-execution-admission' to topic 'development'.
   - version: 46
     action: source.add
     actor: cli
@@ -222,3 +219,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'workspace-artifact-checkpoints' to topic 'development'.
+  - version: 61
+    action: source.add
+    actor: cli
+    summary: Added source 'artifact-candidate-continuation' to topic 'development'.

@@ -7,6 +7,10 @@ pub struct StartRequest {
     pub expected_revision: i64,
     pub expected_spec_revision: i64,
     pub max_runtime_seconds: u32,
+    /// Optional fixed Artifact from this Computer's Workspace. Omission pins the
+    /// current Workspace head; selection never changes that shared pointer.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_artifact_id: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -41,6 +45,9 @@ pub struct StartReceipt {
     pub input_revision: Option<i64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub input_manifest_digest: Option<String>,
+    /// Provenance of the selected input, including a default head from an Artifact.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_artifact_id: Option<String>,
     pub state: StartState,
     pub reason: String,
     pub cpu_millis: i64,

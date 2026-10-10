@@ -4,7 +4,7 @@
 
 Migration 7 adds durable start requests and Computer control counters. The service can admit a request into `Queued`, return its original receipt after a lost response, inspect current admission state, and cancel an undispatched request. The capability `computer.start_admission` is `control-plane`; `computer` remains `unsupported`.
 
-[17 Candidate preparation worker](17-candidate-preparation-worker.md) now pins committed Workspace input at admission and provides a separate authorized storage worker. New Workspace creation records an explicit empty genesis input; existing Workspaces without input are never silently treated as empty. Nonempty Artifact publication, writer leases, Pod dispatch, fencing and driver health remain pending. Start admission itself prepares no files and reports no Ready state.
+[17 Candidate preparation worker](17-candidate-preparation-worker.md) now pins committed Workspace input at admission and provides a separate authorized storage worker. New Workspace creation records an explicit empty genesis input; existing Workspaces without input are never silently treated as empty. Subsequent increments add [Artifacts](38-workspace-artifact-checkpoints.md) and [explicit Artifact selection and parallel Candidates](39-artifact-candidate-continuation.md). General process fencing and full driver health remain pending. Start admission itself prepares no files and reports no Ready state.
 
 ## 16.2 Atomic admission
 
@@ -34,7 +34,8 @@ These conservative platform ceilings are enforced in the database transaction; c
 | --- | --- |
 | Outstanding requests per organization | 64 |
 | Outstanding requests per principal in the organization | 8 |
-| Outstanding requests per Computer / writable Workspace | 1 / 1 |
+| Outstanding requests per Computer | 1 |
+| Candidates per Workspace | Multiple; each reserves its own capacity ([39](39-artifact-candidate-continuation.md)) |
 | Reserved CPU per organization | 64,000 millicores |
 | Reserved memory per organization | 131,072 MiB |
 | Reserved Candidate storage per organization | 1 TiB |

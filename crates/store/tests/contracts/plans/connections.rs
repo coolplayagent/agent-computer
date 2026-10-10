@@ -91,6 +91,7 @@ async fn human_connection_is_idempotent_durable_and_independent_of_compute_gener
                 expected_revision: 1,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await

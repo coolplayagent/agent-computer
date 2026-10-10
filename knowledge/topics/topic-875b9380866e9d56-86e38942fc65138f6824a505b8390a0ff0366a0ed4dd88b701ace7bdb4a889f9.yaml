@@ -4,6 +4,16 @@ topic:
   title: development
   description: Added by CLI source registration.
 sources:
+- id: artifact-candidate-continuation
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/39-artifact-candidate-continuation.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Parallel same-Workspace Candidates, fixed Artifact selection, branch/conflict checkpoints and explicit continuation
 - id: bounded-candidate-file-saves
   topic: development
   kind: doc
@@ -243,6 +253,16 @@ sources:
   status: active
   version: 1
   description: Single-use isolated PID 1, structured argv, bounded output and descendant cleanup; paired English docs/en/22-sandbox-supervisor.md. Durable admission, external watchdog and fencing remain pending.
+- id: undispatched-computer-stop
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/37-undispatched-computer-stop.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Prepared Candidate stop before any user dispatch, retained storage and replacement generations; paired English docs/en/37-undispatched-computer-stop.md
 - id: volume-provisioning-guide
   topic: development
   kind: doc
@@ -253,6 +273,16 @@ sources:
   status: active
   version: 1
   description: Authorized retained JuiceFS Volume worker, immutable PVC/PV UID records and CSI verification; paired English guide in docs/en/13-volume-provisioning.md. Candidate readiness, physical fencing and full storage acceptance remain pending.
+- id: workspace-artifact-checkpoints
+  topic: development
+  kind: doc
+  uri: docs/zh-CN/38-workspace-artifact-checkpoints.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Sealed Workspace artifacts, file-only checkpoints, CAS publication and S3 restoration
 route:
   topic: development
   source_order:
@@ -281,4 +311,7 @@ route:
   - candidate-execution-worker
   - node-cgroup-watchdog
   - node-guarded-startup-guide
+  - undispatched-computer-stop
+  - workspace-artifact-checkpoints
+  - artifact-candidate-continuation
   fallback: bounded-search

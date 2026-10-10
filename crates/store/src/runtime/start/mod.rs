@@ -36,8 +36,8 @@ async fn capacity(
     // Conservative platform ceilings, not caller-supplied capacity. All admissions
     // and releases hold the organization lock. Stopped Candidates retain storage
     // reservations until a separately verified garbage collection exists.
-    let row = sqlx::query("SELECT count(*) FILTER (WHERE state<>'Stopped')::bigint AS total, count(*) FILTER (WHERE principal=$2 AND state<>'Stopped')::bigint AS actor, COALESCE(sum(cpu_millis) FILTER (WHERE state<>'Stopped'),0)::bigint AS cpu, COALESCE(sum(memory_mib) FILTER (WHERE state<>'Stopped'),0)::bigint AS memory, COALESCE(sum(storage_bytes),0)::bigint AS storage, COALESCE(sum(storage_bytes) FILTER (WHERE volume_id=$3),0)::bigint AS volume, COALESCE(sum(max_runtime_seconds) FILTER (WHERE principal=$2 AND state<>'Stopped'),0)::bigint AS seconds, count(*) FILTER (WHERE workspace_id=$4 AND state<>'Stopped')::bigint AS workspace FROM runtime_start_requests WHERE organization=$1 AND state <> 'Cancelled'")
-        .bind(org).bind(principal).bind(&admission.volume).bind(&admission.workspace).fetch_one(&mut **tx).await?;
+    let row = sqlx::query("SELECT count(*) FILTER (WHERE state<>'Stopped')::bigint AS total, count(*) FILTER (WHERE principal=$2 AND state<>'Stopped')::bigint AS actor, COALESCE(sum(cpu_millis) FILTER (WHERE state<>'Stopped'),0)::bigint AS cpu, COALESCE(sum(memory_mib) FILTER (WHERE state<>'Stopped'),0)::bigint AS memory, COALESCE(sum(storage_bytes),0)::bigint AS storage, COALESCE(sum(storage_bytes) FILTER (WHERE volume_id=$3),0)::bigint AS volume, COALESCE(sum(max_runtime_seconds) FILTER (WHERE principal=$2 AND state<>'Stopped'),0)::bigint AS seconds FROM runtime_start_requests WHERE organization=$1 AND state <> 'Cancelled'")
+        .bind(org).bind(principal).bind(&admission.volume).fetch_one(&mut **tx).await?;
     for (field, added, limit) in [
         ("total", 1, 64),
         ("actor", 1, 8),
@@ -46,7 +46,6 @@ async fn capacity(
         ("storage", CANDIDATE_BYTES, 1024 * 1024 * 1024 * 1024),
         ("volume", CANDIDATE_BYTES, admission.volume_quota),
         ("seconds", i64::from(seconds), 86_400),
-        ("workspace", 1, 1),
     ] {
         if row
             .try_get::<i64, _>(field)?
@@ -123,6 +122,10 @@ impl Store {
         if request.expected_revision < 1
             || request.expected_spec_revision < 1
             || !(1..=86400).contains(&request.max_runtime_seconds)
+            || request
+                .input_artifact_id
+                .as_ref()
+                .is_some_and(|id| ComputerId::new(id).is_err())
         {
             return Err(Error::InvalidRuntimeRequest);
         }
@@ -153,9 +156,13 @@ impl Store {
         }
         let admission = graph::capture(&mut tx, org, computer, request).await?;
         authorize_in(&mut tx, token, &admission.snapshot.requirements).await?;
-        let input_revision = super::inputs::current(&mut tx, org, &admission.workspace).await?;
-        let input_digest: String = sqlx::query_scalar("SELECT digest FROM workspace_input_versions WHERE organization=$1 AND workspace_id=$2 AND revision=$3")
-            .bind(org).bind(&admission.workspace).bind(input_revision).fetch_one(&mut *tx).await?;
+        let (input_revision, input_digest, input_artifact_id) = super::inputs::select(
+            &mut tx,
+            org,
+            &admission.workspace,
+            request.input_artifact_id.as_deref(),
+        )
+        .await?;
         capacity(
             &mut tx,
             org,
@@ -180,6 +187,7 @@ impl Store {
             snapshot_digest: digest("agent-computer/start-snapshot-v1", &admission.snapshot)?,
             input_revision: Some(input_revision),
             input_manifest_digest: Some(input_digest),
+            input_artifact_id,
             state: StartState::Queued,
             reason: "awaiting_runtime_preparation".into(),
             cpu_millis: admission.cpu,
@@ -206,6 +214,9 @@ impl Store {
             .bind(org).bind(computer).bind(receipt.control_revision).bind(receipt.generation).bind(&receipt.request_id).execute(&mut *tx).await?;
         transactions::emit(&mut tx, org, seq, "computer.start_queued", serde_json::json!({"computer_id":computer,"request_id":receipt.request_id,"generation":receipt.generation,"revision":receipt.control_revision,"ready":false})).await?;
         transactions::save_receipt(&mut tx, &identity, START, key, &input, &receipt).await?;
+        // An outbox hook may outlive a grant or credential; recheck the complete
+        // graph after every write, including selected Workspace input authority.
+        graph::reauthorize(&mut tx, token, org, &receipt.request_id).await?;
         Store::authorize_service_in(&mut tx, token, ServiceScope::RuntimeActivate).await?;
         tx.commit().await?;
         Ok(receipt)

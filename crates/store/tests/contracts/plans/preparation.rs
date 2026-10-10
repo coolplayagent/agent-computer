@@ -1,5 +1,5 @@
 use super::*;
-use super::{runtime::runtime_fixture_with_apps, starts::grants};
+use super::{runtime::runtime_fixture_many, starts::grants};
 use agent_computer_storage::{Manifest, Prepared};
 use agent_computer_store::{
     Error,
@@ -20,7 +20,14 @@ pub(super) async fn setup_with_apps(
     quota: i64,
     apps: bool,
 ) -> (Database, String, String, StartReceipt, PreparationTarget) {
-    let (db, _, token, computer, _) = runtime_fixture_with_apps(quota, apps).await;
+    setup_many(quota, apps, 1).await
+}
+pub(super) async fn setup_many(
+    quota: i64,
+    apps: bool,
+    computers: usize,
+) -> (Database, String, String, StartReceipt, PreparationTarget) {
+    let (db, _, token, computer, _) = runtime_fixture_many(quota, apps, computers).await;
     grants(&db).await;
     let ClaimOutcome::Claimed(volume) = db
         .store
@@ -91,6 +98,7 @@ pub(super) async fn setup_with_apps(
                 expected_revision: 1,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await
@@ -536,6 +544,7 @@ async fn upgrade_never_infers_empty_inputs_for_legacy_workspaces_or_queued_reque
                 expected_revision: 3,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await

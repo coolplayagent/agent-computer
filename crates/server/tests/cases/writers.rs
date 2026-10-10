@@ -115,6 +115,7 @@ pub(super) async fn prepared(
                 expected_revision: 1,
                 expected_spec_revision: 1,
                 max_runtime_seconds: 300,
+                input_artifact_id: None,
             },
         )
         .await

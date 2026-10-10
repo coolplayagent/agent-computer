@@ -1031,7 +1031,7 @@
     "/v1alpha1/computers/{id}/start": {
       "post": {
         "operationId": "admitComputerStart",
-        "description": "Requires Computer activate, Workspace read/modify, App app.use/activate, private profile app.use and corresponding credential scopes. Pins the immutable dependency graph, allocates a generation and Candidate ID and reserves capacity atomically. Returns Queued only. A committed Workspace input is pinned; missing input returns 409. Storage preparation runs through a separate trusted worker; this HTTP call dispatches no storage/Pod operation. Replays require current authorization and do not transfer the original credential binding.",
+        "description": "Requires Computer activate, Workspace read/modify, App app.use/activate, private profile app.use and corresponding credential scopes. Pins the immutable dependency graph, allocates a generation and Candidate ID and reserves capacity atomically. Returns Queued only. A committed Workspace input is pinned; missing input returns 409. Storage preparation runs through a separate trusted worker; this HTTP call dispatches no storage/Pod operation. Replays require current authorization and do not transfer the original credential binding. Multiple Computers may own independent Candidates in the same Workspace; each reserves its own capacity. input_artifact_id selects a published same-Workspace Artifact; unavailable or unauthorized selection returns the same 404.",
         "security": [
           {
             "serviceBearer": []
@@ -3305,7 +3305,7 @@
     "/v1alpha1/computers/{id}/stop": {
       "post": {
         "operationId": "stopPreparedComputer",
-        "description": "Requires runtime.manage and an exact Computer manage grant. Stops an undispatched Prepared Candidate or a Sealed file-only Computer with a verified artifact published as the current Workspace input. Undrained writers, dispatched process executions, queued work, required uncaptured Apps or active human input block checkpoint stop. Retains old Candidate storage. A normal next start pins the current input and allocates a new Candidate. Queued cancellation remains separate.",
+        "description": "Requires runtime.manage and an exact Computer manage grant. Stops an undispatched Prepared Candidate or a Sealed file-only Computer with a verified published Artifact, including a retained branch or CAS conflict. Undrained writers, dispatched process executions, queued work, required uncaptured Apps or active human input block checkpoint stop. Retains old Candidate storage. A normal next start pins the current Workspace head; input_artifact_id explicitly selects the checkpoint version. Either allocates a new Candidate without changing the head. Queued cancellation remains separate.",
         "security": [
           {
             "serviceBearer": []
@@ -4754,6 +4754,14 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 86400
+          },
+          "input_artifact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z0-9_-]{1,128}$",
+            "description": "Optional published Artifact from this Computer's Workspace, including a retained branch or CAS conflict. Omitted/null pins the current Workspace head. Selection creates a new Candidate and never moves the head; current Workspace read/modify grants are required."
           }
         }
       },
@@ -4876,6 +4884,11 @@
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$",
             "description": "Pinned input manifest digest; absent only in legacy receipts."
+          },
+          "input_artifact_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$",
+            "description": "Fixed Artifact provenance, including a default head produced by an Artifact. Absent for genesis input and legacy receipts."
           }
         }
       },

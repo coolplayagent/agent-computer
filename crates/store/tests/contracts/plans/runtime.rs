@@ -13,9 +13,26 @@ pub(super) async fn runtime_fixture_with_apps(
     quota: i64,
     apps: bool,
 ) -> (Database, String, String, String, String) {
+    runtime_fixture_many(quota, apps, 1).await
+}
+pub(super) async fn runtime_fixture_many(
+    quota: i64,
+    apps: bool,
+    computers: usize,
+) -> (Database, String, String, String, String) {
     let (db, definition_token, mut document) = fixture().await;
+    for i in 1..computers {
+        let mut computer = document["spec"]["computers"][0].clone();
+        computer["name"] = format!("parallel-{i}").into();
+        document["spec"]["computers"]
+            .as_array_mut()
+            .unwrap()
+            .push(computer);
+    }
     if !apps {
-        document["spec"]["computers"][0]["appRefs"] = serde_json::json!([]);
+        for computer in document["spec"]["computers"].as_array_mut().unwrap() {
+            computer["appRefs"] = serde_json::json!([]);
+        }
         document["spec"]["apps"] = serde_json::json!([]);
     }
     document["spec"]["volumes"][0]["quotaBytes"] = quota.into();
