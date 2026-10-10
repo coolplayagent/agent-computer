@@ -55,3 +55,5 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 原始需求：[issue #1](https://github.com/coolplayagent/agent-computer/issues/1)；定位演进：[issue #2](https://github.com/coolplayagent/agent-computer/issues/2)，从成果文件扩展到过程和成品 GUI，并结合用户补充支持人直接连接与操作。研究依据：[superpod 知识库](https://github.com/stevetdp/superpod/tree/54f75c3f487dbcfe1f47779d0903383d5bce0ada/knowledge/software)。
 
 导航地图由 relay-knowledge CLI 管理。Qualitygate 初始化策略当前只检查行尾；文档链接、示例语法与需求覆盖需另行验证，运行能力必须通过验收设计中的真实环境测试。
+
+[内部 Browser Driver](docs/zh-CN/53-browser-driver.md) 已提供 TypeScript/Playwright 多页、观察和动作组件；公开 Browser 能力仍等待 App 生命周期与持久控制授权接入。

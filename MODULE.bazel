@@ -14,3 +14,33 @@ crate.from_cargo(
     manifests = ["//:Cargo.toml"],
 )
 use_repo(crate, "crates")
+
+bazel_dep(name = "aspect_rules_js", version = "3.5.1")
+bazel_dep(name = "aspect_rules_ts", version = "3.10.1")
+bazel_dep(name = "rules_nodejs", version = "6.7.3")
+
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(
+    node_version = "22.22.1",
+    # Official Node SHASUMS256.txt; this release postdates rules_nodejs' table.
+    node_repositories = {
+        "22.22.1-linux_amd64": ["node-v22.22.1-linux-x64.tar.xz", "node-v22.22.1-linux-x64", "9a6bc82f9b491279147219f6a18add1e18424dce90d41d2a5fcd69d4924ba3aa"],
+        "22.22.1-linux_arm64": ["node-v22.22.1-linux-arm64.tar.xz", "node-v22.22.1-linux-arm64", "0f3550d58d45e5d3cf7103d9e3f69937f09fe82fb5dd474c66a5d816fa58c9ee"],
+        "22.22.1-darwin_amd64": ["node-v22.22.1-darwin-x64.tar.gz", "node-v22.22.1-darwin-x64", "07b13722d558790fca20bb1ecf61bde24b7a4863111f7be77fc57251a407359a"],
+        "22.22.1-darwin_arm64": ["node-v22.22.1-darwin-arm64.tar.gz", "node-v22.22.1-darwin-arm64", "679ad4966339e4ef4900f57996714864e4211b898825bb840c3086c419fbcef2"],
+        "22.22.1-windows_amd64": ["node-v22.22.1-win-x64.zip", "node-v22.22.1-win-x64", "877cb93829e14fffbbc7903e7d8037336c9a79f3ea43c5d0b8c2379b79da56de"],
+        "22.22.1-windows_arm64": ["node-v22.22.1-win-arm64.zip", "node-v22.22.1-win-arm64", "d0722fcdefa1c08e4af31809e91ad4f23282f6c535c261607e8aa372d0ce61dd"],
+    },
+)
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(name = "npm", pnpm_lock = "//:pnpm-lock.yaml")
+use_repo(npm, "npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(name = "pnpm", pnpm_version_from = "//:package.json")
+use_repo(pnpm, "pnpm")
+
+typescript = use_extension("@aspect_rules_ts//ts:extensions.bzl", "typescript")
+typescript.deps(version_from = "//:package.json")
+use_repo(typescript, "npm_typescript")

@@ -1,0 +1,168 @@
+{
+  "kind": "isolated-browser-driver-component-verification",
+  "date": "2026-10-11",
+  "source_commit": "7d2400d4651893753ac5885265d321eae5404489",
+  "base_commit": "5b9ff12e2ad4e20ccce70b12b82807c8e3426472",
+  "source_manifest_sha256": "fbe4abda3b46b7ac9422991de44fcb183ec84f1b501c7d10a6282eb45ed35bdf",
+  "source_files": [
+    {
+      "path": "BUILD.bazel",
+      "sha256": "96eec1d2c36079213e6859b4e42c1d391497fc2f43039d64e1772c9149be207a"
+    },
+    {
+      "path": "MODULE.bazel",
+      "sha256": "2ced7142b039518f11b8a334c60b198ad7eb5624a98cd28afef19058481bbf6b"
+    },
+    {
+      "path": "MODULE.bazel.lock",
+      "sha256": "7ec4c8d6278b5333d98b8257fd0f118c2231ced00fe924f95d34f043f5c587cb"
+    },
+    {
+      "path": "REPO.bazel",
+      "sha256": "485b73b5fc2a9b8c4a8aab6f6091eb7c31c8679270515ecd0fa781ffa3ab7d20"
+    },
+    {
+      "path": "package.json",
+      "sha256": "1ff10396d5b6ef8d2251f806fa71c691d89c92b87f75ffe007e8f9c7aaa39b7e"
+    },
+    {
+      "path": "packages/browser-driver/BUILD.bazel",
+      "sha256": "3eecc0ca87ed14032d6f2f4a64225938f2c39dabf405235b3310a74af162a055"
+    },
+    {
+      "path": "packages/browser-driver/src/authority.ts",
+      "sha256": "4ea081865948de1e6974071eadf23c00fcb591d15a178173d9981504e4df5c79"
+    },
+    {
+      "path": "packages/browser-driver/src/contracts.ts",
+      "sha256": "340a73f1ad95fc3c44971a172a858bf4a4f3277fa692740f2f9379e49e81ca43"
+    },
+    {
+      "path": "packages/browser-driver/src/driver.ts",
+      "sha256": "43a4902c8b00f7c91fda28e2170c52872f370257b3564b97ca8d7906e8f8a1fe"
+    },
+    {
+      "path": "packages/browser-driver/src/index.ts",
+      "sha256": "43684922b19c5fce495ec3407c0475a24b045e98b48e84719474624658156e44"
+    },
+    {
+      "path": "packages/browser-driver/src/observation.ts",
+      "sha256": "a1d2fe194ba9f38c54bd52c74d94c22de823ef33ce23f5d0288bca3faa54ad61"
+    },
+    {
+      "path": "packages/browser-driver/src/validation.ts",
+      "sha256": "a84beb1917e79e57c975ad6d96a501e32795d0c034e333da8f7e20d46261e74b"
+    },
+    {
+      "path": "packages/browser-driver/tests/browser.test.ts",
+      "sha256": "9d3144482277df7ab2f17b4056fdd28e75fca0afb094cc65ff4ab40774c925d9"
+    },
+    {
+      "path": "packages/browser-driver/tests/fixture.ts",
+      "sha256": "88ca461b702fd7a17ce7a70d51f66a16cf816614bca8569160a0301e4b765980"
+    },
+    {
+      "path": "packages/browser-driver/tests/unit.test.ts",
+      "sha256": "77ebadf8111bf803f7b0e52aed3ba705ecc004d0d5b35edabcaa51068c8c3054"
+    },
+    {
+      "path": "packages/browser-driver/tsconfig.json",
+      "sha256": "97a33bea762a9d016c309893f52e61bc76e79897f9ddba523d3e25968415ffa5"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "5c0feb4ad548864116fd4df559f05652bfa443892b56688f31ad227b1c0e7f6a"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "1a943e78ceca0715810ae1a11fd2e41e4fc0964303e1274ae0fdb3f14816b1a6"
+    }
+  ],
+  "compiled_manifest_sha256": "ced5996d3c93cdd51701b84839b9a568e19daa9543a0898ccfa511612276567f",
+  "environment": {
+    "os": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+    "node": "v22.22.1",
+    "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+    "node_sha256": "243fd8938011479f41b3de101842150fa990f33fbbb3f7aabd330857f2d79e1d",
+    "runsc_sha256": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a",
+    "chromium_sha256": "377a9fc07b495c3b8d0ab8ec1fdfd153641759f9756fea34d8dfce4de82f5025",
+    "oci_config_sha256": "2b6a27985f17d903ee1a7fcb17c0fa53ca3fdaf6a599b74a15373599119d92ad",
+    "packages": [
+      "libasound2t64:amd64\t1.2.11-1ubuntu0.3",
+      "libc6:amd64\t2.39-0ubuntu8.9",
+      "libcairo2:amd64\t1.18.0-3build1",
+      "libgbm1:amd64\t25.2.8-0ubuntu0.24.04.4",
+      "libnspr4:amd64\t2:4.35-1.1build1",
+      "libnss3:amd64\t2:3.98-1ubuntu0.2",
+      "libpango-1.0-0:amd64\t1.52.1+ds-1build1"
+    ]
+  },
+  "browser": {
+    "playwright_core": "1.64.0",
+    "chromium": "156.0.8078.4",
+    "revision": 1248,
+    "chromium_sandbox": true,
+    "source": "existing matching Playwright browser cache; actual binary digest recorded"
+  },
+  "isolation": {
+    "outer": "disposable QEMU/KVM Ubuntu 24.04 VM",
+    "inner": "runsc systrap OCI bundle",
+    "network": "none; loopback HTTP fixture in same sandbox",
+    "uid": 1000,
+    "gid": 1000,
+    "capabilities": [],
+    "no_new_privileges": true,
+    "root_read_only": true,
+    "configured_memory_bytes": 4294967296,
+    "configured_pids": 512,
+    "configured_cpu_quota": 300000,
+    "configured_cpu_period": 100000,
+    "source": "owned copy; no host workspace/personal profile mount",
+    "repo_sandbox": "0.2.1 target list empty; established disposable VM fallback used"
+  },
+  "checks": {
+    "bazel_targets_passed": 18,
+    "rust_cases_passed": 487,
+    "rust_cases_ignored": 4,
+    "typescript_unit_cases_passed": 5,
+    "real_chromium_cases_passed": 11,
+    "real_chromium_cases_skipped": 0,
+    "clippy": "workspace all-targets all-features locked warnings-denied pass",
+    "format": "cargo fmt --all --check pass",
+    "docs": {
+      "markdown_files": 129,
+      "local_links": 884,
+      "structured_examples": 58,
+      "yaml_files": 20,
+      "requirement_rows": 35,
+      "test_rows": 43
+    },
+    "maps": "both valid",
+    "final_bazel": "18 pass; final TypeScript target re-executed after two browser fixes, 17 unchanged Rust targets cached from successful full run"
+  },
+  "observed": [
+    "Real DOM and coordinate clicks produce exactly one loopback HTTP effect; identical action ID does not repeat it",
+    "Matching PNG hash/dimensions, private profile and bounded DOM references; structured type/key/select input",
+    "Page creation, popup tracking, closure and quotas; context closes at runtime expiry",
+    "Navigation/frame/control handoff and changed geometry/pixels invalidate observations",
+    "Revocation is checked before reads and after persisted intent, before dispatch",
+    "Lost completion acknowledgement remains unknown, blocks new control and does not rewrite committed receipt",
+    "Late or malformed journal admission never dispatches; persisted Unknown never repeats the browser action",
+    "Slow target proof cannot extend observation validity or admit an expired intent"
+  ],
+  "log_sha256": {
+    "gvisor-final-3.log": "293e9884e6f8fd87b95efc7b6a9fa8762340fd42331af655bcf12a169c9cd2c7",
+    "bazel-full-initial.log": "d914d0b9ff770615b7cc37a654c514ededdb1ddeda0a56914e42f81aad98b705",
+    "bazel-final.log": "f78572753e2a5ff545a29ba735a2d19a862bfbd03adafeaf5bc675d4ede57c6e",
+    "clippy.log": "43be3a66fcf5f37f6f71850e5e22af433642254b428f60254f98e8e2430e0dc1"
+  },
+  "limits": [
+    "Component verification, with in-memory authority/journal fixtures; no production App lifecycle or durable GUI control adapter",
+    "Context close is not physical node/cgroup fencing; no profile restore/encrypted checkpoint/publication or handoff certification",
+    "Host Chromium launch denied by host namespace policy; no host policy changed and no sandbox-disable fallback",
+    "Bazel browser target is manual and requires provisioned Chromium; actual browser suite ran inside gVisor using matching compiled JS",
+    "No public Browser API, ComputerView, cross-node runtime proof or T04/T05/T10/T24 acceptance; Computer readiness unchanged",
+    "Four existing privileged Rust cases retain separately scoped prior evidence",
+    "Qualitygate final full report retained locally; existing policy selects line-ending only"
+  ]
+}
