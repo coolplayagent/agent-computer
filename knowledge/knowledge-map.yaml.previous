@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 55
-updated_at: unix:1791596787
+map_version: 56
+updated_at: unix:1791597888
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -124,10 +124,11 @@ topics:
   title: execution
   description: Added by CLI source registration.
   source_ids:
+  - node-expiry-reaper
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-5b9f3b20ba2473e295c9634102d026d66d2e3d64a8eab8536b194262b59326e3.yaml
-  digest: 5b9f3b20ba2473e295c9634102d026d66d2e3d64a8eab8536b194262b59326e3
+  ref: topics/topic-a402c4336ebfd782-20be327857ed04db7bfd101697e929194f5839c11f045a544355c997fea3c8f5.yaml
+  digest: 20be327857ed04db7bfd101697e929194f5839c11f045a544355c997fea3c8f5
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -151,12 +152,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 39
+  omitted_through: 40
   recent:
-  - version: 40
-    action: source.add
-    actor: cli
-    summary: Added source 'connection-sessions-guide' to topic 'development'.
   - version: 41
     action: source.add
     actor: cli
@@ -217,3 +214,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'watchdog-journals' to topic 'execution'.
+  - version: 56
+    action: source.add
+    actor: cli
+    summary: Added source 'node-expiry-reaper' to topic 'execution'.

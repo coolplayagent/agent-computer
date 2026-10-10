@@ -16,6 +16,21 @@ impl Cgroup {
     }
 
     pub fn open_matching(request: &Request, device: Option<u64>) -> Result<Self> {
+        let (directory, kill, events, device) = Self::files(request, device)?;
+        Ok(Self {
+            _directory: directory,
+            kill,
+            events,
+            device,
+        })
+    }
+
+    /// Admission observation must never construct the kill-on-drop handle.
+    pub fn verify(request: &Request, device: u64) -> Result<()> {
+        Self::files(request, Some(device)).map(|_| ())
+    }
+
+    fn files(request: &Request, device: Option<u64>) -> Result<(File, File, File, u64)> {
         let mut dir = File::from(open(
             "/sys/fs/cgroup",
             OFlags::RDONLY | OFlags::DIRECTORY | OFlags::NOFOLLOW | OFlags::CLOEXEC,
@@ -44,12 +59,7 @@ impl Cgroup {
         trusted(&events)?;
         // No empty-tree rejection: the bootstrap may not have spawned yet.
         populated(&read_control(&events)?)?;
-        Ok(Self {
-            _directory: dir,
-            kill,
-            events,
-            device: stat.st_dev,
-        })
+        Ok((dir, kill, events, stat.st_dev))
     }
 
     pub fn kill(&self) -> Result<()> {

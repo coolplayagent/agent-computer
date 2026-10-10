@@ -30,7 +30,7 @@ rust_test(
     tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
     edition = "2024",
     rustc_flags = ["-Dwarnings"],
-    deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/store", "//crates/watchdog"] + all_crate_deps(normal = True, normal_dev = True),
+    deps = [":worker", "//crates/core", "//crates/definitions", "//crates/kubernetes", "//crates/node", "//crates/store", "//crates/watchdog"] + all_crate_deps(normal = True, normal_dev = True),
 )
 
 rust_test(

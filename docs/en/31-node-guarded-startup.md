@@ -51,3 +51,5 @@ The final source in `fd672ef` passed all seven live cases after the child-reapin
 Review found a host PID-reuse window: `try_wait` could reap the CLI leader before error cleanup signalled its old process-group ID. The adapter now observes exit using `waitid` with `NOWAIT`, sends cleanup signals while the child identity remains reserved, and reaps afterward. The real-child regression, full default suites, workspace Clippy and VM rerun passed on this revision. Earlier runtime observations retain their separate source scope in the record.
 
 The persistent expiry service and separate recovery reports are described in [34](34-node-expiry-reaper.md).
+
+[New startup authorization also requires live reaper admission.](35-reaper-startup-admission.md)

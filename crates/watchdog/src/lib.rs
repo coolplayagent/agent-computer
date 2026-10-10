@@ -2,6 +2,7 @@
 //! Journals retain observations, never Kubernetes authority or a restart permit.
 #![forbid(unsafe_code)]
 
+pub mod admission;
 mod cgroup;
 pub mod journal;
 pub mod reaper;
@@ -31,6 +32,7 @@ pub enum Error {
     UntrustedJournal,
     InvalidJournal,
     ReaperAlreadyRunning,
+    ReaperUnavailable,
 }
 
 impl std::fmt::Display for Error {

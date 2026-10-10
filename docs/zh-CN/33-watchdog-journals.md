@@ -59,3 +59,5 @@ python3 crates/watchdog/tests/component.py \
 2026-10-10 的[源码绑定记录](../evidence/watchdog-journals-2026-10-10.json)和[原始日志](../evidence/watchdog-journals-2026-10-10.log)记录了 310 项默认测试通过（含 136 项 PostgreSQL 测试），以及 22 个 root VM 组件场景：4 个双守卫故障、6 个日志 IO 场景和 12 个内核回归。初次目录权限失败及显式 `0700` 修复均已保留。最终 VM 二进制与本地 Bazel 哈希一致，测试 VM、私钥和可写磁盘已清理。
 
 常驻到期回收服务与独立回收报告见[34](34-node-expiry-reaper.md)。
+
+[当前新启动授权还要求回收服务可用性准入。](35-reaper-startup-admission.md)

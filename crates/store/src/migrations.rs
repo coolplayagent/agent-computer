@@ -138,6 +138,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0017_redundant_watchdogs.sql")),
                     false,
                 ),
+                Migration::new(
+                    18,
+                    Cow::Borrowed("execution reaper admission"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0018_reaper_admission.sql")),
+                    false,
+                ),
             ])
         })
     }

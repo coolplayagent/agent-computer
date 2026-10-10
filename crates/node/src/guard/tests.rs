@@ -352,3 +352,114 @@ fn reaper_observation_preserves_original_arms_after_both_guards_die() {
         serde_json::json!({"case":"node_reaper_recovery","status":"pass","writer_released":false})
     );
 }
+
+#[test]
+#[ignore = "requires root, writable host cgroup v2 and AGENT_COMPUTER_WATCHDOG_BIN in a disposable VM"]
+fn reaper_admission_checks_live_instance_and_never_revives_a_failed_client() {
+    use agent_computer_watchdog::admission::Client;
+    use std::{os::unix::fs::MetadataExt, path::PathBuf};
+    assert!(rustix::process::geteuid().is_root());
+    let binary = std::env::var("AGENT_COMPUTER_WATCHDOG_BIN").unwrap();
+    let executable = File::open(&binary).unwrap();
+    let spool = tempfile::Builder::new()
+        .prefix("admission-")
+        .permissions(std::fs::Permissions::from_mode(0o700))
+        .tempdir_in("/root")
+        .unwrap();
+    let name = format!("ac-admission-{}-{}", std::process::id(), boottime_ms());
+    let path = PathBuf::from("/sys/fs/cgroup").join(&name);
+    std::fs::create_dir(&path).unwrap();
+    let _group = OwnedGroup(path.clone());
+    let mut workload = sleeper();
+    let pid = Pid::from_child(workload.process());
+    std::fs::write(path.join("cgroup.procs"), pid.as_raw_nonzero().to_string()).unwrap();
+    kill_process(pid, Signal::STOP).unwrap();
+    let request = Request {
+        version: 1,
+        execution_id: name.clone(),
+        boot_id: std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
+            .unwrap()
+            .trim()
+            .into(),
+        cgroup_path: name,
+        cgroup_inode: std::fs::metadata(&path).unwrap().ino(),
+        deadline_boottime_ms: boottime_ms() + 5000,
+    };
+    let mut guards = launch_pair(
+        &executable,
+        spool.path(),
+        &request,
+        Instant::now() + Duration::from_secs(1),
+    )
+    .unwrap();
+    let _children = OwnedProcesses(
+        guards
+            .iter_mut()
+            .map(|(_, child, _)| child.0.take().unwrap())
+            .collect(),
+    );
+    let refs = [
+        guards[0].0.journal.clone().unwrap(),
+        guards[1].0.journal.clone().unwrap(),
+    ];
+    let device = guards[0].0.cgroup_device;
+    assert!(Client::connect(spool.path(), &request, refs.clone(), device).is_err());
+    let spawn = || {
+        Command::new(&binary)
+            .args([
+                std::ffi::OsStr::new("--reap"),
+                std::ffi::OsStr::new("--spool"),
+                spool.path().as_os_str(),
+            ])
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .unwrap()
+    };
+    let mut services = OwnedProcesses(vec![spawn()]);
+    let limit = Instant::now() + Duration::from_secs(1);
+    while !spool.path().join("reaper.sock").exists() {
+        assert!(Instant::now() < limit);
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    let mut admitted = Client::connect(spool.path(), &request, refs.clone(), device).unwrap();
+    assert_eq!(admitted.receipt().pid, services.0[0].id());
+    admitted.check().unwrap();
+    assert!(
+        std::fs::read_to_string(path.join("cgroup.events"))
+            .unwrap()
+            .contains("populated 1\n")
+    );
+    let mut wrong = refs.clone();
+    wrong[1] = wrong[0].clone();
+    assert!(Client::connect(spool.path(), &request, wrong, device).is_err());
+    let mut restart_client = Client::connect(spool.path(), &request, refs.clone(), device).unwrap();
+    let service_pid = Pid::from_child(&services.0[0]);
+    kill_process(service_pid, Signal::STOP).unwrap();
+    std::thread::sleep(Duration::from_millis(10));
+    let before = Instant::now();
+    assert!(admitted.check().is_err());
+    assert!(before.elapsed() < Duration::from_secs(1));
+    kill_process(service_pid, Signal::CONT).unwrap();
+    assert!(admitted.check().is_err());
+    let original = restart_client.receipt().instance.clone();
+    services.0[0].kill().unwrap();
+    services.0[0].wait().unwrap();
+    services.0.push(spawn());
+    let limit = Instant::now() + Duration::from_secs(1);
+    let new = loop {
+        if let Ok(new) = Client::connect(spool.path(), &request, refs.clone(), device) {
+            break new;
+        }
+        assert!(Instant::now() < limit);
+        std::thread::sleep(Duration::from_millis(5));
+    };
+    assert_ne!(original, new.receipt().instance);
+    assert!(restart_client.check().is_err());
+    println!(
+        "{}",
+        serde_json::json!({"case":"reaper_admission","status":"pass","receipt":new.receipt(),"missing_service_denied":true,"stopped_service_denied":true,"failed_client_revoked":true,"restart_rejected_by_original_client":true,"probe_did_not_kill_target":true})
+    );
+    std::fs::write(path.join("cgroup.kill"), "1").unwrap();
+    workload.process().wait().unwrap();
+}

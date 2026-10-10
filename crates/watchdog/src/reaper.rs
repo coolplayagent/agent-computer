@@ -35,6 +35,8 @@ pub struct Batch {
 /// Batches bound memory and allow service watchdog notifications between them;
 /// the cursor advances through the whole spool instead of starving later entries.
 pub struct Reaper {
+    // Remove the endpoint while the exclusive directory lock is still held.
+    admission: Option<crate::admission::Server>,
     spool: PathBuf,
     _lock: File,
     entries: Dir,
@@ -50,10 +52,26 @@ impl Reaper {
             .map_err(|_| Error::ReaperAlreadyRunning)?;
         let entries = Dir::read_from(&dir).map_err(|_| Error::JournalUnavailable)?;
         Ok(Self {
+            admission: None,
             spool: spool.into(),
             _lock: dir,
             entries,
         })
+    }
+
+    pub fn enable_admission(&mut self) -> Result<()> {
+        if self.admission.is_some() {
+            return Err(Error::Setup);
+        }
+        self.admission = Some(crate::admission::Server::bind(&self.spool)?);
+        Ok(())
+    }
+
+    pub fn poll_admission(&mut self) -> Result<()> {
+        if let Some(server) = &self.admission {
+            server.poll()?;
+        }
+        Ok(())
     }
 
     pub fn step(&mut self) -> Result<Batch> {
