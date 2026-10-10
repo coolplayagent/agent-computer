@@ -43,3 +43,5 @@ unit 创建 root 所有、模式 `0700` 的 `/var/lib/agent-computer/watchdogs`�
 root VM 场景覆盖双守卫被杀死/停止、服务 SIGKILL 和 SIGSTOP 后 systemd 实际替换、报告发布中断、重复回收器互斥、设备/inode/摘要拒绝、旧 boot、未登记日志、路径复用、非私有 spool 拒绝，以及 302 条目的分页扫描。节点 fixture 另通过原双 arm 引用读取回收结果，并拒绝伪装成原 deadline 报告的回收记录。原双守卫、日志 IO 和内核探针继续作为回归验证。
 
 这是故障后回收机制，不能承诺硬实时截止：服务 watchdog 先要发现停止的进程，磁盘/内核阻塞或扫描积压也可能延迟终止。原双守卫仍是必需条件，服务可用性尚未接入数据库启动准入。本轮组件测试没有认证整机重启、断电持久性、多节点路由、存储 fencing 或完整 Kubernetes/CSI/worker 链路。任何报告均不释放 writer 或接受执行输出；Execution 保持 Unknown、writer 保持 Draining，产品 T01–T43 仍为 `not_run`。
+
+2026-10-10 的[源码绑定证据](../evidence/node-expiry-reaper-2026-10-10.json)和[原始日志](../evidence/node-expiry-reaper-2026-10-10.log)记录了 311 项默认测试通过（含 136 项 PostgreSQL 测试），以及最终 Bazel 产物的 37 个 VM 场景。两个服务故障场景各观察到一次自动重启。服务停止场景的完成观察比原截止时间晚 9,030 ms，其他成功回收场景为 277–489 ms；这些是单次测量，不是延迟保证。取证后已删除测试 unit、spool、安装二进制及自有 VM/私有文件。

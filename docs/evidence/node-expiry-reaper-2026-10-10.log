@@ -1,0 +1,373 @@
+Final Bazel binary VM verification: 14 service + 5 node + 6 journal + 12 kernel scenarios
+{"case": "both-killed", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "both-killed", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-e7e302422140428da3ec69b9a97219c5", "cgroup_inode": 8746, "deadline_boottime_ms": 267878}, "cgroup_device": 28, "armed_boottime_ms": 268362, "kill_boottime_ms": 268362, "observed_boottime_ms": 268362, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-a7ffe9b122f8498697eca179648e928e", "device": 64769, "inode": 262210, "intent_digest": "sha256:ae4298cfb89ca974d2579dc48938f6136565ea9d6dcdbf544dd59a75610834b9"}}, {"version": 1, "request": {"version": 1, "execution_id": "both-killed", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-e7e302422140428da3ec69b9a97219c5", "cgroup_inode": 8746, "deadline_boottime_ms": 267878}, "cgroup_device": 28, "armed_boottime_ms": 268107, "kill_boottime_ms": 268107, "observed_boottime_ms": 268107, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-954b7af60c744f038ef7daa80e55b246", "device": 64769, "inode": 262213, "intent_digest": "sha256:4a36bca0e967fbc13a66796d293f536b3a84b99ab6a3ce94142012becdadda68"}}], "max_observation_delay_ms": 484, "service_restarts": 0}
+{"case": "both-stopped", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "both-stopped", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-29c6f782578143a0b480a187028bb6c8", "cgroup_inode": 8879, "deadline_boottime_ms": 270247}, "cgroup_device": 28, "armed_boottime_ms": 270524, "kill_boottime_ms": 270524, "observed_boottime_ms": 270524, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-5e80d42432894a2794a90da903ac3a57", "device": 64769, "inode": 262210, "intent_digest": "sha256:b47580ca933d62175f1a24fe1b1446f23e6f1b280bae75a79acf41e18661f310"}}, {"version": 1, "request": {"version": 1, "execution_id": "both-stopped", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-29c6f782578143a0b480a187028bb6c8", "cgroup_inode": 8879, "deadline_boottime_ms": 270247}, "cgroup_device": 28, "armed_boottime_ms": 270264, "kill_boottime_ms": 270264, "observed_boottime_ms": 270264, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-0cd3fe16e42d427b8629e53db3107110", "device": 64769, "inode": 262213, "intent_digest": "sha256:4335a0220235b5f82012b1517bb3f3893e9b640089607c42ee7004117fcde31e"}}], "max_observation_delay_ms": 277, "service_restarts": 0}
+{"case": "service-killed", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "service-killed", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-aa1423f5b8294610befc3fe1c1d96206", "cgroup_inode": 9012, "deadline_boottime_ms": 272477}, "cgroup_device": 28, "armed_boottime_ms": 272913, "kill_boottime_ms": 272913, "observed_boottime_ms": 272913, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-931e0c3e358849649288095e1d67a258", "device": 64769, "inode": 262210, "intent_digest": "sha256:4813cfc38c6abd1afc548e2518f44708b3e51ef33076f41d4ace6eb6cd6c40e5"}}, {"version": 1, "request": {"version": 1, "execution_id": "service-killed", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-aa1423f5b8294610befc3fe1c1d96206", "cgroup_inode": 9012, "deadline_boottime_ms": 272477}, "cgroup_device": 28, "armed_boottime_ms": 272933, "kill_boottime_ms": 272933, "observed_boottime_ms": 272933, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-ca3774ed04244f0b9b4d4e478a682404", "device": 64769, "inode": 262213, "intent_digest": "sha256:bf5a65712c51f7b5ebf2a6d6e9ea6faae4f8ecbdf9c556a8c4f983e4731633ad"}}], "max_observation_delay_ms": 456, "service_restarts": 1}
+{"case": "service-stopped", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "service-stopped", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-43b4940818244a1daf3a7cbcaf1c1a9d", "cgroup_inode": 9187, "deadline_boottime_ms": 274853}, "cgroup_device": 28, "armed_boottime_ms": 283626, "kill_boottime_ms": 283626, "observed_boottime_ms": 283626, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-8ff2a948d405498ea6546b29e089aadb", "device": 64769, "inode": 262210, "intent_digest": "sha256:25d02da12addfb56be4b48c5ced7b0d0e08b2042e29291de95e73103b42908be"}}, {"version": 1, "request": {"version": 1, "execution_id": "service-stopped", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-43b4940818244a1daf3a7cbcaf1c1a9d", "cgroup_inode": 9187, "deadline_boottime_ms": 274853}, "cgroup_device": 28, "armed_boottime_ms": 283883, "kill_boottime_ms": 283883, "observed_boottime_ms": 283883, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-88a920a92eae47eea35bb93d7561687f", "device": 64769, "inode": 262213, "intent_digest": "sha256:2658e0d7eb3509e43053899f5c5c54d54fb39ad52656e52c07dad4f7aaaaba4f"}}], "max_observation_delay_ms": 9030, "service_restarts": 1}
+{"case": "interrupted-publication", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "interrupted-publication", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-675a609c9d5a4fefa54ccc72f057fae7", "cgroup_inode": 9362, "deadline_boottime_ms": 285850}, "cgroup_device": 28, "armed_boottime_ms": 286322, "kill_boottime_ms": 286322, "observed_boottime_ms": 286322, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-d08bc1f673ce4884bb3ffebc4f505923", "device": 64769, "inode": 262210, "intent_digest": "sha256:ba23f15c9476a30ba2c4999ab3755a5b40e8d7f4dd26756bf997b965c1a927ee"}}, {"version": 1, "request": {"version": 1, "execution_id": "interrupted-publication", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-675a609c9d5a4fefa54ccc72f057fae7", "cgroup_inode": 9362, "deadline_boottime_ms": 285850}, "cgroup_device": 28, "armed_boottime_ms": 286339, "kill_boottime_ms": 286339, "observed_boottime_ms": 286339, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-8619703c580f43d0875f040ef40e45c0", "device": 64769, "inode": 262213, "intent_digest": "sha256:4ed3744e48101c14ce1ab29922079247b8c656aa77e1dc69267cfd109d71cee0"}}], "max_observation_delay_ms": 489, "service_restarts": 0}
+{"case": "wrong-device", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-bb97d1675c0d4d8cb7d608767c12e2e6", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}, {"journal_id": "journal-aa301812a09548868dc19b072961ef24", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}]}
+{"case": "wrong-inode", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-d247f2e78ba94d18b72a4d99d85c3cac", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}, {"journal_id": "journal-1865f038e92241268d76543a97776cdf", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}]}
+{"case": "old-boot", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-a65206a875904272b75f119d8069f1c8", "outcome": {"state": "historical_boot"}}, {"journal_id": "journal-1681ddaec1e846618ecab7f41544a569", "outcome": {"state": "historical_boot"}}]}
+{"case": "altered-digest", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-a3247ec810dd4a5c9ed2fc937156c768", "outcome": {"state": "unavailable", "error": "InvalidJournal"}}, {"journal_id": "journal-a84bf0e13b4547c0900c05560ebed036", "outcome": {"state": "unavailable", "error": "InvalidJournal"}}]}
+{"case": "unenrolled", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-5b6e29e1869f4e12aebcbbe3ce442cef", "outcome": {"state": "unenrolled"}}, {"journal_id": "journal-2e8fb6663f404cbaaa5dbfe3e3d8ee1c", "outcome": {"state": "unenrolled"}}]}
+{"case": "path-reuse", "status": "pass", "target_untouched": true, "outcomes": [{"journal_id": "journal-1ff9e63e80d94160a558dd300d5a38f6", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}, {"journal_id": "journal-5ccb99e25e47484b90077d41ccc5532b", "outcome": {"state": "unavailable", "error": "IdentityMismatch"}}]}
+{"case": "pagination", "status": "pass", "reports": [{"version": 1, "request": {"version": 1, "execution_id": "pagination", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-9cbe0fb8bf7e4868b92a1140c7dbfa77", "cgroup_inode": 10342, "deadline_boottime_ms": 303493}, "cgroup_device": 28, "armed_boottime_ms": 303565, "kill_boottime_ms": 303565, "observed_boottime_ms": 303565, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-25455b9cf20746eca8e88f3ba24c1f56", "device": 64769, "inode": 262210, "intent_digest": "sha256:9e8993ecf53128131ddb8bb83e5e812a247df0753eb79c7548ef282d355f1b47"}}, {"version": 1, "request": {"version": 1, "execution_id": "pagination", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-reaper-9cbe0fb8bf7e4868b92a1140c7dbfa77", "cgroup_inode": 10342, "deadline_boottime_ms": 303493}, "cgroup_device": 28, "armed_boottime_ms": 303854, "kill_boottime_ms": 303854, "observed_boottime_ms": 303854, "trigger": "Recovery", "observation": "EmptyObserved", "error": null, "journal": {"id": "journal-97ba5aa8a644494ca0f973b14e61a669", "device": 64769, "inode": 262213, "intent_digest": "sha256:6ea5f3fc19152ddfd12b35a6ef668b56b90bb0213918a6d498a4b317614fc112"}}], "max_observation_delay_ms": 361, "service_restarts": 0}
+
+running 2 tests
+{"guards":[{"state":"recovered","journal":{"id":"journal-W38tpc","device":64769,"inode":262214,"intent_digest":"sha256:0f8ba9b447ca2e83e94b089f1475169e5a30d66b5a4aa614a55a07cbc092a0d8"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-reaper-node-2151-304150","boot_id":"01e44320-9236-42bd-80d9-aabd170e2014","cgroup_path":"ac-reaper-node-2151-304150","cgroup_inode":10517,"deadline_boottime_ms":305363},"cgroup_device":28,"armed_boottime_ms":305373,"kill_boottime_ms":305373,"observed_boottime_ms":305373,"trigger":"Recovery","observation":"EmptyObserved","error":null,"journal":{"id":"journal-W38tpc","device":64769,"inode":262214,"intent_digest":"sha256:0f8ba9b447ca2e83e94b089f1475169e5a30d66b5a4aa614a55a07cbc092a0d8"}}},{"state":"recovered","journal":{"id":"journal-YhJuvn","device":64769,"inode":262218,"intent_digest":"sha256:45ac03e8b20c23975510500fbfdcb477a32d92c32a4cd03eef175e0448122c2b"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-reaper-node-2151-304150","boot_id":"01e44320-9236-42bd-80d9-aabd170e2014","cgroup_path":"ac-reaper-node-2151-304150","cgroup_inode":10517,"deadline_boottime_ms":305363},"cgroup_device":28,"armed_boottime_ms":305439,"kill_boottime_ms":305439,"observed_boottime_ms":305439,"trigger":"Recovery","observation":"EmptyObserved","error":null,"journal":{"id":"journal-YhJuvn","device":64769,"inode":262218,"intent_digest":"sha256:45ac03e8b20c23975510500fbfdcb477a32d92c32a4cd03eef175e0448122c2b"}}}]}
+{"case":"node_reaper_recovery","status":"pass","writer_released":false}
+test guard::tests::reaper_observation_preserves_original_arms_after_both_guards_die ... ok
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-DR9Aej","device":64769,"inode":262212,"intent_digest":"sha256:6cb19ed81e495d5da2cb8153a71cf5c38e06093cd90812138b5489db98f0c332"}},{"state":"recorded","journal":{"id":"journal-Ur5wlP","device":64769,"inode":262220,"intent_digest":"sha256:3d0e30b2f119623f910140a307c131684fb7767f3986a650679480a88670eae6"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-2151-304150","boot_id":"01e44320-9236-42bd-80d9-aabd170e2014","cgroup_path":"ac-guard-pair-2151-304150","cgroup_inode":10566,"deadline_boottime_ms":305663},"cgroup_device":28,"armed_boottime_ms":304231,"kill_boottime_ms":305663,"observed_boottime_ms":305675,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-Ur5wlP","device":64769,"inode":262220,"intent_digest":"sha256:3d0e30b2f119623f910140a307c131684fb7767f3986a650679480a88670eae6"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":305663,"empty_observed_boottime_ms":305668,"failed_index":0,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-VhVvdH","device":64769,"inode":262211,"intent_digest":"sha256:6ab30d1b911774031891af866b32fefe56bb808daca76a83dc7978f1e3cef779"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-2151-305818","boot_id":"01e44320-9236-42bd-80d9-aabd170e2014","cgroup_path":"ac-guard-pair-2151-305818","cgroup_inode":10615,"deadline_boottime_ms":307333},"cgroup_device":28,"armed_boottime_ms":305850,"kill_boottime_ms":307333,"observed_boottime_ms":307343,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-VhVvdH","device":64769,"inode":262211,"intent_digest":"sha256:6ab30d1b911774031891af866b32fefe56bb808daca76a83dc7978f1e3cef779"}}},{"state":"unconfirmed","journal":{"id":"journal-84TDXm","device":64769,"inode":262217,"intent_digest":"sha256:1360a86580eabb838a8a970b6a5fc4d8558a29d849da5e0c93465f2cf8011097"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":307333,"empty_observed_boottime_ms":307341,"failed_index":1,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-Crtp80","device":64769,"inode":262224,"intent_digest":"sha256:dad54013d5f1f5ae3f32c58dde6814be4d431ec5d5c9cdc02b7ae63d431869d6"}},{"state":"recorded","journal":{"id":"journal-Kl9tcI","device":64769,"inode":262227,"intent_digest":"sha256:5d670fb8d9edb21b4ddaf316eeb57d608f139f2da70f4aa4d5e2b027cc290e17"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-2151-307398","boot_id":"01e44320-9236-42bd-80d9-aabd170e2014","cgroup_path":"ac-guard-pair-2151-307398","cgroup_inode":10664,"deadline_boottime_ms":308909},"cgroup_device":28,"armed_boottime_ms":307448,"kill_boottime_ms":308909,"observed_boottime_ms":308919,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-Kl9tcI","device":64769,"inode":262227,"intent_digest":"sha256:5d670fb8d9edb21b4ddaf316eeb57d608f139f2da70f4aa4d5e2b027cc290e17"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":308909,"empty_observed_boottime_ms":308910,"failed_index":0,"signal":"\"Signal::STOP\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-bSInvo","device":64769,"inode":262231,"intent_digest":"sha256:5f79d8a1ed48d5b46caae5d9bc3ebfe07ce5ee6c72225fcea6fd89debd0351e6"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-2151-308982","boot_id":"01e44320-9236-42bd-80d9-aabd170e2014","cgroup_path":"ac-guard-pair-2151-308982","cgroup_inode":10713,"deadline_boottime_ms":310496},"cgroup_device":28,"armed_boottime_ms":309051,"kill_boottime_ms":310496,"observed_boottime_ms":310506,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-bSInvo","device":64769,"inode":262231,"intent_digest":"sha256:5f79d8a1ed48d5b46caae5d9bc3ebfe07ce5ee6c72225fcea6fd89debd0351e6"}}},{"state":"unconfirmed","journal":{"id":"journal-VbzPi4","device":64769,"inode":262234,"intent_digest":"sha256:6f0672e16085f5ea465bb3d099e4bcf6a5bb2430ad3b33e00621748971edc641"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":310496,"empty_observed_boottime_ms":310504,"failed_index":1,"signal":"\"Signal::STOP\"","writer_released":false}
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 6.40s
+
+{"case": "normal", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "normal", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-journal-3f5a2e83661841deb065bb6f9780cce7", "cgroup_inode": 10762, "deadline_boottime_ms": 311797}, "cgroup_device": 28, "armed_boottime_ms": 310608, "kill_boottime_ms": 311798, "observed_boottime_ms": 311811, "trigger": "Deadline", "observation": "EmptyObserved", "error": null, "journal": {"id": "normal", "device": 64769, "inode": 262209, "intent_digest": "sha256:e483c055378cf96b33b62d4604e52933c170cb6237d54deeae647fc0fc2decdb"}}}
+{"case": "closed-output", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "closed-output", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-journal-1eb1c695bdf4463f908efce843226dca", "cgroup_inode": 10811, "deadline_boottime_ms": 313052}, "cgroup_device": 28, "armed_boottime_ms": 311873, "kill_boottime_ms": 313052, "observed_boottime_ms": 313062, "trigger": "Deadline", "observation": "EmptyObserved", "error": null, "journal": {"id": "closed-output", "device": 64769, "inode": 262214, "intent_digest": "sha256:507412d8a1e6d94a29ae00f385dc03d90100524d3e7c080a84d8e0d0c1c37861"}}}
+{"case": "report-write-error", "status": "pass", "target_empty": true, "report_missing": true}
+{"case": "full-output", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "full-output", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-journal-402f3cf4a19b4b80b6c4913cb971b8d8", "cgroup_inode": 10909, "deadline_boottime_ms": 339355}, "cgroup_device": 28, "armed_boottime_ms": 314371, "kill_boottime_ms": 314371, "observed_boottime_ms": 314381, "trigger": "ReceiptUnavailable", "observation": "EmptyObserved", "error": null, "journal": {"id": "full-output", "device": 64769, "inode": 262224, "intent_digest": "sha256:9cc0605113aeeb96ebc56a19badd2b32c9906d8cd7b68349b91ec68e9b15589b"}}}
+{"case": "duplicate-journal", "status": "pass", "armed": false, "target_untouched": true}
+{"case": "nonprivate-journal", "status": "pass", "armed": false, "target_untouched": true}
+{"case": "stopped-supervisor", "status": "pass", "pids": {"parent": 2191, "child": 2192}, "report": {"version": 1, "request": {"version": 1, "execution_id": "stopped-supervisor", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-watchdog-c34ec65456ac4537bc3cfa7a7900db20/stopped-supervisor", "cgroup_inode": 11105, "deadline_boottime_ms": 315846}, "cgroup_device": 28, "armed_boottime_ms": 314673, "kill_boottime_ms": 315846, "observed_boottime_ms": 315857, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "frozen-tree", "status": "pass", "pids": {"parent": 2194, "child": 2195}, "report": {"version": 1, "request": {"version": 1, "execution_id": "frozen-tree", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-watchdog-c34ec65456ac4537bc3cfa7a7900db20/frozen-tree", "cgroup_inode": 11141, "deadline_boottime_ms": 317144}, "cgroup_device": 28, "armed_boottime_ms": 315947, "kill_boottime_ms": 317144, "observed_boottime_ms": 317174, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "expired-deadline", "status": "pass", "pids": {"parent": 2197, "child": 2198}, "report": {"version": 1, "request": {"version": 1, "execution_id": "expired-deadline", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-watchdog-c34ec65456ac4537bc3cfa7a7900db20/expired-deadline", "cgroup_inode": 11177, "deadline_boottime_ms": 316249}, "cgroup_device": 28, "armed_boottime_ms": 317251, "kill_boottime_ms": 317251, "observed_boottime_ms": 317261, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "closed-receipt", "status": "pass", "pids": {"parent": 2200, "child": 2201}, "elapsed_ms": 18, "deadline": 342340}
+{"case": "full-receipt", "status": "pass", "pids": {"parent": 2203, "child": 2204}, "elapsed_ms": 13, "deadline": 342434}
+{"case": "controller-exit", "status": "pass", "pids": {"parent": 2206, "child": 2207}, "report": {"version": 1, "request": {"version": 1, "execution_id": "controller-exit", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-watchdog-c34ec65456ac4537bc3cfa7a7900db20/controller-exit", "cgroup_inode": 11285, "deadline_boottime_ms": 318730}, "cgroup_device": 28, "armed_boottime_ms": 317590, "kill_boottime_ms": 318730, "observed_boottime_ms": 318740, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "path-reuse", "status": "pass", "original": {"parent": 2210, "child": 2211}, "replacement": {"parent": 2213, "child": 2214}, "report": {"version": 1, "request": {"version": 1, "execution_id": "path-reuse", "boot_id": "01e44320-9236-42bd-80d9-aabd170e2014", "cgroup_path": "ac-watchdog-c34ec65456ac4537bc3cfa7a7900db20/path-reuse", "cgroup_inode": 11321, "deadline_boottime_ms": 320592}, "cgroup_device": 28, "armed_boottime_ms": 318796, "kill_boottime_ms": 320592, "observed_boottime_ms": 320592, "trigger": "Deadline", "observation": "Unknown", "error": "KillFailed"}}
+{"case": "wrong-inode", "status": "pass", "pids": {"parent": 2215, "child": 2216}}
+{"case": "wrong-boot", "status": "pass", "pids": {"parent": 2218, "child": 2219}}
+{"case": "own-ancestor", "status": "pass", "pids": {"parent": 2221, "child": 2222}}
+{"case": "delegated-group", "status": "pass", "pids": {"parent": 2224, "child": 2225}}
+{"case": "threaded-group", "status": "pass"}
+
+Real systemd service lifecycle journal, including preliminary and final runs
+2026-10-10T02:01:05+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:05+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:07+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Main process exited, code=killed, status=9/KILL
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Failed with result 'signal'.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Scheduled restart job, restart counter is at 1.
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:10+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:12+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:22+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Watchdog timeout (limit 10s)!
+2026-10-10T02:01:22+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Killing process 1517 (agent-computer-) with signal SIGKILL.
+2026-10-10T02:01:22+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Main process exited, code=killed, status=9/KILL
+2026-10-10T02:01:22+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Failed with result 'watchdog'.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Scheduled restart job, restart counter is at 1.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:23+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:25+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:28+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:30+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:33+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:35+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:38+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:40+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:01:42+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:02:56+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:02:56+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:02:59+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Main process exited, code=killed, status=9/KILL
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Failed with result 'signal'.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Scheduled restart job, restart counter is at 1.
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:01+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:03+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:13+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Watchdog timeout (limit 10s)!
+2026-10-10T02:03:13+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Killing process 1983 (agent-computer-) with signal SIGKILL.
+2026-10-10T02:03:13+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Main process exited, code=killed, status=9/KILL
+2026-10-10T02:03:13+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Failed with result 'watchdog'.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Scheduled restart job, restart counter is at 1.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:14+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:17+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:19+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:22+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:24+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:27+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:29+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:32+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Starting agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Started agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Stopping agent-computer-expiry-reaper.service - Agent Computer node expiry recovery...
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: agent-computer-expiry-reaper.service: Deactivated successfully.
+2026-10-10T02:03:34+00:00 ac-kube-validation systemd[1]: Stopped agent-computer-expiry-reaper.service - Agent Computer node expiry recovery.
+
+Final Bazel build
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 28 targets (0 packages loaded, 30 targets configured).
+INFO: Found 28 targets...
+INFO: Elapsed time: 1.133s, Critical Path: 0.92s
+INFO: 6 processes: 53 action cache hit, 3 internal, 3 processwrapper-sandbox.
+INFO: Build completed successfully, 6 total actions
+
+Final Bazel default tests
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 28 targets (0 packages loaded, 30 targets configured).
+[974 / 975] 9 / 10 tests; Testing //crates/node:node_contracts_test; 1s processwrapper-sandbox
+INFO: Found 18 targets and 10 test targets...
+INFO: Elapsed time: 1.742s, Critical Path: 1.43s
+INFO: 2 processes: 60 action cache hit, 1 internal, 2 processwrapper-sandbox.
+INFO: Build completed successfully, 2 total actions
+//crates/cli:cli_contracts_test                                 (cached) PASSED in 0.9s
+//crates/core:core_contracts_test                               (cached) PASSED in 0.1s
+//crates/definitions:definitions_contracts_test                 (cached) PASSED in 0.5s
+//crates/kubernetes:kubernetes_contracts_test                   (cached) PASSED in 1.8s
+//crates/sandbox:sandbox_contracts_test                         (cached) PASSED in 0.1s
+//crates/server:server_contracts_test                           (cached) PASSED in 3.1s
+//crates/storage:storage_contracts_test                         (cached) PASSED in 2.2s
+//crates/store:postgres_contracts_test                          (cached) PASSED in 9.7s
+//crates/watchdog:watchdog_contracts_test                       (cached) PASSED in 0.1s
+//crates/node:node_contracts_test                                        PASSED in 1.4s
+
+Executed 1 out of 10 tests: 10 tests pass.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+Final Clippy workspace all targets
+    Checking agent-computer-watchdog v0.1.0 (/opt/workspace/agent-computer/crates/watchdog)
+    Checking agent-computer-node v0.1.0 (/opt/workspace/agent-computer/crates/node)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s
+
+Initial Cargo fixture setup failure (corrected by explicit PG paths)
+thread 'cases::authentication::spoofed_identity_browser_origin_and_revoked_credentials_are_rejected' (3952932) panicked at crates/test-support/src/lib.rs:37:9:
+Install PostgreSQL 18 or set AGENT_COMPUTER_PG_BIN; database tests must not be skipped
