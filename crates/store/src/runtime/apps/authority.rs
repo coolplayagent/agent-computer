@@ -163,6 +163,7 @@ pub(super) async fn bound(
     {
         return Err(Error::ConnectionInactive);
     }
+    browser::check_deadline(tx, org, &row.try_get::<String, _>("instance_id")?).await?;
     Ok(())
 }
 pub(super) async fn reconcile(
@@ -171,7 +172,10 @@ pub(super) async fn reconcile(
     row: &PgRow,
     seq: i64,
 ) -> Result<()> {
-    if row.try_get::<String, _>("state")? != "Queued" {
+    if !matches!(
+        row.try_get::<String, _>("state")?.as_str(),
+        "Queued" | "Dispatching" | "Running"
+    ) {
         return Ok(());
     }
     match bound(tx, org, row).await {
@@ -186,13 +190,17 @@ pub(super) async fn reconcile(
             | Error::ReferenceUnavailable,
         ) => {
             let id: String = row.try_get("instance_id")?;
-            sqlx::query("UPDATE app_instances SET state='Blocked',revision=revision+1 WHERE organization=$1 AND instance_id=$2 AND state='Queued'").bind(org).bind(&id).execute(&mut **tx).await?;
+            sqlx::query("UPDATE app_instances SET state=CASE WHEN state='Queued' THEN 'Blocked' ELSE 'Draining' END,revision=revision+1 WHERE organization=$1 AND instance_id=$2 AND state IN ('Queued','Dispatching','Running')").bind(org).bind(&id).execute(&mut **tx).await?;
             transactions::emit(
                 tx,
                 org,
                 seq,
-                "app.admission_blocked",
-                json!({"instance_id":id,"dispatch_started":false}),
+                if row.try_get::<String, _>("state")? == "Queued" {
+                    "app.admission_blocked"
+                } else {
+                    "app.browser_authority_invalidated"
+                },
+                json!({"instance_id":id,"dispatch_started":row.try_get::<String, _>("state")? != "Queued"}),
             )
             .await?;
             Ok(())

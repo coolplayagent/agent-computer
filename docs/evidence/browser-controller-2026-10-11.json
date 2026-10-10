@@ -1,0 +1,2547 @@
+{
+  "schema_version": 1,
+  "component": "durable-browser-launch-controller",
+  "status": "component_contracts_passed",
+  "recorded_at": "2026-10-10T23:37:54.566535+00:00",
+  "base_commit": "d86c2f5088190343b0538536171b2948f70353f1",
+  "source_manifest_sha256": {
+    "Cargo.lock": "9d5988903bad725a6b0aa434231736f7f0e611a5cc08ec66f5d12061dfc9801c",
+    "Cargo.toml": "cab66f83028d2831d13d7b7bc0fc772dadfe0ab91756001e34499ffedcc6f156",
+    "MODULE.bazel": "2ced7142b039518f11b8a334c60b198ad7eb5624a98cd28afef19058481bbf6b",
+    "crates/browser/BUILD.bazel": "6fec214d6fa8c6a61e0722c505f832e13657e1766b9b0b77446aabace52634e2",
+    "crates/browser/Cargo.toml": "b7d200e581068fc4e3c954316483e07887030dcf84464f6334861b6cb2aafb1a",
+    "crates/browser/src/binding.rs": "334ef25a3f617338134bd632cd33e122f08c10d5da4a162ccfdd290f0dcde484",
+    "crates/browser/src/contracts.rs": "bf06cb759dff54253c5c5c5d7f2e545ee1cfcf29bc7f9ebd108ff112f6f09346",
+    "crates/browser/src/lib.rs": "ceae25147056c47c5e293b25f0f8acff257da796dbcb44d8c2fcbb89aee9806a",
+    "crates/browser/src/observation.rs": "251a05a783ec91506c05a783540f14f0f815d8343cb9de9f9a43264b8aa624bf",
+    "crates/browser/src/session.rs": "8a12c2645f31f237b68b493d06e96b27763819ef3abb81ee379f4270a6c5dbac",
+    "crates/browser/src/tests.rs": "8be922adffd6ca680c10da718de3a9bb6750e3fd5cfc4c92161cf057ff882768",
+    "crates/cli/BUILD.bazel": "ca080fb6cb747c5b77d0e1871740554df319e18cb523e4ae2fa2e4effb27688a",
+    "crates/cli/Cargo.toml": "641368f8fc72c09c0dd01dd05bdb56d20ada9d98a41a2323fb99d9064a2002c8",
+    "crates/cli/src/main.rs": "1712bdaa9e272a5dc09d725998e02f784e1beb49eaf16571b66220af46f6c573",
+    "crates/cli/src/remote.rs": "a7754be7619319bf184f6c5fff993e9485894e241a6aa8cf9f9020caf1dc7a50",
+    "crates/cli/src/remote/options.rs": "c90cf11d18bbdfb8f937c24913e4cf24ea7fc40c195ee740e141ad5f9753cc6a",
+    "crates/cli/src/remote/output.rs": "960d5f2d8700fc702498ef42e4265420505a90d4349cbba574d35419eb0f945f",
+    "crates/cli/src/validate.rs": "a81b8211e7c33dc70f2609358a6224a088a9aaed0fffa8566d9d0b31ca58e166",
+    "crates/cli/tests/cli_contracts.rs": "0609e8a724647e29780210c0c128fcfe68203e5a233dadbd026fda55cb34221f",
+    "crates/cli/tests/remote_contracts.rs": "de63f3dea740c25e6348cdf21b76b842a36d66c211ea1f44005a23ebd63f5e42",
+    "crates/cli/tests/remote_service.rs": "5e040cd62b09d5201ef40bcea38adcd205bcf4183e7f9961670679005370c782",
+    "crates/cli/tests/support/runtime.rs": "0023808d88610d2d398723b32d643903e7ed14a12c811e5059b042549a76b0fc",
+    "crates/core/BUILD.bazel": "1cccfdde401f4e71bbf8d03a99332cd3e22500ce11ce5a47e07757fb5aa2918d",
+    "crates/core/Cargo.toml": "203f9e6d91e59921d919723e76c4a995ca62b32a3a8afe2dff3e23d8c637f7b6",
+    "crates/core/src/computer.rs": "6d9d82b7eac2660e45812b4238ab71401cd723c410d9e5098a274ee2599592d8",
+    "crates/core/src/execution.rs": "cac70d326d3b8216228116c81a6ef28a90364794cb8bcb896a653c0f6a68036e",
+    "crates/core/src/idempotency.rs": "a5344cb37ea705b82eea93190c9c482c4b56ead5ccd5d369cfc6ad9bef1f3ae6",
+    "crates/core/src/identity.rs": "3bc0e51fc6fb84c5c6620772d5397445f488ce009397df44a8f7f421925b2c70",
+    "crates/core/src/lease.rs": "afb9c941f5dc5473a4acf0166e7ef09c36ed287d2438d6208abd1e79b2c07a9d",
+    "crates/core/src/lib.rs": "2994904065f64886e763bd89372ee67de99537f29e069f043e6c8f3c0f4af388",
+    "crates/core/tests/contracts/computer.rs": "aca5b2eac91d8d03e1c14fdbf4be68b176e8aa647ac30a5513d44c4fd4bed4a8",
+    "crates/core/tests/contracts/execution.rs": "437bf817e23e29f985f473ca94240b55ec43903485e1aadb4be9296d5286ab2a",
+    "crates/core/tests/contracts/idempotency.rs": "186d29ebf356e3e59dabe359de97a670d3ffe23e12bbcb71f03d4ab876e38d08",
+    "crates/core/tests/contracts/identity.rs": "3229cd482af425ca83ecc193d32d3b8b57e1aaad7b56fa8df33ae0e70c60b86a",
+    "crates/core/tests/contracts/lease.rs": "fc0e8335e86a1c3646b3b2ea826a5448ef06af5801e0c2149516c6436a0d80d5",
+    "crates/core/tests/core_contracts.rs": "4b95c1d435077bc4dc407bd5e88dc9bbff1715646b3fc289e9f1ab2a620a3fc5",
+    "crates/csi/BUILD.bazel": "fe1e5467745dc4e76d5b64ed563402c52746b3b4f6a4ca4a36094dbc7be8d158",
+    "crates/csi/Cargo.toml": "f7847ac1ae0f4286bd56518b9724db5204c2d9d4758a99a92b26355e8845a64d",
+    "crates/csi/build.rs": "21cca4eb7f50b06bb6423d5fac2f0d1abbef880acc753f8f8b8fd4623b57490c",
+    "crates/csi/src/lib.rs": "ec914d19bd04080bc0d0c2814d55824c3723cd62952456f53c3ec3ff0d845ff3",
+    "crates/csi/src/local.rs": "d0da92076cabe589150582761566b1f60a9ab0809bed310fadd113cfbc8a880c",
+    "crates/csi/src/main.rs": "350e652663e2f11fa175a290b683d79d336e5d6a5646a8fb669a7a5e75e04b3a",
+    "crates/csi/src/registry.rs": "e10a106576061dca0fc6eb4bcab4fb538d0c564a6339320fa88dd105b2c6b8ae",
+    "crates/csi/src/server.rs": "adb5e8fda846e14a6b82205c2e1b1f9efac0ab4ec016b967a5126dcb144c3a0b",
+    "crates/csi/src/tests.rs": "412d495cb4f95da024d05545bd106afdd185a59571779dfdbc14ca277b8474b9",
+    "crates/csi/src/wire.rs": "9a6cca774425814b067522228c4cf08fd04b2223febfd6620fe5aabc2b373490",
+    "crates/csi/tests/live.rs": "5f3e19c770b083ddf01014284de1cbd14bdc9329e3b8ea74d29332dfab0f9f52",
+    "crates/definitions/BUILD.bazel": "68d9e25712df19eae384b0868e69f8478fd18178fd4c06ceec31b69fa0fda192",
+    "crates/definitions/Cargo.toml": "25f5d47d8d588a19154de375f65a6d7046c49edd6da22bb16bb84ca0d5882086",
+    "crates/definitions/src/bounded.rs": "5736dc340c912d9150a77162912c514b152a4ba8f56b00b4fcaa48ade095a28f",
+    "crates/definitions/src/canonical.rs": "5421ea7ea4c5aeaf596e346b44c8ce967ebbfb70e16bcff6a822e6bb4b7482a8",
+    "crates/definitions/src/lib.rs": "8dc1e1cb28b89a37f8b9540846f8a9e031dca1092a8a306c300c72319c66293f",
+    "crates/definitions/src/model.rs": "af1353a7acad0411bf4b5ecfa1b09af172b9b6ff7849e43b04e7ac0731bd4a05",
+    "crates/definitions/src/validation.rs": "9b2dabe77a43d39fd29ed8c2f1c7d02eb5cc9f9723c1e7368f271abb70f2406a",
+    "crates/definitions/tests/cases/canonical.rs": "49486f538b72ba7103420f298bba72467864ae9a84fb962aee9eddf84373c889",
+    "crates/definitions/tests/cases/parsing.rs": "04e990deeacc99c4c475eaa64b893c9e49f80dd9dbff3cf0062f785b62ea217d",
+    "crates/definitions/tests/cases/references.rs": "e81ce2e4bebb4685e297d95f6cab37ca19f8b533a3e99ae0af7e22215338900e",
+    "crates/definitions/tests/cases/sandbox.rs": "790790d5b98ade0004ab95d6b4bb65263ac7343f653d64918139e82287e6537b",
+    "crates/definitions/tests/definitions_contracts.rs": "023f5d084a643ed6c76c5f6161f0f19c1dc4d92ebdc3419264af2311016a9cc1",
+    "crates/fence/BUILD.bazel": "171f330a2a78bd98b911aabc0dd77c65c2b8d554c611e49f180d268cc60e26d4",
+    "crates/fence/Cargo.toml": "55adc683b4b372a58afdc9319e73e98877711f7cd2839953fba44392075e92b1",
+    "crates/fence/src/backend.rs": "bdc65a80b9f4d4a6e3a06e47a02c7b5545c2650f69e7bd920e42ce81bb7727af",
+    "crates/fence/src/filesystem.rs": "2aa6257f41a1afd99f5d74461ebc8b903479b33c9ae1b0d230aa079b4545054d",
+    "crates/fence/src/lib.rs": "c4b75f2a7cbc0a0d437017ec9eb5cae300b3f7ac10416cd41887d1b874634a3a",
+    "crates/fence/src/reference.rs": "b46f24ddd5c48ce2f3b91d639279ead54e36992ff41faca693cb82e3f26581fa",
+    "crates/fence/src/tests.rs": "d75713fe35ed0d9e1d9409a26e5440a42b7b80e413b302718ea2f98583247af6",
+    "crates/kubernetes/BUILD.bazel": "79de238305a3fd09cb64d64407cb3821d8b9d25684f4ca6bbb2e3dd30fff3204",
+    "crates/kubernetes/Cargo.toml": "00e2cf2628fe98c30e291e8ce92450d09d3d3bbb3e35f0cf6562319b3cf862f4",
+    "crates/kubernetes/src/attach.rs": "e736c49a3131e12849f57fca6dfc18b236a01105c133144f923982c9c1a84eda",
+    "crates/kubernetes/src/attach/running.rs": "0d7ecaad89e53c229a204500fd5acdf62c188ebdd0d93ac39e394719d7ab30f5",
+    "crates/kubernetes/src/browser.rs": "b60829117fa664e42f06990efbe73bfe578d95b30ac239122e89fd50a01149eb",
+    "crates/kubernetes/src/browser_attach.rs": "0e26e2b8158ca906bdf065cb68533ac73c0141efd0617130a0ec1cb1d82e7944",
+    "crates/kubernetes/src/candidate.rs": "26198406950882039a90583e18200a733978e835ae498e27b43e9571bfba2f09",
+    "crates/kubernetes/src/client.rs": "e82218558dccd0a8f5954323203ae4112557a7dd9e5b545106625106b6c6d006",
+    "crates/kubernetes/src/lib.rs": "b3ad28dd002e70bbbf388bbcf95c0719bb67a8452ed98f9630ee6ccb85afd0b1",
+    "crates/kubernetes/src/node.rs": "4193db93fe5817a26ffdaa930028fb5ac191794b53d9e67c8ce04fa4708e71d3",
+    "crates/kubernetes/src/plan.rs": "06e71ea37c5f627e4308bca65b85bb2754b40e30c43bc9d857e55d141137eff5",
+    "crates/kubernetes/src/startup_plan.rs": "eec5fc4f4378132b142aaaa2b9dada28e66854e77ac4698ffdc527eb9b572c29",
+    "crates/kubernetes/src/tests.rs": "f3382af21f7927363e0acf4836a99911bab52539459fe5e0e91047f7ecac7e3b",
+    "crates/kubernetes/src/tests/attach.rs": "a7cd2371f0205260d1f9b647887bce50811efdb6e6ec14d19ae17642873e5212",
+    "crates/kubernetes/src/tests/attach/candidate.rs": "9894529e882bbbc429db73f1fa099656d3a404a346fa3243c3b85541fa61474e",
+    "crates/kubernetes/src/tests/attach/renewal.rs": "6d18ba9fdd8e847bbe40b5c38de63b10f01acba3895629ba726b9753f1007a03",
+    "crates/kubernetes/src/tests/attach/streaming.rs": "031f3871c54f07e600fa0811ff91762da11d82ecfb91189130526e50c186ebdd",
+    "crates/kubernetes/src/verify.rs": "1b8838a1660d4e05f08f1bd092e5eae1a2f6dc502a65637ad2829742e1d61d12",
+    "crates/kubernetes/src/volume.rs": "c8d403a1ccbd97ec992b8eab06474ec9f165a32b63b5ca9abe95690e252d6d8a",
+    "crates/kubernetes/tests/candidate_live.rs": "c3214645c4db6b1846b430f350afca679761b9357e530cc928db471eae5a9e1a",
+    "crates/kubernetes/tests/live.rs": "48712af00fbac0f2a77cca5baae0a224613a3cffc09232d9e21edc151afbd60c",
+    "crates/kubernetes/tests/startup_image.py": "e71f5f1f42063121e9debd3a45338a901fb9ba8358c55bebd41165254a27a3ca",
+    "crates/kubernetes/tests/startup_live.rs": "65278bbfc18e9904e667f717a9615bda8f96086f311961b7e2835cc0bfa72653",
+    "crates/node/BUILD.bazel": "835a54dc9e181b2ada9a430c15c5367d474b6bef80dd91b6b186725fbc5e13d9",
+    "crates/node/Cargo.toml": "9a59e5cfb4f16d7cd9672cad12e6015a564fa0e032e181ebdc1c2b18026969aa",
+    "crates/node/src/browser.rs": "3fdd89ee4fb01334e79bd3cd3288a0c69095485c267bfd66d39f1a83d2ebdcc8",
+    "crates/node/src/command.rs": "36379db1cd89b4eef78f5635df9c585fbf8bf67a0ad55e1dacc6845189905c13",
+    "crates/node/src/drain.rs": "e2cddb707902ec15739aa625dd5382a6e0d3cde9b5697334ebb3fae7dada3391",
+    "crates/node/src/drain/tests.rs": "cc5af31e8e6e49ce0699925bba423ebd3891090252c2e46c02f29c3e07589184",
+    "crates/node/src/guard.rs": "98fcf65b0f347fa1e41420c4b38f0539245af31ba3e9631ee760256575ff05a6",
+    "crates/node/src/guard/tests.rs": "81c53cd7ced5a491f88c93d26ce4cca4087e1467d8ac4533a5c9b478e3ed1d0d",
+    "crates/node/src/journals.rs": "8688e0dde6425026457c05c6c822dfc26ef30862c9bd7725fe3899da072eb5a3",
+    "crates/node/src/lib.rs": "d66917b1ac93344c1aaadb0ae54f1dcbbf1581a699f99cd97baec403dc8be477",
+    "crates/node/src/observation.rs": "b6343c4e1f62a448ce7175b17b6df5714ed1fcc14c68f2d07fb8a8dc963dd30d",
+    "crates/node/src/runtime.rs": "c29306e8c6bd80223506b10d8fa4436bef901e4d0ceff536a850ec684b2d2810",
+    "crates/node/src/termination.rs": "e0789b93bbac569a202753aec1a797a891cb1f6324afd580e601af20505464ca",
+    "crates/node/tests/browser_image.py": "b9c448c6e6906d3c970e36a2450250528cc3b8d589012499dabdcef27ecbaf70",
+    "crates/node/tests/browser_live.rs": "c4d9774204c352f39ebdf365256ee8e5f3858f6ac5cda69ffac0f0d2120bf70c",
+    "crates/objects/BUILD.bazel": "9a974b50b37251d57721ed8eb869eb1edf3881ade9589abdb2613f57ad3fb677",
+    "crates/objects/Cargo.toml": "b80333f178552f326dcc14bd245c4c28d9851cc7a6117eebcf4371d46d981c19",
+    "crates/objects/src/artifact.rs": "0c4bfd0353f154ba263beb854c9841ad38a5a496d07ddba5fb76f97ab08fdf10",
+    "crates/objects/src/lib.rs": "d01bb03f031e14f7452d5ca56eef5ca125ea1c1a59118d073c02959bb63646e4",
+    "crates/objects/src/s3.rs": "131a8767b828cc2b403d37010a4929d09e0cf60cca816af1a39ab3af08f3f1da",
+    "crates/objects/src/s3/tests.rs": "0728c81e4f6035fb7f9d3004175f0aa088838d513119aba82f462fccd7f8e826",
+    "crates/objects/src/s3/tests/http.rs": "20467764a93e667e52ee2acc88d140a6a0265dd911d590dc1df8652340051a19",
+    "crates/objects/src/spool.rs": "c12f4b6be6027d4aa7772ee8c3cc7430d7aacaa43769e163dbc754c9af91b3c2",
+    "crates/objects/src/tests.rs": "eef3deacfd222264078c7d190eb55f33726c2b4b184df8d3ce10b20bff789b03",
+    "crates/sandbox/BUILD.bazel": "79dbed49d07d9c6e57711ca5f9491fa4f07fb836b4cdd4674362b25912292d23",
+    "crates/sandbox/Cargo.toml": "f9af73e96f4335bc488c77f42ebb5eafe0b10a2a6f21bd399bca7470450ccc31",
+    "crates/sandbox/src/control.rs": "8d0da55cdf3d38f209f90c969eb3012d0d0a6f74111f611ff8debbe72ab3f3e5",
+    "crates/sandbox/src/lib.rs": "5c9a392e7971c4d40426304c765f6451709daac2148fa17a5f80786333754046",
+    "crates/sandbox/src/main.rs": "71b39de404e0d4d10102ddad34ec82ef78e41c3c1dd580908293a4d6c60ffd90",
+    "crates/sandbox/src/output.rs": "39426995be26be24f6994ce08f596cbb366466944dad1db08bef224590808ac1",
+    "crates/sandbox/src/renewal.rs": "f1041585ec3f7bdf1a611d3658b8661ecdbd32b2e9a6fdcfce0057486b14cd01",
+    "crates/sandbox/src/request.rs": "e7d66718a566929fcfbae089e72a9db5d3bd8ef597d178bd340f9c5c4f2e3f0c",
+    "crates/sandbox/src/startup.rs": "43df4cf0772a597254501726dfed4e4c695621d72bae5c91503ede2d96ef46f5",
+    "crates/sandbox/src/streaming.rs": "f9679e728b6a164510ccd35791c288fd99e586d7805f3d1e2836f78a94edccd5",
+    "crates/sandbox/src/streaming/channel.rs": "8630735e72a6f417f2dd7b1d8595634a0d066336e3f7c8def9c1290ea14c5d1b",
+    "crates/sandbox/src/supervisor.rs": "aabbc2931a592018ab0b85d1e7bfa08aca1c90941b6e1fbac0af05f996b6fc84",
+    "crates/sandbox/tests/component.py": "df53677c4d12b5cfeac762a56e10e48a64bafb4f933f86f692d2789a02101e8e",
+    "crates/sandbox/tests/rootfs.py": "aaa8ca832027700e79aed142690de48d6a804e1d4773aff9e4aaf77f233b9249",
+    "crates/sandbox/tests/startup_component.py": "d1671c99de3dce9bbd2e96f2d14a863d7b68c590e71a71339a62abac6f99924e",
+    "crates/server/BUILD.bazel": "c49cbde53fc903ac85c5bdfe3a50d4bd3ac72565690762db47240cf702292c7d",
+    "crates/server/Cargo.toml": "90e5c21c22c111d9c39916b57ab1dc34cb75e2a1a2bcbca02866b3efd91d80e6",
+    "crates/server/src/apps.rs": "d08166f188888d5d5226d498f877057a6a5c11d3c26b4f9092e04aaaa8023a60",
+    "crates/server/src/artifact_worker.rs": "2bb8cb09406efedc6facc22306a45a1579a67062e8693ad70e2b231142cdb434",
+    "crates/server/src/artifacts.rs": "cde55d7c4f5c2b5dafe4f72bc94e93f653245f35bbe80654b80c50748781744b",
+    "crates/server/src/browser_worker.rs": "70eec98cf8b3dc789684f5f6d90e70e3fadbc7d177509ba31e2fae8049c299a9",
+    "crates/server/src/candidate_worker.rs": "d5e5aceffc55b395c8e61c3bed6ba91b74453289391f884b2fa6a5544f633808",
+    "crates/server/src/computers.rs": "1e9efd11a17c2dbd229affd5e688baadaec4bcdc7c985caa5360188fce4a81cc",
+    "crates/server/src/connections.rs": "f7081f0d17ba3fcc723413debfcdb2dcb689874ca0c3e3166240fe05f19cc923",
+    "crates/server/src/definition_admin.rs": "2207bc177f0457dfa6d337679e90222cdf9e48c690570bda5d67e5eb41affa79",
+    "crates/server/src/error.rs": "b98260077917e0d2cce91e96e458c9d2bc45fd2c033cbfb72c48498cb609652d",
+    "crates/server/src/execution_worker.rs": "1391b049da4e404524c80f6e65c43a96db5247da365e68486fe25379b61b177d",
+    "crates/server/src/executions.rs": "e9707f6789eccdd93b86059ce79498ca80046cf95be3d1121e2939091d84f4fa",
+    "crates/server/src/files.rs": "8cd128c3241991561bbd99ce22ca58e4b4f8f3caa1671a4107ed3f6f24cf363a",
+    "crates/server/src/http.rs": "c89aa0fd5235eeff63dbc626f21968b29006bdd6d989c065870aafcc3d2b7e38",
+    "crates/server/src/lib.rs": "537d849fb03e2b1e191fbe97b60dc14e1489bfdcfb34af501f23625657ec6a85",
+    "crates/server/src/main.rs": "605612d69edd8729bd5639d92b84d73f5eb7866c1bb6de6668846225e31358a4",
+    "crates/server/src/operator.rs": "3acec5ac1f8b80ed0b38a176ab5c9ff5c826bbb164c4a2d566e76fbb1672a666",
+    "crates/server/src/outputs.rs": "08dffcfe432abd707828aee9f9f7fed3c49e28904fd36a8ad12c80c57b8f93c9",
+    "crates/server/src/outputs/chunks.rs": "31d1625a5e024f009bd42c329cf01cad273cae61e5a79fb8fa2bdf0610b171cd",
+    "crates/server/src/plans.rs": "5589d070778b1bf628f5c0c17435043eccaf39f0c84e95fb0095e6bfc11a0b3a",
+    "crates/server/src/reconciliation_admin.rs": "e728c8bb4be397cf51edcc1673a8c0e82477939a76a0409f870b822d6baf7fdb",
+    "crates/server/src/requests.rs": "0fdc19bf5de83a24081507913a69ca8df98acb8527ac91bfe443b470f090050c",
+    "crates/server/src/runtime.rs": "d214a146c018ab26e4bb3dabe94fbc09a9c6eff5050158e9bb4f5a5561bcad8c",
+    "crates/server/src/runtime_admin.rs": "a652d63fa5044d98390965e81943aa1ad4e6a39d0d0296050eac2a47caf7f6d8",
+    "crates/server/src/volume_worker.rs": "11fbab53741d694b377a4914508606b85efcf7c2e1d6cd2423dd24a745bc367f",
+    "crates/server/src/writers.rs": "2e47d29bdc3076000094d0a1cbb252b1e747749826c623bac252a27bf34180ce",
+    "crates/server/tests/cases/apps.rs": "3c43a7a9499d725559f533034e4474c59fd5d63ae4aa17f5e5e3cf9d386770c0",
+    "crates/server/tests/cases/artifacts.rs": "530e55d352ca44a96d4fea918b13696cd2598097a5b1bff4255dbbd3686a2c05",
+    "crates/server/tests/cases/authentication.rs": "3eda502a3ca2c1e40d83666e1a85b9300c89fc1ab8f2e56d70e39d2bbc84ffaa",
+    "crates/server/tests/cases/connections.rs": "06081eb9037a213d52cd47fda2c1219f07903c8e2024c06f793456fc2cbf7a2d",
+    "crates/server/tests/cases/executions.rs": "6490f0f793d42ad4c177d6d9e048bb8cb7f5a74a98bb4b047d8fbf7d11091e5c",
+    "crates/server/tests/cases/files.rs": "5b5895b372d3dc65642b28a7ae761507d10ecd9d05a04c5f0704d04ea12d09cc",
+    "crates/server/tests/cases/outputs.rs": "eb847d4eaca7f4af501e8826fb4fc35dde719994fa4f718755b68d77ee4debc1",
+    "crates/server/tests/cases/plans.rs": "836b7a7f63d9a550cd90a018c727bd33c01d27b8e2848b969e6df3027cc45f9d",
+    "crates/server/tests/cases/process.rs": "626d31398b29d43c0071f6b1d70b0e6ab1e81ea08a3f9b32f210aba0c226d14e",
+    "crates/server/tests/cases/protocol.rs": "aaf41dab01b7bc82f62ab835406a8a12e1306c9f32aeb41f96fc43140689d585",
+    "crates/server/tests/cases/runtime.rs": "57b24d3fc585378db5857610fcdce918e3c63d1c1c8910d7ec90f36f990d2681",
+    "crates/server/tests/cases/starts.rs": "f9db499e05c5ece7932d703f3f76da7d9f41ef8ca97cd378f3a411617edab92b",
+    "crates/server/tests/cases/stops.rs": "7170db01f43c09bad4fda41139527723ccf2063ab389b43789a55374038ac2e2",
+    "crates/server/tests/cases/writers.rs": "0e2cb5f7f8b4e31343104e48ee003eb4e9c7f89872b9d3409799d7b60be9e870",
+    "crates/server/tests/server_contracts.rs": "1ecfb28b01d5b1aa9832af090eec86df53db26549cb273bd4de0e3ccd89e6a50",
+    "crates/server/tests/support/mod.rs": "872728d2a49d119468d029dad047f62d3a9b555d461dbfabeb9a26683d972e4b",
+    "crates/storage/BUILD.bazel": "e2d69ab074689a1075bd3b0a246f7ac02764a93cae981d7264b802359e13c969",
+    "crates/storage/Cargo.toml": "45c9acbce44f170b44509359e76ae4a9c15e7974eb1ab686688482d059814e35",
+    "crates/storage/src/capture.rs": "3034604f06815f804c2667d4c6e9fc666cebf03666f4601df84499227272cbe7",
+    "crates/storage/src/directory.rs": "d0cc240981462b83e73abc034a6a23619be2f0ade20709bcae64dc82c89ad7cd",
+    "crates/storage/src/files.rs": "e04cab8a0df0b3d73c886fafc8cf7aefcf7aa8143e523fe8bc5ee3316c2bf3cf",
+    "crates/storage/src/files/tests.rs": "3e0e4e6a933fbddbbf9f0f03c07fca34ea9010be9aceacfb28f9816a90d9406b",
+    "crates/storage/src/lib.rs": "e7d3b93ee35f4053beb7afe29afcaac862941035eb2b9458ea1b19c7a113f9e0",
+    "crates/storage/src/main.rs": "1a37a568b7eeb871655f37986c0cd297a35e2e090268cdc4e5550a6f758f78ce",
+    "crates/storage/src/materialize.rs": "5811009e138349e69797abfeff027368125c34eacbe766186fa3674516490490",
+    "crates/storage/src/model.rs": "44b81794fb300f31fc5517b03943c725c74bcb7c7ab361ff17de32f6916ea4ff",
+    "crates/storage/src/quota.rs": "3f8275ec1d2c2b85235ac910fced9a1f27484cfbfef88c13f2cbde87d7d17633",
+    "crates/storage/src/tests.rs": "faa36fcda4e703b561cda773649f49858454bd9ff31fb074487bc482d45b0c7d",
+    "crates/storage/src/tests/capture_tests.rs": "b8364dc42d5aa87736fbba118f0e9351609b476544fb90ae862f6f8717dd0f69",
+    "crates/store/BUILD.bazel": "223e119d42c82d01a4a2cdfb925dabbb06cdc326d76f03f5dec33b74d01738a2",
+    "crates/store/Cargo.toml": "c4bd207c42d57ceb81ae69f5edd34dc2ddc021eb03c328a97700148579a5c91c",
+    "crates/store/migrations/0001_declaration_registry.sql": "222a24399b8d54549c5e9ef6f7e58081044dab3ac431ee16a477e1bcd2a6dbb7",
+    "crates/store/migrations/0002_service_credentials.sql": "f2d9f103f3a689eaa5131417acf4e6df961e801939a7a61b66de764b01bf6d0a",
+    "crates/store/migrations/0003_definition_plans.sql": "b239f0c1f06b47bffb3ee87b2814cf7ceae618c3e91c10b68fef037b4e32ef4e",
+    "crates/store/migrations/0004_reconciliation_leases.sql": "77253f972913c603a3e5527e32b139de8af69462513e6dd62b9f6ae44a1b2903",
+    "crates/store/migrations/0005_reconciliation_objects.sql": "590434ab67e26c3a348b7d7c962fb5ca029eb956b8e321aad47c5cb0fb4cb04b",
+    "crates/store/migrations/0006_runtime_grants.sql": "7116f9d1d553a0c2b62bc27c95b9f6e7d9fc9954be99366c572d61cacdee56ac",
+    "crates/store/migrations/0007_runtime_start_admission.sql": "0764f9658154c9c3b59180e7f3a26e496d28e5eff6a5f3846507f132285e63b7",
+    "crates/store/migrations/0008_candidate_preparation.sql": "903a22f104bda844ff40bce96943fb43153bb48b3cf4c516e9a386cbdad9053e",
+    "crates/store/migrations/0009_connection_sessions.sql": "d5b4f1249a25ac5a915699903e9629e9a610c4f749aa0e127906ed1b34e2c7cc",
+    "crates/store/migrations/0010_candidate_writer_leases.sql": "4421125b27ca4d0d199901748f1932bff41cb7f1901d66aaf2f4d22a3a6081b4",
+    "crates/store/migrations/0011_candidate_file_completions.sql": "560390995b5a66c81cb5fac3e6893cab9b867ceb6ffa1a0103e012230d68ddc5",
+    "crates/store/migrations/0012_execution_admission.sql": "381d01c13cba7e165b08e06abbdd623a1464b4f1cc7da065b1cb913dd42c7b5d",
+    "crates/store/migrations/0013_execution_dispatch.sql": "48e374c04d996a56173f8f53ae2f275af862e4ca8aea4ae4884373135273ebbb",
+    "crates/store/migrations/0014_execution_startup.sql": "86cd2ca00cdb925053c9c33a6afc8b4490a82783ba7d48f421bb53b1b7b4eacc",
+    "crates/store/migrations/0015_execution_pods.sql": "c25255885da207c5002c6525f2607282874ed37975e2cb6258184dde878e6f45",
+    "crates/store/migrations/0016_execution_watchdogs.sql": "7e81722f0464dfd4479f0e0b6b5dbb92f7dadc1cd998192fe910aa3322eebf95",
+    "crates/store/migrations/0017_redundant_watchdogs.sql": "b44ba78c21c79662f75ab3b2bd4bb8fd5e07ba6448c8fa9ad1e103c5f6e2fa44",
+    "crates/store/migrations/0018_reaper_admission.sql": "ac948f8715ca66e003c27abaf4a272ce42d251cad66d40a0fbf2623fd79715d3",
+    "crates/store/migrations/0019_execution_outputs.sql": "0923ae3e25b1f60b4437a384918d936a181735ce0506ae82dcda9383e16a287b",
+    "crates/store/migrations/0020_undispatched_computer_stop.sql": "a2de59232588ac17051eb214b86c24e8de1db8bdfa7894504e12890fcc756777",
+    "crates/store/migrations/0021_workspace_artifacts.sql": "5387647cb2db65087c617b754d0e018fed8988bed4fbb9d5d750768c01fd3929",
+    "crates/store/migrations/0022_artifact_candidate_continuation.sql": "da505461d425af2cc795d940ddc5c896e7863bf2999dab97f67096555eda7940",
+    "crates/store/migrations/0023_execution_completions.sql": "81938d6fc964cbf8837503c98eba4c33720b05e7365f82fb5c446c5c3b16b54d",
+    "crates/store/migrations/0024_execution_queue_poll.sql": "a5c4212872219924001786206bd2bb01a1038c53080646bd291b35e88f3ec0e2",
+    "crates/store/migrations/0025_preparation_queue_poll.sql": "dd027a22aa0aad5f4dd719a24f631e49c224302c8f4be3712a402d270a0ca5a9",
+    "crates/store/migrations/0026_checkpoint_stop_worker.sql": "3865defa831ce9d8f27cc730108e2eea58a69b78a2938d22ba46edcb591dafd0",
+    "crates/store/migrations/0027_checkpoint_stop_drain.sql": "69159053b7f8422371932b19de41d92cdf318825d12decb6cb35a1b168d78d8c",
+    "crates/store/migrations/0028_background_execution.sql": "f99bd07ce0d4be85484e50a7f306287096a993479b8af0ba52dff9a9bbbb8c1b",
+    "crates/store/migrations/0029_execution_renewal.sql": "8b21ae5ee5ece76231391edade0d61891e8fdb5df931c76e9ed768e0e4196283",
+    "crates/store/migrations/0030_execution_output_chunks.sql": "6629971f95031a494fdba8cb2d25d7912c4733363fd5aacc02c2106983ded93a",
+    "crates/store/migrations/0031_app_admission.sql": "187533e9ce7f6c1a9e1f86c9ea6a1585f046c66721aa0ad3a1c2f6ae6c6b63d5",
+    "crates/store/migrations/0032_browser_dispatch.sql": "eb92ad31a73df92f6b37432ddba5b449e28660cd89e5da2365047d570fae149e",
+    "crates/store/src/auth.rs": "91f8ca19a231b15d656b494260f2a6049dccc516c171222c646546bf07cd03bf",
+    "crates/store/src/lib.rs": "09c2aee0c436381ec69ee3b6c5f422dec6a3f43d6ef1b140fac53e8bd1b78588",
+    "crates/store/src/migrations.rs": "398656f20cfefd3ac594b74956dde1570592f2316750c38714ab7e6edfd1e8b3",
+    "crates/store/src/plans/access.rs": "3d42f2feb2ec6b64f1ac724d89b65a118b4a7af62fc3034df50f4971e3dfbe91",
+    "crates/store/src/plans/apply.rs": "89ff4cd5042d94d8be6f12e6b1ddf68a3ae5890e8dc83f04e6d99a7d59c717c1",
+    "crates/store/src/plans/build.rs": "a74fd51335913f4fd7111e67cef8f3ff7e7d728732251b76ded3bb4e92f7bdc0",
+    "crates/store/src/plans/mod.rs": "d1ae31663935137f257de1c83b6abc516dddecc4b1c6930354e1e09136cbd04e",
+    "crates/store/src/plans/references.rs": "54930ad93da338c95d217a82a58ad81894cb2a09b89c13ef924e4eed3f62de32",
+    "crates/store/src/plans/transactions.rs": "35e427f6a42bf1bfbcd1a52f2860b4728af7039111b5ff6ab94cf71945fd4c5e",
+    "crates/store/src/plans/types.rs": "7d8369013f533c5a64df354d12667eff2e4f689bd47056e8a3f8928ba0175c7f",
+    "crates/store/src/reads.rs": "e767bc933623a1ea242e7b9d85eab6ceb3d3b797827ddb513908928180a5d2f0",
+    "crates/store/src/reconciliation/claims.rs": "129dbe63f0a433be5a0c1f339653262eee387916c11ddc422cf78079fe9dd269",
+    "crates/store/src/reconciliation/completion.rs": "0fc82b4252b52e0c343742163ce0d97891677013d8306191674c9b72543e22a5",
+    "crates/store/src/reconciliation/mod.rs": "d6516b4b7be1f6b922781912369218dcd011047fb0bae967c1f299644206046e",
+    "crates/store/src/reconciliation/objects.rs": "a78b363453b079575a4de1fb1a41009b94e297c64e814008fe345a082fa5d0cf",
+    "crates/store/src/reconciliation/state.rs": "b159cf6e41a7d0c183fcb25949d3e0ada2261a810dcc9d472940c44a6a32a394",
+    "crates/store/src/reconciliation/types.rs": "a4e501ceecf8747e713527f25604df85e95a523848d89a583e5e0a2df2d85452",
+    "crates/store/src/retention.rs": "ef68e438b45cad5a178ba5ec11d6eb478ec037ab5876c23119a1b06cbdb86f65",
+    "crates/store/src/runtime/apps/authority.rs": "a4f3aec1ffe97bac9b8cff57ba0a18484cc57f54ab7dfa16abfe178de7959db0",
+    "crates/store/src/runtime/apps/browser.rs": "8639c838a446bcb2ebb32bbed152948f60b788dc5b3a1a9055a64ab3e46001bd",
+    "crates/store/src/runtime/apps/browser/plan.rs": "07c4e01b24f45caa37c9b3989ded1ef247778ac0205a5b7228b5d62cbb439089",
+    "crates/store/src/runtime/apps/mod.rs": "88d5076e80340ed6da5ebb9a10fb56855d845420222a0562182f2d3ffe06e607",
+    "crates/store/src/runtime/apps/types.rs": "6b09547e14622d9dc51d2827e7cf98ff8e405b6617b79930f2dbeb12982a3701",
+    "crates/store/src/runtime/artifacts/admission.rs": "f4e281c1f9e99ec8bd57f1fa5d2c887ca432f2930b0d9527708694ad1d2eac92",
+    "crates/store/src/runtime/artifacts/mod.rs": "71194dde1577e6547f700ff3e0ae4dfcbed863503b5dca1a947522a670a6f201",
+    "crates/store/src/runtime/artifacts/queue.rs": "315df06ef76b4bb48bed17cee61a67099fb30b883237853a7b0d3cd18395da1b",
+    "crates/store/src/runtime/artifacts/types.rs": "29afba8b19280377b278690ebcee4e18a860a6812aeec627800b7c77c9d11fe5",
+    "crates/store/src/runtime/artifacts/worker.rs": "961fc5b025bbea3ff237c4fdd123621872d9114cedca71f764a34cc0ab59e117",
+    "crates/store/src/runtime/connections/mod.rs": "b337e4d75ce284e3c846a524403e4b6e3106f72c1677b715abaae22eb6a70b7d",
+    "crates/store/src/runtime/connections/types.rs": "4636c448bf0d9789434571c3bb1d41d3d39812771be9c3ffd4700287d7b20161",
+    "crates/store/src/runtime/files.rs": "c7b385a77083ece094fde6955e8c874e95f22fb941cde3d450b5d284e0dcb153",
+    "crates/store/src/runtime/inputs.rs": "a8b8975594b99cd2cd49f3bf6ca30c38db4f9a1b61925e9fe10ec1472746285e",
+    "crates/store/src/runtime/mod.rs": "b6a91c35bb66e4574fa99a0b2cf81f38f5908cdf101ee604b0441a752fdaa240",
+    "crates/store/src/runtime/preparation.rs": "89a0f93ef5306455f0fe747d5607aa878c6e15f2d21b93543834dbd316674969",
+    "crates/store/src/runtime/preparation/queue.rs": "a8d41f926af4bdc9eac98fe21a60214c05385671c6fb4476f069fee9f3dd96bb",
+    "crates/store/src/runtime/start/graph.rs": "a68675d2a0ae6ee55a367c1ab689cf30984201def8801f93da69043b14c6d31d",
+    "crates/store/src/runtime/start/mod.rs": "e5f95ac8edf336b26de2b6094407dc05c4a3209181ea87b9d13ec81fe2479396",
+    "crates/store/src/runtime/start/stop.rs": "8d9a963dc862c64cf8bf1fa49359027665d05052baec601269b0da4c5fe6ec76",
+    "crates/store/src/runtime/start/types.rs": "dedb2a0d5ebeb80ccaec445c9a3b6da740558e75d86f9841ee37c10d0400507c",
+    "crates/store/src/runtime/types.rs": "7eda1438ced0752f5e0c75656dbb9789a1c484bc56361d321f3f141c6a30ad1c",
+    "crates/store/src/runtime/writers/authority.rs": "37012c122069cec748d705c1b999cdc9e7bdf1483aaf8ec829ad683fa7ad2441",
+    "crates/store/src/runtime/writers/checkpoint.rs": "424d773cc086f12dd8dde9f0f5028cf8d66df03dc3047fd7686ab6731aba2785",
+    "crates/store/src/runtime/writers/executions.rs": "4bbcefeb5a5b5faf51acaa4b2fb2cbfca3bfb6513a9a93e70bc2711c25e18375",
+    "crates/store/src/runtime/writers/executions/dispatch.rs": "1fb6af8d3bc16b1c8841c657354a7a817cacf45b8bef639b488220cd84d608c0",
+    "crates/store/src/runtime/writers/executions/dispatch/completion.rs": "315d071e519f8969cc0a2867b32d04b1d60ffec9440907456bee2b5bcff60929",
+    "crates/store/src/runtime/writers/executions/dispatch/inputs.rs": "6bf4ab25b585cff7bc153ef68bbb4554f6f2bfcd96ca82656631c8fadb9d430f",
+    "crates/store/src/runtime/writers/executions/dispatch/outputs.rs": "2aa17f0c9d483193102aed6f854b6085e3725b0c8a10ba54b56102f241b44de1",
+    "crates/store/src/runtime/writers/executions/dispatch/outputs/chunks.rs": "881008d55506d14c5f38319a9c6ba380738db4a438df94d6cabe43731f01a592",
+    "crates/store/src/runtime/writers/executions/dispatch/outputs/chunks/read.rs": "7091cfa3255ccf6c3c20eeca07ff82be563e7393eed8569904bec93b0d2da231",
+    "crates/store/src/runtime/writers/executions/dispatch/outputs/download.rs": "b43f50d644d4a273ec338896745f0548f95c837834eef1539ccc7319cfaf3788",
+    "crates/store/src/runtime/writers/executions/dispatch/pods.rs": "cf0a4782a4d2cb6f89147c0c226fa6265bafd13367df928ba1daa5e9b0c8b56d",
+    "crates/store/src/runtime/writers/executions/dispatch/pods/validation.rs": "47ab37bca8ff5276583f6917dd1b9a071f29eb91eea57a9d98e413c9bf7deeae",
+    "crates/store/src/runtime/writers/executions/dispatch/queue.rs": "ddd13fdb87a8ecc857d74487f50adf43debe1c81a126520ff1a9816a0e04fff8",
+    "crates/store/src/runtime/writers/executions/dispatch/renewal.rs": "8102bbfda1561f0f7ac366f21a7be91faf82eda05ed7baa55799e17aace61e94",
+    "crates/store/src/runtime/writers/executions/dispatch/startup.rs": "a476f0a5e29e001f8f241c8bdc75084220dd8430aa92bba25a2a70f9065ee050",
+    "crates/store/src/runtime/writers/executions/dispatch/watchdogs.rs": "dbed2b98a225a96f41f577511420b8ea2ec804aa1e673dfe429da67ea3b0f39c",
+    "crates/store/src/runtime/writers/files.rs": "59cdc57edbf0e41d3c282f7f58095144117a8f11b5628dc56a3b4c1806feef37",
+    "crates/store/src/runtime/writers/mod.rs": "1a4709e0859478dd90b80727bd413293d7a10626e5190ea1df2a65335d1eaae4",
+    "crates/store/src/runtime/writers/types.rs": "bb7e17d825d06cecfa94b1e32a7f9d07458c6496aa4fb63d08e2453763a9ce20",
+    "crates/store/src/types.rs": "e62ead756b204988cf6408f890a53667566d223cf3e4888f3a7a8e103e39127a",
+    "crates/store/src/writes.rs": "6b1fb463b39c8c663bab136e3792d5700c0706d65b31ea100435baadf856b516",
+    "crates/store/tests/contracts/atomicity.rs": "57aef74fe3bb5e9b7d2e8482cf70ddec7d9716a9d58dfa9cabbc0da45f765307",
+    "crates/store/tests/contracts/authentication.rs": "cd7101a8a982c22573d161e6fc288ecd2f8b5952c4e71b8d5684675fec0ecdd9",
+    "crates/store/tests/contracts/concurrency.rs": "4f044a05e6df293f262819cf47aa01c68be31a41d17779d2ed823348bb7da1b1",
+    "crates/store/tests/contracts/plans/admission.rs": "27e10bb8c9285bf48a3bcdb78835a37d5b11b6eb72fcecd10c8eb1a9d937b889",
+    "crates/store/tests/contracts/plans/apps.rs": "fcf934eebc568d19e0195eea428078854b60931b3e38b6af9815988aff93cb19",
+    "crates/store/tests/contracts/plans/apps/browser.rs": "97f5ca1e20fcae4dda0cc6fb195d71cd2d627d9fbc3f718821fd57447f641c78",
+    "crates/store/tests/contracts/plans/apps/live.rs": "6da9d8e75ba9f9cc7fd7e989750a53a6df4478990aa6158b752af441f401e8c3",
+    "crates/store/tests/contracts/plans/artifacts/checkpoint.rs": "cc6c8d28febbafb2becace4d3f226c94844cd16dbe7dc7740e95eb457512b352",
+    "crates/store/tests/contracts/plans/artifacts/checkpoint_authority.rs": "2b7053bba5349d112291e0a89391575779772978ed0e61876a8381ce8bd858a6",
+    "crates/store/tests/contracts/plans/artifacts/continuation.rs": "b86977121203688cd6ee4d3a9d3db2f556963576eab818e258ecbe86f8208bf2",
+    "crates/store/tests/contracts/plans/artifacts/drain.rs": "8945a711a6d755dee58244af2925fa24e0ca6489db39ec36a996d151694190b5",
+    "crates/store/tests/contracts/plans/artifacts/mod.rs": "8ecb1366c8f05d907b7b727f0f535cb8f70b241b5aa4bd47d399e361d0879e08",
+    "crates/store/tests/contracts/plans/artifacts/objects.rs": "b54267e3ff1586c7989a71a095eb33113e0f4703f3189e0548048388121671c0",
+    "crates/store/tests/contracts/plans/artifacts/recovery.rs": "10179830f87e03d20504e985d792fa275293088e9e6b6084306d328dd6cd2cdf",
+    "crates/store/tests/contracts/plans/connections.rs": "d0c0cd489c7d0c3006daea426b7c226afdcb4389eab5ac33d9df93f8200cad74",
+    "crates/store/tests/contracts/plans/mod.rs": "d7d3b90d71cf37acddf23bd0ceb82e7a5814aefeefcae5a290ff1405eebbe737",
+    "crates/store/tests/contracts/plans/preparation.rs": "eaeb07f49cba8df9418e643895e2d34d2d943c2e13e362e0f67f2cd6e0803275",
+    "crates/store/tests/contracts/plans/preparation/queue.rs": "d4b4b0c2979b4e6e32e703fad8afcb380a36f3bbde6f5538df0079c505d39765",
+    "crates/store/tests/contracts/plans/publication.rs": "fcba4ccc95d857a8a3fe084d849b71eb93564c12714f46471ad505424aea4f89",
+    "crates/store/tests/contracts/plans/reconciliation/admission.rs": "ad64325accb0030c24ff61b2ab665948d6e2d444a058cabdba87b7e942ab1b30",
+    "crates/store/tests/contracts/plans/reconciliation/claims.rs": "90ec069cd5bf7960d9f96ddd4205d3926897e6b79ac08cb7854958a19ce37c39",
+    "crates/store/tests/contracts/plans/reconciliation/leases.rs": "451d4d9381b931ebe7a349038a305af7dd8a44621252615b0153ba26b9ba6d27",
+    "crates/store/tests/contracts/plans/reconciliation/mod.rs": "3cebd4adcfa1628dd5804386beff905ef05642c949d5ce6ba0dcbf5a99e4f2f2",
+    "crates/store/tests/contracts/plans/reconciliation/objects.rs": "987045c3128a0e3bf81ba11d2c97fcf8f38a02fb8b203955100d29b5df72f89a",
+    "crates/store/tests/contracts/plans/reconciliation/results.rs": "722849cc648a23afec5a5b08a0d6733164cdd81640720436731ff93e61e7fbe9",
+    "crates/store/tests/contracts/plans/references.rs": "0db8c2f00f34b538738e2fb32d783a9abc3877d89788a1c0818b2c42dedeb25a",
+    "crates/store/tests/contracts/plans/runtime.rs": "123a9de5fcc5b8af9c68fa79ba72c292ee7d64631262a61ce63d30199665c284",
+    "crates/store/tests/contracts/plans/starts.rs": "260932ae09984a0ad8dc06631e3d1bb00b5cf77b7b65cb82d04964eb79a59f9b",
+    "crates/store/tests/contracts/plans/writers/artifacts.rs": "42ecf0d43fae9bc9e57c1fb035401743d8bdb21dbae2d17253e1bd8ad6b5592a",
+    "crates/store/tests/contracts/plans/writers/authority.rs": "6647c117cc1faf7e38fd183b5c6c3c9075cccb51836eb86cf618be4d4e5bdcbc",
+    "crates/store/tests/contracts/plans/writers/background.rs": "c6cc7cbba31884cbda8755abcf0e8a40b786339540f83ea75260201535736c5c",
+    "crates/store/tests/contracts/plans/writers/executions.rs": "cec8cd74795df59a6e924991fb1eebfe7412fdbd92b864c9d92d40acd7b7a56f",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch.rs": "78943a9b369609d2d1bb73585a1374a6965645685ce71a71892e506a64f029fa",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/inputs.rs": "cbd10111ed7bfb26549e868ffea12d11fe095e5f28e8f39f499a52e8c793f791",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/lease_policy.rs": "f0b157cc4c7ea7538735745c31e73fbdaf8b801a64fedbfc25a0d62b8c93e3b3",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/pods.rs": "7a8c5f1b73dc0acbe05b90f47fb02042fdebbb494f3a2e282eb4660520718d8c",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/queue.rs": "52a613f311baace26b7b65642d8acd977ac24c022332e8eb9afcbad913a1bdc2",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/startup.rs": "0e569c246d2148b69830abf69436ee5e068b82e33d3333203946671d58d982b6",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs.rs": "dedb07fed3b106467a1e75f0df5273d7f6cfd31d371ede35a33a87fdbd2c50b6",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs/outputs.rs": "5a0160df8120fb292126d3cb051bd94b28c0c57d566154ba33c5f368b52e33cd",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs/outputs/chunks.rs": "05b275bd093ce0f14b1eaf43ece9526c83d16e4f24887c1452ce4214c7031cd7",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs/outputs/completions.rs": "40395afb022a911b69cd7859dce82f02382564e423f8c829aac5a0fbb97ebe96",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs/outputs/downloads.rs": "b3a14c7e58195de2d8face2c64af3b973e011e6c082cadb9af7b470bb1521cbd",
+    "crates/store/tests/contracts/plans/writers/executions/dispatch/watchdogs/renewal.rs": "80a9fcd0469af5ab36d454910f9001183015d0b80aad9911f5625e15197d5dc5",
+    "crates/store/tests/contracts/plans/writers/mod.rs": "1a58f9d214b24ea1a95171649f15ad8bf96e4afa9502057042bca39784420b54",
+    "crates/store/tests/contracts/plans/writers/reads.rs": "034970781a50240209af6a36c6e433b2948e412266a44a10284f4a89fbf47a90",
+    "crates/store/tests/contracts/plans/writers/recovery.rs": "004f0c88be7fc6a871e468796d63e2d00249c25aa20cb0183c4eb839c452aaef",
+    "crates/store/tests/contracts/plans/writers/stops.rs": "3e44f7aafd8ea3096a38417dddc1872624eaba254d4018f677d94e4e4feaef22",
+    "crates/store/tests/contracts/registry.rs": "99d5c5922bef622c35200e91f9509e6692996ec2fc9e10f4c965bd3b41d8d941",
+    "crates/store/tests/contracts/streams.rs": "abdd479fadf85ddaa91823af5acab0755dc41ea13d7968f4f43419a9bd05cadb",
+    "crates/store/tests/postgres_contracts.rs": "03a1c782d4a20cc05598320aaf05aea72e7508e0b95bc73330ae865b622b2e15",
+    "crates/store/tests/support/checkpoint_upgrade.rs": "6bf125e924f2442b657f56a9b2dab8e86d68a4ea84792107c27d2217bdb5f084",
+    "crates/store/tests/support/mod.rs": "4464838be9d9fe82057c397e61a4c61455cea698c74997a8113d5db3df68eca8",
+    "crates/test-support/BUILD.bazel": "92696aa164f9eb5136f837910635a03e04872e835c431df952b36947a927560d",
+    "crates/test-support/Cargo.toml": "c1afb870567a35f73107bace36c8175d6359ff0d82b3e1a2ab808c5f119f8687",
+    "crates/test-support/src/lib.rs": "128398108ec4d3404268ae75bf2d71e72953a22fad757b325bcdea55bd2f001f",
+    "crates/watchdog/BUILD.bazel": "11d80c69145184e662ce21c884267ff4a0cd5b0c3af7d30fc936c7f629bea155",
+    "crates/watchdog/Cargo.toml": "ade61d1d3e47b7e512390b1f8a4f7f3b96b9b234f4aa7b24cf5847c6171fca1b",
+    "crates/watchdog/src/admission.rs": "0207942f4dd1b43f394795032f884a6e6dab6b96426b0f5452454d99913181f9",
+    "crates/watchdog/src/admission/tests.rs": "dd05bc88b6114575c57bec0e5dff39e9ce76efac5409b213cb393e203c4106ce",
+    "crates/watchdog/src/cgroup.rs": "a934ea97f63676bf093f5010aef2229711f39d1c045f64e0b5fb87fb7d091e4b",
+    "crates/watchdog/src/journal.rs": "f9560e0ed0611716e362c769ad2fc932a861155ca30001e7f5ce22c403173da6",
+    "crates/watchdog/src/journal/tests.rs": "bfbe785fc448ad21b2d77a1228e8ffdb8e317c54415b8cbfc0259d04fb46ff2b",
+    "crates/watchdog/src/lib.rs": "0a037d8837c7e5d8e7ebf2ec3bcac87adf9ace54dab41cfd0e80474a4b896334",
+    "crates/watchdog/src/main.rs": "4a6ecb5160a99d3ce96bfcb85aa36d1668fcac5b1fd1dd72e60cd6aa24d09fa9",
+    "crates/watchdog/src/reaper.rs": "2a919fae9a073d4d18ff131798c471887829e57581e9bec1333effd094ea3a5d",
+    "crates/watchdog/src/renewal.rs": "be780ed120439d4ac3a965ebbeec0b522aac9db9a6f07b82e7f150b3fb476293",
+    "crates/watchdog/src/request.rs": "b51d2bb26030919947ed009166431f9fa311a6308173031e06c87b106e6a7fd2",
+    "crates/watchdog/src/service.rs": "0b4972ded707165a2dce9069fc83d989961d4f5c73a7a162910108ce8e48761b",
+    "crates/watchdog/src/termination.rs": "2bca51d6affbd9e3a19e4aff671b549af9afc06c424e86ca749fea70dde937da",
+    "crates/watchdog/tests/component.py": "7160669f5cd0dca53f63b4e2893782df6569c6fa495e1ab4336548147ea571ef",
+    "crates/watchdog/tests/journal_component.py": "a11dd0c38f69792f26b937ff79903fbc04fb7e7aecbea5641b595de59039af3e",
+    "crates/watchdog/tests/reaper_component.py": "42ea60e1dcd8afade0345ac5a11a89442274fe7a5af8268f8bc427cff610ae91",
+    "crates/watchdog/tests/renewal_component.py": "37e7cc9a8330d26735f5268054dfc60846f3d880431f34285aa7b2cf0a88a170",
+    "crates/watchdog/tests/runsc_component.py": "94d7c6963920c1bde984a0383dd8ed6bfdb948bf07f526b011752bd13ec2f219",
+    "crates/worker/BUILD.bazel": "ebdecf8a63c16a6cb33ae465fb8f56e60134abe65278be3b92ee32c21ecdf532",
+    "crates/worker/Cargo.toml": "74543ad5873d506cdac0aa208d537e7bcbf3fcac984d7bf19275cb2940a2bfbf",
+    "crates/worker/src/artifacts.rs": "014d65488cc586ba8e19a7ac200f2b5b732fbeb6e0e8830db2180a6b852f3a00",
+    "crates/worker/src/artifacts/capture.rs": "6a386957f759ea2319f9717ae6c8043ea88b8ec446a9387f1534e2256048480f",
+    "crates/worker/src/artifacts/queue.rs": "41852b5cc043513f8cb76446d65579f63672cd935fced36cc723454a3774b155",
+    "crates/worker/src/browser.rs": "8e59b6048e86751f836d053fc46184500fe5ec02a5bed09c7e9d274fdd8d1963",
+    "crates/worker/src/candidate.rs": "b5ad39a415e32e29fb40ffe65ee537d789b5d30684bffc439a22e50aeaab0541",
+    "crates/worker/src/candidate/queue.rs": "39e95ac82f3356133e455d96bb50020d2e72a375b8b3df3de8194e2b4afa1dc4",
+    "crates/worker/src/execution.rs": "23f5de501d835bcd20e809e0b54a9a21463de1c38939a9ee72ca375e7a3636eb",
+    "crates/worker/src/execution/completion.rs": "45788c35b57a33323d36eeb1c94b4acc33c5ab962b91f704c211c36a9eca4287",
+    "crates/worker/src/execution/plan.rs": "767d35837e8dbd73f101205619eb6f6e7f8434a72c1b659918634e932ab4ca44",
+    "crates/worker/src/execution/queue.rs": "5d6cd0c2ca3807bebf3b3cb5348eb1c7e99c5361dce40ab79b4ea0f2e3b27583",
+    "crates/worker/src/execution/storage.rs": "d065d645c3cdba5e81ccbe1e10a82d57a03fd7751ea87ac36d1cc143f75e1774",
+    "crates/worker/src/execution/stream.rs": "a715f18de95a473d2150e96a3c6f12fc8beb8132275b44a9b1e2b950704016ef",
+    "crates/worker/src/files.rs": "a1992ef8741e7f15e256412f63d0d5c3a8ec41cc9109f9ac81d686d0b25d0b80",
+    "crates/worker/src/files/gateway.rs": "7e27018e11a7053f2f6bb609165a49740b3a1e9a22cfb62b1923a5b3a0c06f5e",
+    "crates/worker/src/lib.rs": "70d10ec1226379c17b91cafe4cdc182140918a7a2882223277b5ac15984d9624",
+    "crates/worker/src/queue_options.rs": "9b030309b6ec49b328237ec0a49f63d97b9ecb84a7bb69bc12cc1e726b5de6f4",
+    "crates/worker/tests/candidate_live.rs": "77e9be510473e3ee4b58accd812deec8735d3b0f76c55a8dde000b3daf4e644c",
+    "crates/worker/tests/execution_live.rs": "a4a83c5f086aa30be97da13764125240421e7b628a3b4eb6eb06534c4810a69e",
+    "crates/worker/tests/execution_node.py": "ecbb38ad691ccfaf529ac77d3f17e6b84de95123ddd9d47c67fccd160d439fa1",
+    "crates/worker/tests/live.rs": "131c3d90797b13261562e3b1b0fcbe4c41323829ec02cf861b1521a6e8b4fdb4",
+    "crates/worker/tests/support/artifact_queue.rs": "6d6a45f996b9ebe70fc868e5fbca58f57c27b508680958f0a9687e9285b5954b",
+    "crates/worker/tests/support/artifacts.rs": "31cc8e8e59bce6643090ffca5a86134cb71b0423b7c2a3c12614f4f2b36743f8",
+    "crates/worker/tests/support/continuation.rs": "ebd7ab4aebfffdc9a84ddb758e14f3d9555724a81f3e833ecbc10b3ec2b2ad28",
+    "crates/worker/tests/support/execution_background.rs": "5ea9a1e4e0d2aa83aba445693fe505c3d77bd0e83bed4a1caad0bf74cd7ed5d5",
+    "crates/worker/tests/support/execution_checkpoint.rs": "04ffc15370369a7a6ea7d0288943df296072b7cf91461ac4202a0ab1e7da099e",
+    "crates/worker/tests/support/execution_drain.rs": "bb0ee11719f8c21f6e6e667cef2f26a648f1c9903a771556a77c4d8f8e7cb52d",
+    "crates/worker/tests/support/execution_faults.rs": "32f2a6022fa03f12f88ac3817ea4818ac7929cd80fd7d544ffe6989ca86a05f9",
+    "crates/worker/tests/support/execution_outputs.rs": "bd2d73c71813b6423f027abc23266e280d4852a028eaf853d8de422276635239",
+    "crates/worker/tests/support/execution_queue.rs": "eeb387a68e01df19ad2d045332de22e64ad711295ed6ad591e8e272625cffcc5",
+    "crates/worker/tests/support/execution_renewal.rs": "024295ffc2eed02e8d9fd91e6770bf37b66dea04dfe86f8dbc76ba4770007f89",
+    "crates/worker/tests/support/execution_streaming.rs": "f516237b3b61f06754c1ae9c076af3b57ec61edba554f43cb76bc275eba3727e",
+    "crates/worker/tests/support/fence.rs": "7c3b98b2a47fdee784a0ba1444505318afa3a26aa65771c13583cc77da4d3df4",
+    "crates/worker/tests/support/file_http.rs": "c08e398131a63cc8e5fe851e10d49d3f28560273bef83119f878388fd2578c45",
+    "crates/worker/tests/support/file_writer.rs": "4b91ad5f2d3fca043e4364135c35ba2fd6d3c4ceafa99edaf8cb987afb6678a6",
+    "crates/worker/tests/support/output_http.rs": "371f5547f01d4816ddf51366b582b5c4e9d4810d4202e48a06301b01aef08c1a",
+    "crates/worker/tests/support/preparation_queue.rs": "f79391793f01a2bbed723b170fdb629d3c3353f82c99347422d347cc04e7723d",
+    "packages/browser-driver/BUILD.bazel": "a4fb9797b5c196053d68a222e13bed888791f3b5a0e81a00c19f19778bede0c6",
+    "packages/browser-driver/src/authority.ts": "4ea081865948de1e6974071eadf23c00fcb591d15a178173d9981504e4df5c79",
+    "packages/browser-driver/src/bridge-protocol.ts": "e16cc37e7d3b464f503318c72b6fc297973f52b0099398ff0690aa70e738afbe",
+    "packages/browser-driver/src/bridge.ts": "e24ec4302670ef448d74b5e4dffb7cfb055210ba958b8f423acbb8b17b9f5ddd",
+    "packages/browser-driver/src/contracts.ts": "340a73f1ad95fc3c44971a172a858bf4a4f3277fa692740f2f9379e49e81ca43",
+    "packages/browser-driver/src/driver.ts": "43a4902c8b00f7c91fda28e2170c52872f370257b3564b97ca8d7906e8f8a1fe",
+    "packages/browser-driver/src/index.ts": "c6a43b595516ecf10ca8bab16fd6f018e9fd02aa3a443f7931a10435bd2e2035",
+    "packages/browser-driver/src/observation.ts": "a1d2fe194ba9f38c54bd52c74d94c22de823ef33ce23f5d0288bca3faa54ad61",
+    "packages/browser-driver/src/validation.ts": "a84beb1917e79e57c975ad6d96a501e32795d0c034e333da8f7e20d46261e74b",
+    "packages/browser-driver/src/worker.ts": "4c90d6abfc9f0a20f190afa1b1253ba1037a76723890214e269bd6b7a8cc78c3",
+    "packages/browser-driver/tests/bridge-browser.test.ts": "ba3110e025c9c96432b495041b08928f207833d08d55f0ceb42f831827e963a0",
+    "packages/browser-driver/tests/bridge-peer.ts": "32335b0200d5ab8a31baeff50d7c2703d46c0ade84cbfe2eecd1390555fed3b7",
+    "packages/browser-driver/tests/bridge.test.ts": "42be4acbb56334a7bfb823cefc48a3107917d3d8d9f68de5b22cc7f159f3a865",
+    "packages/browser-driver/tests/browser.test.ts": "9d3144482277df7ab2f17b4056fdd28e75fca0afb094cc65ff4ab40774c925d9",
+    "packages/browser-driver/tests/fixture.ts": "88ca461b702fd7a17ce7a70d51f66a16cf816614bca8569160a0301e4b765980",
+    "packages/browser-driver/tests/unit.test.ts": "77ebadf8111bf803f7b0e52aed3ba705ecc004d0d5b35edabcaa51068c8c3054",
+    "packages/browser-driver/tsconfig.json": "97a33bea762a9d016c309893f52e61bc76e79897f9ddba523d3e25968415ffa5",
+    "schemas/openapi-v1alpha1.json": "1587be970ac5a6d4eb726d53dd94229a564d1ea2d63cba0eb37d5e2e4e9f085e"
+  },
+  "tests": {
+    "bazel_targets": [
+      {
+        "target": "crates/browser/browser_contracts_test",
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "88100d1cb8b43d834e861ebc0a6181a4f282674e64eb3a20aff2433c9b9000db"
+      },
+      {
+        "target": "crates/cli/cli_contracts_test",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "540c8b61df1fe005380f69cd227cb8b607d3739460acd980c997fbe1cd6b1bdf"
+      },
+      {
+        "target": "crates/cli/remote_contracts_test",
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ad4b9cc24bd128110a2e1981286adb8cef1b9b543a6eef86c21de75d7177032e"
+      },
+      {
+        "target": "crates/cli/remote_service_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "282510882c445f648ecb73930dfe717a180210dbfc7b1331d62f0533b0f94f31"
+      },
+      {
+        "target": "crates/core/core_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "46ee77c20f534dd5553533dfc8cad2f94fd9ba3e22c506879358c5afbec5dc86"
+      },
+      {
+        "target": "crates/csi/csi_contracts_test",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fba239b1728eee4fc1ca0b0cb86e9e0a2b5bf6b38a6623bf5763b9f63a73f8ea"
+      },
+      {
+        "target": "crates/definitions/definitions_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "e06f1127483d0d48d44edec0fe2f95c01a911ee7a472f72422161cea9011c9c4"
+      },
+      {
+        "target": "crates/fence/fence_contracts_test",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "c278d7a6f52048f49e2d52ca6e8a5f725d2d7291d984f4e0718dfc1616fa4471"
+      },
+      {
+        "target": "crates/kubernetes/kubernetes_contracts_test",
+        "passed": 46,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "8d1e0cf402f2105278f25cf268ab191ed75f3c1c042e38759b895be3bcacdaf6"
+      },
+      {
+        "target": "crates/node/node_contracts_test",
+        "passed": 17,
+        "failed": 0,
+        "ignored": 3,
+        "language": "rust",
+        "log_sha256": "e453189c15cf7a486cda87c5acb98502d2940dc3b1268348d6b31040f51182aa"
+      },
+      {
+        "target": "crates/objects/objects_contracts_test",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "04b790f815ef2ae7d44ad432c872b61976e11d6c53c845eb158966cc87805cde"
+      },
+      {
+        "target": "crates/sandbox/sandbox_contracts_test",
+        "passed": 27,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ec2028d44371ed1abb468e789dc69bf122a2125052c13634010eec8bceb1a8f3"
+      },
+      {
+        "target": "crates/server/server_contracts_test",
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "921702f8b0c1c6e4011f706534c1c1e82edb1479e467f3b79b0b6887bfafe8a7"
+      },
+      {
+        "target": "crates/server/server_unit_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "369d97c3404152250321d4e4c777c0cb85966153d0c5559066b8206f592a8812"
+      },
+      {
+        "target": "crates/storage/storage_contracts_test",
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "376dfe520d46887ff4eaf29d47d02ec2bd123fc4236223785b55548acf0414aa"
+      },
+      {
+        "target": "crates/store/postgres_contracts_test",
+        "passed": 244,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "ef5de1d6c92b3c56f21f9e090ae419804536e4b14126ba9d5dfcfe3618b2d131"
+      },
+      {
+        "target": "crates/watchdog/watchdog_contracts_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "189e3e9e6a0c3ad629810327f6c5bcf7c2cbf6b25ff0003ea2defefe0d49862f"
+      },
+      {
+        "target": "crates/worker/worker_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "11af2472242161964adac27a0a32c7efe0d06983ef4257639175add04b152b58"
+      },
+      {
+        "target": "packages/browser-driver/bridge_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "2e4f3b30997f1bf6ff61ca47196bd74dadf6937d15eef8530a72925daa4dbd7e"
+      },
+      {
+        "target": "packages/browser-driver/unit_test",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "5e6e9f95822b31a3c7eff99b303f29519d6dd6809375fb083f91cca1bbbb0a0a"
+      }
+    ],
+    "rust_passed": 520,
+    "typescript_unit_passed": 19,
+    "default_ignored": 5,
+    "full_bazel_log_sha256": "827bed710efc556ed91658add7bd79e0ce2fa01ced0dfd685e48f0eb25547188",
+    "clippy_workspace_all_targets_all_features_warnings_denied": "passed",
+    "clippy_log_sha256": "3fdff98072bd13481df1861d08a79ae6019e0c10206576c95ba8f99422ab7fd7",
+    "fmt": "passed",
+    "actual_browser_controller_cases": 4,
+    "live_log_sha256": "3740e6dbbfcedcc0764086a8531eecca34372aee3111d2856eb02aec5b0b3be7",
+    "full_contract_database": "PostgreSQL 18",
+    "live_fixture_database": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+  },
+  "runtime_evidence": {
+    "cases": [
+      {
+        "case": "normal",
+        "journal": [
+          {
+            "digest": "sha256:5948ba79216697d7a08ac1b64b01141193e34106990f50466322a90f8ccc6a03",
+            "kind": "dispatch",
+            "payload": {
+              "binding_digest": "sha256:8de8362fbbc0fc60885a67f851bfbb5f89e84884b00c9d7bb6e51e347fd53fce",
+              "expires_at_ms": 1791675074266,
+              "manifest": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "metadata": {
+                  "annotations": {
+                    "agent-computer.io/binding": "{\"approved_image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"base\":{\"command\":[\"/usr/local/bin/node\",\"/opt/agent-computer/browser-driver/worker.js\",\"--stdio-binding-json\",\"{\\\"scope\\\":{\\\"organization_id\\\":\\\"acme\\\",\\\"computer_id\\\":\\\"res_05926b1388f5bd09b25d87d25a557288\\\",\\\"computer_generation\\\":1,\\\"app_instance_id\\\":\\\"app_c8cb962f794f2129b3fa126f67989df6\\\",\\\"app_generation\\\":1,\\\"profile_owner_id\\\":\\\"alice\\\"},\\\"actor\\\":{\\\"principal_id\\\":\\\"alice\\\",\\\"connection_session_id\\\":\\\"conn_7f833d16d662d88426050f646e4eebba\\\"},\\\"viewport\\\":{\\\"width\\\":800,\\\"height\\\":600},\\\"runtime_ms\\\":299921}\"],\"identity\":{\"computer\":\"res_05926b1388f5bd09b25d87d25a557288\",\"generation\":1,\"instance\":\"app_c8cb962f794f2129b3fa126f67989df6\",\"organization\":\"acme\",\"sandbox\":\"res_8c06b731bc276c2f6b354083f0f59a25\",\"spec_revision\":1},\"namespace\":\"ac-kube-component\",\"sandbox\":{\"image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"mounts\":[],\"name\":\"browser\",\"networkPolicyRef\":\"id:ref_b06eebbd0e3b3580248898493a690c6b\",\"resources\":{\"cpuMillis\":3000,\"memoryMiB\":4096},\"runtimeClass\":\"gvisor\"},\"version\":1},\"browser\":{\"actor\":{\"connection_session_id\":\"conn_7f833d16d662d88426050f646e4eebba\",\"principal_id\":\"alice\"},\"runtime_ms\":299921,\"scope\":{\"app_generation\":1,\"app_instance_id\":\"app_c8cb962f794f2129b3fa126f67989df6\",\"computer_generation\":1,\"computer_id\":\"res_05926b1388f5bd09b25d87d25a557288\",\"organization_id\":\"acme\",\"profile_owner_id\":\"alice\"},\"viewport\":{\"height\":600,\"width\":800}},\"kind\":\"browser\",\"node\":{\"boot_id\":\"fb747c00-5837-4179-913e-f4b1f8608d0e\",\"name\":\"ac-component-node\",\"uid\":\"6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80\"},\"version\":3}"
+                  },
+                  "labels": {
+                    "agent-computer.io/instance": "50d2956b205a21d622107bfc1a0a02bdf4a5d5afc7927532a7eb"
+                  },
+                  "name": "ac-50d2956b205a21d622107bfc1a0a02bdf4a5d5afc7927532a7eb",
+                  "namespace": "ac-kube-component"
+                },
+                "spec": {
+                  "activeDeadlineSeconds": 345,
+                  "automountServiceAccountToken": false,
+                  "containers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--stdio-binding-json",
+                        "{\"scope\":{\"organization_id\":\"acme\",\"computer_id\":\"res_05926b1388f5bd09b25d87d25a557288\",\"computer_generation\":1,\"app_instance_id\":\"app_c8cb962f794f2129b3fa126f67989df6\",\"app_generation\":1,\"profile_owner_id\":\"alice\"},\"actor\":{\"principal_id\":\"alice\",\"connection_session_id\":\"conn_7f833d16d662d88426050f646e4eebba\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":299921}"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "sandbox",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "stdin": true,
+                      "stdinOnce": true,
+                      "tty": false,
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/tmp",
+                          "name": "tmp"
+                        },
+                        {
+                          "mountPath": "/dev/shm",
+                          "name": "shm"
+                        },
+                        {
+                          "mountPath": "/browser-state",
+                          "name": "browser-profile",
+                          "subPath": "private"
+                        }
+                      ]
+                    }
+                  ],
+                  "enableServiceLinks": false,
+                  "hostIPC": false,
+                  "hostNetwork": false,
+                  "hostPID": false,
+                  "initContainers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--prepare-profile-volume"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "prepare-profile",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/browser-volume",
+                          "name": "browser-profile"
+                        }
+                      ]
+                    }
+                  ],
+                  "nodeName": "ac-component-node",
+                  "restartPolicy": "Never",
+                  "runtimeClassName": "gvisor",
+                  "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  },
+                  "shareProcessNamespace": false,
+                  "terminationGracePeriodSeconds": 30,
+                  "volumes": [
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "tmp"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "64Mi"
+                      },
+                      "name": "shm"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "browser-profile"
+                    }
+                  ]
+                }
+              },
+              "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe"
+            },
+            "recorded_at_ms": 1791674774493
+          },
+          {
+            "digest": "sha256:4564912396a0eee6828bb5cf0b1b57f15240de70bea5d0b25eef04f82481bffb",
+            "kind": "pod",
+            "payload": {
+              "pod_uid": "9359c45d-ca36-42e2-824d-d8479dcd1dce"
+            },
+            "recorded_at_ms": 1791674774548
+          },
+          {
+            "digest": "sha256:616a94a63f4eaed32d3c2a5cf12f86bde44feffeb4af6f41bd65656896139b6b",
+            "kind": "arm",
+            "payload": {
+              "evidence": {
+                "armed": {
+                  "armed_boottime_ms": 1680240,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-iEM4s2",
+                    "inode": 1572927,
+                    "intent_digest": "sha256:7ce09c27516f5e36402b4bc0d4231bbf7a36100a29e5b62be20e3c3b65fd4269"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17300,
+                    "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                    "deadline_boottime_ms": 1708468,
+                    "execution_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "backup_armed": {
+                  "armed_boottime_ms": 1680265,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-CrHuPj",
+                    "inode": 1572947,
+                    "intent_digest": "sha256:2e87873dc6c589e56eb84177497779801de5a8fdbc8e260dd56c143d3bd0d4d0"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17300,
+                    "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                    "deadline_boottime_ms": 1708468,
+                    "execution_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "observed_boottime_ms": 1680289,
+                "reaper": {
+                  "cgroup_device": 28,
+                  "instance": "da4004fe9d22e6af95aa026be5d2af99643df7ea63c0e8231defef267510993e",
+                  "journals": [
+                    {
+                      "device": 64769,
+                      "id": "journal-iEM4s2",
+                      "inode": 1572927,
+                      "intent_digest": "sha256:7ce09c27516f5e36402b4bc0d4231bbf7a36100a29e5b62be20e3c3b65fd4269"
+                    },
+                    {
+                      "device": 64769,
+                      "id": "journal-CrHuPj",
+                      "inode": 1572947,
+                      "intent_digest": "sha256:2e87873dc6c589e56eb84177497779801de5a8fdbc8e260dd56c143d3bd0d4d0"
+                    }
+                  ],
+                  "nonce": "d29d5988ef3ee4871e609d33d725e04525f598ee15a79e567c53a463a592991a",
+                  "observed_boottime_ms": 1680286,
+                  "pid": 8021,
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17300,
+                    "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                    "deadline_boottime_ms": 1708468,
+                    "execution_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                    "version": 1
+                  },
+                  "spool_device": 64769,
+                  "spool_inode": 830838,
+                  "version": 1
+                },
+                "runtime": {
+                  "binding": {
+                    "actor": {
+                      "connection_session_id": "conn_7f833d16d662d88426050f646e4eebba",
+                      "principal_id": "alice"
+                    },
+                    "runtime_ms": 299921,
+                    "scope": {
+                      "app_generation": 1,
+                      "app_instance_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                      "computer_generation": 1,
+                      "computer_id": "res_05926b1388f5bd09b25d87d25a557288",
+                      "organization_id": "acme",
+                      "profile_owner_id": "alice"
+                    },
+                    "viewport": {
+                      "height": 600,
+                      "width": 800
+                    }
+                  },
+                  "cgroup_inode": 17300,
+                  "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                  "identity": {
+                    "container_id": "5cec26e0c9136b3213ddc61ba7cb6c04298cdb1bb03d886092228c347e28edb3",
+                    "namespace": "ac-kube-component",
+                    "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe",
+                    "node": {
+                      "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                      "name": "ac-component-node",
+                      "uid": "6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80"
+                    },
+                    "pod_name": "ac-50d2956b205a21d622107bfc1a0a02bdf4a5d5afc7927532a7eb",
+                    "pod_uid": "9359c45d-ca36-42e2-824d-d8479dcd1dce"
+                  },
+                  "kind": "browser",
+                  "profile": {
+                    "device": 60,
+                    "filesystem": 16914836,
+                    "inode": 2,
+                    "source": "/var/lib/kubelet/pods/9359c45d-ca36-42e2-824d-d8479dcd1dce/volume-subpaths/browser-profile/sandbox/2"
+                  },
+                  "runtime_processes": [
+                    {
+                      "pid": 22903,
+                      "role": "gofer",
+                      "start_ticks": 167711
+                    },
+                    {
+                      "pid": 22908,
+                      "role": "sentry",
+                      "start_ticks": 167712
+                    },
+                    {
+                      "pid": 23121,
+                      "role": "gofer",
+                      "start_ticks": 167809
+                    }
+                  ],
+                  "sandbox_id": "dc209eb76f6eebb3c48342fadece8d952a11c5fc53081afc688dcc29483ed024",
+                  "sentry_pid": 22908,
+                  "sentry_start_ticks": 167712
+                },
+                "version": 2,
+                "watchdog_pids": [
+                  23240,
+                  23241
+                ]
+              },
+              "expires_at_ms": 1791674806376
+            },
+            "recorded_at_ms": 1791674778234
+          },
+          {
+            "digest": "sha256:0fb3102eac39ef2cc027691fe82bf88abe01594f293dc0842eebc8f774ccb971",
+            "kind": "launch",
+            "payload": {
+              "request": {
+                "actor": {
+                  "connection_session_id": "conn_7f833d16d662d88426050f646e4eebba",
+                  "principal_id": "alice"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                  "computer_generation": 1,
+                  "computer_id": "res_05926b1388f5bd09b25d87d25a557288",
+                  "organization_id": "acme",
+                  "profile_owner_id": "alice"
+                }
+              }
+            },
+            "recorded_at_ms": 1791674778332
+          },
+          {
+            "digest": "sha256:05b71e2d0d82e4eea23226273f18ceeabafd3b38e7abdd3951aa19cd3f5e40bf",
+            "kind": "running",
+            "payload": {
+              "driver_launch_observed": true,
+              "ready": false
+            },
+            "recorded_at_ms": 1791674779171
+          },
+          {
+            "digest": "sha256:f759f906a3b6d7be80ac08ae6a01c2c8d993ebe6ee498f7529df001b8314bfeb",
+            "kind": "stop",
+            "payload": {
+              "arm": {
+                "armed": {
+                  "armed_boottime_ms": 1680240,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-iEM4s2",
+                    "inode": 1572927,
+                    "intent_digest": "sha256:7ce09c27516f5e36402b4bc0d4231bbf7a36100a29e5b62be20e3c3b65fd4269"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17300,
+                    "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                    "deadline_boottime_ms": 1708468,
+                    "execution_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "backup_armed": {
+                  "armed_boottime_ms": 1680265,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-CrHuPj",
+                    "inode": 1572947,
+                    "intent_digest": "sha256:2e87873dc6c589e56eb84177497779801de5a8fdbc8e260dd56c143d3bd0d4d0"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17300,
+                    "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                    "deadline_boottime_ms": 1708468,
+                    "execution_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "observed_boottime_ms": 1680289,
+                "reaper": {
+                  "cgroup_device": 28,
+                  "instance": "da4004fe9d22e6af95aa026be5d2af99643df7ea63c0e8231defef267510993e",
+                  "journals": [
+                    {
+                      "device": 64769,
+                      "id": "journal-iEM4s2",
+                      "inode": 1572927,
+                      "intent_digest": "sha256:7ce09c27516f5e36402b4bc0d4231bbf7a36100a29e5b62be20e3c3b65fd4269"
+                    },
+                    {
+                      "device": 64769,
+                      "id": "journal-CrHuPj",
+                      "inode": 1572947,
+                      "intent_digest": "sha256:2e87873dc6c589e56eb84177497779801de5a8fdbc8e260dd56c143d3bd0d4d0"
+                    }
+                  ],
+                  "nonce": "d29d5988ef3ee4871e609d33d725e04525f598ee15a79e567c53a463a592991a",
+                  "observed_boottime_ms": 1680286,
+                  "pid": 8021,
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17300,
+                    "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                    "deadline_boottime_ms": 1708468,
+                    "execution_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                    "version": 1
+                  },
+                  "spool_device": 64769,
+                  "spool_inode": 830838,
+                  "version": 1
+                },
+                "runtime": {
+                  "binding": {
+                    "actor": {
+                      "connection_session_id": "conn_7f833d16d662d88426050f646e4eebba",
+                      "principal_id": "alice"
+                    },
+                    "runtime_ms": 299921,
+                    "scope": {
+                      "app_generation": 1,
+                      "app_instance_id": "app_c8cb962f794f2129b3fa126f67989df6",
+                      "computer_generation": 1,
+                      "computer_id": "res_05926b1388f5bd09b25d87d25a557288",
+                      "organization_id": "acme",
+                      "profile_owner_id": "alice"
+                    },
+                    "viewport": {
+                      "height": 600,
+                      "width": 800
+                    }
+                  },
+                  "cgroup_inode": 17300,
+                  "cgroup_path": "kubepods.slice/kubepods-pod9359c45d_ca36_42e2_824d_d8479dcd1dce.slice",
+                  "identity": {
+                    "container_id": "5cec26e0c9136b3213ddc61ba7cb6c04298cdb1bb03d886092228c347e28edb3",
+                    "namespace": "ac-kube-component",
+                    "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe",
+                    "node": {
+                      "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                      "name": "ac-component-node",
+                      "uid": "6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80"
+                    },
+                    "pod_name": "ac-50d2956b205a21d622107bfc1a0a02bdf4a5d5afc7927532a7eb",
+                    "pod_uid": "9359c45d-ca36-42e2-824d-d8479dcd1dce"
+                  },
+                  "kind": "browser",
+                  "profile": {
+                    "device": 60,
+                    "filesystem": 16914836,
+                    "inode": 2,
+                    "source": "/var/lib/kubelet/pods/9359c45d-ca36-42e2-824d-d8479dcd1dce/volume-subpaths/browser-profile/sandbox/2"
+                  },
+                  "runtime_processes": [
+                    {
+                      "pid": 22903,
+                      "role": "gofer",
+                      "start_ticks": 167711
+                    },
+                    {
+                      "pid": 22908,
+                      "role": "sentry",
+                      "start_ticks": 167712
+                    },
+                    {
+                      "pid": 23121,
+                      "role": "gofer",
+                      "start_ticks": 167809
+                    }
+                  ],
+                  "sandbox_id": "dc209eb76f6eebb3c48342fadece8d952a11c5fc53081afc688dcc29483ed024",
+                  "sentry_pid": 22908,
+                  "sentry_start_ticks": 167712
+                },
+                "version": 2,
+                "watchdog_pids": [
+                  23240,
+                  23241
+                ]
+              },
+              "domain": "empty",
+              "kind": "browser_process_stop",
+              "observed_boottime_ms": 1707784,
+              "version": 1
+            },
+            "recorded_at_ms": 1791674805701
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 22903
+          },
+          {
+            "original_alive": false,
+            "pid": 22908
+          },
+          {
+            "original_alive": false,
+            "pid": 23121
+          }
+        ],
+        "report": {
+          "api_cleanup_confirmed": false,
+          "drain_recorded": true,
+          "instance_id": "app_c8cb962f794f2129b3fa126f67989df6",
+          "interrupted_at": null,
+          "launch_observed": true,
+          "pod_uid": "9359c45d-ca36-42e2-824d-d8479dcd1dce",
+          "process_stop_recorded": true
+        },
+        "state": {
+          "app_generation": 1,
+          "app_id": "res_e037b8fa11c55b63c9e2b5166ab1ecd3",
+          "app_revision": 1,
+          "binding_digest": "sha256:8de8362fbbc0fc60885a67f851bfbb5f89e84884b00c9d7bb6e51e347fd53fce",
+          "checked_at_ms": 1791674805752,
+          "computer_generation": 1,
+          "computer_id": "res_05926b1388f5bd09b25d87d25a557288",
+          "connection_session_id": "conn_7f833d16d662d88426050f646e4eebba",
+          "created_at_ms": 1791674774266,
+          "expires_at_ms": 1791675074266,
+          "instance_id": "app_c8cb962f794f2129b3fa126f67989df6",
+          "profile_id": "ref_71bd5b0cd103bf151700e6b91929d722",
+          "profile_owner_id": "alice",
+          "ready": false,
+          "revision": 4,
+          "sandbox_id": "res_8c06b731bc276c2f6b354083f0f59a25",
+          "state": "Draining"
+        }
+      },
+      {
+        "case": "revoke",
+        "journal": [
+          {
+            "digest": "sha256:cbee331a38289cfaa7e94c2dd64d3fa092c41382ec5641cbd29e41a98e394fbe",
+            "kind": "dispatch",
+            "payload": {
+              "binding_digest": "sha256:0e15d0841f501bf46ca80587fe50dbc8bff8166b3bee57d2c33d12b86304fd84",
+              "expires_at_ms": 1791675109855,
+              "manifest": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "metadata": {
+                  "annotations": {
+                    "agent-computer.io/binding": "{\"approved_image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"base\":{\"command\":[\"/usr/local/bin/node\",\"/opt/agent-computer/browser-driver/worker.js\",\"--stdio-binding-json\",\"{\\\"scope\\\":{\\\"organization_id\\\":\\\"acme\\\",\\\"computer_id\\\":\\\"res_c32baa8f26709235fad438139481d845\\\",\\\"computer_generation\\\":1,\\\"app_instance_id\\\":\\\"app_e867e897786ba7ee08cc63ce740d08e4\\\",\\\"app_generation\\\":1,\\\"profile_owner_id\\\":\\\"alice\\\"},\\\"actor\\\":{\\\"principal_id\\\":\\\"alice\\\",\\\"connection_session_id\\\":\\\"conn_e6417e67bad188c4a3259c3b8e57534c\\\"},\\\"viewport\\\":{\\\"width\\\":800,\\\"height\\\":600},\\\"runtime_ms\\\":299876}\"],\"identity\":{\"computer\":\"res_c32baa8f26709235fad438139481d845\",\"generation\":1,\"instance\":\"app_e867e897786ba7ee08cc63ce740d08e4\",\"organization\":\"acme\",\"sandbox\":\"res_3c3792131fa5561d90c7f231bd1f72d9\",\"spec_revision\":1},\"namespace\":\"ac-kube-component\",\"sandbox\":{\"image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"mounts\":[],\"name\":\"browser\",\"networkPolicyRef\":\"id:ref_1a8382e52c265101d63319f136f38bf9\",\"resources\":{\"cpuMillis\":3000,\"memoryMiB\":4096},\"runtimeClass\":\"gvisor\"},\"version\":1},\"browser\":{\"actor\":{\"connection_session_id\":\"conn_e6417e67bad188c4a3259c3b8e57534c\",\"principal_id\":\"alice\"},\"runtime_ms\":299876,\"scope\":{\"app_generation\":1,\"app_instance_id\":\"app_e867e897786ba7ee08cc63ce740d08e4\",\"computer_generation\":1,\"computer_id\":\"res_c32baa8f26709235fad438139481d845\",\"organization_id\":\"acme\",\"profile_owner_id\":\"alice\"},\"viewport\":{\"height\":600,\"width\":800}},\"kind\":\"browser\",\"node\":{\"boot_id\":\"fb747c00-5837-4179-913e-f4b1f8608d0e\",\"name\":\"ac-component-node\",\"uid\":\"6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80\"},\"version\":3}"
+                  },
+                  "labels": {
+                    "agent-computer.io/instance": "8f8f26e71cc5cd600da711961e187be2e13bfb0f779a94fa7c78"
+                  },
+                  "name": "ac-8f8f26e71cc5cd600da711961e187be2e13bfb0f779a94fa7c78",
+                  "namespace": "ac-kube-component"
+                },
+                "spec": {
+                  "activeDeadlineSeconds": 345,
+                  "automountServiceAccountToken": false,
+                  "containers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--stdio-binding-json",
+                        "{\"scope\":{\"organization_id\":\"acme\",\"computer_id\":\"res_c32baa8f26709235fad438139481d845\",\"computer_generation\":1,\"app_instance_id\":\"app_e867e897786ba7ee08cc63ce740d08e4\",\"app_generation\":1,\"profile_owner_id\":\"alice\"},\"actor\":{\"principal_id\":\"alice\",\"connection_session_id\":\"conn_e6417e67bad188c4a3259c3b8e57534c\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":299876}"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "sandbox",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "stdin": true,
+                      "stdinOnce": true,
+                      "tty": false,
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/tmp",
+                          "name": "tmp"
+                        },
+                        {
+                          "mountPath": "/dev/shm",
+                          "name": "shm"
+                        },
+                        {
+                          "mountPath": "/browser-state",
+                          "name": "browser-profile",
+                          "subPath": "private"
+                        }
+                      ]
+                    }
+                  ],
+                  "enableServiceLinks": false,
+                  "hostIPC": false,
+                  "hostNetwork": false,
+                  "hostPID": false,
+                  "initContainers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--prepare-profile-volume"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "prepare-profile",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/browser-volume",
+                          "name": "browser-profile"
+                        }
+                      ]
+                    }
+                  ],
+                  "nodeName": "ac-component-node",
+                  "restartPolicy": "Never",
+                  "runtimeClassName": "gvisor",
+                  "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  },
+                  "shareProcessNamespace": false,
+                  "terminationGracePeriodSeconds": 30,
+                  "volumes": [
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "tmp"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "64Mi"
+                      },
+                      "name": "shm"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "browser-profile"
+                    }
+                  ]
+                }
+              },
+              "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe"
+            },
+            "recorded_at_ms": 1791674810097
+          },
+          {
+            "digest": "sha256:8ff1d00e11b9b23cef02a40b63b491dc982b24227c60a508b0c7452ae78fc44b",
+            "kind": "pod",
+            "payload": {
+              "pod_uid": "1d215396-ff84-46d6-9817-49daa62bd38b"
+            },
+            "recorded_at_ms": 1791674810138
+          },
+          {
+            "digest": "sha256:4a5b716e47a8e077cda3ceccfde11b2fbe4bdcbaf448f2f7e9e967eef7111513",
+            "kind": "arm",
+            "payload": {
+              "evidence": {
+                "armed": {
+                  "armed_boottime_ms": 1716369,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-UrrIjC",
+                    "inode": 1574232,
+                    "intent_digest": "sha256:ef0d7c472bb66062e5d78815f427b711caac3d7fa869241c8b9a19d9f82ffc39"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17676,
+                    "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                    "deadline_boottime_ms": 1744591,
+                    "execution_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "backup_armed": {
+                  "armed_boottime_ms": 1716393,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-0DanXB",
+                    "inode": 1574250,
+                    "intent_digest": "sha256:cd912b706e4780d1376dc9742f30137990c5cd9d4df2129142c99d62aa3615ba"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17676,
+                    "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                    "deadline_boottime_ms": 1744591,
+                    "execution_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "observed_boottime_ms": 1716416,
+                "reaper": {
+                  "cgroup_device": 28,
+                  "instance": "da4004fe9d22e6af95aa026be5d2af99643df7ea63c0e8231defef267510993e",
+                  "journals": [
+                    {
+                      "device": 64769,
+                      "id": "journal-UrrIjC",
+                      "inode": 1574232,
+                      "intent_digest": "sha256:ef0d7c472bb66062e5d78815f427b711caac3d7fa869241c8b9a19d9f82ffc39"
+                    },
+                    {
+                      "device": 64769,
+                      "id": "journal-0DanXB",
+                      "inode": 1574250,
+                      "intent_digest": "sha256:cd912b706e4780d1376dc9742f30137990c5cd9d4df2129142c99d62aa3615ba"
+                    }
+                  ],
+                  "nonce": "75f21bcf803eef802453b3dc001854a10e93ea501aa4f064631dc9d95953a933",
+                  "observed_boottime_ms": 1716415,
+                  "pid": 8021,
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17676,
+                    "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                    "deadline_boottime_ms": 1744591,
+                    "execution_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                    "version": 1
+                  },
+                  "spool_device": 64769,
+                  "spool_inode": 830838,
+                  "version": 1
+                },
+                "runtime": {
+                  "binding": {
+                    "actor": {
+                      "connection_session_id": "conn_e6417e67bad188c4a3259c3b8e57534c",
+                      "principal_id": "alice"
+                    },
+                    "runtime_ms": 299876,
+                    "scope": {
+                      "app_generation": 1,
+                      "app_instance_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                      "computer_generation": 1,
+                      "computer_id": "res_c32baa8f26709235fad438139481d845",
+                      "organization_id": "acme",
+                      "profile_owner_id": "alice"
+                    },
+                    "viewport": {
+                      "height": 600,
+                      "width": 800
+                    }
+                  },
+                  "cgroup_inode": 17676,
+                  "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                  "identity": {
+                    "container_id": "1c55c86051acb0436d92fdcc260928d562147165de354a748d140dae13d0c0d2",
+                    "namespace": "ac-kube-component",
+                    "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe",
+                    "node": {
+                      "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                      "name": "ac-component-node",
+                      "uid": "6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80"
+                    },
+                    "pod_name": "ac-8f8f26e71cc5cd600da711961e187be2e13bfb0f779a94fa7c78",
+                    "pod_uid": "1d215396-ff84-46d6-9817-49daa62bd38b"
+                  },
+                  "kind": "browser",
+                  "profile": {
+                    "device": 68,
+                    "filesystem": 16914836,
+                    "inode": 2,
+                    "source": "/var/lib/kubelet/pods/1d215396-ff84-46d6-9817-49daa62bd38b/volume-subpaths/browser-profile/sandbox/2"
+                  },
+                  "runtime_processes": [
+                    {
+                      "pid": 23779,
+                      "role": "gofer",
+                      "start_ticks": 171271
+                    },
+                    {
+                      "pid": 23781,
+                      "role": "sentry",
+                      "start_ticks": 171271
+                    },
+                    {
+                      "pid": 23993,
+                      "role": "gofer",
+                      "start_ticks": 171421
+                    }
+                  ],
+                  "sandbox_id": "277fb853359a5fab8f5ecdff7a664ff6b8e2158e8a721318d90cbbd3c4f9ef9c",
+                  "sentry_pid": 23781,
+                  "sentry_start_ticks": 171271
+                },
+                "version": 2,
+                "watchdog_pids": [
+                  24111,
+                  24112
+                ]
+              },
+              "expires_at_ms": 1791674842500
+            },
+            "recorded_at_ms": 1791674814374
+          },
+          {
+            "digest": "sha256:ba512b27420b7ea5fceae013883612400f4c25299a9acbe16359be31cb96dc1a",
+            "kind": "launch",
+            "payload": {
+              "request": {
+                "actor": {
+                  "connection_session_id": "conn_e6417e67bad188c4a3259c3b8e57534c",
+                  "principal_id": "alice"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                  "computer_generation": 1,
+                  "computer_id": "res_c32baa8f26709235fad438139481d845",
+                  "organization_id": "acme",
+                  "profile_owner_id": "alice"
+                }
+              }
+            },
+            "recorded_at_ms": 1791674814463
+          },
+          {
+            "digest": "sha256:7e10f88a4885eedd3eb0e276f1e6d64f1a99b7e439d1b77079c635c9f6343d4e",
+            "kind": "running",
+            "payload": {
+              "driver_launch_observed": true,
+              "ready": false
+            },
+            "recorded_at_ms": 1791674815279
+          },
+          {
+            "digest": "sha256:417ce4b95492ccc65a1023d8fd42a0313a68c35080ac910453958184830f73a3",
+            "kind": "stop",
+            "payload": {
+              "arm": {
+                "armed": {
+                  "armed_boottime_ms": 1716369,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-UrrIjC",
+                    "inode": 1574232,
+                    "intent_digest": "sha256:ef0d7c472bb66062e5d78815f427b711caac3d7fa869241c8b9a19d9f82ffc39"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17676,
+                    "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                    "deadline_boottime_ms": 1744591,
+                    "execution_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "backup_armed": {
+                  "armed_boottime_ms": 1716393,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-0DanXB",
+                    "inode": 1574250,
+                    "intent_digest": "sha256:cd912b706e4780d1376dc9742f30137990c5cd9d4df2129142c99d62aa3615ba"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17676,
+                    "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                    "deadline_boottime_ms": 1744591,
+                    "execution_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "observed_boottime_ms": 1716416,
+                "reaper": {
+                  "cgroup_device": 28,
+                  "instance": "da4004fe9d22e6af95aa026be5d2af99643df7ea63c0e8231defef267510993e",
+                  "journals": [
+                    {
+                      "device": 64769,
+                      "id": "journal-UrrIjC",
+                      "inode": 1574232,
+                      "intent_digest": "sha256:ef0d7c472bb66062e5d78815f427b711caac3d7fa869241c8b9a19d9f82ffc39"
+                    },
+                    {
+                      "device": 64769,
+                      "id": "journal-0DanXB",
+                      "inode": 1574250,
+                      "intent_digest": "sha256:cd912b706e4780d1376dc9742f30137990c5cd9d4df2129142c99d62aa3615ba"
+                    }
+                  ],
+                  "nonce": "75f21bcf803eef802453b3dc001854a10e93ea501aa4f064631dc9d95953a933",
+                  "observed_boottime_ms": 1716415,
+                  "pid": 8021,
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 17676,
+                    "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                    "deadline_boottime_ms": 1744591,
+                    "execution_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                    "version": 1
+                  },
+                  "spool_device": 64769,
+                  "spool_inode": 830838,
+                  "version": 1
+                },
+                "runtime": {
+                  "binding": {
+                    "actor": {
+                      "connection_session_id": "conn_e6417e67bad188c4a3259c3b8e57534c",
+                      "principal_id": "alice"
+                    },
+                    "runtime_ms": 299876,
+                    "scope": {
+                      "app_generation": 1,
+                      "app_instance_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+                      "computer_generation": 1,
+                      "computer_id": "res_c32baa8f26709235fad438139481d845",
+                      "organization_id": "acme",
+                      "profile_owner_id": "alice"
+                    },
+                    "viewport": {
+                      "height": 600,
+                      "width": 800
+                    }
+                  },
+                  "cgroup_inode": 17676,
+                  "cgroup_path": "kubepods.slice/kubepods-pod1d215396_ff84_46d6_9817_49daa62bd38b.slice",
+                  "identity": {
+                    "container_id": "1c55c86051acb0436d92fdcc260928d562147165de354a748d140dae13d0c0d2",
+                    "namespace": "ac-kube-component",
+                    "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe",
+                    "node": {
+                      "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                      "name": "ac-component-node",
+                      "uid": "6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80"
+                    },
+                    "pod_name": "ac-8f8f26e71cc5cd600da711961e187be2e13bfb0f779a94fa7c78",
+                    "pod_uid": "1d215396-ff84-46d6-9817-49daa62bd38b"
+                  },
+                  "kind": "browser",
+                  "profile": {
+                    "device": 68,
+                    "filesystem": 16914836,
+                    "inode": 2,
+                    "source": "/var/lib/kubelet/pods/1d215396-ff84-46d6-9817-49daa62bd38b/volume-subpaths/browser-profile/sandbox/2"
+                  },
+                  "runtime_processes": [
+                    {
+                      "pid": 23779,
+                      "role": "gofer",
+                      "start_ticks": 171271
+                    },
+                    {
+                      "pid": 23781,
+                      "role": "sentry",
+                      "start_ticks": 171271
+                    },
+                    {
+                      "pid": 23993,
+                      "role": "gofer",
+                      "start_ticks": 171421
+                    }
+                  ],
+                  "sandbox_id": "277fb853359a5fab8f5ecdff7a664ff6b8e2158e8a721318d90cbbd3c4f9ef9c",
+                  "sentry_pid": 23781,
+                  "sentry_start_ticks": 171271
+                },
+                "version": 2,
+                "watchdog_pids": [
+                  24111,
+                  24112
+                ]
+              },
+              "domain": "empty",
+              "kind": "browser_process_stop",
+              "observed_boottime_ms": 1717673,
+              "version": 1
+            },
+            "recorded_at_ms": 1791674815588
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 23779
+          },
+          {
+            "original_alive": false,
+            "pid": 23781
+          },
+          {
+            "original_alive": false,
+            "pid": 23993
+          }
+        ],
+        "report": {
+          "api_cleanup_confirmed": false,
+          "drain_recorded": true,
+          "instance_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+          "interrupted_at": "authority",
+          "launch_observed": true,
+          "pod_uid": "1d215396-ff84-46d6-9817-49daa62bd38b",
+          "process_stop_recorded": true
+        },
+        "state": {
+          "app_generation": 1,
+          "app_id": "res_1f68f467aa457b811c4c91fa48f35ae7",
+          "app_revision": 1,
+          "binding_digest": "sha256:0e15d0841f501bf46ca80587fe50dbc8bff8166b3bee57d2c33d12b86304fd84",
+          "checked_at_ms": 1791674815643,
+          "computer_generation": 1,
+          "computer_id": "res_c32baa8f26709235fad438139481d845",
+          "connection_session_id": "conn_e6417e67bad188c4a3259c3b8e57534c",
+          "created_at_ms": 1791674809855,
+          "expires_at_ms": 1791675109855,
+          "instance_id": "app_e867e897786ba7ee08cc63ce740d08e4",
+          "profile_id": "ref_b9bcca0665a0df3bdfaf68cacff1b2ea",
+          "profile_owner_id": "alice",
+          "ready": false,
+          "revision": 4,
+          "sandbox_id": "res_3c3792131fa5561d90c7f231bd1f72d9",
+          "state": "Draining"
+        }
+      },
+      {
+        "case": "database-stall",
+        "journal": [
+          {
+            "digest": "sha256:1bee7eb674d4c6602a64084eaca437db7d3052a66c6c03f75fa40ade5548e887",
+            "kind": "dispatch",
+            "payload": {
+              "binding_digest": "sha256:b98645cdf0c7859190571a2368452f3ff511e5085ffd08578210bbb39924da37",
+              "expires_at_ms": 1791675119632,
+              "manifest": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "metadata": {
+                  "annotations": {
+                    "agent-computer.io/binding": "{\"approved_image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"base\":{\"command\":[\"/usr/local/bin/node\",\"/opt/agent-computer/browser-driver/worker.js\",\"--stdio-binding-json\",\"{\\\"scope\\\":{\\\"organization_id\\\":\\\"acme\\\",\\\"computer_id\\\":\\\"res_e0bef6f95b6cf6d9b9822d373e26848d\\\",\\\"computer_generation\\\":1,\\\"app_instance_id\\\":\\\"app_f50655e9821db9ae9f7496bdea3610e3\\\",\\\"app_generation\\\":1,\\\"profile_owner_id\\\":\\\"alice\\\"},\\\"actor\\\":{\\\"principal_id\\\":\\\"alice\\\",\\\"connection_session_id\\\":\\\"conn_7c78f5d5132fbfb50fbe9c714fdf175c\\\"},\\\"viewport\\\":{\\\"width\\\":800,\\\"height\\\":600},\\\"runtime_ms\\\":299848}\"],\"identity\":{\"computer\":\"res_e0bef6f95b6cf6d9b9822d373e26848d\",\"generation\":1,\"instance\":\"app_f50655e9821db9ae9f7496bdea3610e3\",\"organization\":\"acme\",\"sandbox\":\"res_f907daee88829dbd34e85e42970537a5\",\"spec_revision\":1},\"namespace\":\"ac-kube-component\",\"sandbox\":{\"image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"mounts\":[],\"name\":\"browser\",\"networkPolicyRef\":\"id:ref_0060288390fc49d62510583787f3ab7c\",\"resources\":{\"cpuMillis\":3000,\"memoryMiB\":4096},\"runtimeClass\":\"gvisor\"},\"version\":1},\"browser\":{\"actor\":{\"connection_session_id\":\"conn_7c78f5d5132fbfb50fbe9c714fdf175c\",\"principal_id\":\"alice\"},\"runtime_ms\":299848,\"scope\":{\"app_generation\":1,\"app_instance_id\":\"app_f50655e9821db9ae9f7496bdea3610e3\",\"computer_generation\":1,\"computer_id\":\"res_e0bef6f95b6cf6d9b9822d373e26848d\",\"organization_id\":\"acme\",\"profile_owner_id\":\"alice\"},\"viewport\":{\"height\":600,\"width\":800}},\"kind\":\"browser\",\"node\":{\"boot_id\":\"fb747c00-5837-4179-913e-f4b1f8608d0e\",\"name\":\"ac-component-node\",\"uid\":\"6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80\"},\"version\":3}"
+                  },
+                  "labels": {
+                    "agent-computer.io/instance": "4376b6ecefbb2cd6c990a96477f681440361af7c802f7b8d9338"
+                  },
+                  "name": "ac-4376b6ecefbb2cd6c990a96477f681440361af7c802f7b8d9338",
+                  "namespace": "ac-kube-component"
+                },
+                "spec": {
+                  "activeDeadlineSeconds": 345,
+                  "automountServiceAccountToken": false,
+                  "containers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--stdio-binding-json",
+                        "{\"scope\":{\"organization_id\":\"acme\",\"computer_id\":\"res_e0bef6f95b6cf6d9b9822d373e26848d\",\"computer_generation\":1,\"app_instance_id\":\"app_f50655e9821db9ae9f7496bdea3610e3\",\"app_generation\":1,\"profile_owner_id\":\"alice\"},\"actor\":{\"principal_id\":\"alice\",\"connection_session_id\":\"conn_7c78f5d5132fbfb50fbe9c714fdf175c\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":299848}"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "sandbox",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "stdin": true,
+                      "stdinOnce": true,
+                      "tty": false,
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/tmp",
+                          "name": "tmp"
+                        },
+                        {
+                          "mountPath": "/dev/shm",
+                          "name": "shm"
+                        },
+                        {
+                          "mountPath": "/browser-state",
+                          "name": "browser-profile",
+                          "subPath": "private"
+                        }
+                      ]
+                    }
+                  ],
+                  "enableServiceLinks": false,
+                  "hostIPC": false,
+                  "hostNetwork": false,
+                  "hostPID": false,
+                  "initContainers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--prepare-profile-volume"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "prepare-profile",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/browser-volume",
+                          "name": "browser-profile"
+                        }
+                      ]
+                    }
+                  ],
+                  "nodeName": "ac-component-node",
+                  "restartPolicy": "Never",
+                  "runtimeClassName": "gvisor",
+                  "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  },
+                  "shareProcessNamespace": false,
+                  "terminationGracePeriodSeconds": 30,
+                  "volumes": [
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "tmp"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "64Mi"
+                      },
+                      "name": "shm"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "browser-profile"
+                    }
+                  ]
+                }
+              },
+              "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe"
+            },
+            "recorded_at_ms": 1791674819903
+          },
+          {
+            "digest": "sha256:c14d00b8a1abae9b7999ca83281ff87b9c48a84bef822ae02504b22ecf8d2c78",
+            "kind": "pod",
+            "payload": {
+              "pod_uid": "742d0717-6eac-43f0-a0d6-5cafb85f49c9"
+            },
+            "recorded_at_ms": 1791674819940
+          },
+          {
+            "digest": "sha256:f396cb677afb39d15f267b96bfeb0a0f63cfe797a05b2fe4b5cc730b8194bd88",
+            "kind": "arm",
+            "payload": {
+              "evidence": {
+                "armed": {
+                  "armed_boottime_ms": 1726486,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-ez1wSg",
+                    "inode": 1574258,
+                    "intent_digest": "sha256:2e8b6d79822976f9a93123f66d0833ddef5d0643e3abf8a79d07c07518f49479"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 18052,
+                    "cgroup_path": "kubepods.slice/kubepods-pod742d0717_6eac_43f0_a0d6_5cafb85f49c9.slice",
+                    "deadline_boottime_ms": 1754712,
+                    "execution_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "backup_armed": {
+                  "armed_boottime_ms": 1726510,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-xZ7rd4",
+                    "inode": 1574271,
+                    "intent_digest": "sha256:d1791379f93dbe2f691f58beb70872551ba19e35f7613b0f8d2519afb558c1eb"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 18052,
+                    "cgroup_path": "kubepods.slice/kubepods-pod742d0717_6eac_43f0_a0d6_5cafb85f49c9.slice",
+                    "deadline_boottime_ms": 1754712,
+                    "execution_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "observed_boottime_ms": 1726528,
+                "reaper": {
+                  "cgroup_device": 28,
+                  "instance": "da4004fe9d22e6af95aa026be5d2af99643df7ea63c0e8231defef267510993e",
+                  "journals": [
+                    {
+                      "device": 64769,
+                      "id": "journal-ez1wSg",
+                      "inode": 1574258,
+                      "intent_digest": "sha256:2e8b6d79822976f9a93123f66d0833ddef5d0643e3abf8a79d07c07518f49479"
+                    },
+                    {
+                      "device": 64769,
+                      "id": "journal-xZ7rd4",
+                      "inode": 1574271,
+                      "intent_digest": "sha256:d1791379f93dbe2f691f58beb70872551ba19e35f7613b0f8d2519afb558c1eb"
+                    }
+                  ],
+                  "nonce": "bc09ac4d3a8c0800bccd6d33cd9cc51338dea7b2a2d9b166df97e46a7172fe6a",
+                  "observed_boottime_ms": 1726526,
+                  "pid": 8021,
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 18052,
+                    "cgroup_path": "kubepods.slice/kubepods-pod742d0717_6eac_43f0_a0d6_5cafb85f49c9.slice",
+                    "deadline_boottime_ms": 1754712,
+                    "execution_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+                    "version": 1
+                  },
+                  "spool_device": 64769,
+                  "spool_inode": 830838,
+                  "version": 1
+                },
+                "runtime": {
+                  "binding": {
+                    "actor": {
+                      "connection_session_id": "conn_7c78f5d5132fbfb50fbe9c714fdf175c",
+                      "principal_id": "alice"
+                    },
+                    "runtime_ms": 299848,
+                    "scope": {
+                      "app_generation": 1,
+                      "app_instance_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+                      "computer_generation": 1,
+                      "computer_id": "res_e0bef6f95b6cf6d9b9822d373e26848d",
+                      "organization_id": "acme",
+                      "profile_owner_id": "alice"
+                    },
+                    "viewport": {
+                      "height": 600,
+                      "width": 800
+                    }
+                  },
+                  "cgroup_inode": 18052,
+                  "cgroup_path": "kubepods.slice/kubepods-pod742d0717_6eac_43f0_a0d6_5cafb85f49c9.slice",
+                  "identity": {
+                    "container_id": "b0b2bc8d18de880f146d2b9b374cd4a8f122a0ddb4c39b7f33a6b68214ee98a2",
+                    "namespace": "ac-kube-component",
+                    "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe",
+                    "node": {
+                      "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                      "name": "ac-component-node",
+                      "uid": "6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80"
+                    },
+                    "pod_name": "ac-4376b6ecefbb2cd6c990a96477f681440361af7c802f7b8d9338",
+                    "pod_uid": "742d0717-6eac-43f0-a0d6-5cafb85f49c9"
+                  },
+                  "kind": "browser",
+                  "profile": {
+                    "device": 60,
+                    "filesystem": 16914836,
+                    "inode": 2,
+                    "source": "/var/lib/kubelet/pods/742d0717-6eac-43f0-a0d6-5cafb85f49c9/volume-subpaths/browser-profile/sandbox/2"
+                  },
+                  "runtime_processes": [
+                    {
+                      "pid": 24485,
+                      "role": "gofer",
+                      "start_ticks": 172248
+                    },
+                    {
+                      "pid": 24486,
+                      "role": "sentry",
+                      "start_ticks": 172248
+                    },
+                    {
+                      "pid": 24695,
+                      "role": "gofer",
+                      "start_ticks": 172429
+                    }
+                  ],
+                  "sandbox_id": "30884807152748885a04b5fd85482e38432d5c24d2608e45d051ef709876637a",
+                  "sentry_pid": 24486,
+                  "sentry_start_ticks": 172248
+                },
+                "version": 2,
+                "watchdog_pids": [
+                  24819,
+                  24820
+                ]
+              },
+              "expires_at_ms": 1791674852621
+            },
+            "recorded_at_ms": 1791674824475
+          },
+          {
+            "digest": "sha256:e453ffbcb0646ff57621b69765cb4ba93ec022767d80dcae18542b3caf6fabaf",
+            "kind": "launch",
+            "payload": {
+              "request": {
+                "actor": {
+                  "connection_session_id": "conn_7c78f5d5132fbfb50fbe9c714fdf175c",
+                  "principal_id": "alice"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+                  "computer_generation": 1,
+                  "computer_id": "res_e0bef6f95b6cf6d9b9822d373e26848d",
+                  "organization_id": "acme",
+                  "profile_owner_id": "alice"
+                }
+              }
+            },
+            "recorded_at_ms": 1791674824531
+          },
+          {
+            "digest": "sha256:0a43872366d3e192e933ee897473ac75dc189e302f5b627bcc809a91288780da",
+            "kind": "running",
+            "payload": {
+              "driver_launch_observed": true,
+              "ready": false
+            },
+            "recorded_at_ms": 1791674825249
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 24485
+          },
+          {
+            "original_alive": false,
+            "pid": 24486
+          },
+          {
+            "original_alive": false,
+            "pid": 24695
+          }
+        ],
+        "report": {
+          "api_cleanup_confirmed": false,
+          "drain_recorded": false,
+          "instance_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+          "interrupted_at": "authority",
+          "launch_observed": true,
+          "pod_uid": "742d0717-6eac-43f0-a0d6-5cafb85f49c9",
+          "process_stop_recorded": false
+        },
+        "state": {
+          "app_generation": 1,
+          "app_id": "res_039c61849af6a726714fe7b85051897e",
+          "app_revision": 1,
+          "binding_digest": "sha256:b98645cdf0c7859190571a2368452f3ff511e5085ffd08578210bbb39924da37",
+          "checked_at_ms": 1791674833615,
+          "computer_generation": 1,
+          "computer_id": "res_e0bef6f95b6cf6d9b9822d373e26848d",
+          "connection_session_id": "conn_7c78f5d5132fbfb50fbe9c714fdf175c",
+          "created_at_ms": 1791674819632,
+          "expires_at_ms": 1791675119632,
+          "instance_id": "app_f50655e9821db9ae9f7496bdea3610e3",
+          "profile_id": "ref_d0c0785ed673c1ee139330255013b476",
+          "profile_owner_id": "alice",
+          "ready": false,
+          "revision": 4,
+          "sandbox_id": "res_f907daee88829dbd34e85e42970537a5",
+          "state": "Draining"
+        }
+      },
+      {
+        "case": "controller-kill",
+        "journal": [
+          {
+            "digest": "sha256:d2c0824906951095935365e9359cffc301e8ab458efe2028271f7505e76e80d7",
+            "kind": "dispatch",
+            "payload": {
+              "binding_digest": "sha256:7a39c8dcd93e269a241d7c18cf61c7aead07d50be0de19f2dd726ff35f462160",
+              "expires_at_ms": 1791675137562,
+              "manifest": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "metadata": {
+                  "annotations": {
+                    "agent-computer.io/binding": "{\"approved_image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"base\":{\"command\":[\"/usr/local/bin/node\",\"/opt/agent-computer/browser-driver/worker.js\",\"--stdio-binding-json\",\"{\\\"scope\\\":{\\\"organization_id\\\":\\\"acme\\\",\\\"computer_id\\\":\\\"res_8893a9d59a2a8c654a44739371481cde\\\",\\\"computer_generation\\\":1,\\\"app_instance_id\\\":\\\"app_80d1b68eb3612c9f1f8010c7dc537bcf\\\",\\\"app_generation\\\":1,\\\"profile_owner_id\\\":\\\"alice\\\"},\\\"actor\\\":{\\\"principal_id\\\":\\\"alice\\\",\\\"connection_session_id\\\":\\\"conn_fd40de36e1ce6ac49d622d5f31b17703\\\"},\\\"viewport\\\":{\\\"width\\\":800,\\\"height\\\":600},\\\"runtime_ms\\\":299852}\"],\"identity\":{\"computer\":\"res_8893a9d59a2a8c654a44739371481cde\",\"generation\":1,\"instance\":\"app_80d1b68eb3612c9f1f8010c7dc537bcf\",\"organization\":\"acme\",\"sandbox\":\"res_7b7da538ec5242285aaaa7331949f6d9\",\"spec_revision\":1},\"namespace\":\"ac-kube-component\",\"sandbox\":{\"image\":\"registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83\",\"mounts\":[],\"name\":\"browser\",\"networkPolicyRef\":\"id:ref_71a47e7d43da1aa638e850bc1d88aed5\",\"resources\":{\"cpuMillis\":3000,\"memoryMiB\":4096},\"runtimeClass\":\"gvisor\"},\"version\":1},\"browser\":{\"actor\":{\"connection_session_id\":\"conn_fd40de36e1ce6ac49d622d5f31b17703\",\"principal_id\":\"alice\"},\"runtime_ms\":299852,\"scope\":{\"app_generation\":1,\"app_instance_id\":\"app_80d1b68eb3612c9f1f8010c7dc537bcf\",\"computer_generation\":1,\"computer_id\":\"res_8893a9d59a2a8c654a44739371481cde\",\"organization_id\":\"acme\",\"profile_owner_id\":\"alice\"},\"viewport\":{\"height\":600,\"width\":800}},\"kind\":\"browser\",\"node\":{\"boot_id\":\"fb747c00-5837-4179-913e-f4b1f8608d0e\",\"name\":\"ac-component-node\",\"uid\":\"6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80\"},\"version\":3}"
+                  },
+                  "labels": {
+                    "agent-computer.io/instance": "362a9e11fc03e9ef9588ab669807fb7d07fc7ad7dbe12bb7b8f9"
+                  },
+                  "name": "ac-362a9e11fc03e9ef9588ab669807fb7d07fc7ad7dbe12bb7b8f9",
+                  "namespace": "ac-kube-component"
+                },
+                "spec": {
+                  "activeDeadlineSeconds": 345,
+                  "automountServiceAccountToken": false,
+                  "containers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--stdio-binding-json",
+                        "{\"scope\":{\"organization_id\":\"acme\",\"computer_id\":\"res_8893a9d59a2a8c654a44739371481cde\",\"computer_generation\":1,\"app_instance_id\":\"app_80d1b68eb3612c9f1f8010c7dc537bcf\",\"app_generation\":1,\"profile_owner_id\":\"alice\"},\"actor\":{\"principal_id\":\"alice\",\"connection_session_id\":\"conn_fd40de36e1ce6ac49d622d5f31b17703\"},\"viewport\":{\"width\":800,\"height\":600},\"runtime_ms\":299852}"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "sandbox",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "stdin": true,
+                      "stdinOnce": true,
+                      "tty": false,
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/tmp",
+                          "name": "tmp"
+                        },
+                        {
+                          "mountPath": "/dev/shm",
+                          "name": "shm"
+                        },
+                        {
+                          "mountPath": "/browser-state",
+                          "name": "browser-profile",
+                          "subPath": "private"
+                        }
+                      ]
+                    }
+                  ],
+                  "enableServiceLinks": false,
+                  "hostIPC": false,
+                  "hostNetwork": false,
+                  "hostPID": false,
+                  "initContainers": [
+                    {
+                      "command": [
+                        "/usr/local/bin/node",
+                        "/opt/agent-computer/browser-driver/worker.js",
+                        "--prepare-profile-volume"
+                      ],
+                      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+                      "imagePullPolicy": "IfNotPresent",
+                      "name": "prepare-profile",
+                      "resources": {
+                        "limits": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        },
+                        "requests": {
+                          "cpu": "3",
+                          "memory": "4Gi"
+                        }
+                      },
+                      "securityContext": {
+                        "allowPrivilegeEscalation": false,
+                        "capabilities": {
+                          "drop": [
+                            "ALL"
+                          ]
+                        },
+                        "privileged": false,
+                        "readOnlyRootFilesystem": true
+                      },
+                      "volumeMounts": [
+                        {
+                          "mountPath": "/browser-volume",
+                          "name": "browser-profile"
+                        }
+                      ]
+                    }
+                  ],
+                  "nodeName": "ac-component-node",
+                  "restartPolicy": "Never",
+                  "runtimeClassName": "gvisor",
+                  "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  },
+                  "shareProcessNamespace": false,
+                  "terminationGracePeriodSeconds": 30,
+                  "volumes": [
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "tmp"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "64Mi"
+                      },
+                      "name": "shm"
+                    },
+                    {
+                      "emptyDir": {
+                        "medium": "Memory",
+                        "sizeLimit": "512Mi"
+                      },
+                      "name": "browser-profile"
+                    }
+                  ]
+                }
+              },
+              "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe"
+            },
+            "recorded_at_ms": 1791674837867
+          },
+          {
+            "digest": "sha256:45c069544bb5ee3d79a871e5e890a849ed8d95b42b9da089ac70349151d3bf88",
+            "kind": "pod",
+            "payload": {
+              "pod_uid": "6b0e4bf1-ed83-40e1-a97c-511e228ddbfb"
+            },
+            "recorded_at_ms": 1791674837930
+          },
+          {
+            "digest": "sha256:9e4d99a480370e15629222ff2616a6e2b882157d40a1c4fea6e90bb80feeb7da",
+            "kind": "arm",
+            "payload": {
+              "evidence": {
+                "armed": {
+                  "armed_boottime_ms": 1743597,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-HAy00O",
+                    "inode": 1572883,
+                    "intent_digest": "sha256:bcb87fdfd2a84cb964554567d674e9458426853a7575780797ead0fac22efebd"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 18428,
+                    "cgroup_path": "kubepods.slice/kubepods-pod6b0e4bf1_ed83_40e1_a97c_511e228ddbfb.slice",
+                    "deadline_boottime_ms": 1771787,
+                    "execution_id": "app_80d1b68eb3612c9f1f8010c7dc537bcf",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "backup_armed": {
+                  "armed_boottime_ms": 1743618,
+                  "cgroup_device": 28,
+                  "event": "armed",
+                  "journal": {
+                    "device": 64769,
+                    "id": "journal-7g6IC9",
+                    "inode": 1572887,
+                    "intent_digest": "sha256:5850bc8591878e89b02fed45dc832f3f7a0c9d21064e456cec39d1e0fed0c0e0"
+                  },
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 18428,
+                    "cgroup_path": "kubepods.slice/kubepods-pod6b0e4bf1_ed83_40e1_a97c_511e228ddbfb.slice",
+                    "deadline_boottime_ms": 1771787,
+                    "execution_id": "app_80d1b68eb3612c9f1f8010c7dc537bcf",
+                    "version": 1
+                  },
+                  "version": 1
+                },
+                "observed_boottime_ms": 1743631,
+                "reaper": {
+                  "cgroup_device": 28,
+                  "instance": "da4004fe9d22e6af95aa026be5d2af99643df7ea63c0e8231defef267510993e",
+                  "journals": [
+                    {
+                      "device": 64769,
+                      "id": "journal-HAy00O",
+                      "inode": 1572883,
+                      "intent_digest": "sha256:bcb87fdfd2a84cb964554567d674e9458426853a7575780797ead0fac22efebd"
+                    },
+                    {
+                      "device": 64769,
+                      "id": "journal-7g6IC9",
+                      "inode": 1572887,
+                      "intent_digest": "sha256:5850bc8591878e89b02fed45dc832f3f7a0c9d21064e456cec39d1e0fed0c0e0"
+                    }
+                  ],
+                  "nonce": "1066d0fe3ece782f395c0a6420f67e0761a7c09fb3f320262ef28b9c3ea375cf",
+                  "observed_boottime_ms": 1743628,
+                  "pid": 8021,
+                  "request": {
+                    "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                    "cgroup_inode": 18428,
+                    "cgroup_path": "kubepods.slice/kubepods-pod6b0e4bf1_ed83_40e1_a97c_511e228ddbfb.slice",
+                    "deadline_boottime_ms": 1771787,
+                    "execution_id": "app_80d1b68eb3612c9f1f8010c7dc537bcf",
+                    "version": 1
+                  },
+                  "spool_device": 64769,
+                  "spool_inode": 830838,
+                  "version": 1
+                },
+                "runtime": {
+                  "binding": {
+                    "actor": {
+                      "connection_session_id": "conn_fd40de36e1ce6ac49d622d5f31b17703",
+                      "principal_id": "alice"
+                    },
+                    "runtime_ms": 299852,
+                    "scope": {
+                      "app_generation": 1,
+                      "app_instance_id": "app_80d1b68eb3612c9f1f8010c7dc537bcf",
+                      "computer_generation": 1,
+                      "computer_id": "res_8893a9d59a2a8c654a44739371481cde",
+                      "organization_id": "acme",
+                      "profile_owner_id": "alice"
+                    },
+                    "viewport": {
+                      "height": 600,
+                      "width": 800
+                    }
+                  },
+                  "cgroup_inode": 18428,
+                  "cgroup_path": "kubepods.slice/kubepods-pod6b0e4bf1_ed83_40e1_a97c_511e228ddbfb.slice",
+                  "identity": {
+                    "container_id": "0418add8edcb2fa82dde7bce3d07ddb74c5d84cf89d675dcf28d6a6ce16dbc42",
+                    "namespace": "ac-kube-component",
+                    "namespace_uid": "14863499-98c1-4fa9-89a2-2192f3483abe",
+                    "node": {
+                      "boot_id": "fb747c00-5837-4179-913e-f4b1f8608d0e",
+                      "name": "ac-component-node",
+                      "uid": "6eef6dd0-7b2a-49a0-9cb5-a201d38e1b80"
+                    },
+                    "pod_name": "ac-362a9e11fc03e9ef9588ab669807fb7d07fc7ad7dbe12bb7b8f9",
+                    "pod_uid": "6b0e4bf1-ed83-40e1-a97c-511e228ddbfb"
+                  },
+                  "kind": "browser",
+                  "profile": {
+                    "device": 69,
+                    "filesystem": 16914836,
+                    "inode": 2,
+                    "source": "/var/lib/kubelet/pods/6b0e4bf1-ed83-40e1-a97c-511e228ddbfb/volume-subpaths/browser-profile/sandbox/2"
+                  },
+                  "runtime_processes": [
+                    {
+                      "pid": 25214,
+                      "role": "gofer",
+                      "start_ticks": 174044
+                    },
+                    {
+                      "pid": 25215,
+                      "role": "sentry",
+                      "start_ticks": 174045
+                    },
+                    {
+                      "pid": 25526,
+                      "role": "gofer",
+                      "start_ticks": 174129
+                    }
+                  ],
+                  "sandbox_id": "02fce57e1a1d0f954838d26e9257d4a555bc2c00ad344e5dc36ca6403888b240",
+                  "sentry_pid": 25215,
+                  "sentry_start_ticks": 174045
+                },
+                "version": 2,
+                "watchdog_pids": [
+                  25711,
+                  25712
+                ]
+              },
+              "expires_at_ms": 1791674869696
+            },
+            "recorded_at_ms": 1791674841601
+          },
+          {
+            "digest": "sha256:1181ddde0287f0bbc16b3c6247477b6cce96d10e7c95221b8eeddc215617d5fa",
+            "kind": "launch",
+            "payload": {
+              "request": {
+                "actor": {
+                  "connection_session_id": "conn_fd40de36e1ce6ac49d622d5f31b17703",
+                  "principal_id": "alice"
+                },
+                "permission": "launch",
+                "scope": {
+                  "app_generation": 1,
+                  "app_instance_id": "app_80d1b68eb3612c9f1f8010c7dc537bcf",
+                  "computer_generation": 1,
+                  "computer_id": "res_8893a9d59a2a8c654a44739371481cde",
+                  "organization_id": "acme",
+                  "profile_owner_id": "alice"
+                }
+              }
+            },
+            "recorded_at_ms": 1791674841662
+          },
+          {
+            "digest": "sha256:10f3a401921142cfb7e87354a4395df39310831c6295a14e8baf63a2d3e7188a",
+            "kind": "running",
+            "payload": {
+              "driver_launch_observed": true,
+              "ready": false
+            },
+            "recorded_at_ms": 1791674842448
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 25214
+          },
+          {
+            "original_alive": false,
+            "pid": 25215
+          },
+          {
+            "original_alive": false,
+            "pid": 25526
+          }
+        ],
+        "report": null,
+        "state": {
+          "app_generation": 1,
+          "app_id": "res_e014d62d47870569401c58216a9ab8ac",
+          "app_revision": 1,
+          "binding_digest": "sha256:7a39c8dcd93e269a241d7c18cf61c7aead07d50be0de19f2dd726ff35f462160",
+          "checked_at_ms": 1791674869722,
+          "computer_generation": 1,
+          "computer_id": "res_8893a9d59a2a8c654a44739371481cde",
+          "connection_session_id": "conn_fd40de36e1ce6ac49d622d5f31b17703",
+          "created_at_ms": 1791674837562,
+          "expires_at_ms": 1791675137562,
+          "instance_id": "app_80d1b68eb3612c9f1f8010c7dc537bcf",
+          "profile_id": "ref_b5a823dc0636cb9470e8ad483b5ea75a",
+          "profile_owner_id": "alice",
+          "ready": false,
+          "revision": 4,
+          "sandbox_id": "res_7b7da538ec5242285aaaa7331949f6d9",
+          "state": "Draining"
+        }
+      }
+    ],
+    "binaries": {
+      "/usr/local/bin/agent-computer-server": "df37e7e50f70a577f36f68d98ad2214eabdb1cc334b3aa501ad415528192f7ea",
+      "/usr/local/bin/agent-computer-watchdog": "c76dfc6eb2ec597181094b93b56e2475860c32555d3f8bb0b4b757d5a9d663ea",
+      "/home/ac-test/postgres_contracts-a7ad06fa24158921": "a63bad91f67e7f983ab03ba34f84c19ea70c1c73c20868c27c5a44882e0aacad",
+      "/usr/local/bin/k3s": "92b94582eb7b34a8cf532e6006842b9ed215a6783cf56a3dd6271fd35243b2c0",
+      "/usr/local/bin/runsc": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a"
+    },
+    "versions": {
+      "kernel": "6.8.0-142-generic",
+      "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+      "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+      "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+    },
+    "image": {
+      "image": "registry.invalid/agent-computer/browser-controller@sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+      "archive_sha256": "d6a861544c56c9e09b33c34243cb613ff0a268ee36599157fa722eb3ed209c33",
+      "containerd_target_digest": "sha256:462b9f680da340e6bed3544d8df4f511e0762d53e705df57c4bdc1f35ae4fd83",
+      "config_digest": "sha256:c2d00199aa7f3911d15d180f33e84ce4a7bbe2573c94ac1020cfe93e37bedba6",
+      "layer_digests": [
+        "sha256:a3f031ae8c7122a4bb50b67165c2a010db934eccb6f5f43a518ae33df96b8cd7"
+      ]
+    },
+    "compiled_driver_sha256": {
+      "authority.js": "439d5d30ce9b3fdceb340d3b70f4cb7a909f32240a358b0f8df300d4733047a9",
+      "bridge-protocol.js": "961de6c59856182a3d6ba8ce1e6b657821a2b718755990695351409165440a86",
+      "bridge.js": "a153913b2d1eb8ff958c9bda45d1d02ff5c8da6115a068d6d13b9a3430754cee",
+      "contracts.js": "c1d71c8449db4566be6cdd68f6b04d97192aa9ec121c5a5e1598ade26d32fcab",
+      "driver.js": "fc36f46dfdc9f4aea9f22f668fb3a6dfef78cbbd89df5649eae40d2831920584",
+      "index.js": "0bddf1f236217446941c64f23d09383ce7bac94fc014bcb10b1cb8e10a9a4ab7",
+      "observation.js": "50855e895d8b0ca68c9f02fe5bd7b5dd4609cd08a35fd8f90346778aece13b82",
+      "validation.js": "7b77cefde2a19a100b07e2d5426957f6a6e30136a607293ac1fd6179d1d2fc00",
+      "worker.js": "ce4fb02455cd17b7682c6110059457b2c854267db6f4240950954bb65d1498da"
+    },
+    "remaining_pods": []
+  },
+  "cleanup": {
+    "owned_vm_stopped": true,
+    "pid": 251921,
+    "process_start_ticks": "16343755",
+    "private_vm_files_removed": [
+      "SHA256SUMS",
+      "disk.qcow2",
+      "gvisor-release.json",
+      "gvisor-x86_64.tar.bz2",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "k3s",
+      "k3s-release.json",
+      "known_hosts",
+      "meta-data",
+      "noble-server-cloudimg-amd64.img",
+      "qemu.log",
+      "seed.iso",
+      "serial.log",
+      "user-data",
+      "vm.json"
+    ],
+    "recorded_at": "2026-10-10T23:32:41.299993+00:00"
+  },
+  "scope": "Real trusted server process, PostgreSQL original-credential launch authorization, one-shot immutable Pod/guard/launch journals, K3s/gVisor/Chromium and live original process termination. No GUI control/observe grant; profile reservation remains held.",
+  "corrections": [
+    "Bound Browser operator database-pool shutdown after canceled blocked queries.",
+    "Stage pause image through a verified mirror before starting the isolated K3s fixture.",
+    "Fixture API cleanup accepts already-absent original Pods only after physical readback.",
+    "Controller-loss state is reconciled at original arm expiry; historical Running is not health or action authority."
+  ],
+  "known_limits": [
+    "Existing PreparedComputer/Volume/Candidate prerequisite in this integration fixture uses synthetic database evidence; no Workspace/CSI acceptance claim.",
+    "Fixed watchdog slice of at most 30 seconds, capped by original App expiry. No renewal, automatic queue adoption, or creation replay.",
+    "No GUI control epochs, action journal, observation publication or ComputerView; ready remains false and public Browser capability remains unsupported.",
+    "Volatile private profile only. Physical stop does not checkpoint, restore, release the profile slot, or authorize Computer stop/recovery.",
+    "Controller-death case includes actual transport closure and does not isolate EOF from watchdog expiry; separate node fault evidence is preserved in browser-runtime-2026-10-11.json.",
+    "Database stall uses a held organization stream lock, not a network partition or full database outage.",
+    "One disposable K3s node; no multi-node deployment certification."
+  ],
+  "qualitygate": "Final unfiltered full delivery check uses existing line-ending policy; actual behavior evidence is separate above."
+}

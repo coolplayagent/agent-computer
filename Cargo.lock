@@ -191,6 +191,7 @@ dependencies = [
 name = "agent-computer-store"
 version = "0.1.0"
 dependencies = [
+ "agent-computer-browser",
  "agent-computer-core",
  "agent-computer-definitions",
  "agent-computer-kubernetes",
@@ -234,6 +235,7 @@ dependencies = [
 name = "agent-computer-worker"
 version = "0.1.0"
 dependencies = [
+ "agent-computer-browser",
  "agent-computer-core",
  "agent-computer-csi",
  "agent-computer-definitions",

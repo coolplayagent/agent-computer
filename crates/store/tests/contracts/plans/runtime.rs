@@ -20,7 +20,21 @@ pub(super) async fn runtime_fixture_many(
     apps: bool,
     computers: usize,
 ) -> (Database, String, String, String, String) {
+    runtime_fixture_many_for_browser(quota, apps, computers, None).await
+}
+pub(super) async fn runtime_fixture_many_for_browser(
+    quota: i64,
+    apps: bool,
+    computers: usize,
+    image: Option<&str>,
+) -> (Database, String, String, String, String) {
     let (db, definition_token, mut document) = fixture().await;
+    if let Some(image) = image {
+        document["spec"]["sandboxes"][0]["image"] = image.into();
+        document["spec"]["sandboxes"][0]["resources"] =
+            serde_json::json!({"cpuMillis":3000,"memoryMiB":4096});
+    }
+
     for i in 1..computers {
         let mut computer = document["spec"]["computers"][0].clone();
         computer["name"] = format!("parallel-{i}").into();

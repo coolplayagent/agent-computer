@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+agent-computer-browser = { path = "../browser" }
 agent-computer-csi = { path = "../csi" }
 agent-computer-fence = { path = "../fence" }
 agent-computer-core = { path = "../core" }

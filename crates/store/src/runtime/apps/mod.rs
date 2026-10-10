@@ -1,5 +1,6 @@
 //! Durable App reservations. No launch, GUI authority or readiness is implied.
 mod authority;
+pub mod browser;
 mod types;
 use super::*;
 use crate::plans::types::{digest, random_id};
@@ -106,7 +107,7 @@ pub(super) async fn invalidate_grant(
         ) | (RuntimeKind::BrowserProfile, RuntimePermission::AppUse)
     );
     if relevant && (!enabled || grant.permission == RuntimePermission::Activate) {
-        sqlx::query("UPDATE app_instances SET state='Blocked',revision=revision+1 WHERE organization=$1 AND principal=$2 AND state='Queued' AND (($3='computer' AND computer_id=$4) OR ($3='app' AND app_id=$4) OR ($3='browser_profile' AND profile_id=$4)) AND (NOT $5 OR runtime_seconds>$6)")
+        sqlx::query("UPDATE app_instances SET state=CASE WHEN state='Queued' THEN 'Blocked' ELSE 'Draining' END,revision=revision+1 WHERE organization=$1 AND principal=$2 AND state IN ('Queued','Dispatching','Running') AND (($3='computer' AND computer_id=$4) OR ($3='app' AND app_id=$4) OR ($3='browser_profile' AND profile_id=$4)) AND (NOT $5 OR runtime_seconds>$6)")
             .bind(grant.organization.as_str()).bind(grant.principal.as_str()).bind(grant.kind.as_str()).bind(grant.resource_id).bind(enabled).bind(grant.max_runtime_seconds.map(|n|n as i32)).execute(&mut **tx).await?;
     }
     Ok(())
@@ -298,7 +299,10 @@ impl Store {
         {
             if current.try_get::<i64, _>("app_generation")? != input.app_generation
                 || current.try_get::<i64, _>("revision")? != input.expected_revision
-                || current.try_get::<String, _>("state")? == "Cancelled"
+                || !matches!(
+                    current.try_get::<String, _>("state")?.as_str(),
+                    "Queued" | "Blocked"
+                )
             {
                 return Err(Error::RuntimeConflict);
             }

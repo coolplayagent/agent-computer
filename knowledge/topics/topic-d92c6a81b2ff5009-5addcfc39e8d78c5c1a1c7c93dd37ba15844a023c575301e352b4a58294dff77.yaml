@@ -24,6 +24,26 @@ sources:
   status: active
   version: 1
   description: Internal TypeScript Playwright Browser Driver and remaining lifecycle boundaries
+- id: browser-launch-controller
+  topic: runtime
+  kind: doc
+  uri: docs/en/57-browser-controller.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Durable one-shot Browser dispatch, database launch authorization, fixed live watchdog and retained profile reservation.
+- id: browser-runtime-components
+  topic: runtime
+  kind: doc
+  uri: docs/zh-CN/56-browser-runtime.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Browser 独立 Pod、Rust 私有协议与节点进程保护；生产 App dispatch/GUI journal 和 profile checkpoint 尚待接入
 - id: browser-worker-bridge
   topic: runtime
   kind: doc
@@ -72,4 +92,6 @@ route:
   - browser-driver
   - app-admission
   - browser-worker-bridge
+  - browser-runtime-components
+  - browser-launch-controller
   fallback: bounded-search

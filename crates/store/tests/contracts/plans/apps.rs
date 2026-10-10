@@ -1,3 +1,5 @@
+mod browser;
+mod live;
 use super::runtime::{allow, runtime_token};
 use super::*;
 use agent_computer_store::{
@@ -7,7 +9,11 @@ use agent_computer_store::{
 use sqlx::Row;
 
 async fn setup() -> (Database, String, String, AdmitApp) {
-    let (db, token, computer, start, target) = super::preparation::setup().await;
+    setup_browser(None).await
+}
+async fn setup_browser(image: Option<&str>) -> (Database, String, String, AdmitApp) {
+    let (db, token, computer, start, target) =
+        super::preparation::setup_browser(10 * 1024 * 1024 * 1024, true, 1, image).await;
     let lease = super::preparation::claim(&db, &start, &target, "app-test-preparer").await;
     db.store.begin_candidate_preparation(&lease).await.unwrap();
     // Database authority contracts only; this is explicitly synthetic storage evidence.
