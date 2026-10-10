@@ -61,3 +61,5 @@ Nine additional default contracts cover exact node/process identity, bounded loc
 The final worktree passed all 303 default Cargo/Bazel tests and seven guarded-startup VM cases after the child-reaping fix. The [component evidence](../evidence/node-guarded-startup-2026-10-10.json) retains exact source and binary hashes, full VM readback, twelve kernel probes of the unchanged watchdog binary, and earlier failures. The owned VM and ten private files were removed after collection. This remains component evidence; T01–T43 stay `not_run`.
 
 Four additional default tests cover watchdog exit/stop detection, detached lifetime, redundant SQL evidence and migration 17 compatibility. The root-only pair fault fixture remains separate; see [32 Redundant node watchdogs](32-redundant-node-watchdogs.md).
+
+Node-local intent/report journals and read-only recovery observations are now delivered in [33](33-watchdog-journals.md). They preserve the remaining fencing and writer-release boundaries.

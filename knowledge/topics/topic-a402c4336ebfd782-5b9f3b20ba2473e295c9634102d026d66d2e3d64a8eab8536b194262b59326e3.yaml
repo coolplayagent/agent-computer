@@ -1,0 +1,32 @@
+schema_version: 4
+topic:
+  id: execution
+  title: execution
+  description: Added by CLI source registration.
+sources:
+- id: redundant-node-watchdogs
+  topic: execution
+  kind: doc
+  uri: docs/en/32-redundant-node-watchdogs.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Redundant fixed node watchdog deadlines, durable pair evidence, fault tests and remaining fencing boundaries.
+- id: watchdog-journals
+  topic: execution
+  kind: doc
+  uri: docs/en/33-watchdog-journals.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Durable node watchdog intents and reports, read-only recovery and journal failure boundaries.
+route:
+  topic: execution
+  source_order:
+  - redundant-node-watchdogs
+  - watchdog-journals
+  fallback: bounded-search

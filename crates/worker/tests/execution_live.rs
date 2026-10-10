@@ -427,6 +427,7 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                     &queued.execution_id,
                     &storage,
                     image,
+                    std::path::Path::new(field(&config["node"], "spool")),
                 )
                 .await
                 .unwrap();
@@ -623,10 +624,17 @@ async fn real_candidate_execution_uses_durable_grants_and_observation_only_recov
                 "normal" | "command" | "cancel" | "controller-kill" | "pid1-stop"
             )
         );
-        let recovery =
-            execution::recover_once(&store, &client, &org, &queued.execution_id, &storage, image)
-                .await
-                .unwrap();
+        let recovery = execution::recover_once(
+            &store,
+            &client,
+            &org,
+            &queued.execution_id,
+            &storage,
+            image,
+            std::path::Path::new(field(&config["node"], "spool")),
+        )
+        .await
+        .unwrap();
         let watchdog = store
             .candidate_execution_watchdog(&org, &queued.execution_id)
             .await

@@ -5,7 +5,7 @@ pub const MAX_REQUEST_BYTES: usize = 4096;
 pub const MAX_BUDGET_MS: u64 = 30_000;
 
 /// Trusted node operator input; never accept this from a workload or public API.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
     pub version: u8,

@@ -2,6 +2,8 @@
 #![forbid(unsafe_code)]
 mod command;
 mod guard;
+mod journals;
+pub use journals::{JournalObservations, JournalStatus, observe_journals};
 mod observation;
 use agent_computer_kubernetes::{NodeIdentity, PodRuntimeIdentity};
 use agent_computer_watchdog::{Request, boottime_ms};

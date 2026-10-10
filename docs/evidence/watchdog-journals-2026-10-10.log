@@ -1,0 +1,105 @@
+Initial failing VM probe before explicit 0700 directory fix
+
+running 1 test
+
+thread 'guard::tests::redundant_timers_survive_either_guard_killed_or_stopped' (1392) panicked at crates/node/src/guard/tests.rs:109:10:
+called `Result::unwrap()` on an `Err` value: WatchdogUnavailable
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... FAILED
+
+failures:
+
+failures:
+    guard::tests::redundant_timers_survive_either_guard_killed_or_stopped
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.04s
+
+Final Bazel binary VM verification: 4 pair + 6 journal + 12 kernel cases
+
+running 1 test
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-B0477x","device":64769,"inode":262206,"intent_digest":"sha256:ec9efcdcbad0cbf7edf62216773b21f8afe079d24923ff70c842fe9b96c935c9"}},{"state":"recorded","journal":{"id":"journal-O1vaht","device":64769,"inode":262208,"intent_digest":"sha256:ba4e196e5b5ecd25bdd930f403d84374a5a4ebabd1a838bc5c6c8a19f0a77ddc"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-1888-491432","boot_id":"56e0a404-ca27-4096-970d-777c61c49c6a","cgroup_path":"ac-guard-pair-1888-491432","cgroup_inode":7766,"deadline_boottime_ms":492947},"cgroup_device":28,"armed_boottime_ms":491475,"kill_boottime_ms":492947,"observed_boottime_ms":492957,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-O1vaht","device":64769,"inode":262208,"intent_digest":"sha256:ba4e196e5b5ecd25bdd930f403d84374a5a4ebabd1a838bc5c6c8a19f0a77ddc"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":492947,"empty_observed_boottime_ms":492950,"failed_index":0,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-RV6TMY","device":64769,"inode":262211,"intent_digest":"sha256:37e7d3e7716db2e8afc7c09e7318726482a9894bbce8abc1692f849cc3e328e7"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-1888-493002","boot_id":"56e0a404-ca27-4096-970d-777c61c49c6a","cgroup_path":"ac-guard-pair-1888-493002","cgroup_inode":7815,"deadline_boottime_ms":494513},"cgroup_device":28,"armed_boottime_ms":493021,"kill_boottime_ms":494513,"observed_boottime_ms":494523,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-RV6TMY","device":64769,"inode":262211,"intent_digest":"sha256:37e7d3e7716db2e8afc7c09e7318726482a9894bbce8abc1692f849cc3e328e7"}}},{"state":"unconfirmed","journal":{"id":"journal-BV3Kwj","device":64769,"inode":262213,"intent_digest":"sha256:7062f558c96156aec85e39a2199dd30e7d31aa79d4c5dad81d829626e33aa344"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":494513,"empty_observed_boottime_ms":494522,"failed_index":1,"signal":"\"Signal::KILL\"","writer_released":false}
+{"guards":[{"state":"unconfirmed","journal":{"id":"journal-ysJGRK","device":64769,"inode":262216,"intent_digest":"sha256:41736e0071a12c54d41bf1fedef3ad2e88d85b1b20586f63a39477b2878bc750"}},{"state":"recorded","journal":{"id":"journal-KW4Ooo","device":64769,"inode":262218,"intent_digest":"sha256:7c94d69eaa97ac445615130a433713bd8798cdb372c06ed5a342303d4ecc1c98"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-1888-494562","boot_id":"56e0a404-ca27-4096-970d-777c61c49c6a","cgroup_path":"ac-guard-pair-1888-494562","cgroup_inode":7864,"deadline_boottime_ms":496071},"cgroup_device":28,"armed_boottime_ms":494594,"kill_boottime_ms":496071,"observed_boottime_ms":496081,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-KW4Ooo","device":64769,"inode":262218,"intent_digest":"sha256:7c94d69eaa97ac445615130a433713bd8798cdb372c06ed5a342303d4ecc1c98"}}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":496071,"empty_observed_boottime_ms":496080,"failed_index":0,"signal":"\"Signal::STOP\"","writer_released":false}
+{"guards":[{"state":"recorded","journal":{"id":"journal-z1Ntuf","device":64769,"inode":262221,"intent_digest":"sha256:166c61941ba643113c470b47653e234b1cdaa4cbe77f80263be1655d0cf1aec5"},"report":{"version":1,"request":{"version":1,"execution_id":"ac-guard-pair-1888-496130","boot_id":"56e0a404-ca27-4096-970d-777c61c49c6a","cgroup_path":"ac-guard-pair-1888-496130","cgroup_inode":7913,"deadline_boottime_ms":497642},"cgroup_device":28,"armed_boottime_ms":496152,"kill_boottime_ms":497642,"observed_boottime_ms":497652,"trigger":"Deadline","observation":"EmptyObserved","error":null,"journal":{"id":"journal-z1Ntuf","device":64769,"inode":262221,"intent_digest":"sha256:166c61941ba643113c470b47653e234b1cdaa4cbe77f80263be1655d0cf1aec5"}}},{"state":"unconfirmed","journal":{"id":"journal-Y0SRvc","device":64769,"inode":262223,"intent_digest":"sha256:53af8f49aafd538101d5bd80f43926c9b3cdb89a1aebac971ae44f93e83a87bc"}}]}
+{"case":"redundant_guard_fault","deadline_boottime_ms":497642,"empty_observed_boottime_ms":497642,"failed_index":1,"signal":"\"Signal::STOP\"","writer_released":false}
+test guard::tests::redundant_timers_survive_either_guard_killed_or_stopped ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 6.26s
+
+{"case": "normal", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "normal", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-journal-75eb5451370e4659b44d58f2ac064f33", "cgroup_inode": 7962, "deadline_boottime_ms": 498933}, "cgroup_device": 28, "armed_boottime_ms": 497742, "kill_boottime_ms": 498933, "observed_boottime_ms": 498943, "trigger": "Deadline", "observation": "EmptyObserved", "error": null, "journal": {"id": "normal", "device": 64769, "inode": 262205, "intent_digest": "sha256:af164134785ff53c2c7aa5445f303c56cb98d099c4217e65638e2c8daeffa5ae"}}}
+{"case": "closed-output", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "closed-output", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-journal-3ca709f85fec4cb580eab6258445145a", "cgroup_inode": 8011, "deadline_boottime_ms": 500174}, "cgroup_device": 28, "armed_boottime_ms": 498982, "kill_boottime_ms": 500174, "observed_boottime_ms": 500184, "trigger": "Deadline", "observation": "EmptyObserved", "error": null, "journal": {"id": "closed-output", "device": 64769, "inode": 262209, "intent_digest": "sha256:4d97c44fb3e4a11577305c9458aa57469a3165e50151cd6268e4c0efe414ca09"}}}
+{"case": "report-write-error", "status": "pass", "target_empty": true, "report_missing": true}
+{"case": "full-output", "status": "pass", "report": {"version": 1, "request": {"version": 1, "execution_id": "full-output", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-journal-f72bdf7876704b449297d0fcd3b1eb7c", "cgroup_inode": 8109, "deadline_boottime_ms": 526501}, "cgroup_device": 28, "armed_boottime_ms": 501525, "kill_boottime_ms": 501525, "observed_boottime_ms": 501535, "trigger": "ReceiptUnavailable", "observation": "EmptyObserved", "error": null, "journal": {"id": "full-output", "device": 64769, "inode": 262217, "intent_digest": "sha256:2926874322d040a10de8f5a2c33e09a051b1ba67aa6eb5ecfd601efae02bb9fd"}}}
+{"case": "duplicate-journal", "status": "pass", "armed": false, "target_untouched": true}
+{"case": "nonprivate-journal", "status": "pass", "armed": false, "target_untouched": true}
+{"case": "stopped-supervisor", "status": "pass", "pids": {"parent": 1925, "child": 1926}, "report": {"version": 1, "request": {"version": 1, "execution_id": "stopped-supervisor", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/stopped-supervisor", "cgroup_inode": 8305, "deadline_boottime_ms": 502933}, "cgroup_device": 28, "armed_boottime_ms": 501735, "kill_boottime_ms": 502933, "observed_boottime_ms": 502943, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "frozen-tree", "status": "pass", "pids": {"parent": 1928, "child": 1929}, "report": {"version": 1, "request": {"version": 1, "execution_id": "frozen-tree", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/frozen-tree", "cgroup_inode": 8341, "deadline_boottime_ms": 504298}, "cgroup_device": 28, "armed_boottime_ms": 503099, "kill_boottime_ms": 504298, "observed_boottime_ms": 504308, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "expired-deadline", "status": "pass", "pids": {"parent": 1931, "child": 1932}, "report": {"version": 1, "request": {"version": 1, "execution_id": "expired-deadline", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/expired-deadline", "cgroup_inode": 8377, "deadline_boottime_ms": 503371}, "cgroup_device": 28, "armed_boottime_ms": 504372, "kill_boottime_ms": 504372, "observed_boottime_ms": 504382, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "closed-receipt", "status": "pass", "pids": {"parent": 1934, "child": 1935}, "elapsed_ms": 16, "deadline": 529434}
+{"case": "full-receipt", "status": "pass", "pids": {"parent": 1937, "child": 1938}, "elapsed_ms": 16, "deadline": 529512}
+{"case": "controller-exit", "status": "pass", "pids": {"parent": 1940, "child": 1941}, "report": {"version": 1, "request": {"version": 1, "execution_id": "controller-exit", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/controller-exit", "cgroup_inode": 8485, "deadline_boottime_ms": 505780}, "cgroup_device": 28, "armed_boottime_ms": 504616, "kill_boottime_ms": 505780, "observed_boottime_ms": 505790, "trigger": "Deadline", "observation": "EmptyObserved", "error": null}}
+{"case": "path-reuse", "status": "pass", "original": {"parent": 1944, "child": 1945}, "replacement": {"parent": 1947, "child": 1948}, "report": {"version": 1, "request": {"version": 1, "execution_id": "path-reuse", "boot_id": "56e0a404-ca27-4096-970d-777c61c49c6a", "cgroup_path": "ac-watchdog-973708c0b2f54c408c4da6b1d168bc2c/path-reuse", "cgroup_inode": 8521, "deadline_boottime_ms": 507662}, "cgroup_device": 28, "armed_boottime_ms": 505863, "kill_boottime_ms": 507662, "observed_boottime_ms": 507662, "trigger": "Deadline", "observation": "Unknown", "error": "KillFailed"}}
+{"case": "wrong-inode", "status": "pass", "pids": {"parent": 1949, "child": 1950}}
+{"case": "wrong-boot", "status": "pass", "pids": {"parent": 1952, "child": 1953}}
+{"case": "own-ancestor", "status": "pass", "pids": {"parent": 1955, "child": 1956}}
+{"case": "delegated-group", "status": "pass", "pids": {"parent": 1958, "child": 1959}}
+{"case": "threaded-group", "status": "pass"}
+
+Final Bazel build
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 28 targets (1 packages loaded, 0 targets configured).
+[956 / 965] Compiling Rust rlib store (41 files); 1s processwrapper-sandbox
+[957 / 965] Compiling Rust rlib worker (7 files); 0s processwrapper-sandbox ... (2 actions running)
+[958 / 965] Compiling Rust bin postgres_contracts_test (31 files); 1s processwrapper-sandbox ... (2 actions running)
+[959 / 965] Compiling Rust bin postgres_contracts_test (31 files); 3s processwrapper-sandbox ... (2 actions, 1 running)
+[959 / 965] Compiling Rust bin postgres_contracts_test (31 files); 4s processwrapper-sandbox ... (3 actions running)
+[961 / 965] Compiling Rust bin server_contracts_test (12 files); 2s processwrapper-sandbox ... (2 actions running)
+INFO: Found 28 targets...
+INFO: Elapsed time: 8.183s, Critical Path: 7.87s
+INFO: 13 processes: 5 internal, 8 processwrapper-sandbox.
+INFO: Build completed successfully, 13 total actions
+
+Final Bazel default tests
+Computing main repo mapping:
+Loading:
+Loading: 0 packages loaded
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+Analyzing: 28 targets (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed 28 targets (0 packages loaded, 30 targets configured).
+[972 / 975] 7 / 10 tests; Testing //crates/node:node_contracts_test; 1s processwrapper-sandbox ... (3 actions running)
+[974 / 975] 9 / 10 tests; Testing //crates/store:postgres_contracts_test; 2s processwrapper-sandbox
+[974 / 975] 9 / 10 tests; Testing //crates/store:postgres_contracts_test; 8s processwrapper-sandbox
+INFO: Found 18 targets and 10 test targets...
+INFO: Elapsed time: 8.946s, Critical Path: 8.69s
+INFO: 5 processes: 57 action cache hit, 1 internal, 8 processwrapper-sandbox.
+INFO: Build completed successfully, 5 total actions
+//crates/cli:cli_contracts_test                                 (cached) PASSED in 0.9s
+//crates/core:core_contracts_test                               (cached) PASSED in 0.1s
+//crates/definitions:definitions_contracts_test                 (cached) PASSED in 0.5s
+//crates/kubernetes:kubernetes_contracts_test                   (cached) PASSED in 1.8s
+//crates/sandbox:sandbox_contracts_test                         (cached) PASSED in 0.1s
+//crates/storage:storage_contracts_test                         (cached) PASSED in 2.2s
+//crates/node:node_contracts_test                                        PASSED in 1.8s
+//crates/server:server_contracts_test                                    PASSED in 2.1s
+//crates/store:postgres_contracts_test                                   PASSED in 8.7s
+//crates/watchdog:watchdog_contracts_test                                PASSED in 0.1s
+
+Executed 4 out of 10 tests: 10 tests pass.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.
+
+Clippy workspace all targets
+    Checking agent-computer-watchdog v0.1.0 (/opt/workspace/agent-computer/crates/watchdog)
+    Checking agent-computer-node v0.1.0 (/opt/workspace/agent-computer/crates/node)
+    Checking agent-computer-store v0.1.0 (/opt/workspace/agent-computer/crates/store)
+    Checking agent-computer-worker v0.1.0 (/opt/workspace/agent-computer/crates/worker)
+    Checking agent-computer-server v0.1.0 (/opt/workspace/agent-computer/crates/server)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.51s

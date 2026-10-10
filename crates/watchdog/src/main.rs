@@ -1,4 +1,7 @@
-use agent_computer_watchdog::{Error, MAX_REQUEST_BYTES, Observation, Request, run, write_frame};
+use agent_computer_watchdog::{
+    Error, MAX_REQUEST_BYTES, Observation, Request, journal::Journal, run, run_journaled,
+    write_frame,
+};
 use std::{fs::File, io::Read, process::ExitCode};
 
 fn main() -> ExitCode {
@@ -18,7 +21,10 @@ fn execute() -> Result<bool, Error> {
         rustix::process::setsid().map_err(|_| Error::Setup)?;
     }
     let args: Vec<_> = std::env::args_os().collect();
-    if args.len() != 3 || args[1] != "--request" {
+    if !matches!(args.len(), 3 | 5)
+        || args[1] != "--request"
+        || (args.len() == 5 && args[3] != "--journal")
+    {
         return Err(Error::InvalidRequest);
     }
     let mut bytes = Vec::new();
@@ -28,7 +34,13 @@ fn execute() -> Result<bool, Error> {
         .read_to_end(&mut bytes)
         .map_err(|_| Error::InvalidRequest)?;
     let output = std::io::stdout();
-    let report = run(Request::parse(&bytes)?, &output)?;
+    let request = Request::parse(&bytes)?;
+    let report = if args.len() == 5 {
+        let journal = Journal::create(std::path::Path::new(&args[4]), &request)?;
+        run_journaled(request, &output, journal)?
+    } else {
+        run(request, &output)?
+    };
     write_frame(&output, &report)?;
     Ok(report.observation == Observation::EmptyObserved)
 }

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
     io::{Read, Write},
+    os::unix::fs::PermissionsExt,
     process::{Child, ChildStdout},
     time::{Duration, Instant},
 };
@@ -18,6 +19,8 @@ pub struct ArmedReceipt {
     pub request: Request,
     pub cgroup_device: u64,
     pub armed_boottime_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub journal: Option<agent_computer_watchdog::journal::Reference>,
 }
 
 #[derive(Debug, Serialize)]
@@ -168,10 +171,22 @@ fn launch_one(
     if boottime_ms() >= request.deadline_boottime_ms {
         return Err(Error::Deadline);
     }
+    // Retain even partial evidence. Only explicit trusted retention may remove it.
+    let journal_path = tempfile::Builder::new()
+        .prefix("journal-")
+        .permissions(std::fs::Permissions::from_mode(0o700))
+        .tempdir_in(spool)
+        .map_err(|_| Error::Configuration)?
+        .keep();
     // Do not create a child process group here: the CLI calls setsid itself.
     let mut child = DetachedChild(Some(
         command::command(executable, "agent-computer-watchdog")
-            .args([std::ffi::OsStr::new("--request"), input.path().as_os_str()])
+            .args([
+                std::ffi::OsStr::new("--request"),
+                input.path().as_os_str(),
+                std::ffi::OsStr::new("--journal"),
+                journal_path.as_os_str(),
+            ])
             .spawn()
             .map_err(|_| Error::WatchdogUnavailable)?,
     ));
@@ -193,6 +208,15 @@ fn launch_one(
         || armed.armed_boottime_ms >= request.deadline_boottime_ms
         || now >= request.deadline_boottime_ms
     {
+        return Err(Error::IdentityMismatch);
+    }
+    let reference = armed.journal.as_ref().ok_or(Error::InvalidObservation)?;
+    if Some(reference.id.as_str()) != journal_path.file_name().and_then(|v| v.to_str()) {
+        return Err(Error::IdentityMismatch);
+    }
+    let durable = agent_computer_watchdog::journal::Journal::read(spool, reference)
+        .map_err(|_| Error::InvalidObservation)?;
+    if durable.intent.request != *request || durable.intent.watchdog_pid != child.process().id() {
         return Err(Error::IdentityMismatch);
     }
     child.require_running()?;
