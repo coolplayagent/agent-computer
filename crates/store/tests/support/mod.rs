@@ -10,7 +10,11 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_execution_outputs(&self) {
+        sqlx::raw_sql("DROP TABLE execution_outputs; DROP TABLE execution_output_intents; DROP FUNCTION guard_execution_output(); DELETE FROM _sqlx_migrations WHERE version=19;").execute(&self.pool).await.unwrap();
+    }
     pub async fn remove_reaper_admission(&self) {
+        self.remove_execution_outputs().await;
         sqlx::raw_sql("DROP TRIGGER check_reaper_admission ON execution_watchdog_arms; DROP FUNCTION guard_reaper_admission(); DROP TRIGGER check_reaper_startup ON execution_startup_grants; DROP FUNCTION guard_reaper_startup(); DROP INDEX execution_reaper_challenges; DELETE FROM _sqlx_migrations WHERE version=18;").execute(&self.pool).await.unwrap();
     }
     pub async fn remove_redundant_watchdogs(&self) {

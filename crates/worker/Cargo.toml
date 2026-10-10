@@ -13,6 +13,7 @@ agent-computer-store = { path = "../store" }
 agent-computer-storage = { path = "../storage" }
 agent-computer-node = { path = "../node" }
 agent-computer-watchdog = { path = "../watchdog" }
+agent-computer-objects = { path = "../objects" }
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true

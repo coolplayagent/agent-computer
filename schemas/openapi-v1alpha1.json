@@ -3170,6 +3170,137 @@
           }
         }
       }
+    },
+    "/v1alpha1/executions/{id}/output": {
+      "get": {
+        "operationId": "getCandidateExecutionOutput",
+        "description": "Requires runtime.connect and the original valid connection credential. Returns null before an output intent exists, otherwise bounded stream metadata. verified records historical full S3 read-back and database publication; it is not accepted execution completion, current object availability or writer drain. No command bytes, output bytes, object keys or credentials are returned.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request, ID, scope, duration or missing idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid, revoked, expired or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing required service scope or unsupported browser Origin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource or original connection owner is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Candidate not Prepared/current, ownership busy, inactive lease, stale generation/epoch/revision or conflicting idempotency input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Connection inactive or idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable. Retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Output metadata, or null when no report was captured.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ExecutionOutput"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Selected Sandbox is unavailable, incompatible, outside the pinned Computer or shared with an App.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5048,6 +5179,92 @@
             }
           }
         ]
+      },
+      "ExecutionOutputStream": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sha256",
+          "retained_bytes",
+          "observed_bytes",
+          "truncated",
+          "eof"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "retained_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048576
+          },
+          "observed_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "eof": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ExecutionOutput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "execution_id",
+          "manifest_digest",
+          "state",
+          "observed_outcome",
+          "stdout",
+          "stderr",
+          "verified_at_ms"
+        ],
+        "properties": {
+          "execution_id": {
+            "type": "string"
+          },
+          "manifest_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified"
+            ]
+          },
+          "observed_outcome": {
+            "type": "string",
+            "enum": [
+              "succeeded",
+              "failed",
+              "spawn_failed",
+              "cancelled",
+              "timed_out",
+              "lease_expired",
+              "descendants_terminated",
+              "unknown"
+            ]
+          },
+          "stdout": {
+            "$ref": "#/components/schemas/ExecutionOutputStream"
+          },
+          "stderr": {
+            "$ref": "#/components/schemas/ExecutionOutputStream"
+          },
+          "verified_at_ms": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
       }
     },
     "responses": {

@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+agent-computer-objects = { path = "../objects" }
 agent-computer-core = { path = "../core" }
 agent-computer-definitions = { path = "../definitions" }
 agent-computer-store = { path = "../store" }

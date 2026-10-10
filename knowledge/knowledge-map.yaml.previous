@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 56
-updated_at: unix:1791597888
+map_version: 57
+updated_at: unix:1791599329
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -125,10 +125,11 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - node-expiry-reaper
+  - reaper-startup-admission
   - redundant-node-watchdogs
   - watchdog-journals
-  ref: topics/topic-a402c4336ebfd782-20be327857ed04db7bfd101697e929194f5839c11f045a544355c997fea3c8f5.yaml
-  digest: 20be327857ed04db7bfd101697e929194f5839c11f045a544355c997fea3c8f5
+  ref: topics/topic-a402c4336ebfd782-a85227c6962c15d61793e83158e4e1bcf034e006add32bc999fb31361b603184.yaml
+  digest: a85227c6962c15d61793e83158e4e1bcf034e006add32bc999fb31361b603184
 - id: integrations
   title: integrations
   description: Added by CLI source registration.
@@ -152,12 +153,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 40
+  omitted_through: 41
   recent:
-  - version: 41
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-writer-leases' to topic 'development'.
   - version: 42
     action: source.add
     actor: cli
@@ -218,3 +215,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'node-expiry-reaper' to topic 'execution'.
+  - version: 57
+    action: source.add
+    actor: cli
+    summary: Added source 'reaper-startup-admission' to topic 'execution'.

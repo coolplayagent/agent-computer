@@ -27,6 +27,33 @@ pub async fn run(
         options.get("config-file").ok_or_else(usage)?,
     )?)
     .map_err(|_| failed("Invalid private execution worker configuration."))?;
+    if matches!(
+        command,
+        "execution-output-recover" | "execution-output-read"
+    ) {
+        let client = agent_computer_objects::Client::new(&config.execution.outputs)
+            .map_err(|_| failed("Invalid private output store configuration."))?;
+        if command == "execution-output-read" {
+            let bytes = store
+                .read_candidate_execution_output(&org, id, &client)
+                .await
+                .map_err(|_| failed("Durable output was not verified."))?;
+            use std::io::Write;
+            std::io::stdout()
+                .write_all(&bytes)
+                .map_err(|_| failed("Unable to write output report."))?;
+        } else {
+            let spool = agent_computer_objects::Spool::open(&config.execution.output_spool)
+                .map_err(|_| failed("Private output spool is unavailable."))?;
+            let output=store.recover_candidate_execution_output(&org,id,&client,&spool).await.map_err(|_|failed("Output publication is unconfirmed; retain the original spool and object identities."))?;
+            println!(
+                "{}",
+                serde_json::to_string(&output)
+                    .map_err(|_| failed("Unable to encode output metadata."))?
+            );
+        }
+        return Ok(());
+    }
     let ca = private_file(&config.ca_file)?;
     let token = private_file(&config.token_file)?;
     let client = Client::new(
