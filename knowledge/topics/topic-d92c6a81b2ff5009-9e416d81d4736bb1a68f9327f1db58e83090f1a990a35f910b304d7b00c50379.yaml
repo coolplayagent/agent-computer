@@ -1,0 +1,31 @@
+schema_version: 4
+topic:
+  id: runtime
+  title: runtime
+  description: Added by CLI source registration.
+sources:
+- id: checkpoint-stop-worker
+  topic: runtime
+  kind: doc
+  uri: docs/zh-CN/46-checkpoint-stop-worker.md
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: 纯文件检查点停止、原子发布与停止回执、活跃使用阻断和常驻 Artifact worker
+- id: continuous-candidate-preparation
+  topic: runtime
+  kind: doc
+  uri: docs/zh-CN/45-continuous-candidate-preparation.md
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Candidate 常驻准备、原始授权、有限并发、轮换发现、停止等待与只观察恢复
+route:
+  topic: runtime
+  source_order:
+  - continuous-candidate-preparation
+  - checkpoint-stop-worker
+  fallback: bounded-search

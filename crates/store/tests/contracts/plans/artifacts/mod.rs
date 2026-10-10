@@ -10,6 +10,8 @@ use agent_computer_store::{
     reconciliation::WorkerId,
     runtime::{artifacts::*, *},
 };
+mod checkpoint;
+mod checkpoint_authority;
 mod continuation;
 mod objects;
 mod recovery;

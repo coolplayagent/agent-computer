@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+mod artifact_worker;
 mod candidate_worker;
 mod definition_admin;
 mod execution_worker;

@@ -200,6 +200,15 @@ impl<'s> MigrationSource<'s> for Embedded {
                     )),
                     false,
                 ),
+                Migration::new(
+                    26,
+                    Cow::Borrowed("checkpoint stop worker"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!(
+                        "../migrations/0026_checkpoint_stop_worker.sql"
+                    )),
+                    false,
+                ),
             ])
         })
     }

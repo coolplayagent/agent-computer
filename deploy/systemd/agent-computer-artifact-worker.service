@@ -1,0 +1,26 @@
+[Unit]
+Description=Agent Computer continuous Artifact publication and checkpoint-stop worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+UMask=0077
+# Pin one organization and qualified mounted Volume. Update binding after changes.
+# The root-owned file supplies DATABASE_URL_FILE, ORGANIZATION, WORKER_ID, CONFIG_FILE.
+EnvironmentFile=/etc/agent-computer/artifact-worker.env
+ExecStart=/usr/local/bin/agent-computer-server artifact-worker --database-url-file ${DATABASE_URL_FILE} --organization ${ORGANIZATION} --worker-id ${WORKER_ID} --config-file ${CONFIG_FILE} --concurrency 2 --poll-ms 1000
+Restart=on-failure
+RestartSec=5s
+# SIGTERM joins capture/upload jobs. Forced termination retains sealed storage
+# and captured identities; a replacement verifies the original immutable bundle.
+KillMode=mixed
+TimeoutStopSec=360s
+NoNewPrivileges=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

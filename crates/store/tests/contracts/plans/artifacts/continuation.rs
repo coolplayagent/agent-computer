@@ -79,7 +79,6 @@ async fn artifact_selector_cannot_cross_workspace_even_with_both_workspace_grant
 #[tokio::test]
 async fn migration_twenty_two_preserves_history_and_releases_branch_checkpoint() {
     let (db, token, computer, workspace, mut input) = setup().await;
-    db.remove_artifact_continuation().await;
     input.publish_current = false;
     let artifact = admit(&db, &token, &workspace, &input).await;
     let objects = Objects::new();
@@ -92,6 +91,9 @@ async fn migration_twenty_two_preserves_history_and_releases_branch_checkpoint()
         )
         .await
         .unwrap();
+    // Build legacy-compatible history before removing newer schema columns;
+    // current application code is not an executable migration-21 client.
+    db.remove_artifact_continuation().await;
     let current = db.store.computer_runtime(&token, &computer).await.unwrap();
     let command = StopPreparedComputer {
         expected_revision: current.revision,
@@ -107,8 +109,15 @@ async fn migration_twenty_two_preserves_history_and_releases_branch_checkpoint()
     assert!(before["start"].get("input_artifact_id").is_none());
     db.store.migrate().await.unwrap();
     db.store.ready().await.unwrap();
-    let after:Value=sqlx::query_scalar("SELECT jsonb_build_object('start',r.receipt,'input',to_jsonb(i),'artifact',to_jsonb(a)) FROM runtime_start_requests r JOIN runtime_start_inputs i USING(organization,request_id) JOIN artifact_commits a USING(organization,request_id)").fetch_one(&db.pool).await.unwrap();
+    let after:Value=sqlx::query_scalar("SELECT jsonb_build_object('start',r.receipt,'input',to_jsonb(i),'artifact',to_jsonb(a)-'stop_after_commit') FROM runtime_start_requests r JOIN runtime_start_inputs i USING(organization,request_id) JOIN artifact_commits a USING(organization,request_id)").fetch_one(&db.pool).await.unwrap();
     assert_eq!(before, after);
+    assert!(
+        !db.store
+            .workspace_artifact(&token, &done.commit_id)
+            .await
+            .unwrap()
+            .stop_after_commit
+    );
     let stopped = db
         .store
         .stop_prepared_computer(&token, &key("migration-stop"), &computer, &command)

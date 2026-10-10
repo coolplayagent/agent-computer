@@ -3971,6 +3971,154 @@
           }
         }
       }
+    },
+    "/v1alpha1/computers/{id}/checkpoint-stop": {
+      "post": {
+        "operationId": "checkpointStopComputer",
+        "description": "Requires current Computer read/modify/manage and Workspace read/modify/publish grants with matching credential scopes. Atomically seals an already drained Candidate and admits durable Artifact work. A trusted artifact-worker captures and verifies S3 content, then publishes the fixed version and records the Computer stop in one transaction. Declared Apps, active human input, another principal's live connection, unreleased writers and unresolved execution history block this normal stop; force is unsupported. publish_current chooses head CAS or a retained branch checkpoint. A CAS conflict still saves the fixed checkpoint and stops without overwriting the shared head. Repeating the same key/input returns current work and may refresh the original principal's credential; it does not reopen mutation. A 202 response does not mean stopped: inspect stop_receipt in Artifact metadata or Computer runtime.",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,128}$"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid resource ID or request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, revoked or disabled credential.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing scope, browser Origin, or activation exceeds its grant cap.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource is unavailable or inaccessible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request exceeded its deadline.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable; retry unknown write outcomes with the same key and input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stop requires a verified eligible checkpoint or an undispatched Candidate; active input, mismatched revision/state or idempotency conflict also blocks stopping.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Idempotency receipt retired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body or dependency snapshot too large.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Uncompressed application/json required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Durable checkpoint-stop work admitted or replayed. Stopped is confirmed only by stop_receipt after verified publication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactCommit"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckpointStop"
+              }
+            }
+          }
+        },
+        "summary": "Save a verified file checkpoint and stop"
+      }
     }
   },
   "components": {
@@ -6137,7 +6285,8 @@
           "publish_current",
           "input_revision",
           "manifest_digest",
-          "published_at_ms"
+          "published_at_ms",
+          "stop_after_commit"
         ],
         "properties": {
           "commit_id": {
@@ -6206,6 +6355,13 @@
             ],
             "minimum": 1,
             "maximum": 9223372036854775807
+          },
+          "stop_after_commit": {
+            "type": "boolean",
+            "description": "True only for an admitted checkpoint-stop; publication and stopping finish in one transaction."
+          },
+          "stop_receipt": {
+            "$ref": "#/components/schemas/ComputerStopReceipt"
           }
         }
       },
@@ -6310,6 +6466,28 @@
           "unfinished_execution_ids": {
             "type": "array",
             "maxItems": 0
+          }
+        }
+      },
+      "CheckpointStop": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "request_id",
+          "expected_revision",
+          "publish_current"
+        ],
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "publish_current": {
+            "type": "boolean"
           }
         }
       }

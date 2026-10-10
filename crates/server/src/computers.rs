@@ -184,3 +184,53 @@ pub(crate) async fn stop(
         Err(e) => context.store_error(e),
     }
 }
+
+/// Admit durable capture and stop, without reporting that work already completed.
+pub(crate) async fn checkpoint_stop(
+    State(state): State<ServiceState>,
+    Extension(context): Extension<RequestContext>,
+    path: Result<Path<String>, PathRejection>,
+    request: Request,
+) -> Response {
+    let token = match requests::authorize(
+        &state,
+        &context,
+        request.headers(),
+        ServiceScope::RuntimeManage,
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let id = match id(&context, path) {
+        Ok(v) => v,
+        Err(e) => return *e,
+    };
+    let key = match crate::plans::key(&context, request.headers()) {
+        Ok(v) => v,
+        Err(e) => return *e,
+    };
+    let body = match requests::body(&context, request).await {
+        Ok(v) => v,
+        Err(e) => return e,
+    };
+    let Ok(input) =
+        serde_json::from_slice::<agent_computer_store::runtime::artifacts::CheckpointStop>(&body)
+    else {
+        return context.error(
+            StatusCode::BAD_REQUEST,
+            "invalid_request",
+            "Supply expected_revision, request_id and publish_current.",
+            false,
+        );
+    };
+    match state
+        .store
+        .checkpoint_stop_computer(&token, &key, &id, &input)
+        .await
+    {
+        Ok(v) => (StatusCode::ACCEPTED, Json(v)).into_response(),
+        Err(e) => context.store_error(e),
+    }
+}

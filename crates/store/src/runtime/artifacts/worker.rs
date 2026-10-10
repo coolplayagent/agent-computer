@@ -16,6 +16,7 @@ async fn authority(tx: &mut Transaction<'_, Postgres>, record: &PgRow) -> Result
     for need in requirements(
         &record.try_get::<String, _>("workspace_id")?,
         &record.try_get::<String, _>("computer_id")?,
+        record.try_get("stop_after_commit")?,
     ) {
         let identity = Store::authorize_bound_runtime_in(
             tx,
@@ -26,6 +27,9 @@ async fn authority(tx: &mut Transaction<'_, Postgres>, record: &PgRow) -> Result
         )
         .await?;
         require_in(tx, &identity, &need).await?;
+    }
+    if record.try_get("stop_after_commit")? {
+        admission::available(tx, &org, &request, &principal).await?;
     }
     super::super::start::graph::validate_catalogs(tx, &org, &request).await
 }
@@ -211,9 +215,36 @@ impl Store {
         }
         sqlx::query("UPDATE runtime_start_requests SET state='Sealed' WHERE organization=$1 AND request_id=$2").bind(&lease.org).bind(&input.request_id).execute(&mut *tx).await?;
         sqlx::query("UPDATE runtime_controls SET revision=revision+1 WHERE organization=$1 AND active_request=$2").bind(&lease.org).bind(&input.request_id).execute(&mut *tx).await?;
-        transactions::emit(&mut tx,&lease.org,seq,"artifact.committed",serde_json::json!({"commit_id":lease.commit,"workspace_id":workspace,"input_revision":revision,"manifest_digest":manifest_digest,"publish_current":input.publish_current,"state":state})).await?;
+        let committed_seq = transactions::emit(&mut tx,&lease.org,seq,"artifact.committed",serde_json::json!({"commit_id":lease.commit,"workspace_id":workspace,"input_revision":revision,"manifest_digest":manifest_digest,"publish_current":input.publish_current,"state":state})).await?;
+        if record.try_get("stop_after_commit")? {
+            admission::available(
+                &mut tx,
+                &lease.org,
+                &input.request_id,
+                &record.try_get::<String, _>("principal")?,
+            )
+            .await?;
+            super::super::start::commit_stop(
+                &mut tx,
+                &lease.org,
+                &record.try_get::<String, _>("computer_id")?,
+                &StopPreparedComputer {
+                    request_id: input.request_id.clone(),
+                    expected_revision: input
+                        .expected_revision
+                        .checked_add(2)
+                        .ok_or(Error::CounterExhausted)?,
+                },
+                committed_seq,
+            )
+            .await?;
+        }
         // Fresh principal authorization after the event/outbox too.
-        for need in requirements(&workspace, &record.try_get::<String, _>("computer_id")?) {
+        for need in requirements(
+            &workspace,
+            &record.try_get::<String, _>("computer_id")?,
+            record.try_get("stop_after_commit")?,
+        ) {
             let identity = Store::authorize_bound_runtime_in(
                 &mut tx,
                 &lease.org,

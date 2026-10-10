@@ -10,7 +10,12 @@ pub struct Database {
     postgres: Postgres,
 }
 impl Database {
+    pub async fn remove_checkpoint_stop_worker(&self) {
+        sqlx::raw_sql("DROP TRIGGER checkpoint_stop_completion ON artifact_commits; DROP FUNCTION verify_checkpoint_stop_completion(); DROP TRIGGER check_checkpoint_stop_admission ON artifact_commits; DROP FUNCTION guard_checkpoint_stop_admission(); DROP FUNCTION checkpoint_stop_available(TEXT,TEXT,TEXT); DROP FUNCTION checkpoint_stop_active_use(TEXT,TEXT,TEXT); DROP INDEX artifact_worker_queue; ALTER TABLE artifact_commits DROP COLUMN stop_after_commit; DELETE FROM _sqlx_migrations WHERE version=26;")
+            .execute(&self.pool).await.unwrap();
+    }
     pub async fn remove_preparation_queue_poll(&self) {
+        self.remove_checkpoint_stop_worker().await;
         sqlx::raw_sql("DROP INDEX candidate_preparation_queue_poll; DELETE FROM _sqlx_migrations WHERE version=25;")
             .execute(&self.pool).await.unwrap();
     }

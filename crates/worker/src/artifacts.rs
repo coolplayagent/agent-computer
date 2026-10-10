@@ -7,9 +7,12 @@ use agent_computer_objects::{
 use agent_computer_store::{
     Error, Store, reconciliation::WorkerId, runtime::artifacts::ArtifactCommit,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+mod capture;
+mod queue;
+pub use queue::{QueueEvent, QueueOptions, QueueSummary, run_queue};
 use std::{path::PathBuf, sync::Arc, time::Duration};
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Configuration {
     pub storage: crate::files::Configuration,
@@ -23,54 +26,83 @@ pub async fn publish_once(
     owner: &WorkerId,
     config: Configuration,
 ) -> agent_computer_store::Result<Option<ArtifactCommit>> {
-    let client = Arc::new(Client::new(&config.objects).map_err(|_| Error::ReferenceUnavailable)?);
-    let spool = Spool::open(&config.spool).map_err(|_| Error::ReferenceUnavailable)?;
+    let checked = config.clone();
+    let (client, spool) = tokio::task::spawn_blocking(move || resources(&checked))
+        .await
+        .map_err(|_| Error::ReferenceUnavailable)??;
     let Some(lease) = store.claim_artifact(org, id, owner).await? else {
         return Ok(None);
     };
-    let work = async {
-        if lease.target() != &config.storage.target {
-            return Err(Error::ReferenceUnavailable);
-        }
-        let bundle = if let Some(bundle) = lease.capture() {
-            bundle.clone()
-        } else {
+    let result = publish_claimed(store, &lease, config, client, spool).await;
+    if result.is_err() {
+        let _ = store.release_artifact_worker(&lease).await;
+    }
+    result.map(Some)
+}
+
+fn resources(config: &Configuration) -> agent_computer_store::Result<(Arc<Client>, Spool)> {
+    let client = Arc::new(Client::new(&config.objects).map_err(|_| Error::ReferenceUnavailable)?);
+    let spool = Spool::open(&config.spool).map_err(|_| Error::ReferenceUnavailable)?;
+    Ok((client, spool))
+}
+
+async fn publish_claimed(
+    store: &Store,
+    lease: &agent_computer_store::runtime::artifacts::ArtifactLease,
+    config: Configuration,
+    client: Arc<Client>,
+    spool: Spool,
+) -> agent_computer_store::Result<ArtifactCommit> {
+    if lease.target() != &config.storage.target {
+        return Err(Error::ReferenceUnavailable);
+    }
+    let captured = if lease.capture().is_none() {
+        let prepared = lease.prepared().clone();
+        let object_client = client.clone();
+        let local = spool.clone();
+        let organization = lease.organization().to_owned();
+        let commit = lease.commit_id().to_owned();
+        let task = tokio::task::spawn_blocking(move || {
             let mount = crate::files::open_mount(&config.storage)?;
-            let prepared = lease.prepared().clone();
-            let object_client = client.clone();
-            let local = spool.clone();
-            let organization = org.as_str().to_owned();
-            let commit = id.to_owned();
-            let capture = tokio::task::spawn_blocking(move || {
-                CapturedArtifact::capture(
-                    &object_client,
-                    &local,
-                    &mount,
-                    &prepared,
-                    &organization,
-                    &commit,
-                )
-            })
-            .await
-            .map_err(|_| Error::InvalidReconcileResult)?
-            .map_err(|_| Error::InvalidReconcileResult)?;
-            store.record_artifact_capture(&lease, &capture).await?;
-            capture.bundle().clone()
+            CapturedArtifact::capture(
+                &object_client,
+                &local,
+                &mount,
+                &prepared,
+                &organization,
+                &commit,
+            )
+            .map_err(|_| Error::InvalidReconcileResult)
+        });
+        Some(
+            capture::joined(
+                task,
+                || store.renew_artifact(lease),
+                Duration::from_secs(10),
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
+    let work = async {
+        let bundle = if let Some(captured) = &captured {
+            store.record_artifact_capture(lease, captured).await?;
+            captured.bundle()
+        } else {
+            lease.capture().ok_or(Error::InvalidStoredData)?
         };
-        let verified = verify(&client, &bundle, Some(&spool))
+        let verified = verify(&client, bundle, Some(&spool))
             .await
             .map_err(|_| Error::InvalidReconcileResult)?;
-        store.finish_artifact(&lease, &verified).await.map(Some)
+        store.finish_artifact(lease, &verified).await
     };
     tokio::pin!(work);
     loop {
         tokio::select! {
             biased;
-            result=&mut work=>{
-                if result.is_err() {let _=store.release_artifact_worker(&lease).await;}
-                return result;
-            },
-            _=tokio::time::sleep(Duration::from_secs(10))=>store.renew_artifact(&lease).await?,
+            result=&mut work=>return result,
+            _=tokio::time::sleep(Duration::from_secs(10))=>store.renew_artifact(lease).await?,
         }
     }
 }

@@ -13,6 +13,12 @@ rust_library(
 )
 
 rust_test(
+    name = "worker_test",
+    crate = ":worker",
+    deps = all_crate_deps(normal_dev = True),
+)
+
+rust_test(
     name = "volume_worker_live_test",
     size = "large",
     srcs = ["tests/live.rs"],
@@ -25,7 +31,7 @@ rust_test(
 rust_test(
     name = "execution_worker_live_test",
     size = "large",
-    srcs = ["tests/execution_live.rs", "tests/support/execution_faults.rs", "tests/support/execution_outputs.rs", "tests/support/output_http.rs", "tests/support/execution_queue.rs"],
+    srcs = ["tests/execution_live.rs", "tests/support/execution_faults.rs", "tests/support/execution_outputs.rs", "tests/support/output_http.rs", "tests/support/execution_queue.rs", "tests/support/execution_checkpoint.rs"],
     crate_root = "tests/execution_live.rs",
     tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
     edition = "2024",
@@ -36,7 +42,7 @@ rust_test(
 rust_test(
     name = "candidate_worker_live_test",
     size = "large",
-    srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs", "tests/support/file_http.rs", "tests/support/artifacts.rs", "tests/support/continuation.rs", "tests/support/fence.rs", "tests/support/preparation_queue.rs"],
+    srcs = ["tests/candidate_live.rs", "tests/support/file_writer.rs", "tests/support/file_http.rs", "tests/support/artifacts.rs", "tests/support/artifact_queue.rs", "tests/support/continuation.rs", "tests/support/fence.rs", "tests/support/preparation_queue.rs"],
     crate_root = "tests/candidate_live.rs",
     tags = ["manual", "requires-kubernetes", "requires-postgresql", "requires-juicefs"],
     edition = "2024",

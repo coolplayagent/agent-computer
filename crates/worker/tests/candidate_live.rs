@@ -26,6 +26,8 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+#[path = "support/artifact_queue.rs"]
+mod artifact_queue;
 #[path = "support/artifacts.rs"]
 mod artifacts;
 #[path = "support/continuation.rs"]

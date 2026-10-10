@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 66
-updated_at: unix:1791622745
+map_version: 67
+updated_at: unix:1791624158
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -154,6 +154,13 @@ topics:
   - agent-computer-product
   ref: topics/topic-a8792157cb4f27fb-e7a46c4b437237adc215919e98c4a0988a2a3fef46c452fdc1ccd600f0f50f8b.yaml
   digest: e7a46c4b437237adc215919e98c4a0988a2a3fef46c452fdc1ccd600f0f50f8b
+- id: runtime
+  title: runtime
+  description: Added by CLI source registration.
+  source_ids:
+  - continuous-candidate-preparation
+  ref: topics/topic-d92c6a81b2ff5009-cfcc638a470a83d9aa64bcf6b33f10b7ea781288be46d84c4568c67d1ed2a677.yaml
+  digest: cfcc638a470a83d9aa64bcf6b33f10b7ea781288be46d84c4568c67d1ed2a677
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -162,12 +169,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 50
+  omitted_through: 51
   recent:
-  - version: 51
-    action: source.add
-    actor: cli
-    summary: Added source 'candidate-execution-worker' to topic 'development'.
   - version: 52
     action: source.add
     actor: cli
@@ -228,3 +231,7 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'queued-execution-worker' to topic 'execution'.
+  - version: 67
+    action: source.add
+    actor: cli
+    summary: Added source 'continuous-candidate-preparation' to topic 'runtime'.
