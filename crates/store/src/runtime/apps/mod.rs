@@ -110,6 +110,19 @@ pub(super) async fn invalidate_grant(
         sqlx::query("UPDATE app_instances SET state=CASE WHEN state='Queued' THEN 'Blocked' ELSE 'Draining' END,revision=revision+1 WHERE organization=$1 AND principal=$2 AND state IN ('Queued','Dispatching','Running') AND (($3='computer' AND computer_id=$4) OR ($3='app' AND app_id=$4) OR ($3='browser_profile' AND profile_id=$4)) AND (NOT $5 OR runtime_seconds>$6)")
             .bind(grant.organization.as_str()).bind(grant.principal.as_str()).bind(grant.kind.as_str()).bind(grant.resource_id).bind(enabled).bind(grant.max_runtime_seconds.map(|n|n as i32)).execute(&mut **tx).await?;
     }
+    if !enabled
+        && matches!(
+            grant.permission,
+            RuntimePermission::Control
+                | RuntimePermission::Observe
+                | RuntimePermission::Read
+                | RuntimePermission::Connect
+                | RuntimePermission::AppUse
+        )
+    {
+        sqlx::query("UPDATE browser_controls c SET state='Draining' FROM app_instances a WHERE c.organization=a.organization AND c.instance_id=a.instance_id AND c.organization=$1 AND c.principal=$2 AND c.state='Owned' AND (($3='computer' AND a.computer_id=$4) OR ($3='app' AND a.app_id=$4) OR ($3='browser_profile' AND a.profile_id=$4))")
+            .bind(grant.organization.as_str()).bind(grant.principal.as_str()).bind(grant.kind.as_str()).bind(grant.resource_id).execute(&mut **tx).await?;
+    }
     Ok(())
 }
 

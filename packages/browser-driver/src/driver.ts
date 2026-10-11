@@ -215,6 +215,25 @@ export class BrowserDriver {
     });
   }
 
+  /** Private controller barrier. A failed/uncertain action cannot be drained into
+   * a new owner. All admitted inputs are discrete; release inputs explicitly and
+   * discard observations before acknowledging a serial handoff. */
+  async drain(epoch: number): Promise<{ control_epoch: number; drained: true; requires_observation: true }> {
+    if (!Number.isSafeInteger(epoch) || epoch < 1 || epoch < this.#epoch) throw new DriverError("invalid_request");
+    return this.#operation(async (op) => {
+      if (this.#blocked) throw new DriverError("control_blocked");
+      for (const { page } of this.#pages.values()) {
+        if (page.isClosed()) continue;
+        for (const button of ["left", "middle", "right"] as const) await page.mouse.up({ button });
+        for (const key of ["Enter", "Tab", "Escape", "Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown", "Space"]) await page.keyboard.up(key);
+      }
+      await this.#invalidate();
+      this.#assertLive(op.deadline);
+      this.#epoch = epoch;
+      return { control_epoch: epoch, drained: true, requires_observation: true };
+    });
+  }
+
   async close(): Promise<void> {
     if (this.#closing) return this.#closing;
     this.#state = "closing";

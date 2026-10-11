@@ -219,3 +219,21 @@ test("real Chromium: collecting target proof cannot extend observation validity"
     assert.equal(f.driver.control_blocked, false);
   } finally { await f.close(); }
 });
+
+test("real Chromium: serial control drain invalidates old observations before handoff", { timeout: 60000 }, async () => {
+  const f = await fixture();
+  try {
+    const old = await f.navigate();
+    const barrier = await f.driver.drain(f.authority.epoch);
+    assert.deepEqual(barrier, { control_epoch: f.authority.epoch, drained: true, requires_observation: true });
+    await assert.rejects(f.driver.act(actor, f.nextId(), { kind: "click_at", page_id: old.page_id,
+      observation_id: old.observation_id, x: 10, y: 10 }), { code: "stale_observation" });
+    f.authority.epoch++;
+    const fresh = await f.driver.observe(actor, old.page_id);
+    assert.equal(fresh.control_epoch, f.authority.epoch);
+    await assert.rejects(f.driver.drain(f.authority.epoch - 1), { code: "invalid_request" });
+    f.journal.loseComplete = true;
+    await f.driver.act(actor, f.nextId(), { kind: "create_page" });
+    await assert.rejects(f.driver.drain(f.authority.epoch), { code: "control_blocked" });
+  } finally { await f.close(); }
+});

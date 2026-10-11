@@ -23,6 +23,7 @@ function fake() {
           control_epoch: 1, outcome: "delivered" as const };
         await c.journal.complete(receipt, signal); return { receipt, recorded: true };
       },
+      drain: async (control_epoch: number) => ({ control_epoch, drained: true as const, requires_observation: true as const }),
       close: async () => { closed++; },
     };
   };

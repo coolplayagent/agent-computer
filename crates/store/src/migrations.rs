@@ -253,6 +253,13 @@ impl<'s> MigrationSource<'s> for Embedded {
                     Cow::Borrowed(include_str!("../migrations/0032_browser_dispatch.sql")),
                     false,
                 ),
+                Migration::new(
+                    33,
+                    Cow::Borrowed("browser control"),
+                    MigrationType::Simple,
+                    Cow::Borrowed(include_str!("../migrations/0033_browser_control.sql")),
+                    false,
+                ),
             ])
         })
     }

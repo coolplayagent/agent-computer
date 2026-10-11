@@ -2,7 +2,7 @@ use super::*;
 use agent_computer_browser::Viewport;
 use agent_computer_kubernetes::NodeIdentity;
 use agent_computer_store::runtime::apps::browser::BrowserDeployment;
-fn deployment() -> BrowserDeployment {
+pub(super) fn deployment() -> BrowserDeployment {
     BrowserDeployment {
         namespace: "browser-test".into(),
         namespace_uid: "namespace-uid".into(),

@@ -64,6 +64,7 @@ export class FrameReader {
 
 export type Operation =
   | { readonly method: "launch" | "close" }
+  | { readonly method: "drain"; readonly control_epoch: number }
   | { readonly method: "pages"; readonly actor: Actor }
   | { readonly method: "observe"; readonly actor: Actor; readonly page_id: string }
   | { readonly method: "act"; readonly actor: Actor; readonly action_id: string; readonly action: ReturnType<typeof validate.action> };
@@ -72,6 +73,11 @@ export function operation(value: unknown): Operation {
   const method = (value as { method?: unknown } | null)?.method;
   switch (method) {
     case "launch": case "close": record(value, ["method"]); return { method };
+    case "drain": {
+      const v = record(value, ["method", "control_epoch"]);
+      if (typeof v.control_epoch !== "number" || !Number.isSafeInteger(v.control_epoch) || v.control_epoch < 1) return fail();
+      return { method, control_epoch: v.control_epoch };
+    }
     case "pages": {
       const v = record(value, ["method", "actor"]);
       return { method, actor: validate.actor(v.actor) };

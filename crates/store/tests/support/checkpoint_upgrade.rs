@@ -2,6 +2,7 @@ use super::Database;
 
 impl Database {
     pub async fn remove_app_admission(&self) {
+        sqlx::raw_sql("DROP TRIGGER revoke_browser_credential ON service_credentials; DROP TRIGGER revoke_browser_principal ON principals; DROP TRIGGER revoke_browser_session ON connection_sessions; DROP TABLE browser_action_journal,browser_requests,browser_controls; DROP FUNCTION guard_browser_action_journal(); DROP FUNCTION guard_browser_request(); DROP FUNCTION guard_browser_control(); DROP FUNCTION invalidate_browser_control(); DELETE FROM _sqlx_migrations WHERE version=33;").execute(&self.pool).await.unwrap();
         sqlx::raw_sql("DROP TABLE app_browser_journal; DROP FUNCTION guard_app_browser_journal(); DELETE FROM _sqlx_migrations WHERE version=32;").execute(&self.pool).await.unwrap();
         // Disposable test database only; production exposes forward migrations.
         sqlx::raw_sql("DROP TRIGGER revoke_app_credential ON service_credentials; DROP TRIGGER revoke_app_principal ON principals; DROP TRIGGER close_app_connection ON connection_sessions; DROP TRIGGER check_computer_app_reservations ON runtime_start_requests; DROP FUNCTION invalidate_app_authority(); DROP FUNCTION guard_computer_app_reservations(); DROP TABLE app_instances,browser_profile_owners; DROP FUNCTION guard_app_admission(); DELETE FROM _sqlx_migrations WHERE version=31;")

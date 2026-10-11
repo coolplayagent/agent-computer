@@ -3,6 +3,7 @@
 
 mod apps;
 mod artifacts;
+mod browser;
 mod computers;
 mod connections;
 mod error;

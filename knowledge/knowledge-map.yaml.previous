@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 80
-updated_at: unix:1791673410
+map_version: 82
+updated_at: unix:1791677247
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -55,9 +55,10 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - agent-computer-acceptance
+  - browser-controller-evidence
   - browser-runtime-component-evidence
-  ref: topics/topic-c1514c6cdad166c1-092c5eb676629b54100e6da6423afe3cb81196bba783dce58838734c983a870a.yaml
-  digest: 092c5eb676629b54100e6da6423afe3cb81196bba783dce58838734c983a870a
+  ref: topics/topic-c1514c6cdad166c1-00c791897a5b5a965914fafaf1ff96ee7f7cb6ac44b24d8c4826692ecbc2f796.yaml
+  digest: 00c791897a5b5a965914fafaf1ff96ee7f7cb6ac44b24d8c4826692ecbc2f796
 - id: api
   title: api
   description: Added by CLI source registration.
@@ -171,6 +172,7 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - app-admission
+  - browser-control-queue
   - browser-driver
   - browser-launch-controller
   - browser-runtime-components
@@ -178,8 +180,8 @@ topics:
   - checkpoint-stop-drain
   - checkpoint-stop-worker
   - continuous-candidate-preparation
-  ref: topics/topic-d92c6a81b2ff5009-5addcfc39e8d78c5c1a1c7c93dd37ba15844a023c575301e352b4a58294dff77.yaml
-  digest: 5addcfc39e8d78c5c1a1c7c93dd37ba15844a023c575301e352b4a58294dff77
+  ref: topics/topic-d92c6a81b2ff5009-d9b1d909975b66040ecd7ade385e386e326b21fbc77203b3fbcbc85bea741b35.yaml
+  digest: d9b1d909975b66040ecd7ade385e386e326b21fbc77203b3fbcbc85bea741b35
 - id: software-model
   title: Whole-software model
   description: Code-map-backed architecture, build, deployment, dependency, configuration, and design knowledge.
@@ -188,16 +190,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 64
+  omitted_through: 66
   recent:
-  - version: 65
-    action: source.add
-    actor: cli
-    summary: Added source 'execution-output-downloads' to topic 'execution'.
-  - version: 66
-    action: source.add
-    actor: cli
-    summary: Added source 'queued-execution-worker' to topic 'execution'.
   - version: 67
     action: source.add
     actor: cli
@@ -254,3 +248,11 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'browser-launch-controller' to topic 'runtime'.
+  - version: 81
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-controller-evidence' to topic 'acceptance'.
+  - version: 82
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-control-queue' to topic 'runtime'.

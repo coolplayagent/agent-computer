@@ -172,12 +172,22 @@ pub enum Operation {
         action_id: String,
         action: Action,
     },
+    Drain {
+        control_epoch: u64,
+    },
     Close,
 }
 impl Operation {
     pub(crate) fn normalize(self) -> Result<Self> {
         match self {
             Self::Launch | Self::Close => Ok(self),
+            Self::Drain { control_epoch } => {
+                if (1..(1 << 53)).contains(&control_epoch) {
+                    Ok(self)
+                } else {
+                    Err(Error::Protocol)
+                }
+            }
             Self::Pages { actor } => {
                 actor.validate()?;
                 Ok(Self::Pages { actor })

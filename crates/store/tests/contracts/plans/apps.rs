@@ -1,5 +1,7 @@
 mod browser;
+mod control;
 mod live;
+mod live_control;
 use super::runtime::{allow, runtime_token};
 use super::*;
 use agent_computer_store::{

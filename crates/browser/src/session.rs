@@ -32,8 +32,16 @@ pub trait Policy: Send {
 pub struct ResponseObservation {
     ok: bool,
     value: Value,
+    scope: crate::Scope,
+    operation: Operation,
 }
 impl ResponseObservation {
+    pub fn scope(&self) -> &crate::Scope {
+        &self.scope
+    }
+    pub fn operation(&self) -> &Operation {
+        &self.operation
+    }
     pub fn ok(&self) -> bool {
         self.ok
     }
@@ -138,6 +146,10 @@ impl<T: Transport> Session<T> {
     pub fn session_id(&self) -> &str {
         &self.session
     }
+    pub fn control_blocked(&self) -> bool {
+        self.blocked
+    }
+
     pub fn is_closed(&self) -> bool {
         self.closed
     }
@@ -261,7 +273,12 @@ impl<T: Transport> Session<T> {
                         Operation::Close => self.closed = true,
                         _ => {}
                     }
-                    return Ok(ResponseObservation { ok, value });
+                    return Ok(ResponseObservation {
+                        ok,
+                        value,
+                        scope: self.binding.scope.clone(),
+                        operation,
+                    });
                 }
                 _ => return Err(Error::Protocol),
             }
@@ -280,7 +297,7 @@ impl<T: Transport> Session<T> {
                         (actor, Permission::Observe)
                     }
                     Operation::Act { actor, .. } => (actor, Permission::Control),
-                    Operation::Close => return Err(Error::Protocol),
+                    Operation::Close | Operation::Drain { .. } => return Err(Error::Protocol),
                 };
                 if request.scope != self.binding.scope
                     || &request.actor != actor
@@ -347,6 +364,16 @@ impl<T: Transport> Session<T> {
                     || value["browser_version"]
                         .as_str()
                         .is_none_or(|s| s.is_empty() || s.len() > 64 || s == "unavailable")
+                {
+                    return Err(Error::Protocol);
+                }
+            }
+            Operation::Drain { control_epoch } => {
+                exact(value, &["control_epoch", "drained", "requires_observation"])?;
+                if self.blocked
+                    || value["control_epoch"] != *control_epoch
+                    || value["drained"] != true
+                    || value["requires_observation"] != true
                 {
                     return Err(Error::Protocol);
                 }

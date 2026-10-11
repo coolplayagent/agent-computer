@@ -8,7 +8,7 @@
 
 控制器从不可变准入快照读取 CPU、内存、固定镜像及网络引用，运维配置绑定 namespace UID、Node UID/boot 与 viewport。核对 Kubernetes 身份、私有 attach、保护原进程域并持久化 guard 后才能给予启动许可。回调再次检查原凭据、连接、grant、catalog、Computer 代次、完整 actor/scope 和活 watchdog。授权提交后才发给驱动，丢失回执不能重发启动。
 
-首版固定运行窗口最长为 **arm 后 30 秒**，同时受原 App 截止时间限制。更长的准入预算不代表续租。控制器每 200 毫秒检查当前授权，数据库调用最长等待两秒；数据库受阻时停止授权，节点 watchdog 独立运行。该命令的连接池关闭同样限制为两秒，避免已取消但仍受阻的查询无限拖住运维进程退出。SIGTERM/SIGINT 请求收尾；控制器崩溃后保留日志与占用。本控制器不授予 observe/control 回调，也不派发 GUI 动作。
+首版固定运行窗口最长为 **arm 后 30 秒**，同时受原 App 截止时间限制。更长的准入预算不代表续租。空闲时控制器有界轮询当前授权；GUI 操作在授权回调处再次检查，数据库调用最长等待两秒；数据库受阻时停止授权，节点 watchdog 独立运行。该命令的连接池关闭同样限制为两秒，避免已取消但仍受阻的查询无限拖住运维进程退出。SIGTERM/SIGINT 请求收尾；控制器崩溃后保留日志与占用。GUI 回调、串行动作和交接见[控制队列](58-browser-control.md)。
 
 ## 运维命令
 
@@ -24,8 +24,10 @@ agent-computer-server browser-drain --database-url-file /private/database-url --
 
 ## 剩余范围与验证
 
-Running 记录最后一次接受的启动观察。控制器丢失后，查询按原 watchdog 期限收敛到 Draining，这一步不确认物理停止；`ready` 仍为 false，公开 Browser 能力仍未开放。Profile 当前是私有易失 tmpfs，进程停止不能证明检查点已持久化、释放槽位或允许 Computer 停止/恢复。连续调度、watchdog 续租、GUI 控制代次与动作日志、观察发布、profile 检查点/恢复和 ComputerView 仍待实现。
+Running 记录最后一次接受的启动观察。控制器丢失后，查询按原 watchdog 期限收敛到 Draining，这一步不确认物理停止；`ready` 仍为 false，公开 Browser 能力仍未开放。Profile 当前是私有易失 tmpfs，进程停止不能证明检查点已持久化、释放槽位或允许 Computer 停止/恢复。连续调度、watchdog 续租、受控出口、profile 检查点/恢复和 ComputerView 仍待实现。
 
 PostgreSQL 契约覆盖并发一次性派发、重启/丢失确认、原 UID、不可变历史、各类撤权、到期、拒绝取消和资源保留。显式 `manual_browser_controller_live` 验证实际 server、Store、K3s、Chromium 与节点 watchdog，包含正常到期、撤权、数据库受阻和控制器死亡。该测试的 PreparedComputer/存储前置证据明确为合成数据，不验收 Workspace/CSI 或 profile 检查点语义。只在显式一次性 VM fixture 中使用 `--ignored --exact` 过滤运行，控制器死亡场景验证实际传输关闭后原进程已不存在，不把 EOF 处理与 watchdog 到期隔离；独立 watchdog 故障隔离见[节点组件验证](56-browser-runtime.md)。捕获的运维输出仅在生产进程结束后读取。
 
 [源码绑定验证记录](../evidence/browser-controller-2026-10-11.json) · [Test log](../evidence/browser-controller-2026-10-11-tests.log)
+
+[58. Browser 控制、观察与动作队列](58-browser-control.md)现已接入持久动作日志、单控制代次与私有排空屏障；30 秒原窗口和 profile 限制保持。
