@@ -409,3 +409,217 @@ fn malformed_and_unbounded_json_responses_do_not_produce_success_output() {
         result(&out, 2);
     }
 }
+
+#[test]
+fn app_browser_routes_preserve_results_and_explicit_authority() {
+    for (args, method, path, kind) in [
+        (vec!["app", "start", "c"], "POST", "computers/c/apps", None),
+        (vec!["app", "show", "a"], "GET", "app-instances/a", None),
+        (
+            vec!["app", "cancel", "a"],
+            "POST",
+            "app-instances/a/cancel",
+            None,
+        ),
+        (
+            vec!["browser", "control", "show", "a"],
+            "GET",
+            "app-instances/a/browser/control",
+            None,
+        ),
+        (
+            vec!["browser", "control", "acquire", "a"],
+            "POST",
+            "app-instances/a/browser/control",
+            None,
+        ),
+        (
+            vec!["browser", "control", "release", "a"],
+            "POST",
+            "app-instances/a/browser/control/release",
+            None,
+        ),
+        (
+            vec!["browser", "pages", "a"],
+            "POST",
+            "app-instances/a/browser/commands",
+            Some("pages"),
+        ),
+        (
+            vec!["browser", "observe", "a"],
+            "POST",
+            "app-instances/a/browser/commands",
+            Some("observe"),
+        ),
+        (
+            vec!["browser", "act", "a"],
+            "POST",
+            "app-instances/a/browser/commands",
+            Some("act"),
+        ),
+        (
+            vec!["browser", "status", "r"],
+            "GET",
+            "browser-commands/r",
+            None,
+        ),
+    ] {
+        let mut args = args;
+        let release = args.contains(&"release");
+        if method == "POST" {
+            args.extend(["--request", "-"]);
+            if !release {
+                args.extend(["--idempotency-key", "original"]);
+            }
+        }
+        let body = serde_json::to_vec(&serde_json::json!({"connection_session_id":"session","app_generation":3,"control_epoch":7,"command":{"kind":kind,"page_id":"page","action":{"text":"$(literal)"}}})).unwrap();
+        for state in ["Queued", "Unknown", "Draining"] {
+            let response_body = serde_json::to_vec(&serde_json::json!({"state":state})).unwrap();
+            let (out, request, extra) = serve(
+                &args,
+                &body,
+                response("200 OK", "application/json", "", &response_body),
+            );
+            assert_eq!(result(&out, 0)["state"], state);
+            assert!(request.starts_with(&format!("{method} /v1alpha1/{path} HTTP/1.1\r\n")));
+            assert!(request.contains("authorization: Bearer private-test-token"));
+            if method == "POST" {
+                assert!(request.ends_with(std::str::from_utf8(&body).unwrap()));
+                assert_eq!(request.contains("idempotency-key:"), !release);
+            }
+            assert_eq!(extra, 0);
+        }
+    }
+}
+
+#[test]
+fn browser_wrong_verb_and_unused_key_are_rejected_before_network() {
+    for args in [
+        vec![
+            "browser",
+            "observe",
+            "a",
+            "--request",
+            "-",
+            "--idempotency-key",
+            "key",
+        ],
+        vec![
+            "browser",
+            "control",
+            "release",
+            "a",
+            "--request",
+            "-",
+            "--idempotency-key",
+            "unused",
+        ],
+        vec!["browser", "screenshot", "r"],
+        vec!["browser", "status", "r", "--output", "unexpected"],
+        vec!["browser", "screenshot", "../r", "--output", "new.png"],
+    ] {
+        let out = invoke(
+            "http://127.0.0.1:1",
+            &args,
+            br#"{"command":{"kind":"act"}}"#,
+        );
+        let report = result(&out, 2);
+        assert_ne!(report["code"], "transport_error");
+        assert!(report["request_may_have_been_applied"].is_null());
+    }
+    let (out, _, extra) = serve(
+        &["browser", "control", "release", "a", "--request", "-"],
+        br#"{"connection_session_id":"s","control_epoch":7}"#,
+        Vec::new(),
+    );
+    let report = result(&out, 2);
+    assert_eq!(report["request_may_have_been_applied"], true);
+    let recovery = report["recovery"].as_str().unwrap();
+    assert!(recovery.contains("session and epoch"));
+    assert!(!recovery.contains("idempotency key"));
+    assert_eq!(extra, 0);
+}
+
+fn observation_response() -> (Value, Vec<u8>) {
+    use base64::{Engine, engine::general_purpose::STANDARD};
+    let mut png = vec![137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82];
+    png.extend_from_slice(&800u32.to_be_bytes());
+    png.extend_from_slice(&600u32.to_be_bytes());
+    // Header-only fixture: the exporter checks the wire header, never decodes pixels.
+    let deadline = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis()
+        + 25_000;
+    (
+        serde_json::json!({"request_id":"r","instance_id":"a","state":"Complete","control_epoch":7,"result_valid_until_ms":deadline as u64,"result":{"scope":{"app_instance_id":"a"},"observation_id":"o","page_id":"p","document_generation":1,"control_epoch":7,"valid_for_ms":30000,"image_size":{"width":800,"height":600},"viewport":{"width":800,"height":600},"device_scale":1,"image_scale":1,"coordinate_space":"css_viewport","screenshot_base64":STANDARD.encode(&png),"screenshot_sha256":format!("sha256:{:x}",Sha256::digest(&png))}}),
+        png,
+    )
+}
+
+#[test]
+fn screenshot_verifies_correlation_expiry_header_digest_and_never_overwrites() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("frame.png");
+    let args = [
+        "browser",
+        "screenshot",
+        "r",
+        "--output",
+        path.to_str().unwrap(),
+    ];
+    let (frame, png) = observation_response();
+    for (pointer, change) in [
+        ("/request_id", serde_json::json!("other")),
+        ("/state", serde_json::json!("Queued")),
+        ("/result_valid_until_ms", serde_json::json!(0)),
+        ("/result_valid_until_ms", serde_json::json!(u64::MAX)),
+        ("/result/scope/app_instance_id", serde_json::json!("other")),
+        ("/result/control_epoch", serde_json::json!(8)),
+        ("/result/screenshot_sha256", serde_json::json!("sha256:bad")),
+        ("/result/screenshot_base64", serde_json::json!("invalid")),
+        ("/result/image_size/width", serde_json::json!(801)),
+    ] {
+        let mut bad = frame.clone();
+        *bad.pointer_mut(pointer).unwrap() = change;
+        let (out, _, extra) = serve(
+            &args,
+            b"",
+            response(
+                "200 OK",
+                "application/json",
+                "",
+                &serde_json::to_vec(&bad).unwrap(),
+            ),
+        );
+        assert_eq!(result(&out, 2)["code"], "invalid_observation", "{pointer}");
+        assert!(!path.exists());
+        assert_eq!(extra, 0);
+    }
+    let bytes = serde_json::to_vec(&frame).unwrap();
+    let (out, _, _) = serve(
+        &args,
+        b"",
+        response("200 OK", "application/json", "", &bytes),
+    );
+    let report = result(&out, 0);
+    assert_eq!(report["result"]["observation_id"], "o");
+    assert!(report["result"]["screenshot_base64"].is_null());
+    assert_eq!(std::fs::read(&path).unwrap(), png);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        assert_eq!(
+            std::fs::metadata(&path).unwrap().permissions().mode() & 0o777,
+            0o600
+        );
+    }
+    std::fs::write(&path, b"keep").unwrap();
+    let (out, _, _) = serve(
+        &args,
+        b"",
+        response("200 OK", "application/json", "", &bytes),
+    );
+    assert_eq!(result(&out, 2)["code"], "output_unavailable");
+    assert_eq!(std::fs::read(&path).unwrap(), b"keep");
+}

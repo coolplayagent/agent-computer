@@ -36,6 +36,14 @@ pub(super) fn save(path: &str, headers: &HeaderMap, bytes: &[u8]) -> Result<Valu
     {
         return Err(bad());
     }
+    publish(path, bytes)?;
+    Ok(
+        json!({"path":path,"bytes":bytes.len(),"sha256":sha256,"manifest_digest":manifest,
+        "observed_bytes":observed,"truncated":truncated,"eof":eof}),
+    )
+}
+
+pub(super) fn publish(path: &str, bytes: &[u8]) -> Result<()> {
     let target = local_path(path);
     let parent = target
         .parent()
@@ -52,8 +60,5 @@ pub(super) fn save(path: &str, headers: &HeaderMap, bytes: &[u8]) -> Result<Valu
         .and_then(|()| file.as_file().sync_all())
         .map_err(|_| unavailable())?;
     file.persist_noclobber(&target).map_err(|_| unavailable())?;
-    Ok(
-        json!({"path":path,"bytes":bytes.len(),"sha256":sha256,"manifest_digest":manifest,
-        "observed_bytes":observed,"truncated":truncated,"eof":eof}),
-    )
+    Ok(())
 }

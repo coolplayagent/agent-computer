@@ -34,7 +34,10 @@ fn cli(
         .env("AGENT_COMPUTER_ENDPOINT", endpoint)
         .env("AGENT_COMPUTER_TOKEN_FILE", token_file);
     if let Some(key) = key {
-        command.args(["--request", "-", "--idempotency-key", key]);
+        command.args(["--idempotency-key", key]);
+    }
+    if body.is_some() {
+        command.args(["--request", "-"]);
     }
     let mut child = command
         .stdin(Stdio::piped())
@@ -51,7 +54,7 @@ fn cli(
             .unwrap();
     }
     let result = child.wait_with_output().unwrap();
-    assert_eq!(result.status.code(), Some(exit), "{result:?}");
+    assert_eq!(result.status.code(), Some(exit), "{args:?}: {result:?}");
     if exit == 0 {
         assert!(result.stderr.is_empty());
         serde_json::from_slice(&result.stdout).unwrap()
@@ -219,3 +222,6 @@ async fn real_cli_http_postgres_connect_lease_submit_retry_disconnect_cancel_and
     service.abort();
     let _ = service.await;
 }
+
+#[path = "support/browser.rs"]
+mod browser;

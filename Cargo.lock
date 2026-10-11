@@ -24,6 +24,7 @@ dependencies = [
  "agent-computer-store",
  "agent-computer-test-support",
  "axum",
+ "base64 0.22.1",
  "reqwest",
  "rustls",
  "serde_json",

@@ -14,6 +14,26 @@ sources:
   status: active
   version: 4
   description: T00 文档检查与待实现运行验收：核心 T01–T36/T38–T39、可选生态组合 T40–T43、后续评测 T37
+- id: browser-cli-evidence
+  topic: acceptance
+  kind: file
+  uri: docs/evidence/browser-cli-2026-10-11.json
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Source-bound App and Browser CLI contract verification; synthetic Running prerequisite
+- id: browser-control-evidence
+  topic: acceptance
+  kind: file
+  uri: docs/evidence/browser-control-2026-10-11.json
+  source_scope: repo
+  read_policy: direct
+  write_policy: manual-review
+  status: active
+  version: 1
+  description: Source-bound Browser control, serial handoff and uncertain-action verification with PostgreSQL, HTTP, K3s/gVisor and real Chromium.
 - id: browser-controller-evidence
   topic: acceptance
   kind: doc
@@ -40,4 +60,6 @@ route:
   - agent-computer-acceptance
   - browser-runtime-component-evidence
   - browser-controller-evidence
+  - browser-control-evidence
+  - browser-cli-evidence
   fallback: bounded-search

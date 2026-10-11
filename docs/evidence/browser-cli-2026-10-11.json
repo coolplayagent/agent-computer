@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "component": "authenticated-app-browser-cli",
+  "status": "component_contracts_passed",
+  "recorded_at": "2026-10-11T01:43:06.884976+00:00",
+  "base_commit": "505d0028022867ba1ad6fe8d35ab8276cac1ad4e",
+  "source_manifest": {
+    "sha256": "3db4d8499a991688b93d9d8084abf45253d3a9dec158e13038b1c99fa52bd1f9",
+    "file_count": 422,
+    "algorithm": "SHA256 of UTF-8 JSON path-to-SHA256 map, sort_keys=true, separators=(comma,colon), no trailing newline; all versioned crates/** and packages/browser-driver/** files plus Cargo.toml, Cargo.lock, MODULE.bazel, MODULE.bazel.lock, schemas/openapi-v1alpha1.json.",
+    "changed_files": {
+      "Cargo.lock": "2b5b68389a67d766643f051c71819a070e15e26409e91a9750a657710ff8544b",
+      "MODULE.bazel.lock": "87882afb722d119442eb49719cf4206e4e25cea8fc83ab1d014402c34fdbac17",
+      "crates/cli/BUILD.bazel": "948ee53cf0f549c59ddd81160fe381471c31429454597922c724098a0b301a9a",
+      "crates/cli/Cargo.toml": "580201a8fa5c7ebdd45ac556f3a0c7fac0e4d43b21d4bc09e82a4bf0f71004a9",
+      "crates/cli/src/main.rs": "566fae9c33aa5ef538c328680cff07047e03357d65c7ced3937596bd68fda61e",
+      "crates/cli/src/remote.rs": "a85854a3fc794c57eb3280db0dc5c0f43a144becd03443330d81b61a0a9228a3",
+      "crates/cli/src/remote/options.rs": "d97a628b7a69f5e86b3d348e89abf5a884190e9cff5e92e76e534839717339e6",
+      "crates/cli/src/remote/output.rs": "11933380baa535f661fe165a323c4b9d3c339b8b1e15ee6c2f5326fd78adb948",
+      "crates/cli/src/remote/screenshot.rs": "ffdf4592556190e96de34e4683c2e9cfdcb130662cd931cfe5db958509ca65d2",
+      "crates/cli/tests/remote_contracts.rs": "ce3139091d33919517510c48cff6a14c82f294d12e63a5f62673d56304624f73",
+      "crates/cli/tests/remote_service.rs": "a7dfff55ff841b7711c9a128738f5883daa67adf0dc6fadc42aa3fc48ea6bfe9",
+      "crates/cli/tests/support/browser.rs": "cc9f4c1eac2a9a6d09f32908544f4b7eac57bc295260e5e6e642389217af7870",
+      "crates/cli/tests/support/runtime.rs": "eda4c9b3b7f789fc63de607b025e1c041950f9b65be454e3627c534d5ed034f7"
+    }
+  },
+  "tests": {
+    "bazel_targets": [
+      {
+        "target": "crates/browser/browser_contracts_test",
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "0f52db2488ba8f0c408abd305edc0eda4bb0749f7b9492d2337829d66bb92096"
+      },
+      {
+        "target": "crates/cli/cli_contracts_test",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "f063e3c09e36acae4ca18e88505f0bb6f1382949b559cf4cd87950eea01d98af"
+      },
+      {
+        "target": "crates/cli/remote_contracts_test",
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "4dbb847bc6e2632ec75910791f34718ad3623299033225133a622f7b9fa396f7"
+      },
+      {
+        "target": "crates/cli/remote_service_test",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ded76fc2a492176281471ea002d070ebc83a7fdc60efff54ffa5de342ac2dbcb"
+      },
+      {
+        "target": "crates/core/core_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "46ee77c20f534dd5553533dfc8cad2f94fd9ba3e22c506879358c5afbec5dc86"
+      },
+      {
+        "target": "crates/csi/csi_contracts_test",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fba239b1728eee4fc1ca0b0cb86e9e0a2b5bf6b38a6623bf5763b9f63a73f8ea"
+      },
+      {
+        "target": "crates/definitions/definitions_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "9f7c03e15b7064d2394a06612d168716f641a9a9e1b01cd750e99edcea10ac91"
+      },
+      {
+        "target": "crates/fence/fence_contracts_test",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "c278d7a6f52048f49e2d52ca6e8a5f725d2d7291d984f4e0718dfc1616fa4471"
+      },
+      {
+        "target": "crates/kubernetes/kubernetes_contracts_test",
+        "passed": 46,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "50c5082b611a7f6be48e6dde0e9f0d4e9c6382251453d4d1f527cb114ca5829e"
+      },
+      {
+        "target": "crates/node/node_contracts_test",
+        "passed": 17,
+        "failed": 0,
+        "ignored": 3,
+        "language": "rust",
+        "log_sha256": "f9b88d8460ef65fd1a1d5c0a38c0f48a77794e71cea8f5beefa216b14cb2bd5f"
+      },
+      {
+        "target": "crates/objects/objects_contracts_test",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "987999c8fc7dc6b3d47effabe91340a137857dc5db2b584cf07a4876d2ab2abc"
+      },
+      {
+        "target": "crates/sandbox/sandbox_contracts_test",
+        "passed": 27,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "d4051ea45146b1ff73a5bb8efd7011fd45f97f3df5dcdf0e8dc5812bbe55ea25"
+      },
+      {
+        "target": "crates/server/server_contracts_test",
+        "passed": 34,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "bd3c7687a71ce69f23d93ba6c1467a8f45a798195f4330eaf7e56568b3638ef0"
+      },
+      {
+        "target": "crates/server/server_unit_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "369d97c3404152250321d4e4c777c0cb85966153d0c5559066b8206f592a8812"
+      },
+      {
+        "target": "crates/storage/storage_contracts_test",
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "27db53640c0e2909f4b8f1c36a207d2655948f180e55a19902f5a5e2d1097e64"
+      },
+      {
+        "target": "crates/store/postgres_contracts_test",
+        "passed": 253,
+        "failed": 0,
+        "ignored": 2,
+        "language": "rust",
+        "log_sha256": "a6f0b1330778875bba12db2bd8e1544c6591904dd7b6fd94c1cded9ed4a9d7a9"
+      },
+      {
+        "target": "crates/watchdog/watchdog_contracts_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "189e3e9e6a0c3ad629810327f6c5bcf7c2cbf6b25ff0003ea2defefe0d49862f"
+      },
+      {
+        "target": "crates/worker/worker_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "11af2472242161964adac27a0a32c7efe0d06983ef4257639175add04b152b58"
+      },
+      {
+        "target": "packages/browser-driver/bridge_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "2b1fe95121fe5c688fa040e8aa162a2e08950022413cb4c735f810a7a7500d38"
+      },
+      {
+        "target": "packages/browser-driver/unit_test",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "55ad5830fd5af536821de08ef3f99cf24a3ef384cb5221f3586aa6be885b2865"
+      }
+    ],
+    "rust_passed": 535,
+    "typescript_unit_passed": 19,
+    "default_ignored": 6,
+    "full_bazel_log_sha256": "8c983e96e5cbb17e511a44517b0efe31e82b9ab4e5e02213d0c6550651c7e5b9",
+    "clippy_workspace_all_targets_all_features_warnings_denied": "passed",
+    "clippy_log_sha256": "04cb4ba97edf52ea2900b06b39f566bb66297d0669909858fc7193393e8b429f",
+    "fmt": "passed",
+    "database": "PostgreSQL 18"
+  },
+  "cases": [
+    "Authenticated routes preserve explicit payloads, keys and Queued/Unknown/Draining status without implicit requests.",
+    "Browser verb mismatch and unused release key fail before network access; uncertain release preserves session/epoch recovery.",
+    "PNG request/App/epoch/deadline/header/geometry/digest verification, private publication and overwrite protection.",
+    "Real CLI subprocess + HTTP + PostgreSQL: App idempotency/conflict, queued cancellation/retry, new App generation, explicit control/retry, pages/observe/act queue/retry/status, release/retry, Running cancellation conflict and principal revocation."
+  ],
+  "known_limits": [
+    "Running App and volume preparation prerequisites use explicit synthetic PostgreSQL evidence; this increment does not run a physical Browser worker.",
+    "Actual browser execution evidence remains in browser-control-2026-10-11.json; controller/driver/runtime sources are unchanged.",
+    "Screenshots validate PNG headers and digest without decompression or page-content authentication; local clock must be synchronized for deadline validation.",
+    "App cancel only accepts Queued/Blocked instances; running App stop and App listing remain pending.",
+    "Original arm window remains at most 30 seconds with deny-all networking and volatile profile; controlled egress, checkpoints and ComputerView/WSS remain pending.",
+    "Full Computer/Browser capabilities remain unsupported."
+  ],
+  "qualitygate": "Final unfiltered full worktree check uses existing line-ending policy; functional tests above are separate evidence."
+}

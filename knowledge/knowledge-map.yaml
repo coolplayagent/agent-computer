@@ -1,8 +1,8 @@
 schema_version: 4
 artifact_kind: map
 map_type: knowledge
-map_version: 83
-updated_at: unix:1791679493
+map_version: 85
+updated_at: unix:1791683001
 directories:
 - directory: domain
   purpose: Domain concepts, models, and business rules.
@@ -55,11 +55,12 @@ topics:
   description: Added by CLI source registration.
   source_ids:
   - agent-computer-acceptance
+  - browser-cli-evidence
   - browser-control-evidence
   - browser-controller-evidence
   - browser-runtime-component-evidence
-  ref: topics/topic-c1514c6cdad166c1-91793f481cbb241998bc322fbb1e97a7fca07e0cddf9b46c15eaa06d76e9ad5c.yaml
-  digest: 91793f481cbb241998bc322fbb1e97a7fca07e0cddf9b46c15eaa06d76e9ad5c
+  ref: topics/topic-c1514c6cdad166c1-7bb185616da98745c490dbb1b51a77ab957a3fbb6b326b7218d0172858499574.yaml
+  digest: 7bb185616da98745c490dbb1b51a77ab957a3fbb6b326b7218d0172858499574
 - id: api
   title: api
   description: Added by CLI source registration.
@@ -105,6 +106,7 @@ topics:
   source_ids:
   - artifact-candidate-continuation
   - bounded-candidate-file-saves
+  - browser-cli
   - candidate-execution-worker
   - candidate-file-http-gateway
   - candidate-pod-mounts
@@ -131,8 +133,8 @@ topics:
   - undispatched-computer-stop
   - volume-provisioning-guide
   - workspace-artifact-checkpoints
-  ref: topics/topic-875b9380866e9d56-86e38942fc65138f6824a505b8390a0ff0366a0ed4dd88b701ace7bdb4a889f9.yaml
-  digest: 86e38942fc65138f6824a505b8390a0ff0366a0ed4dd88b701ace7bdb4a889f9
+  ref: topics/topic-875b9380866e9d56-68852f4f5446e17f089f21ed100750d30aaf122a690c0b388358ac6cf31c91c6.yaml
+  digest: 68852f4f5446e17f089f21ed100750d30aaf122a690c0b388358ac6cf31c91c6
 - id: execution
   title: execution
   description: Added by CLI source registration.
@@ -191,16 +193,8 @@ topics:
   ref: topics/topic-247e2a0d6f43d185-fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d.yaml
   digest: fc2d5534a38a5ddc28536afa855ff77db8e2941ccaccbfa79f948ddcfaec2f7d
 history:
-  omitted_through: 67
+  omitted_through: 69
   recent:
-  - version: 68
-    action: source.add
-    actor: cli
-    summary: Added source 'checkpoint-stop-worker' to topic 'runtime'.
-  - version: 69
-    action: source.add
-    actor: cli
-    summary: Added source 'checkpoint-stop-drain' to topic 'runtime'.
   - version: 70
     action: source.add
     actor: cli
@@ -257,3 +251,11 @@ history:
     action: source.add
     actor: cli
     summary: Added source 'browser-control-evidence' to topic 'acceptance'.
+  - version: 84
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-cli' to topic 'development'.
+  - version: 85
+    action: source.add
+    actor: cli
+    summary: Added source 'browser-cli-evidence' to topic 'acceptance'.

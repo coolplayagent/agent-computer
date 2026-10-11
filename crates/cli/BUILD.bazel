@@ -35,7 +35,7 @@ rust_test(
 rust_test(
     name = "remote_service_test",
     size = "large",
-    srcs = ["tests/remote_service.rs", "tests/support/runtime.rs"],
+    srcs = ["tests/remote_service.rs", "tests/support/runtime.rs", "tests/support/browser.rs"],
     crate_root = "tests/remote_service.rs",
     data = [":agent-computer"],
     rustc_env = {"AGENT_COMPUTER_BIN": "$(rootpath :agent-computer)"},

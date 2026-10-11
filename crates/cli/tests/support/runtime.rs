@@ -16,6 +16,20 @@ pub async fn provision_with_sandbox(
     actor: &str,
     with_sandbox: bool,
 ) -> String {
+    provision(store, token, actor, with_sandbox, false).await
+}
+
+pub async fn provision_browser(store: &Store, token: &str, actor: &str) -> String {
+    provision(store, token, actor, true, true).await
+}
+
+async fn provision(
+    store: &Store,
+    token: &str,
+    actor: &str,
+    with_sandbox: bool,
+    browser: bool,
+) -> String {
     let org = OrganizationId::new("acme").unwrap();
     let principal = PrincipalId::new(actor).unwrap();
     for kind in [
@@ -93,6 +107,40 @@ pub async fn provision_with_sandbox(
             .unwrap();
         document["spec"]["sandboxes"] = json!([{"name":"exec","runtimeClass":"gvisor","image":format!("registry.example.invalid/tools@sha256:{}","a".repeat(64)),"resources":{"cpuMillis":500,"memoryMiB":256},"networkPolicyRef":"deny-all"}]);
         document["spec"]["computers"][0]["sandboxRefs"] = json!(["exec"]);
+    }
+    if browser {
+        store
+            .set_definition_grant(
+                DefinitionGrant {
+                    organization: &org,
+                    principal: &principal,
+                    kind: DefinitionKind::App,
+                    name: "*",
+                    permission: DefinitionPermission::Create,
+                },
+                true,
+            )
+            .await
+            .unwrap();
+        store
+            .register_catalog_reference(&org, DefinitionKind::BrowserProfile, "profile")
+            .await
+            .unwrap();
+        store
+            .set_definition_grant(
+                DefinitionGrant {
+                    organization: &org,
+                    principal: &principal,
+                    kind: DefinitionKind::BrowserProfile,
+                    name: "profile",
+                    permission: DefinitionPermission::Reference,
+                },
+                true,
+            )
+            .await
+            .unwrap();
+        document["spec"]["apps"] = json!([{"name":"browser", "driver":"chromium-playwright", "sandboxRef":"exec", "profileRef":"profile"}]);
+        document["spec"]["computers"][0]["appRefs"] = json!(["browser"]);
     }
     let plan = store
         .create_definition_plan(

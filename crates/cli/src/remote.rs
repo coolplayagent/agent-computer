@@ -1,6 +1,7 @@
 //! Explicit, single-request client for the bounded runtime HTTP APIs.
 mod options;
 mod output;
+mod screenshot;
 
 use reqwest::{Client, Method, Url};
 use serde_json::{Value, json};
@@ -20,12 +21,23 @@ pub const HELP: &str = "Remote service commands:
   lease show|renew|release <lease-id>
   exec <computer-id>                     Submit structured execution JSON
   status|cancel <execution-id>
+  app start <computer-id>               Queue an App instance
+  app show|cancel <app-instance-id>        Read status or cancel pending admission
+  browser control show|acquire|release <app-instance-id>
+  browser pages|observe|act <app-instance-id>  Submit command JSON
+  browser status <request-id>           Read queued/complete/unknown result
+  browser screenshot <request-id> --output <new-file>
   logs <execution-id>                    Read output publication metadata
   logs <execution-id> --stream stdout|stderr --output <new-file>
 
 Remote options: --endpoint <origin> --token-file <file> [--json]
   Environment defaults: AGENT_COMPUTER_ENDPOINT, AGENT_COMPUTER_TOKEN_FILE
   POST commands require --request <file|-> --idempotency-key <key>.
+  Exception: browser control release requires --request only (session/epoch CAS).
+  Browser command JSON includes command.kind matching pages, observe or act.
+  Acquire is explicit; release still needs controller drain.
+  App cancel only accepts Queued/Blocked instances; Running stop is pending.
+  Screenshots verify bounded PNG headers/digest; pixels are untrusted evidence.
   Request fields follow /v1alpha1/openapi.json; revisions are explicit.
   HTTPS is required except for literal loopback HTTP. No redirects or retries.
   Exit 0 means the request succeeded, including queued work; inspect its state.
@@ -47,12 +59,14 @@ impl Failure {
             report: json!({"code":code,"message":message,"retryable":false}),
         }
     }
-    fn incomplete(mut self, mutation: bool) -> Self {
+    fn incomplete(mut self, mutation: bool, keyed: bool) -> Self {
         if mutation {
             self.report["request_may_have_been_applied"] = json!(true);
-            self.report["recovery"] = json!(
+            self.report["recovery"] = json!(if keyed {
                 "Query authoritative state or explicitly retry identical input with the original idempotency key. Do not submit under a new key."
-            );
+            } else {
+                "Query authoritative resource state before retrying. Any explicit retry must preserve the original resource, session and epoch; do not acquire new control to repeat this request."
+            });
         }
         self
     }
@@ -182,6 +196,14 @@ async fn request(options: options::Options) -> Result<Value> {
                     "The request must be one JSON object.",
                 ));
             }
+            if let Some(kind) = &options.browser_kind
+                && value["command"]["kind"].as_str() != Some(kind.as_str())
+            {
+                return Err(Failure::local(
+                    "invalid_request",
+                    "command.kind must match the Browser command verb.",
+                ));
+            }
             Ok(bytes)
         })
         .transpose()?;
@@ -202,6 +224,7 @@ async fn request(options: options::Options) -> Result<Value> {
         )
     })?;
     let mutation = options.method != Method::GET;
+    let keyed = options.key.is_some();
     let mut request = client.request(options.method, url).bearer_auth(token);
     if let Some(key) = options.key {
         request = request.header("idempotency-key", key);
@@ -216,26 +239,32 @@ async fn request(options: options::Options) -> Result<Value> {
             "transport_error",
             "No verified response was received; the client did not retry.",
         )
-        .incomplete(mutation)
+        .incomplete(mutation, keyed)
     })?;
-    response_value(response, options.output).await.map_err(|e| {
-        // A gateway/server error (or redirect) is not proof that a write never
-        // committed. Preserve the server's report and the original retry key.
-        let uncertain_http = e.report["http_status"]
-            .as_u64()
-            .is_some_and(|status| status >= 500 || status == 408 || (300..400).contains(&status));
-        if e.exit == 2 || uncertain_http {
-            e.incomplete(mutation)
-        } else {
-            e
-        }
-    })
+    response_value(response, options.output, options.screenshot_id)
+        .await
+        .map_err(|e| {
+            // A gateway/server error (or redirect) is not proof that a write never
+            // committed. Preserve the server's report and the original retry key.
+            let uncertain_http = e.report["http_status"].as_u64().is_some_and(|status| {
+                status >= 500 || status == 408 || (300..400).contains(&status)
+            });
+            if e.exit == 2 || uncertain_http {
+                e.incomplete(mutation, keyed)
+            } else {
+                e
+            }
+        })
 }
 
-async fn response_value(mut response: reqwest::Response, output: Option<String>) -> Result<Value> {
+async fn response_value(
+    mut response: reqwest::Response,
+    output: Option<String>,
+    screenshot_id: Option<String>,
+) -> Result<Value> {
     let status = response.status();
     let headers = response.headers().clone();
-    let limit = if status.is_success() && output.is_some() {
+    let limit = if status.is_success() && output.is_some() && screenshot_id.is_none() {
         output::MAX_BYTES
     } else {
         MAX_RESPONSE
@@ -268,14 +297,16 @@ async fn response_value(mut response: reqwest::Response, output: Option<String>)
         report["http_status"] = json!(status.as_u16());
         return Err(Failure { exit: 1, report });
     }
-    if let Some(path) = output {
+    if let Some(path) = &output
+        && screenshot_id.is_none()
+    {
         if status != reqwest::StatusCode::OK {
             return Err(Failure::local(
                 "invalid_output",
                 "Expected a complete output download.",
             ));
         }
-        return output::save(&path, &headers, &bytes);
+        return output::save(path, &headers, &bytes);
     }
     if !headers
         .get("content-type")
@@ -293,6 +324,16 @@ async fn response_value(mut response: reqwest::Response, output: Option<String>)
             "Expected a JSON service response.",
         ));
     }
-    serde_json::from_slice(&bytes)
-        .map_err(|_| Failure::local("invalid_response", "Expected a JSON service response."))
+    let value = serde_json::from_slice(&bytes)
+        .map_err(|_| Failure::local("invalid_response", "Expected a JSON service response."))?;
+    if let Some(id) = screenshot_id {
+        if status != reqwest::StatusCode::OK {
+            return Err(Failure::local(
+                "invalid_output",
+                "Expected a complete observation response.",
+            ));
+        }
+        return screenshot::save(output.as_deref().expect("validated output"), &id, value);
+    }
+    Ok(value)
 }
