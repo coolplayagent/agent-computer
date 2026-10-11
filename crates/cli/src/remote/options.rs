@@ -11,6 +11,8 @@ pub(super) struct Options {
     pub input: Option<String>,
     pub key: Option<String>,
     pub output: Option<String>,
+    pub browser_kind: Option<String>,
+    pub screenshot_id: Option<String>,
 }
 
 pub(super) fn parse(args: &[&str]) -> Result<Options> {
@@ -72,6 +74,25 @@ pub(super) fn parse(args: &[&str]) -> Result<Options> {
             "renew" | "release" => (Method::POST, route("leases", id, action)?),
             _ => return Err(usage()),
         },
+        ["app", "start", id] => (Method::POST, route("computers", id, "apps")?),
+        ["app", "show", id] => (Method::GET, route("app-instances", id, "")?),
+        ["app", "cancel", id] => (Method::POST, route("app-instances", id, "cancel")?),
+        ["browser", "control", action, id] => match *action {
+            "show" => (Method::GET, route("app-instances", id, "browser/control")?),
+            "acquire" => (Method::POST, route("app-instances", id, "browser/control")?),
+            "release" => (
+                Method::POST,
+                route("app-instances", id, "browser/control/release")?,
+            ),
+            _ => return Err(usage()),
+        },
+        ["browser", "pages" | "observe" | "act", id] => (
+            Method::POST,
+            route("app-instances", id, "browser/commands")?,
+        ),
+        ["browser", "status" | "screenshot", id] => {
+            (Method::GET, route("browser-commands", id, "")?)
+        }
         ["exec", id] => (Method::POST, route("computers", id, "executions")?),
         ["status", id] => (Method::GET, route("executions", id, "")?),
         ["cancel", id] => (Method::POST, route("executions", id, "cancel")?),
@@ -89,7 +110,16 @@ pub(super) fn parse(args: &[&str]) -> Result<Options> {
         }
         _ => return Err(usage()),
     };
-    if words[0] != "logs" && (flags.contains_key("--stream") || flags.contains_key("--output")) {
+    let screenshot_id = match words.as_slice() {
+        ["browser", "screenshot", id] => Some(id.to_string()),
+        _ => None,
+    };
+    if screenshot_id.is_some() && !flags.contains_key("--output") {
+        return Err(usage());
+    }
+    if (words[0] != "logs" && flags.contains_key("--stream"))
+        || (words[0] != "logs" && screenshot_id.is_none() && flags.contains_key("--output"))
+    {
         return Err(usage());
     }
     if flags.get("--output") == Some(&"-") {
@@ -97,7 +127,12 @@ pub(super) fn parse(args: &[&str]) -> Result<Options> {
     }
     let input = flags.get("--request").map(|v| v.to_string());
     let key = flags.get("--idempotency-key").map(|v| v.to_string());
-    if method == Method::POST {
+    let release = matches!(words.as_slice(), ["browser", "control", "release", _]);
+    if release {
+        if input.is_none() || key.is_some() {
+            return Err(usage());
+        }
+    } else if method == Method::POST {
         if input.is_none()
             || key
                 .as_deref()
@@ -114,6 +149,11 @@ pub(super) fn parse(args: &[&str]) -> Result<Options> {
         .ok_or_else(|| Failure::local("configuration_required", "Supply an endpoint and token file using options or AGENT_COMPUTER_ENDPOINT and AGENT_COMPUTER_TOKEN_FILE."))
     };
     Ok(Options {
+        browser_kind: match words.as_slice() {
+            ["browser", kind @ ("pages" | "observe" | "act"), _] => Some(kind.to_string()),
+            _ => None,
+        },
+        screenshot_id,
         method,
         path,
         input,

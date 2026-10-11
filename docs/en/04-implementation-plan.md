@@ -47,3 +47,5 @@ The authenticated [execution CLI](52-authenticated-execution-cli.md) supports th
 [Browser worker bridge](55-browser-worker-bridge.md) provides the private process transport; persistent controller and node integration follow in increments 56–58.
 
 [58. Browser control, observations and command queue](58-browser-control.md) adds durable actions, a single control epoch and private drain barriers. The original 30-second slice and profile limits remain.
+
+[59. Authenticated App and Browser CLI](59-browser-cli.md) adds explicit App/control/command requests and verified screenshot export; full runtime certification and App listing remain pending.

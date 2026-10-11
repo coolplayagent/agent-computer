@@ -47,3 +47,5 @@
 [Browser worker 桥接](55-browser-worker-bridge.md)现提供私有进程通信入口，持久控制器和节点接入见 56–58 增量。
 
 [58. Browser 控制、观察与动作队列](58-browser-control.md)现已接入持久动作日志、单控制代次与私有排空屏障；30 秒原窗口和 profile 限制保持。
+
+[59. App 与 Browser 鉴权 CLI](59-browser-cli.md)补齐显式 App、控制和动作请求及校验截图导出；完整运行时验收与 App 列表仍待完成。

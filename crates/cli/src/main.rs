@@ -22,18 +22,18 @@ fn main() -> ExitCode {
         }
         ["capabilities", "--json"] => {
             println!(
-                "{{\"api_version\":\"{API_VERSION}\",\"stage\":\"development\",\"capabilities\":{{\"definitions.validate\":\"static\",\"definitions.schema\":\"supported\",\"definitions.plan\":\"unsupported\",\"definitions.apply\":\"unsupported\",\"computer\":\"unsupported\",\"browser\":\"unsupported\",\"execution\":\"unsupported\",\"client.execution\":\"authenticated-http\",\"artifacts\":\"unsupported\",\"presentation\":\"unsupported\",\"deployment\":\"unsupported\",\"mcp\":\"unsupported\",\"evaluation\":\"unsupported\"}}}}"
+                "{{\"api_version\":\"{API_VERSION}\",\"stage\":\"development\",\"capabilities\":{{\"definitions.validate\":\"static\",\"definitions.schema\":\"supported\",\"definitions.plan\":\"unsupported\",\"definitions.apply\":\"unsupported\",\"computer\":\"unsupported\",\"browser\":\"unsupported\",\"execution\":\"unsupported\",\"client.execution\":\"authenticated-http\",\"client.apps\":\"authenticated-http\",\"client.browser\":\"authenticated-http\",\"artifacts\":\"unsupported\",\"presentation\":\"unsupported\",\"deployment\":\"unsupported\",\"mcp\":\"unsupported\",\"evaluation\":\"unsupported\"}}}}"
             );
         }
         ["capabilities"] => {
             println!(
-                "Static ComputerSet validation, schema export and an authenticated HTTP execution client are available. Remote service capabilities are deployment-dependent; use doctor. Full Computer/browser runtime support remains incomplete."
+                "Static ComputerSet validation, schema export and authenticated HTTP execution, App and Browser clients are available. Remote service capabilities are deployment-dependent; use doctor. Full Computer/browser runtime support remains incomplete."
             );
         }
         ["validate", rest @ ..] => return ExitCode::from(validate::run(rest)),
         [
             "computer" | "connect" | "disconnect" | "connection" | "lease" | "exec" | "status"
-            | "logs" | "cancel" | "doctor",
+            | "logs" | "cancel" | "doctor" | "app" | "browser",
             ..,
         ] => return ExitCode::from(remote::run(&words)),
         ["schema", "computer-set"] | ["schema", "computer-set", "--json"] => {

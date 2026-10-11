@@ -10,6 +10,7 @@ name = "agent-computer"
 path = "src/main.rs"
 
 [dependencies]
+base64 = "0.22.1"
 agent-computer-core = { path = "../core" }
 agent-computer-definitions = { path = "../definitions" }
 serde_json.workspace = true
