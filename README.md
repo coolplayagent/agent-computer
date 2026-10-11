@@ -56,4 +56,4 @@ relay-teams/Harness 负责团队协作与模型执行，workflow 负责持久业
 
 导航地图由 relay-knowledge CLI 管理。Qualitygate 初始化策略当前只检查行尾；文档链接、示例语法与需求覆盖需另行验证，运行能力必须通过验收设计中的真实环境测试。
 
-[内部 Browser Driver](docs/zh-CN/53-browser-driver.md) 已提供 TypeScript/Playwright 多页、观察和动作组件；[App 持久化准入](docs/zh-CN/54-app-admission.md)补齐版本、主体和预算槽位绑定；[Browser worker 桥接](docs/zh-CN/55-browser-worker-bridge.md)提供私有进程通信；[Browser 运行时](docs/zh-CN/56-browser-runtime.md)提供独立 Pod、Rust 协议与节点进程保护；[启动控制器](docs/zh-CN/57-browser-controller.md)接入一次性派发、数据库启动授权与停止记录；公开 Browser 能力仍等待持久 GUI 控制授权和 profile 检查点。
+[内部 Browser Driver](docs/zh-CN/53-browser-driver.md) 已提供 TypeScript/Playwright 多页、观察和动作组件；[App 持久化准入](docs/zh-CN/54-app-admission.md)补齐版本、主体和预算槽位绑定；[Browser worker 桥接](docs/zh-CN/55-browser-worker-bridge.md)提供私有进程通信；[Browser 运行时](docs/zh-CN/56-browser-runtime.md)提供独立 Pod、Rust 协议与节点进程保护；[启动控制器](docs/zh-CN/57-browser-controller.md)接入一次性派发、数据库启动授权与停止记录；[GUI 控制队列](docs/zh-CN/58-browser-control.md)接入鉴权观察、动作回执与排空交接；公开 Browser 能力仍等待受控出口、profile 检查点和完整验收。

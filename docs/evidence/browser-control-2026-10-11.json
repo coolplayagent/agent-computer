@@ -1,0 +1,595 @@
+{
+  "schema_version": 1,
+  "component": "browser-control-and-command-queue",
+  "status": "component_contracts_passed",
+  "recorded_at": "2026-10-11T00:44:44.385057+00:00",
+  "base_commit": "b78101aaffab94977cd02aa9680a3feb2582ef4c",
+  "source_manifest": {
+    "sha256": "c88cb6e9c08b6774b1c0c9a77ce4c22d561dd31f4207e8a23645e644a8f05819",
+    "file_count": 419,
+    "algorithm": "SHA256 of UTF-8 JSON path-to-SHA256 map, sort_keys=true, separators=(comma,colon), no trailing newline. Paths: all versioned crates/** and packages/browser-driver/** files plus Cargo.toml, Cargo.lock, MODULE.bazel, schemas/openapi-v1alpha1.json.",
+    "changed_files": {
+      "crates/browser/src/contracts.rs": "2c0f5ae6eb33a12dbf193a0584520df40b81524a1d5ba8ae0fce66af399e6ed3",
+      "crates/browser/src/session.rs": "fface3f5dd51afa23eeab2ca8eeb1e418b59f6cba2d2386019bb8e7dbd809a0e",
+      "crates/browser/src/tests.rs": "c578e9e27a333b66247bca72473ce2eecf147c31be0f2830bcc11113015a5a23",
+      "crates/server/BUILD.bazel": "01c88e11df603b60f96b83f9833a549c80b55a7c9060d1ca913c2daeaa11cbc4",
+      "crates/server/src/browser.rs": "17720e8d950b2c7cf3afac71c401909717096379c8ecdbc1cd6f789d4ff85608",
+      "crates/server/src/http.rs": "14fb2493a895a3253c746e8b1433e254f1cf2c741e436d2df5297267e3d967e8",
+      "crates/server/src/lib.rs": "b84cef399ee7b19d9e87b67bf6967c454585614708802ad9cb677cfc0e3d7e97",
+      "crates/server/tests/cases/apps.rs": "57cdde006986431c95c4f313e1d98a896134f859a86f4fd04d98e9c4fa04294d",
+      "crates/store/migrations/0033_browser_control.sql": "617d9edf2d1c958cdfbe026932566aacd9000a3bef6e6819310496bc0ce41f83",
+      "crates/store/src/migrations.rs": "55edfe86a35aded9862fe21a36ae09d9549e3214b7c066854724bdf6e59ce604",
+      "crates/store/src/runtime/apps/browser.rs": "2fcd18ad2eb035a564b84ecd10967463a182287217897dfd0424673d042f170d",
+      "crates/store/src/runtime/apps/browser/control/api.rs": "090c708e1be0f06f4489544c658cec0321a6663577158a0dbd7db1088a517501",
+      "crates/store/src/runtime/apps/browser/control/checks.rs": "23043bdaefc8aef547e25962c4df959e187cd87bbba79b0141e569f329dc21e1",
+      "crates/store/src/runtime/apps/browser/control/mod.rs": "8b187ee75e5dd1c4e6727fc6607be4b7e1795dd15fd4b3f565d4e53ce1b9336d",
+      "crates/store/src/runtime/apps/browser/control/types.rs": "1676758ad883f10bdbc36a1ca8529135e46c46895c5e6d21b197968b7bbd9972",
+      "crates/store/src/runtime/apps/browser/control/worker.rs": "751e85e77d53fbab92a4a6eef5641e9fffb99f7b7ae1e6e45aa0ef84241e563b",
+      "crates/store/src/runtime/apps/mod.rs": "e205814aaa91ef6e033957551cf78cacc1dfd2d493a7cc586578212d6da67d65",
+      "crates/store/tests/contracts/plans/apps.rs": "67445ce541ada3972914160d00f1eb60498ad7ad3988f5235ebcfbfb9bae9fb2",
+      "crates/store/tests/contracts/plans/apps/browser.rs": "a16806974c0f862611e64fd9c9f8249e7fb62b1c6bbc5bad105521824cd68a75",
+      "crates/store/tests/contracts/plans/apps/control.rs": "8c3b01430507e4dca740483a6b1536ab2d21176725aeb60ebe8bce3242c200bf",
+      "crates/store/tests/contracts/plans/apps/live_control.rs": "ba8b6b7d650b0864be727f7f277a052d706e7f075609680fe1f30efa9f1f6eb6",
+      "crates/store/tests/support/checkpoint_upgrade.rs": "a1cab875bc98ef98bed2190a560aed9a890d37be383b4db1ab2e53ae0bb992e4",
+      "crates/worker/src/browser.rs": "ae8dabff5969007982edfb2bce9dde1f09b23451ff3a43526b71d7689affb583",
+      "packages/browser-driver/src/bridge-protocol.ts": "31df82a5f4ab7eba38d3d04ec73e892c25e355f44f99e505392173c9563c793a",
+      "packages/browser-driver/src/bridge.ts": "2664d44a3103db33b693e1c8eb16796a2081b23d229b480396c58edb28a73358",
+      "packages/browser-driver/src/driver.ts": "8cb6c61dd4e206b3c3f6c7751a573074890812dae8985be1df2a98da87711c45",
+      "packages/browser-driver/tests/bridge.test.ts": "81a9b7b45f960f105dec974aff82eb34e512926defd98b9eee2b87a0afce9a9f",
+      "packages/browser-driver/tests/browser.test.ts": "b5c03ad00902d8fd7de383ee7b034bd5026f503243fd1bacd4c7eaafc57c75d6",
+      "schemas/openapi-v1alpha1.json": "c058deee8797dae34a5219e3bb2b0fabfa3e47ed4a186d56e6bd1a2fe678e2e9"
+    }
+  },
+  "tests": {
+    "bazel_targets": [
+      {
+        "target": "crates/browser/browser_contracts_test",
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "0f52db2488ba8f0c408abd305edc0eda4bb0749f7b9492d2337829d66bb92096"
+      },
+      {
+        "target": "crates/cli/cli_contracts_test",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "3d4850b92d3069a8ec5b4be278ebaf4bdc73560e8f010359680b8273c6db171a"
+      },
+      {
+        "target": "crates/cli/remote_contracts_test",
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "b788972eeb845d217a58fceaf89264841a689afc98cd29a69dc782b51ef80503"
+      },
+      {
+        "target": "crates/cli/remote_service_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "2bb8562d19758e5f56769a529673497469814297c856a0302abb33ea52760065"
+      },
+      {
+        "target": "crates/core/core_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "46ee77c20f534dd5553533dfc8cad2f94fd9ba3e22c506879358c5afbec5dc86"
+      },
+      {
+        "target": "crates/csi/csi_contracts_test",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "fba239b1728eee4fc1ca0b0cb86e9e0a2b5bf6b38a6623bf5763b9f63a73f8ea"
+      },
+      {
+        "target": "crates/definitions/definitions_contracts_test",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "9d61cbc3c701ba9fd14ac580f40671f8a08b3b2491611142e058b8ff29da5f76"
+      },
+      {
+        "target": "crates/fence/fence_contracts_test",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "c278d7a6f52048f49e2d52ca6e8a5f725d2d7291d984f4e0718dfc1616fa4471"
+      },
+      {
+        "target": "crates/kubernetes/kubernetes_contracts_test",
+        "passed": 46,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "b02fc16d3f94fb29ccabaf5e46ef06a540d3c5e09f82994d6cf44105f7f1001f"
+      },
+      {
+        "target": "crates/node/node_contracts_test",
+        "passed": 17,
+        "failed": 0,
+        "ignored": 3,
+        "language": "rust",
+        "log_sha256": "e453189c15cf7a486cda87c5acb98502d2940dc3b1268348d6b31040f51182aa"
+      },
+      {
+        "target": "crates/objects/objects_contracts_test",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "14804c9ac2eab136d6f517b9656e1837aaab1fa2e7256124ab160308d45a9dea"
+      },
+      {
+        "target": "crates/sandbox/sandbox_contracts_test",
+        "passed": 27,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "ec2028d44371ed1abb468e789dc69bf122a2125052c13634010eec8bceb1a8f3"
+      },
+      {
+        "target": "crates/server/server_contracts_test",
+        "passed": 34,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "a3279e3969b1740e59cb54d6236ed734901fdb0a437ad43376d363d2a79f2517"
+      },
+      {
+        "target": "crates/server/server_unit_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "369d97c3404152250321d4e4c777c0cb85966153d0c5559066b8206f592a8812"
+      },
+      {
+        "target": "crates/storage/storage_contracts_test",
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "15319ad622ef499104451d72268b32fba51564f682dc5db849d47eab8f884d60"
+      },
+      {
+        "target": "crates/store/postgres_contracts_test",
+        "passed": 253,
+        "failed": 0,
+        "ignored": 2,
+        "language": "rust",
+        "log_sha256": "5b01371a716bdf293653f9a4da90954158337d0981b237f9ba768d90a0ac0003"
+      },
+      {
+        "target": "crates/watchdog/watchdog_contracts_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 1,
+        "language": "rust",
+        "log_sha256": "189e3e9e6a0c3ad629810327f6c5bcf7c2cbf6b25ff0003ea2defefe0d49862f"
+      },
+      {
+        "target": "crates/worker/worker_test",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "language": "rust",
+        "log_sha256": "11af2472242161964adac27a0a32c7efe0d06983ef4257639175add04b152b58"
+      },
+      {
+        "target": "packages/browser-driver/bridge_test",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "d7352187a5feae0211855625bed9a97f594a57b352c27a3e7759b9d4edcda11e"
+      },
+      {
+        "target": "packages/browser-driver/unit_test",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "language": "typescript",
+        "log_sha256": "757816d34831157182c5455e44153bc5e025c19b229537c200570a20e240fb3b"
+      }
+    ],
+    "rust_passed": 531,
+    "typescript_unit_passed": 19,
+    "default_ignored": 6,
+    "full_bazel_log_sha256": "6dcc82b45c11ae18e3628d30a0f0fae290af849d6cff2912b2c246952d03b2d9",
+    "clippy_workspace_all_targets_all_features_warnings_denied": "passed",
+    "clippy_log_sha256": "a0303ea4cebf474b65308746f59f7d6c090b25db5565100c64c5d986a524bd14",
+    "fmt": "passed",
+    "actual_browser_control_cases": 3,
+    "actual_chromium_driver_cases": 12,
+    "actual_worker_bridge_cases": 4,
+    "live_log_sha256": "51464b7caf41548fa1d12a2d86a466737c1f1d4fafa0a49b591fea99cc98d7ea",
+    "driver_log_sha256": "efc917affd7a02434a233edad0bcf7a87e51f7ae9bfd99b0a2b52b24bffa675c",
+    "bridge_log_sha256": "6944b29532f4a60c35cfa09a9880f6a73f96fca2417a4aad98fa621432a87f20",
+    "full_contract_database": "PostgreSQL 18",
+    "live_fixture_database": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+  },
+  "runtime_evidence": {
+    "cases": [
+      {
+        "case": "handoff",
+        "gui": {
+          "after_count": 2,
+          "close": {
+            "control_epoch": 2,
+            "created_at_ms": 1791678004358,
+            "expires_at_ms": 1791678028047,
+            "instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+            "request_id": "browser_31292106da1d44082e2d2c0355232fc1",
+            "result": {
+              "receipt": {
+                "action_id": "browser_31292106da1d44082e2d2c0355232fc1",
+                "app_generation": 1,
+                "app_instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+                "control_epoch": 2,
+                "input_digest": "sha256:522e34cd0ea5412632b9e0315a61fc39064f0b3836264ed734cf99ce86116c96",
+                "outcome": "delivered",
+                "page_id": "page_9e59e391ef134a558c04a8445080af38"
+              },
+              "recorded": true
+            },
+            "result_valid_until_ms": null,
+            "state": "Complete"
+          },
+          "create": {
+            "control_epoch": 1,
+            "created_at_ms": 1791678002039,
+            "expires_at_ms": 1791678028047,
+            "instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+            "request_id": "browser_a7603c20e95cfd6a7445c85a74d6a9b6",
+            "result": {
+              "receipt": {
+                "action_id": "browser_a7603c20e95cfd6a7445c85a74d6a9b6",
+                "app_generation": 1,
+                "app_instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+                "control_epoch": 1,
+                "input_digest": "sha256:905a882409dda9d528fdb4a0542ee0686b27634e501e4f87930ba27259c504bc",
+                "outcome": "delivered",
+                "page_id": "page_2d58cd41d1d34a38825869df31141090"
+              },
+              "recorded": true
+            },
+            "result_valid_until_ms": null,
+            "state": "Complete"
+          },
+          "final_count": 1,
+          "new_epoch": 2,
+          "stale": {
+            "control_epoch": 2,
+            "created_at_ms": 1791678003424,
+            "expires_at_ms": 1791678028047,
+            "instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+            "request_id": "browser_032ed5c4c6c0d3998b79b4ca056a8215",
+            "result": {
+              "code": "not_admitted"
+            },
+            "result_valid_until_ms": null,
+            "state": "Rejected"
+          }
+        },
+        "journal": [
+          {
+            "kind": "dispatch",
+            "entry_sha256": "8df2ff8a5061ee40029f38914fa286dc936e37112995d744b21ff562d86fec43"
+          },
+          {
+            "kind": "pod",
+            "entry_sha256": "14c1596f2a876596996bbb29a9bb98aff7b91646e0f1d599ddd6e9090cf33752"
+          },
+          {
+            "kind": "arm",
+            "entry_sha256": "f4f44e78c9582d54d0a3551efc422b5973565fdd2f840d0c02724fdf02514963"
+          },
+          {
+            "kind": "launch",
+            "entry_sha256": "4110c82e2b50e464696444eef44431e5545cb453709952703505602f3c5727f6"
+          },
+          {
+            "kind": "running",
+            "entry_sha256": "0171433831d6501ed6ac5f043cf76d2c3a142eeee206f02574c212c538bcd962"
+          },
+          {
+            "kind": "stop",
+            "entry_sha256": "2e90f9b7f07aa251c04cffaf63e1a57ea2be7201afd8b316bdc332c37e6e5e16"
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 16545
+          },
+          {
+            "original_alive": false,
+            "pid": 16547
+          },
+          {
+            "original_alive": false,
+            "pid": 16761
+          }
+        ],
+        "report": {
+          "api_cleanup_confirmed": false,
+          "drain_recorded": true,
+          "instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+          "interrupted_at": "authority",
+          "launch_observed": true,
+          "pod_uid": "1b671011-07de-43cf-b856-97ee981849b1",
+          "process_stop_recorded": true
+        },
+        "state": {
+          "instance_id": "app_b1e72b2d7cc33d88cc1cf8f7f17e9f49",
+          "computer_id": "res_42acd194230cd03d31fb1410320cb310",
+          "app_generation": 1,
+          "computer_generation": 1,
+          "binding_digest": "sha256:8f0178e6148ef484193069d5ea931dc05d86bd2fe13dda4636f4b7c2a04d9952",
+          "state": "Draining",
+          "ready": false,
+          "checked_at_ms": 1791678005596
+        }
+      },
+      {
+        "case": "completion-loss",
+        "gui": {
+          "begin_count": 1,
+          "complete_count": 0,
+          "replayed": false,
+          "status": {
+            "control_epoch": 1,
+            "created_at_ms": 1791678016034,
+            "expires_at_ms": 1791678042169,
+            "instance_id": "app_2245b9fbbc87ca7798a3b2f49cfdd311",
+            "request_id": "browser_deb174a292e7fa8e3c1bc2953174a90c",
+            "result": null,
+            "result_valid_until_ms": null,
+            "state": "Unknown"
+          }
+        },
+        "journal": [
+          {
+            "kind": "dispatch",
+            "entry_sha256": "671a871a89cd4e45e46398dd7fa309ab44fd68ebd5d7701c929fb3dfa4642515"
+          },
+          {
+            "kind": "pod",
+            "entry_sha256": "aa4e8030916cca9b7abb9b51d25db530934c368b87bb68b194468c32341c784d"
+          },
+          {
+            "kind": "arm",
+            "entry_sha256": "104f907dd7e4a8b6ed611dd7f8ac5d3d11a7c1c509d82cf19f734090fe2e7d73"
+          },
+          {
+            "kind": "launch",
+            "entry_sha256": "68fe04c43c9bd7e39375efbcfc0e614bb40ec33f52544b3bec91bfd9a03ca294"
+          },
+          {
+            "kind": "running",
+            "entry_sha256": "22bfbdcf862d6926d322ab62d84e204ae36045d3a11e55c9e59517f8160085db"
+          },
+          {
+            "kind": "stop",
+            "entry_sha256": "7d2e804689c82627591db166895253ba6b28554331720a0162f5da468b9f3377"
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 17308
+          },
+          {
+            "original_alive": false,
+            "pid": 17310
+          },
+          {
+            "original_alive": false,
+            "pid": 17519
+          }
+        ],
+        "report": {
+          "api_cleanup_confirmed": false,
+          "drain_recorded": false,
+          "instance_id": "app_2245b9fbbc87ca7798a3b2f49cfdd311",
+          "interrupted_at": "authority",
+          "launch_observed": true,
+          "pod_uid": "44230f0f-3728-426a-838f-37134ecc5d34",
+          "process_stop_recorded": true
+        },
+        "state": {
+          "instance_id": "app_2245b9fbbc87ca7798a3b2f49cfdd311",
+          "computer_id": "res_eccd60237bedb9cf862ef7b2296d812a",
+          "app_generation": 1,
+          "computer_generation": 1,
+          "binding_digest": "sha256:92e531dca4ba379e0b0db1bc402ee0bd8057d89c8190343fd612fbaeb1dbb989",
+          "state": "Draining",
+          "ready": false,
+          "checked_at_ms": 1791678025112
+        }
+      },
+      {
+        "case": "controller-kill",
+        "gui": {
+          "controller_killed": true
+        },
+        "journal": [
+          {
+            "kind": "dispatch",
+            "entry_sha256": "0bbb0ce9fd9c3c053994c3ff49ad598dddae40112ef009e3dcb109dceb3185bc"
+          },
+          {
+            "kind": "pod",
+            "entry_sha256": "d25c844121ee0b27186ff2e6c629e339415f45c8239bf6d1846e844754e0e017"
+          },
+          {
+            "kind": "arm",
+            "entry_sha256": "23353783ed54d097e9d45f4cc8e5626a21663541b1b42760c7f2c10fae5fde25"
+          },
+          {
+            "kind": "launch",
+            "entry_sha256": "d32b7092c811aadba22edcca3b9ed83272b56eba7252e26914eec2c77aa80090"
+          },
+          {
+            "kind": "running",
+            "entry_sha256": "873e3f235677cff1aff93a3d43f03c77ba1567aa99d6f089738a4e769b982fc9"
+          }
+        ],
+        "physical_processes": [
+          {
+            "original_alive": false,
+            "pid": 18218
+          },
+          {
+            "original_alive": false,
+            "pid": 18219
+          },
+          {
+            "original_alive": false,
+            "pid": 18433
+          }
+        ],
+        "report": null,
+        "state": {
+          "instance_id": "app_681b8558e3fcc9bbdae4d9d2dde853fd",
+          "computer_id": "res_fca64b94f1f30dc38828f24775b6c68c",
+          "app_generation": 1,
+          "computer_generation": 1,
+          "binding_digest": "sha256:0666bd4e22ee4b1cbc7ccf162816753393b924ab66742103601e70c91d4ba395",
+          "state": "Draining",
+          "ready": false,
+          "checked_at_ms": 1791678062106
+        }
+      }
+    ],
+    "binaries": {
+      "/usr/local/bin/agent-computer-server": "16f6d5c8ab5cb029ed476b933f42fdc8712a58b83aad99995241c23df2699f1d",
+      "/usr/local/bin/agent-computer-watchdog": "c76dfc6eb2ec597181094b93b56e2475860c32555d3f8bb0b4b757d5a9d663ea",
+      "/home/ac-test/postgres_contracts-a7ad06fa24158921": "ca7b6b8174456441ea47c18704226b0ab2d33c48f0f7c0786fad88ca07bb1314",
+      "/usr/local/bin/k3s": "92b94582eb7b34a8cf532e6006842b9ed215a6783cf56a3dd6271fd35243b2c0",
+      "/usr/local/bin/runsc": "210b437a9cfae51e8f8c9074ed19b8b5e59477178e2e391a18117d8d6b924f7a"
+    },
+    "versions": {
+      "kernel": "6.8.0-142-generic",
+      "k3s": "k3s version v1.37.1+k3s1 (356c0254)\ngo version go1.26.8",
+      "runsc": "runsc version release-20261005.0\nspec: 1.2.1",
+      "postgresql": "postgres (PostgreSQL) 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)"
+    },
+    "image": {
+      "image": "registry.invalid/agent-computer/browser-controller@sha256:b2e26ef0f9b12680077030d59dcdc00ad0e6aa4a14152952be98cad07c173a1c",
+      "archive_sha256": "71775e423d89b19ca6fbb313404bc524f77c4f24b1a029a7bc8af9d3785af20a",
+      "containerd_target_digest": "sha256:b2e26ef0f9b12680077030d59dcdc00ad0e6aa4a14152952be98cad07c173a1c",
+      "config_digest": "sha256:dd39a60243ccb5fa6173fa7a5903f4f7be86be6f448add7174a79ff87cb9c17d",
+      "layer_digests": [
+        "sha256:3cef2b938916c00990b11127430cd4e3987d60d8eecc10d6ae87c9b6d3302136"
+      ]
+    },
+    "compiled_driver_sha256": {
+      "authority.js": "439d5d30ce9b3fdceb340d3b70f4cb7a909f32240a358b0f8df300d4733047a9",
+      "bridge-protocol.js": "ff975fea4a331807a9b01a277ef684df97a3d0db73665610006ca987e45da732",
+      "bridge.js": "85b0f5988ec666dcaecb4df5bdb7524cbb72ee86efd5a729a97316bc4145ba08",
+      "contracts.js": "c1d71c8449db4566be6cdd68f6b04d97192aa9ec121c5a5e1598ade26d32fcab",
+      "driver.js": "1ac1722e2f009a316417aea461be452ed9fda21c23e11d49f1587ba8857aa54c",
+      "index.js": "0bddf1f236217446941c64f23d09383ce7bac94fc014bcb10b1cb8e10a9a4ab7",
+      "observation.js": "50855e895d8b0ca68c9f02fe5bd7b5dd4609cd08a35fd8f90346778aece13b82",
+      "validation.js": "7b77cefde2a19a100b07e2d5426957f6a6e30136a607293ac1fd6179d1d2fc00",
+      "worker.js": "ce4fb02455cd17b7682c6110059457b2c854267db6f4240950954bb65d1498da"
+    },
+    "remaining_pods": []
+  },
+  "full_runtime_evidence_sha256": "be5b273dc4a83f0bcf4635bbf19cd1487d03045388de2f86965d39a57e2e4a14",
+  "live_source_manifest_sha256": "a0fa8c4743c769e28c9e6d78bd1af682a193d126bb0ed39f9e8ac0aaa5a439ae",
+  "live_delta_from_final": {
+    "crates/store/src/runtime/apps/browser/control/api.rs": {
+      "live_sha256": "84dfd636b22ce05d9c1071adb3428c3cf1e99090f137723a50549ccc86dd6c19",
+      "final_sha256": "090c708e1be0f06f4489544c658cec0321a6663577158a0dbd7db1088a517501"
+    },
+    "crates/store/tests/contracts/plans/apps/control.rs": {
+      "live_sha256": "40fc70cd05dedc23bc1fb5d6a397a65f22c72714522e9dccb5d3ded5d0a48995",
+      "final_sha256": "8c3b01430507e4dca740483a6b1536ab2d21176725aeb60ebe8bce3242c200bf"
+    }
+  },
+  "live_delta_validation": "After live cases, final source corrects GET for a rejected observation to return its error status instead of requiring a frame deadline. A PostgreSQL regression and the final full Bazel run verify this read-only correction. Runtime dispatch/driver/drain code is unchanged.",
+  "standalone_driver_environment": {
+    "node_version": "v22.22.1",
+    "chromium_version": "Google Chrome for Testing 156.0.8078.4",
+    "chromium_sha256": "377a9fc07b495c3b8d0ab8ec1fdfd153641759f9756fea34d8dfce4de82f5025",
+    "node_sha256": "243fd8938011479f41b3de101842150fa990f33fbbb3f7aabd330857f2d79e1d",
+    "compiled_files_sha256": {
+      "src/authority.js": "439d5d30ce9b3fdceb340d3b70f4cb7a909f32240a358b0f8df300d4733047a9",
+      "src/bridge-protocol.js": "ff975fea4a331807a9b01a277ef684df97a3d0db73665610006ca987e45da732",
+      "src/bridge.js": "85b0f5988ec666dcaecb4df5bdb7524cbb72ee86efd5a729a97316bc4145ba08",
+      "src/contracts.js": "c1d71c8449db4566be6cdd68f6b04d97192aa9ec121c5a5e1598ade26d32fcab",
+      "src/driver.js": "1ac1722e2f009a316417aea461be452ed9fda21c23e11d49f1587ba8857aa54c",
+      "src/index.js": "0bddf1f236217446941c64f23d09383ce7bac94fc014bcb10b1cb8e10a9a4ab7",
+      "src/observation.js": "50855e895d8b0ca68c9f02fe5bd7b5dd4609cd08a35fd8f90346778aece13b82",
+      "src/validation.js": "7b77cefde2a19a100b07e2d5426957f6a6e30136a607293ac1fd6179d1d2fc00",
+      "src/worker.js": "ce4fb02455cd17b7682c6110059457b2c854267db6f4240950954bb65d1498da",
+      "tests/bridge-browser.test.js": "792e21161499a2064b7250ed248625067a648fa39e065ba336b23245c8fe2959",
+      "tests/bridge-peer.js": "e4f993fa111d23e0f8dc1a63913b802f49a31ea2ae18920d0370bdbd790b5f8c",
+      "tests/bridge.test.js": "12ccf4fdcb85ffc5a7e3ed9e830a0e4ccc88c550bd47b86bf271427e454f04a7",
+      "tests/browser.test.js": "8f1f47b2c58e6a2886fb22a3488f76c909c41482e042aaa04508c92c591ed12b",
+      "tests/fixture.js": "791d1fe66b56f3b64d2016df894f0896f59f2e037d6e9dca8da412209b66474d",
+      "tests/unit.test.js": "41be7b44adb54c4344b0dd7a58ce31c5924be53e006e97b754afa575d1fca803"
+    },
+    "userns_restriction_enabled": true,
+    "fixture_apparmor_profile": "abi <abi/4.0>,\ninclude <tunables/global>\nprofile ac-browser-test /home/ac-test/browser-inputs/browsers/chromium-1248/chrome-linux64/chrome flags=(unconfined) {\n  userns,\n}\n",
+    "worker_profile_root_mode": "0o700",
+    "remaining_pods": []
+  },
+  "cleanup": {
+    "owned_vm_stopped": true,
+    "pid": 387424,
+    "process_start_ticks": "16706245",
+    "private_vm_files_removed": [
+      "SHA256SUMS",
+      "disk.qcow2",
+      "gvisor-release.json",
+      "gvisor-x86_64.tar.bz2",
+      "id_ed25519",
+      "id_ed25519.pub",
+      "k3s",
+      "k3s-release.json",
+      "known_hosts",
+      "meta-data",
+      "noble-server-cloudimg-amd64.img",
+      "qemu.log",
+      "seed.iso",
+      "serial.log",
+      "user-data",
+      "vm.json"
+    ],
+    "recorded_at": "2026-10-11T00:25:16.251634+00:00"
+  },
+  "scope": "Real HTTP server, PostgreSQL authorization and immutable GUI journal, serial private worker, K3s/gVisor/Chromium blank-page actions, observations, handoff and original process termination. Separate actual Chromium fixtures cover DOM input and worker protocol.",
+  "corrections": [
+    "Only completed observations require frame validity; rejected observations return their safe failure status under current read authority. Regression verifies status and read revocation.",
+    "Replace second control epoch upsert with an Idle compare-and-swap UPDATE: PostgreSQL BEFORE INSERT trigger runs even on conflict. Regression covers next-epoch acquisition.",
+    "Require current Observe together with Control and make its revocation drain the control lease.",
+    "Stage matching pause 3.10.2 from mirror for disposable K3s.",
+    "Standalone test VM grants userns only to exact Chromium path through AppArmor; global restriction stays enabled and Chromium sandbox stays enabled. Create private /browser-state for worker fixture.",
+    "Relocate completed task image archives off tmpfs after PostgreSQL initdb reached the user quota; all database checks rerun on final code."
+  ],
+  "known_limits": [
+    "PreparedComputer/Volume/Candidate prerequisite uses synthetic database evidence, not Workspace/CSI acceptance.",
+    "Original node slice is at most 30 seconds; no lease renewal, automatic queue adoption or dispatch replay.",
+    "Kubernetes network remains deny-all: integrated case covers blank pages; DOM website tests are separate host fixtures. No controlled egress.",
+    "No ComputerView or WSS held-input/drag. ready remains false; public Browser capability stays unsupported.",
+    "Volatile private profile. Process absence is not a checkpoint or profile reservation release. No result retention/cleanup administration.",
+    "Controller kill includes transport EOF and node expiry, not isolated watchdog proof.",
+    "Completion loss is injected with an 8-second PostgreSQL completion trigger delay and bounded controller database calls; not a full database outage.",
+    "One disposable K3s node; no multi-node certification."
+  ],
+  "qualitygate": "Final unfiltered full delivery check uses existing line-ending policy; functional evidence is recorded separately."
+}

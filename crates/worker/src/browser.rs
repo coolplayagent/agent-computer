@@ -1,12 +1,12 @@
 //! One durable App dispatch with private launch authorization and physical stop.
-//! GUI operations and profile checkpoint/release are deliberately separate APIs.
+//! GUI requests use a serial durable queue; profile checkpoint/release is separate.
 use agent_computer_browser::{Callback, Decision, Operation, Permission, Policy};
 use agent_computer_core::identity::OrganizationId;
 use agent_computer_kubernetes::{Client, DeleteOutcome, PodPhase};
 use agent_computer_node::{BrowserGuard, arm_browser};
 use agent_computer_store::{
     Error, Result, Store,
-    runtime::apps::browser::{BrowserDeployment, BrowserDispatch},
+    runtime::apps::browser::{BrowserDeployment, BrowserDispatch, control::BrowserWork},
 };
 use agent_computer_watchdog::boottime_ms;
 use serde::{Deserialize, Serialize};
@@ -63,6 +63,28 @@ impl Policy for LaunchPolicy<'_> {
             Ok(grant) => Ok(Decision::Grant(grant)),
             Err(_) => Ok(Decision::Deny),
         }
+    }
+}
+struct CommandPolicy<'a> {
+    store: &'a Store,
+    attempt: &'a BrowserDispatch,
+    guard: &'a mut BrowserGuard,
+    work: &'a BrowserWork,
+}
+impl Policy for CommandPolicy<'_> {
+    async fn answer(&mut self, callback: &Callback) -> agent_computer_browser::Result<Decision> {
+        bounded(
+            self.store
+                .browser_callback(self.attempt, self.guard, self.work, callback),
+        )
+        .await
+        .map_err(|_| agent_computer_browser::Error::Denied)
+    }
+}
+struct NoCallbacks;
+impl Policy for NoCallbacks {
+    async fn answer(&mut self, _: &Callback) -> agent_computer_browser::Result<Decision> {
+        Ok(Decision::Deny)
     }
 }
 async fn bounded<T>(future: impl Future<Output = Result<T>>) -> Result<T> {
@@ -176,7 +198,45 @@ pub async fn execute_once(
             if remaining <= 1000 {
                 break;
             }
-            tokio::time::sleep(Duration::from_millis(200)).await;
+            if let Some(drain) = bounded(store.next_browser_drain(&attempt, active)).await? {
+                let response = channel
+                    .session_mut()
+                    .call(
+                        Operation::Drain {
+                            control_epoch: drain.control_epoch(),
+                        },
+                        &mut NoCallbacks,
+                    )
+                    .await
+                    .map_err(|_| Error::RuntimeAccessUnavailable)?;
+                bounded(store.finish_browser_drain(&attempt, active, drain, &response)).await?;
+            }
+            if let Some(work) = bounded(store.next_browser_work(&attempt, active)).await? {
+                let response = channel
+                    .session_mut()
+                    .call(
+                        work.operation(),
+                        &mut CommandPolicy {
+                            store,
+                            attempt: &attempt,
+                            guard: active,
+                            work: &work,
+                        },
+                    )
+                    .await;
+                let safe = bounded(store.finish_browser_work(
+                    &attempt,
+                    active,
+                    work,
+                    response.as_ref().ok(),
+                ))
+                .await?;
+                if !safe || response.is_err() || channel.session_mut().control_blocked() {
+                    return Err(Error::RuntimeAccessUnavailable);
+                }
+            } else {
+                tokio::time::sleep(Duration::from_millis(100)).await;
+            }
         }
         // Keep the attach channel alive through the guarded lifetime. EOF is not
         // physical completion; only stop_browser below can record that proof.

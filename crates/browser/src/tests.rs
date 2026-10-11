@@ -401,3 +401,34 @@ async fn caller_policy_timeout_closes_the_session_without_sending_a_grant() {
     assert!(s.is_closed());
     assert_eq!(output.lock().unwrap().len(), 2);
 }
+
+#[tokio::test]
+async fn drain_barrier_requires_exact_epoch_and_correlated_response() {
+    for wrong in [false, true] {
+        let mut frames = launched();
+        frames.push(result(
+            2,
+            json!({"control_epoch":if wrong{2}else{1},"drained":true,"requires_observation":true}),
+        ));
+        let (wire, _) = scripted_wire(frames);
+        let mut session = Session::connect(wire, binding()).await.unwrap();
+        let mut policy = Controller::default();
+        session.call(Operation::Launch, &mut policy).await.unwrap();
+        let response = session
+            .call(Operation::Drain { control_epoch: 1 }, &mut policy)
+            .await;
+        if wrong {
+            assert!(matches!(response, Err(Error::Protocol)));
+            assert!(session.is_closed());
+        } else {
+            let response = response.unwrap();
+            assert!(response.ok());
+            assert_eq!(response.scope(), &binding().scope);
+            assert_eq!(response.operation(), &Operation::Drain { control_epoch: 1 });
+        }
+        assert_eq!(
+            policy.calls, 1,
+            "barrier must never grant application permissions"
+        );
+    }
+}

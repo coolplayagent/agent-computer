@@ -51,6 +51,19 @@ pub fn router_with_gateways(
         .route("/v1alpha1/computers/{id}/apps", post(crate::apps::admit))
         .route("/v1alpha1/app-instances/{id}", get(crate::apps::get))
         .route(
+            "/v1alpha1/app-instances/{id}/browser/control",
+            get(crate::browser::control).post(crate::browser::acquire),
+        )
+        .route(
+            "/v1alpha1/app-instances/{id}/browser/control/release",
+            post(crate::browser::release),
+        )
+        .route(
+            "/v1alpha1/app-instances/{id}/browser/commands",
+            post(crate::browser::submit),
+        )
+        .route("/v1alpha1/browser-commands/{id}", get(crate::browser::get))
+        .route(
             "/v1alpha1/app-instances/{id}/cancel",
             post(crate::apps::cancel),
         )

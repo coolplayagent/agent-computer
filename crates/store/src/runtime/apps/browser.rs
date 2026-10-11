@@ -1,4 +1,5 @@
 //! Trusted Browser controller API. Persisted records never reissue live permits.
+pub mod control;
 mod plan;
 use super::*;
 use agent_computer_browser::{AuthorizationRequest, Grant, Permission};

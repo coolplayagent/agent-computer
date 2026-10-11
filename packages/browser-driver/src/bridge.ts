@@ -8,7 +8,7 @@ export interface BridgeConfiguration extends BridgeBinding {
   /** Operator-owned private directory. Never read from the wire. */
   readonly profile_root: string;
 }
-type Driver = Pick<BrowserDriver, "scope" | "browser_version" | "state" | "control_blocked" | "pages" | "observe" | "act" | "close">;
+type Driver = Pick<BrowserDriver, "scope" | "browser_version" | "state" | "control_blocked" | "pages" | "observe" | "act" | "drain" | "close">;
 type Launch = (configuration: DriverConfiguration) => Promise<Driver>;
 export type BridgeExit = "closed" | "protocol_error" | "transport_error" | "deadline";
 type CallbackMethod = "authorize" | "begin" | "complete";
@@ -171,6 +171,7 @@ class Session {
             const { screenshot, ...rest } = observation;
             value = { ...rest, screenshot_base64: screenshot.toString("base64") }; break;
           }
+          case "drain": value = await driver.drain(op.control_epoch); break;
           case "act": value = await driver.act(op.actor, op.action_id, op.action); break;
           case "close": await driver.close(); value = { driver_state: driver.state, physical_termination: false }; break;
         }

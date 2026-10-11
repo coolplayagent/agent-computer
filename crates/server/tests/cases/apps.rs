@@ -439,3 +439,88 @@ async fn two_apps_with_distinct_profiles_cannot_spend_one_sandbox_reservation() 
     assert_ne!(next["profile_id"], app["profile_id"]);
     assert_ne!(next["app_id"], app["app_id"]);
 }
+
+#[tokio::test]
+async fn browser_http_rejects_forged_authority_origins_and_missing_scopes() {
+    let (s, token, computer, body) = setup().await;
+    let (_, app) = s
+        .send(req(
+            &token,
+            "POST",
+            &format!("/v1alpha1/computers/{computer}/apps"),
+            Some("app"),
+            body,
+        ))
+        .await;
+    let base = format!(
+        "/v1alpha1/app-instances/{}/browser",
+        app["instance_id"].as_str().unwrap()
+    );
+    let input = json!({"connection_session_id":app["connection_session_id"],"app_generation":1,"control_epoch":0,"command":{"kind":"pages"}});
+    for field in [
+        "principal_id",
+        "credential_id",
+        "organization_id",
+        "dispatch_nonce",
+    ] {
+        let mut forged = input.clone();
+        forged[field] = json!("override");
+        assert_eq!(
+            s.send(req(
+                &token,
+                "POST",
+                &format!("{base}/commands"),
+                Some("forged"),
+                forged
+            ))
+            .await
+            .0,
+            StatusCode::BAD_REQUEST
+        );
+    }
+    assert_eq!(
+        s.send(req(
+            &token,
+            "POST",
+            &format!("{base}/commands"),
+            None,
+            input.clone()
+        ))
+        .await
+        .0,
+        StatusCode::BAD_REQUEST
+    );
+    let read = s.issue("alice", &[ServiceScope::RuntimeRead]).await;
+    assert_eq!(s.send(req(read.expose_token(),"POST",&format!("{base}/control"),Some("scope"),json!({"connection_session_id":app["connection_session_id"],"app_generation":1,"expected_epoch":0,"lifetime_ms":30_000}))).await.0,StatusCode::FORBIDDEN);
+    let mut origin = req(
+        &token,
+        "POST",
+        &format!("{base}/commands"),
+        Some("origin"),
+        input,
+    );
+    origin
+        .headers_mut()
+        .insert("origin", "https://untrusted.invalid".parse().unwrap());
+    assert_eq!(s.send(origin).await.0, StatusCode::FORBIDDEN);
+    let bob = s.issue("bob", &ServiceScope::ALL).await;
+    assert_eq!(
+        s.send(req(
+            bob.expose_token(),
+            "GET",
+            &format!("{base}/control"),
+            None,
+            Value::Null
+        ))
+        .await
+        .0,
+        StatusCode::NOT_FOUND
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM browser_requests")
+            .fetch_one(&s.database.pool)
+            .await
+            .unwrap(),
+        0
+    );
+}
